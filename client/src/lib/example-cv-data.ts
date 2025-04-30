@@ -42,7 +42,6 @@ export const sampleCVData: CVData = {
       id: '1',
       institution: 'University of Dar es Salaam',
       degree: 'Bachelor of Science, Computer Science',
-      location: 'Dar es Salaam',
       startDate: '2014',
       endDate: '2018',
       current: false,
@@ -50,12 +49,12 @@ export const sampleCVData: CVData = {
     }
   ],
   skills: [
-    { id: '1', name: 'JavaScript', level: 'Expert' },
-    { id: '2', name: 'React', level: 'Expert' },
-    { id: '3', name: 'Node.js', level: 'Advanced' },
-    { id: '4', name: 'Python', level: 'Intermediate' },
-    { id: '5', name: 'SQL', level: 'Advanced' },
-    { id: '6', name: 'Git', level: 'Advanced' }
+    { id: '1', name: 'JavaScript' },
+    { id: '2', name: 'React' },
+    { id: '3', name: 'Node.js' },
+    { id: '4', name: 'Python' },
+    { id: '5', name: 'SQL' },
+    { id: '6', name: 'Git' }
   ],
   languages: [
     { id: '1', name: 'English', proficiency: 'Fluent' },

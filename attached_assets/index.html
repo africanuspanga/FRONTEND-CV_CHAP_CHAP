@@ -3,118 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Template - Orange Sidebar</title>
+    <title>CV Template - Modern Split</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     </head>
 <body>
     <div class="cv-container">
 
-        <aside class="sidebar">
-            <header class="sidebar-header">
-                <h1 id="fullName">
-                    <span class="first-name">LAUREN</span>
-                    <span class="last-name">CHEN</span>
-                 </h1>
-                <h2 id="profession">DIGITAL MARKETING SPECIALIST</h2>
-            </header>
+        <header class="cv-header">
+            <h1 id="fullName">NELLY SMITH</h1>
+            <h2 id="profession">Graphic Designer</h2>
+        </header>
 
-            <section class="contact-info">
-                 <h3>CONTACT</h3>
-                <p><span class="icon">[P]</span><span id="contactPhone">(123) 456-7890</span></p>
-                <p><span class="icon">[E]</span><span id="contactEmail">lauren.chen@mail.com</span></p>
-                <p><span class="icon">[A]</span>47 W 13th St,<br>New York, NY 10011</p> <p><span class="icon">[W]</span><a href="#">lauren.chen.com</a></p> <p><span class="icon">[L]</span><a id="contactLinkedin" href="#">linkedin.com/in/lauren.chen</a></p>
-                <p><span class="icon">[T]</span><a href="#">twitter.com/lauren-chen</a></p> </section>
+        <div class="main-content-area">
 
-            <section class="summary">
-                <h3>SUMMARY</h3>
-                 <p id="careerObjective">Digital Marketing Specialist with 6+ years of experience in online marketing, branding, and business strategy across music, media, and entertainment industries. Skilled in evaluating financial needs and implementing multi-pronged digital strategies that increase revenue and drive brand growth.</p>
-            </section>
+            <div class="left-column">
+                <section class="profile">
+                    <h3>PROFILE</h3>
+                    <p id="careerObjective">Graphic Design Specialist with 5+ years of experience in the management of the complete design process, from conceptualization to delivery. Expert at interdepartmental coordination and communication. Skilled with Adobe Creative Suite (Illustrator, Photoshop, InDesign) as well as Figma and Sketch. Able to stretch the boundaries of web design and digital storytelling to help my clients' brands stand out.</p>
+                </section>
 
-             <section id="languagesSection" style="display:none;">
-                <h3>Languages</h3>
-                <ul id="languagesList"></ul>
-            </section>
-             <section id="referencesSection" style="display:none;">
-                <h3>References</h3>
-                <ul id="referencesList"></ul>
-             </section>
-             <section id="hobbiesSection" style="display:none;">
-                 <h3>Hobbies & Interests</h3>
-                 <p id="hobbiesText"></p>
-             </section>
-             <section id="portfolioSection" style="display:none;">
-                 <h3>Portfolio</h3>
-                 <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
-             </section>
+                <section class="contact-info">
+                    <div class="contact-item">
+                        <span class="icon-placeholder">[P]</span> <span id="contactPhone">(123) 456-7891</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="icon-placeholder">[E]</span> <span id="contactEmail">nellysmith.email.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="icon-placeholder">[A]</span> <span>47 W 13th St, New York, NY 10011</span>
+                    </div>
+                     <div class="contact-item">
+                        <span class="icon-placeholder">[L]</span> <a id="contactLinkedin" href="#">linkedin.com/in/nellysmith</a>
+                    </div>
+                     <div class="contact-item">
+                        <span class="icon-placeholder">[T]</span> <a href="#">twitter.com/nellysmith49</a> </div>
+                     <div class="contact-item">
+                        <span class="icon-placeholder">[W]</span> <span>Available to work Monday to Friday</span> </div>
+                </section>
 
-        </aside> <main class="main-content">
-            <section class="experience">
-                <h3>PROFESSIONAL EXPERIENCE</h3>
-                <ul id="experienceList">
-                    <li>
-                        <div class="entry-header">
-                            <span class="date">January 20XX - Present</span>
-                            <strong>Digital Marketing Specialist</strong>
-                            <span>Triangle Music Group, New York, NY</span>
-                        </div>
-                        <ul class="details-list">
-                            <li>Manage digital sales and streaming accounts to improve brand positioning and growth</li>
-                            <li>Source and develop new strategic partnerships, social engagements, and advertising opportunities that generate new revenue streams</li>
-                            <li>Collaborate with internal departments to execute national advertising campaigns, plan global digital distribution, and re-deploy a 1M+ consumer sales and marketing database</li>
-                        </ul>
-                    </li>
-                     <li>
-                        <div class="entry-header">
-                            <span class="date">January 20XX - January 20XX</span>
-                            <strong>Digital Marketing Associate</strong>
-                            <span>Momo Software, New York, NY</span>
-                        </div>
-                        <ul class="details-list">
-                            <li>Worked with management to develop and apply digital marketing plans with a focus on driving acquisition and conversion</li>
-                            <li>Devised and implemented robust digital acquisition plans, ensuring precision in financial reporting, budgets, and forecasts</li>
-                            <li>Increased conversions by 15% from paid sources (PPC, Grant, Display, and VOD)</li>
-                        </ul>
-                    </li>
-                     <li>
-                        <div class="entry-header">
-                            <span class="date">January 20XX - January 20XX</span>
-                            <strong>Marketing Intern</strong>
-                            <span>Kingston Digital, New York, NY</span>
-                        </div>
-                        <ul class="details-list">
-                             <li>Helped research, write, and edit blog posts for Kingston's website</li>
-                             <li>Determined relevant keywords and entities for pages using Semrush, Ahrefs, and Page Optimizer Pro</li>
-                             <li>Gathered and analyzed data from social media PPE campaigns</li>
-                        </ul>
-                    </li>
-                </ul>
-            </section>
-
-            <section class="education">
-                <h3>EDUCATION</h3>
-                <ul id="educationList">
-                    <li>
-                        <div class="entry-header">
-                            <span class="date">May 20XX</span>
-                            <strong>Bachelor of Arts, Communications</strong>
-                            <span>Resume Genius University, New York, NY</span>
-                        </div>
+                <section class="experience">
+                    <h3>PROFESSIONAL EXPERIENCE</h3>
+                    <ul id="experienceList">
+                        <li>
+                            <div class="job-entry">
+                                <div class="job-details">
+                                    <strong>Senior Graphic Design Specialist</strong>
+                                    <span>Experion</span>
+                                    <ul>
+                                        <li>Lead in the design, development, and implementation of the graphic, layout, and production communication materials while helping clients cut their costs by an average of 12%</li>
+                                        <li>Delegate tasks to the 7 members of the design team and provide counsel on all aspects of the project</li>
+                                        <li>Supervise the assessment of all graphic materials in order to ensure quality and accuracy of the design</li>
+                                        <li>Oversee the efficient use of production project budgets ranging from $2,000 - $25,000</li>
+                                    </ul>
+                                </div>
+                                <div class="job-date">
+                                    <span>Jan 20XX - Present</span>
+                                    <span>New York, NY</span>
+                                </div>
+                            </div>
                         </li>
-                </ul>
-            </section>
-
-            <section class="skills">
-                <h3>SKILLS</h3>
-                 <ul id="skillsList" class="skills-columns">
-                    <li>Digital Data Analytics</li>
-                    <li>Digital Marketing</li>
-                    <li>Adobe Photoshop</li>
-                    <li>Adobe Illustrator</li>
+                        <li>
+                             <div class="job-entry">
+                                <div class="job-details">
+                                    <strong>Graphic Design Specialist</strong>
+                                    <span>Stepping Stone Advertising</span>
+                                    <ul>
+                                        <li>Developed numerous marketing programs (logos, brochures, newsletters, infographics, presentations, and advertisements) and guaranteed that they exceeded the expectations of our clients</li>
+                                        <li>Managed up to 5 projects or tasks at a given time while under pressure to meet weekly deadlines</li>
+                                        <li>Recommended and consulted with clients on the most appropriate graphic design options based on their overall marketing goals</li>
+                                    </ul>
+                                </div>
+                                <div class="job-date">
+                                    <span>Jun 20XX - Nov 20XX</span>
+                                    <span>New York, NY</span>
+                                </div>
+                            </div>
+                        </li>
                     </ul>
-            </section>
+                </section>
 
-        </main> </div> </body>
+                <section class="education">
+                    <h3>EDUCATION</h3>
+                    <ul id="educationList">
+                         <li>
+                            <div class="education-entry">
+                                <div class="education-details">
+                                    <strong>Master Of Fine Arts In Graphic Design</strong>
+                                    <span>School of Visual Arts</span>
+                                    <span>GPA: 3.9 / 4.0</span>
+                                    <p>Relevant Coursework:</p>
+                                    <ul> <li>Advanced Typography and Branding</li>
+                                        <li>Interaction Design and Prototyping</li>
+                                        <li>Digital Product Design</li>
+                                        <li>Design Research Methods</li>
+                                        <li>Professional Practice in Design</li>
+                                    </ul>
+                                </div>
+                                <div class="education-date">
+                                    <span>May 20XX</span>
+                                    <span>New York, NY</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div> <div class="right-column">
+                <section class="key-skills">
+                    <h3>KEY SKILLS</h3>
+                    <ul id="skillsList">
+                        <li>
+                            <span class="skill-name">InDesign</span>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-fill" style="width: 90%;"></div>
+                            </div>
+                            <span class="skill-percent">90%</span>
+                        </li>
+                        <li>
+                            <span class="skill-name">Illustrator</span>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-fill" style="width: 100%;"></div>
+                            </div>
+                             <span class="skill-percent">100%</span>
+                        </li>
+                        <li>
+                            <span class="skill-name">Photoshop</span>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-fill" style="width: 90%;"></div>
+                            </div>
+                             <span class="skill-percent">90%</span>
+                        </li>
+                         <li>
+                            <span class="skill-name">Figma</span>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-fill" style="width: 80%;"></div>
+                            </div>
+                             <span class="skill-percent">80%</span>
+                        </li>
+                          <li>
+                            <span class="skill-name">Blender</span>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-fill" style="width: 90%;"></div>
+                            </div>
+                             <span class="skill-percent">90%</span>
+                        </li>
+                         <li>
+                            <span class="skill-name">After Effects</span>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar-fill" style="width: 90%;"></div>
+                            </div>
+                             <span class="skill-percent">90%</span>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="additional-skills">
+                    <h3>ADDITIONAL SKILLS</h3>
+                    <ul>
+                        <li>Typography</li>
+                        <li>Layout and Composition</li>
+                        <li>Branding & Identity Design</li>
+                    </ul>
+                </section>
+
+                <section class="languages">
+                    <h3>LANGUAGES</h3>
+                    <ul>
+                        <li>English | Native</li>
+                        <li>Spanish | Professional Proficiency</li>
+                    </ul>
+                </section>
+
+                <section class="awards">
+                    <h3>AWARDS</h3>
+                    <ul>
+                        <li>AIGA 50 Books | 50 Covers Award</li>
+                        <li>Certified User Experience Professional (CUXP)</li>
+                    </ul>
+                </section>
+
+                <section id="referencesSection" style="display:none;">
+                    <h3>References</h3>
+                    <ul id="referencesList">
+                        <li>Available upon request.</li>
+                    </ul>
+                </section>
+
+                <section id="hobbiesSection" style="display:none;">
+                    <h3>Hobbies & Interests</h3>
+                    <p id="hobbiesText">Reading, Hiking, Photography</p> </section>
+
+                <section id="portfolioSection" style="display:none;">
+                    <h3>Portfolio</h3>
+                    <a id="portfolioLink" href="#" target="_blank">View Portfolio</a> </section>
+
+                 <section id="languagesSection" style="display:none;">
+                    <h3>Languages</h3>
+                    <ul id="languagesList">
+                        </ul>
+                </section>
+
+
+            </div> </div> </div> </body>
 </html>

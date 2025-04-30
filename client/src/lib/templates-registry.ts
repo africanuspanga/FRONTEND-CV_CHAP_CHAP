@@ -21,6 +21,16 @@ export const templateRegistry: TemplateDefinition[] = [
     previewImage: '/templates/previews/moonlight-sonata.png'
   },
   {
+    id: 'kaziFasta',
+    name: 'Kazi Fasta',
+    description: 'Clean two-column layout with skill bars and detailed professional experience sections',
+    contentPath: '/templates/kazi-fasta.html',
+    isLocal: true,
+    category: 'Professional',
+    popularity: 5,
+    previewImage: '/templates/previews/kazi-fasta.png'
+  },
+  {
     id: 'tanzanite',
     name: 'Tanzanite',
     description: 'A professional, clean CV template with structured sections and a touch of blue. Perfect for administrative roles and business professionals.',
