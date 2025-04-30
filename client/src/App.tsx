@@ -22,6 +22,7 @@ import SummaryGeneration from "@/pages/SummaryGeneration";
 import SummaryEditor from "@/pages/SummaryEditor";
 import ReferencesForm from "@/pages/ReferencesForm";
 import AdditionalSectionsForm from "@/pages/AdditionalSectionsForm";
+import About from "@/pages/About";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -46,6 +47,7 @@ function Router() {
           <Route path="/cv/:templateId/references" component={ReferencesForm} />
           <Route path="/cv/:templateId/additional-sections" component={AdditionalSectionsForm} />
           <Route path="/create/:step?" component={CreateCV} />
+          <Route path="/about" component={About} />
           <Route component={NotFound} />
         </Switch>
       </div>

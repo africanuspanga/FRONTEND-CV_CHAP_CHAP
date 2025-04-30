@@ -20,6 +20,7 @@ const NavBar: React.FC = () => {
     { path: '/', label: 'Home' },
     { path: '/templates', label: 'Templates' },
     { path: '/create/method', label: 'Create CV' },
+    { path: '/about', label: 'About' },
   ];
 
   const isActive = (path: string) => location === path;
