@@ -71,6 +71,16 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Professional',
     popularity: 5,
     previewImage: templateImages.mjenziWaTaifa
+  },
+  {
+    id: 'streetHustler',
+    name: 'Street Hustler',
+    description: 'Clean professional template with centered header and detailed work experience sections',
+    contentPath: '/templates/street-hustler.html',
+    isLocal: true,
+    category: 'Professional',
+    popularity: 5,
+    previewImage: templateImages.streetHustler
   }
 ];
 

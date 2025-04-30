@@ -3,8 +3,8 @@ body {
     font-family: 'Lato', sans-serif;
     margin: 0;
     padding: 20px;
-    background-color: #f8f8f8; /* Slightly different background */
-    color: #555; /* Default text color */
+    background-color: #f8f8f8; /* Light background */
+    color: #3a3a3a; /* Default text color */
     line-height: 1.6;
     font-size: 10pt; /* Base font size */
     -webkit-font-smoothing: antialiased;
@@ -14,7 +14,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
     font-weight: 700; /* Bold headings */
-    color: #333;
+    color: #1a1a1a; /* Very dark heading color */
 }
 
 ul {
@@ -24,7 +24,7 @@ ul {
 }
 
 a {
-    color: #666; /* Slightly lighter link color */
+    color: #3a3a3a; /* Match text color */
     text-decoration: none;
 }
 
@@ -38,274 +38,205 @@ strong {
 
 /* === CV Container === */
 .cv-container {
-    max-width: 900px;
+    max-width: 850px; /* Adjust width as needed */
     margin: 20px auto;
     background-color: #ffffff;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    /* No internal padding, handled by sections */
+    padding: 40px; /* Padding inside the container */
 }
 
-/* === CV Header (Top Bar) === */
+/* === CV Header (Centered) === */
 .cv-header {
-    text-align: center; /* Center name and title */
-    padding: 20px 30px;
-    background-color: #f4ecd8; /* Beige background color */
-    border-bottom: 1px solid #e0e0e0; /* Optional separator */
+    text-align: center;
+    margin-bottom: 20px; /* Space below header */
 }
 
 .cv-header h1 {
-    font-size: 2.6em;
-    color: #4a4a4a; /* Dark grey name color */
-    margin-bottom: 2px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    line-height: 1.2;
+    font-size: 2.5em;
+    color: #111;
+    margin-bottom: 3px;
+    /* No uppercase transform */
 }
 
 .cv-header h2 {
-    font-size: 1.3em;
-    color: #777; /* Lighter grey title */
+    font-size: 1.1em;
+    color: #555;
     font-weight: 400; /* Regular weight for title */
+    text-transform: uppercase;
+    letter-spacing: 1px;
     margin-bottom: 0;
 }
 
-/* === Top Info Section (3 Columns) === */
-.top-info-section {
-    display: flex;
-    padding: 25px 30px; /* Padding for this section */
-    gap: 30px; /* Space between columns */
-    border-bottom: 1px solid #eee; /* Separator line */
-}
-
-.top-info-section .column {
-    flex: 1; /* Make columns equal width initially */
-}
-/* Adjust flex basis if specific widths are needed */
-.top-info-section .contact-column { flex-basis: 25%; }
-.top-info-section .summary-column { flex-basis: 45%; }
-.top-info-section .skills-column { flex-basis: 30%; }
-
-
-/* === Section Title Styling (Beige Background) === */
-.section-title {
-    background-color: #f4ecd8; /* Beige background */
-    padding: 5px 10px;
-    margin-bottom: 15px;
-    font-size: 0.9em; /* Smaller font size for titles */
-    color: #5c5c5c; /* Text color for titles */
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: inline-block; /* Fit content width */
-    border-radius: 3px; /* Slightly rounded corners */
-}
-
-/* === Contact Info Styling === */
-.contact-info p {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-    font-size: 0.95em;
-    color: #666;
-}
-.contact-info .icon {
-    width: 18px; /* Space for icon */
-    margin-right: 8px;
+/* === Contact Info Grid === */
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Three equal columns */
+    gap: 15px; /* Gap between columns */
     text-align: center;
-    color: #999;
-}
-
-/* === Summary Styling === */
-.summary-column p {
-    font-size: 0.95em;
-    color: #555;
-}
-
-/* === Skills Styling (Line Bar) === */
-.skills-column ul li {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    font-size: 0.95em;
-}
-.skills-column .skill-name {
-    width: 80px; /* Adjust width */
-    flex-shrink: 0;
-    color: #555;
-    padding-right: 10px;
-}
-.skills-column .skill-line-container {
-    flex-grow: 1;
-    height: 4px; /* Thin line height */
-    background-color: #e0e0e0; /* Line background */
-    border-radius: 2px;
-    overflow: hidden;
-    margin: 0 8px;
-}
-.skills-column .skill-line-fill {
-    height: 100%;
-    background-color: #bdaa84; /* Color for the skill fill */
-    border-radius: 2px;
-}
-.skills-column .skill-percent {
-    width: 30px; /* Adjust width */
-    flex-shrink: 0;
-    text-align: right;
-    color: #888;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee; /* Separator line */
     font-size: 0.9em;
-}
-
-/* === Main Grid Area Layout === */
-.main-grid-area {
-    display: flex;
-    padding: 25px 30px; /* Padding for this area */
-    gap: 30px;
-}
-
-.grid-left-column {
-    width: 40%; /* Adjust width */
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* Space between sections */
-}
-
-.grid-right-column {
-    width: 60%; /* Adjust width */
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* Space between sections */
-}
-
-/* === General Section Styling within Grid === */
-.main-grid-area section {
-    /* Sections don't need extra margin due to column gap */
-}
-
-.main-grid-area section ul li {
-    font-size: 0.95em;
-    color: #555;
-    margin-bottom: 6px;
-}
-/* Add bullets to lists like Additional Skills, Languages, etc. */
-.additional-skills ul li::before,
-.languages ul li::before,
-.licenses ul li::before,
-.awards ul li::before {
-     content: '•';
-     color: #bdaa84; /* Match skill bar color */
-     display: inline-block;
-     width: 1em;
-     margin-left: -1em;
-     padding-right: 0.5em;
-}
-.additional-skills ul li,
-.languages ul li,
-.licenses ul li,
-.awards ul li {
-    padding-left: 0.5em;
-}
-/* References styling */
-.references ul li {
-    margin-bottom: 10px;
-    line-height: 1.4;
-}
-.references ul li strong {
     color: #444;
 }
 
+.contact-grid .contact-item span,
+.contact-grid .contact-item a {
+    display: block; /* Stack items within a cell */
+    line-height: 1.4;
+}
+.contact-grid .contact-item a {
+    color: #444; /* Ensure link color matches */
+}
 
-/* === Experience & Education Styling (Right Grid Column) === */
+
+/* === Summary Section === */
+.summary {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 0 10px; /* Slight horizontal padding */
+}
+.summary p {
+    font-size: 0.95em;
+    color: #444;
+    line-height: 1.7;
+}
+
+/* === Section Title Styling === */
+section h3 {
+    font-size: 1.1em;
+    color: #222;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #444; /* Darker border under titles */
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    /* Titles are left-aligned by default */
+}
+
+/* === Experience & Education Section === */
+.experience, .education {
+    margin-bottom: 25px;
+}
 .experience ul, .education ul {
     margin: 0;
 }
-.experience > ul > li, .education > ul > li {
-    margin-bottom: 20px;
+.experience > ul > li, .education > ul > li { /* Space between entries */
+    margin-bottom: 25px;
 }
 .experience > ul > li:last-child, .education > ul > li:last-child {
     margin-bottom: 0;
 }
 
-.job-entry, .education-entry {
+.entry-header {
     display: flex;
     justify-content: space-between;
-    gap: 15px;
-    align-items: flex-start;
+    align-items: flex-start; /* Align items to top */
+    margin-bottom: 8px;
+    flex-wrap: wrap; /* Allow wrapping */
 }
-.job-details, .education-details {
+
+.company-title { /* Changed class name */
     flex-grow: 1;
 }
-.job-date, .education-date {
+.company-title strong { /* Company / Degree */
+    display: block;
+    font-size: 1.05em; /* Slightly smaller */
+    color: #222;
+    margin-bottom: 2px;
+    text-transform: uppercase; /* Uppercase company/degree */
+}
+.company-title span { /* Job Title / University */
+    display: block;
+    font-size: 1em;
+    color: #444;
+    font-style: italic; /* Italicize job title/university */
+}
+/* Specific override for Education university (not italic) */
+.education .company-title span {
+    font-style: normal;
+}
+
+
+.location-date {
     flex-shrink: 0;
     text-align: right;
     font-size: 0.9em;
-    color: #888; /* Lighter date color */
-    white-space: nowrap;
+    color: #555; /* Slightly darker date/location */
+    padding-left: 15px; /* Space from left content */
 }
-.job-date span, .education-date span {
-    display: block;
+.location-date span {
+    display: block; /* Stack location and date */
     line-height: 1.4;
+    font-weight: 600; /* Bolder date/location */
 }
 
-.job-details strong, .education-details strong {
-    display: block;
-    font-size: 1.05em;
-    color: #444; /* Darker title */
-    margin-bottom: 2px;
-}
-.job-details span, .education-details span { /* Company/School */
-    display: block;
-    font-size: 0.95em;
-    color: #777;
-    margin-bottom: 8px;
-}
-.education-details span:last-of-type { /* GPA */
-     margin-bottom: 4px;
-}
-
-/* Responsibility/Coursework lists */
-.job-details ul, .education-details ul {
+/* Details list (responsibilities) */
+.details-list {
     list-style: none;
     padding-left: 0;
-    margin-top: 8px;
+    margin-top: 5px;
 }
-.job-details ul li, .education-details ul li {
+.details-list li {
     font-size: 0.95em;
-    color: #555;
+    color: #444;
     margin-bottom: 5px;
-    padding-left: 15px;
+    padding-left: 18px; /* Indentation for bullet */
     position: relative;
 }
-.job-details ul li::before, .education-details ul li::before {
+.details-list li::before {
     content: '•';
-    color: #bdaa84; /* Match skill bar color */
+    color: #555; /* Bullet color */
     position: absolute;
     left: 0;
-    top: 0.15em;
-    font-size: 0.9em;
+    top: 0.1em; /* Adjust vertical alignment */
+    font-size: 1em;
 }
-.education-details p { /* Relevant Coursework heading */
+
+/* === Skills Section === */
+.skills {
+    margin-bottom: 25px;
+}
+.skills ul.skills-list {
+    list-style: none;
+    padding-left: 0;
+    columns: 2; /* Use columns for layout */
+    -webkit-columns: 2;
+    -moz-columns: 2;
+    column-gap: 30px;
+}
+.skills ul li {
     font-size: 0.95em;
-    color: #777;
-    margin-top: 10px;
-    margin-bottom: 5px;
-    font-weight: 700;
+    color: #444;
+    margin-bottom: 8px;
+    padding-left: 18px; /* Indentation for bullet */
+    position: relative;
+    break-inside: avoid-column; /* Prevent breaking */
+}
+.skills ul li::before {
+    content: '•';
+    color: #555; /* Bullet color */
+    position: absolute;
+    left: 0;
+    top: 0.1em; /* Adjust vertical alignment */
+    font-size: 1em;
 }
 
 
 /* === Hidden Sections Rule === */
+#languagesSection,
 #referencesSection,
 #hobbiesSection,
-#portfolioSection,
-#languagesSection {
+#portfolioSection {
     display: none;
 }
-/* Style hidden section titles consistently if needed for testing */
-#referencesSection .section-title,
-#hobbiesSection .section-title,
-#portfolioSection .section-title,
-#languagesSection .section-title {
-     background-color: #ddd; /* Grey background for hidden ones */
-     color: #666;
+/* Optional: Style hidden section titles consistently for testing */
+#languagesSection h3,
+#referencesSection h3,
+#hobbiesSection h3,
+#portfolioSection h3 {
+     color: #999;
+     border-bottom-color: #eee;
 }
 
 
@@ -315,34 +246,37 @@ strong {
 }
 
 /* === Responsive Adjustments (Example) === */
-@media (max-width: 820px) {
-    .top-info-section {
-        flex-direction: column; /* Stack top columns */
-        padding: 20px;
+@media (max-width: 768px) {
+    .cv-container {
+        padding: 25px; /* Reduce padding */
     }
-    .top-info-section .column {
-       flex-basis: auto; /* Reset basis */
-       width: 100%;
-    }
-    .main-grid-area {
-        flex-direction: column; /* Stack main grid columns */
-        padding: 20px;
-    }
-    .grid-left-column, .grid-right-column {
-        width: 100%;
-    }
-    .cv-header { padding: 15px 20px; }
-    .cv-header h1 { font-size: 2em; }
-    .cv-header h2 { font-size: 1.1em; }
-
-    .job-entry, .education-entry {
-        flex-direction: column;
-        gap: 5px;
-    }
-    .job-date, .education-date {
+    .contact-grid {
+        grid-template-columns: 1fr; /* Stack contact items */
         text-align: left;
-        white-space: normal;
+        gap: 10px;
+    }
+    .contact-grid .contact-item span,
+    .contact-grid .contact-item a {
+         display: inline; /* Inline on mobile */
+         margin-right: 5px;
+    }
+
+    .summary { padding: 0; } /* Remove summary padding */
+
+    section h3 { font-size: 1em; } /* Smaller section titles */
+
+    .entry-header {
+        flex-direction: column; /* Stack header elements */
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+    .location-date {
+        text-align: left; /* Align date left */
+        padding-left: 0;
         margin-top: 5px;
     }
-}
 
+     .skills ul.skills-list {
+        columns: 1; /* Single column for skills */
+    }
+}

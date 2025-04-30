@@ -4,6 +4,7 @@ import jijengeClassicPreview from '@/assets/jijenge-classic-preview.png';
 import kilimanjaroPreview from '@/assets/kilimanjaro-preview.png';
 import brightDiamondPreview from '@/assets/bright-diamond-preview.png';
 import mjenziWaTaifaPreview from '@/assets/mjenzi-wa-taifa-preview.png';
+import streetHustlerPreview from '@/assets/street-hustler-preview.png';
 
 export const templateImages = {
   moonlightSonata: moonlightSonataPreview,
@@ -11,5 +12,6 @@ export const templateImages = {
   jijengeClassic: jijengeClassicPreview,
   kilimanjaro: kilimanjaroPreview,
   brightDiamond: brightDiamondPreview,
-  mjenziWaTaifa: mjenziWaTaifaPreview
+  mjenziWaTaifa: mjenziWaTaifaPreview,
+  streetHustler: streetHustlerPreview
 };
