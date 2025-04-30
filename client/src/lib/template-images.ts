@@ -7,6 +7,7 @@ import mjenziWaTaifaPreview from '@/assets/mjenzi-wa-taifa-preview.png';
 import streetHustlerPreview from '@/assets/street-hustler-preview.png';
 import safariOriginalPreview from '@/assets/safari-original-preview.png';
 import bigBossPreview from '@/assets/big-boss-preview.png';
+import tanzaniteProPreview from '@/assets/tanzanite-pro-preview.png';
 
 export const templateImages = {
   moonlightSonata: moonlightSonataPreview,
@@ -17,5 +18,6 @@ export const templateImages = {
   mjenziWaTaifa: mjenziWaTaifaPreview,
   streetHustler: streetHustlerPreview,
   safariOriginal: safariOriginalPreview,
-  bigBoss: bigBossPreview
+  bigBoss: bigBossPreview,
+  tanzanitePro: tanzaniteProPreview
 };

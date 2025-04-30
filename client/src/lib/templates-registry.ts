@@ -101,6 +101,16 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Modern',
     popularity: 5,
     previewImage: templateImages.bigBoss
+  },
+  {
+    id: 'tanzanitePro',
+    name: 'Tanzanite Pro',
+    description: 'Elegant template with clean circular initials and professional two-column layout',
+    contentPath: '/templates/tanzanite-pro.html',
+    isLocal: true,
+    category: 'Professional',
+    popularity: 5,
+    previewImage: templateImages.tanzanitePro
   }
 ];
 

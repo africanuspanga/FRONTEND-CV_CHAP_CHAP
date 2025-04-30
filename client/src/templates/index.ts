@@ -7,6 +7,7 @@ import { MjenziWaTaifaTemplate } from './mjenziWaTaifa';
 import { StreetHustlerTemplate } from './streetHustler';
 import { SafariOriginalTemplate } from './safariOriginal';
 import { BigBossTemplate } from './bigBoss';
+import { TanzaniteProTemplate } from './tanzanitePro';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -60,6 +61,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'bigBoss',
     name: 'Big Boss',
     render: BigBossTemplate
+  },
+  tanzanitePro: {
+    id: 'tanzanitePro',
+    name: 'Tanzanite Pro',
+    render: TanzaniteProTemplate
   }
 };
 
