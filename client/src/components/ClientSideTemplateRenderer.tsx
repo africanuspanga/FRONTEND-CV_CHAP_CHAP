@@ -210,7 +210,11 @@ export const ClientSideTemplateRenderer = ({
         id="template-preview-frame"
         title={`CV Template - ${templateId}`}
         className="w-full h-full border-0"
-        style={{ minHeight: '842px' }}
+        style={{ 
+          minHeight: '842px',
+          display: 'block',
+          margin: '0 auto'
+        }}
         srcDoc={templateHtml || ''}
       />
     </div>

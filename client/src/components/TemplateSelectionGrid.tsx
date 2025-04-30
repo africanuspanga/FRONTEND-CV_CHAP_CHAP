@@ -37,11 +37,16 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {templates.map((template) => (
           <Card key={template.id} className="overflow-hidden flex flex-col h-full border shadow-sm hover:shadow-md transition-shadow">
-            <div className="relative aspect-[3/4] bg-white">
+            <div className="relative aspect-[3/4] bg-white overflow-hidden">
               <img
                 src={template.previewImage}
                 alt={`${template.name} template preview`}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain object-top px-2"
+                style={{
+                  maxWidth: '100%',
+                  display: 'block',
+                  margin: '0 auto'
+                }}
                 onError={(e) => {
                   console.error(`Failed to load image: ${template.previewImage}`);
                   e.currentTarget.style.display = 'none';
