@@ -10,15 +10,16 @@ import CVFormStepper from '@/components/CVFormStepper';
 import ClientSideTemplateRenderer from '@/components/ClientSideTemplateRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-// Import form step components
-import PersonalInfoStep from '@/components/cv-form/PersonalInfoStep';
-import WorkExperienceStep from '@/components/cv-form/WorkExperienceStep';
-import EducationStep from '@/components/cv-form/EducationStep';
-import SkillsStep from '@/components/cv-form/SkillsStep';
-import SummaryStep from '@/components/cv-form/SummaryStep';
-import LanguagesStep from '@/components/cv-form/LanguagesStep';
-import ReferencesStep from '@/components/cv-form/ReferencesStep';
-import PreviewStep from '@/components/cv-form/PreviewStep';
+// Create placeholder components for now
+// We'll implement the actual functionality step by step
+const PersonalInfoStep = () => <div>Personal Info Step (Coming Soon)</div>;
+const WorkExperienceStep = () => <div>Work Experience Step (Coming Soon)</div>;
+const EducationStep = () => <div>Education Step (Coming Soon)</div>;
+const SkillsStep = () => <div>Skills Step (Coming Soon)</div>;
+const SummaryStep = () => <div>Summary Step (Coming Soon)</div>;
+const LanguagesStep = () => <div>Languages Step (Coming Soon)</div>;
+const ReferencesStep = () => <div>References Step (Coming Soon)</div>;
+const PreviewStep = () => <div>Preview Step (Coming Soon)</div>;
 
 // Form Steps Mapping
 const stepComponents = [
