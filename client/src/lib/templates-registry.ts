@@ -1,3 +1,5 @@
+import { templateImages } from './template-images';
+
 export interface TemplateDefinition {
   id: string;
   name: string;
@@ -18,7 +20,7 @@ export const templateRegistry: TemplateDefinition[] = [
     isLocal: true,
     category: 'Modern',
     popularity: 5,
-    previewImage: '/templates/previews/moonlight-sonata.png'
+    previewImage: templateImages.moonlightSonata
   },
   {
     id: 'kaziFasta',
@@ -28,7 +30,7 @@ export const templateRegistry: TemplateDefinition[] = [
     isLocal: true,
     category: 'Professional',
     popularity: 5,
-    previewImage: '/templates/previews/kazi-fasta.png'
+    previewImage: templateImages.kaziFasta
   }
 ];
 
