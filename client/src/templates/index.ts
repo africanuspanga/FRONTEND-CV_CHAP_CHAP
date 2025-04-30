@@ -6,6 +6,7 @@ import { BrightDiamondTemplate } from './brightDiamond';
 import { MjenziWaTaifaTemplate } from './mjenziWaTaifa';
 import { StreetHustlerTemplate } from './streetHustler';
 import { SafariOriginalTemplate } from './safariOriginal';
+import { BigBossTemplate } from './bigBoss';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -54,6 +55,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'safariOriginal',
     name: 'Safari Original',
     render: SafariOriginalTemplate
+  },
+  bigBoss: {
+    id: 'bigBoss',
+    name: 'Big Boss',
+    render: BigBossTemplate
   }
 };
 
