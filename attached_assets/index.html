@@ -3,123 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Template - Grey Accent Header</title>
-    <link rel="stylesheet" href="style.css">
+    <title>CV Template - Style 4</title> <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
-    </head>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+</head>
 <body>
-    <div class="cv-container">
-
-        <header class="cv-header">
-            <h1 id="fullName">KELLY BLACKWELL</h1>
-            <h2 id="profession">Administrative Assistant</h2>
+    <div class="resume-container">
+        <header class="resume-header">
+            <div class="header-content">
+                <div class="name-section">
+                    <h1 id="fullName">David Perez</h1>
+                </div>
+                <div class="title-summary">
+                    <p id="profession">Administrative Assistant</p>
+                    <p id="careerObjective">
+                        Administrative Assistant with 6+ years of experience organizing presentations, preparing facility reports, and maintaining the utmost confidentiality. Possess a B.A. in History and expertise in Microsoft Excel. Looking to leverage my knowledge and experience into a role as Project Manager.
+                    </p>
+                </div>
+            </div>
         </header>
 
-        <section class="contact-bar">
-            <span id="contactPhone">(210) 286-1624</span>
-            <span class="separator">•</span>
-            <span id="contactEmail">kelly.blackwell@gmail.com</span>
-            <span class="separator">•</span>
-            <span>San Antonio, TX 78023</span>
-            <a id="contactLinkedin" href="#" style="display:none;">LinkedIn</a>
-        </section>
+        <div class="contact-band">
+            <span><i class="fas fa-phone icon"></i><span id="contactPhone">(123) 456-7895</span></span>
+             <span><i class="fas fa-map-marker-alt icon"></i><span>Chicago, IL 60622</span></span>
+             <span><i class="fas fa-envelope icon"></i><span id="contactEmail">thomasbeasley@gmail.com</span></span>
+             <span><i class="fab fa-linkedin icon"></i><span id="contactLinkedin">linkedin.com/thomasbeasley</span></span>
+        </div>
 
-        <section class="summary">
-             <p id="careerObjective">Administrative assistant with 9+ years of experience organizing presentations, preparing facility reports, and maintaining the utmost confidentiality. Possess a B.A. in history and expertise in Microsoft Excel. Looking to leverage my wealth of knowledge and experience into the open administrative assistant role at your organization.</p>
-        </section>
-
-        <section class="skills">
-            <h3>Skills</h3>
-             <ul id="skillsList" class="skills-columns">
-                <li>Analytical Thinking</li>
-                <li>Team Leadership</li>
-                <li>Tolerant & Flexible</li>
-                <li>Organization & Prioritization</li>
-                </ul>
-        </section>
-
-        <section class="experience">
-            <h3>Experience</h3>
-            <ul id="experienceList">
-                <li>
-                    <div class="entry-header">
-                        <div class="title-location">
-                            <strong>Administrative Assistant</strong>
-                            <span>REDFORD & SONS, Boston, MA</span>
-                        </div>
-                        <div class="date-range">
-                            <span>September 2017 - Present</span>
-                        </div>
+        <main class="resume-body">
+            <div class="left-column">
+                <section class="professional-experience">
+                    <h2>Professional Experience</h2>
+                    <div id="experienceList" class="timeline-container">
+                        <article class="job-entry">
+                            <div class="timeline-item">
+                                <div class="timeline-date">2019 - 2022</div>
+                                <div class="timeline-line"></div>
+                            </div>
+                            <div class="job-details">
+                                <h3>Administrative Assistant</h3>
+                                <p class="meta">Redford & Sons, Chicago, IL</p>
+                                <ul>
+                                    <li>Schedule and coordinate meetings, appointments, and travel arrangements for supervisors and managers</li>
+                                    <li>Trained 2 administrative assistants during a period of company expansion to ensure attention to detail and adherence to company standards</li>
+                                    <li>Developed new filing and organizational practices, saving the company $3,000 per year in contracted labor expenses</li>
+                                </ul>
+                            </div>
+                        </article>
+                        <article class="job-entry">
+                            <div class="timeline-item">
+                                <div class="timeline-date">2017 - 2019</div>
+                                 <div class="timeline-line"></div>
+                            </div>
+                            <div class="job-details">
+                                <h3>Secretary</h3>
+                                <p class="meta">Bright Spot Ltd, Boston, Ma</p>
+                                <ul>
+                                    <li>Type documents such as correspondence, drafts, memos, and emails, and prepared 3 reports weekly for management</li>
+                                    <li>Opened, sorted, and distributed incoming messages and correspondence</li>
+                                    <li>Purchased and maintained office supplied inventories, and always carefully adhered to budgeting practices</li>
+                                 </ul>
+                            </div>
+                        </article>
+                         <article class="job-entry">
+                            <div class="timeline-item">
+                                <div class="timeline-date">2015 - 2017</div>
+                                 <div class="timeline-line"></div>
+                            </div>
+                             <div class="job-details">
+                                <h3>Secretary</h3>
+                                <p class="meta">Suntrust Financial, Chicago, IL</p>
+                                <ul>
+                                    <li>Recorded, transcribed and distributed weekly meetings</li>
+                                    <li>Answered upwards of 20 phone calls daily, taking detailed messages</li>
+                                    <li>Arranged appointments and ensured executives arrived to meetings with clients on time</li>
+                                </ul>
+                            </div>
+                        </article>
                     </div>
-                    <ul class="details-list">
-                        <li>Schedule and coordinate meetings, appointments, and travel arrangements for supervisors, managers, and C-level executives</li>
-                        <li>Trained 2 administrative assistants during a period of company expansion to ensure attention to detail and adherence to company</li>
-                        <li>Developed new filing and organizational practices, saving the company $3,000 per year in contracted labor expenses</li>
+                </section>
+            </div>
+
+            <div class="right-column">
+                <section class="education">
+                    <h2>Education</h2>
+                    <div id="educationList">
+                        <article>
+                            <p class="year">2015</p>
+                            <h3>Bachelor Of Arts In English Literature</h3>
+                            <p class="meta">River Brook University, Chicago, IL</p>
+                            <p>Graduated Magna Cum Laude</p>
+                        </article>
+                         <article>
+                            <p class="year">2013</p>
+                             <h3>AA Communications</h3>
+                            <p class="meta">Harry S Truman College, Chicago, IL</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="skills">
+                    <h2>Key Skills</h2>
+                    <ul id="skillsList">
+                        <li>
+                            <span class="skill-name">Microsoft Office</span>
+                            <div class="skill-bar"></div>
+                        </li>
+                         <li>
+                            <span class="skill-name">MailChimp</span>
+                            <div class="skill-bar"></div>
+                        </li>
+                         <li>
+                            <span class="skill-name">HubSpot</span>
+                            <div class="skill-bar"></div>
+                        </li>
+                         <li>
+                            <span class="skill-name">Google Workspace</span>
+                            <div class="skill-bar"></div>
+                        </li>
+                        <li><span class="skill-name">Spanish</span></li>
+                        <li><span class="skill-name">Problem solving</span></li>
+                        <li><span class="skill-name">Team leadership</span></li>
                     </ul>
-                </li>
-                 <li>
-                    <div class="entry-header">
-                         <div class="title-location">
-                            <strong>Secretary</strong>
-                            <span>BRIGHT SPOT LTD, Boston</span>
-                        </div>
-                        <div class="date-range">
-                            <span>June 2016 - August 2017</span>
-                        </div>
-                    </div>
-                    <ul class="details-list">
-                        <li>Typed documents such as correspondence, drafts, memos, and emails, and prepared 3 reports weekly for management</li>
-                        <li>Opened, sorted, and distributed incoming messages and correspondence to the appropriate personnel</li>
-                        <li>Purchased and maintained office supply inventories, and always careful to adhere to budgeting practices</li>
-                        <li>Greeted visitors and determined to whom and when they could speak with specific individuals</li>
-                    </ul>
-                </li>
-            </ul>
-        </section>
+                </section>
 
-        <section class="education">
-            <h3>Education</h3>
-            <ul id="educationList">
-                <li>
-                    <div class="entry-header">
-                        <div class="title-location"> <strong>Bachelor of Arts (B.A.) in Finance</strong> <span>Brown University, Providence, RI</span>
-                        </div>
-                        <div class="date-range"> <span>05/2009</span>
-                        </div>
-                    </div>
-                </li>
-                 <li>
-                    <div class="entry-header">
-                        <div class="title-location">
-                            <strong>Associate of Arts in Business</strong>
-                             <span>San Antonio Community College, San Antonio, TX</span>
-                        </div>
-                        <div class="date-range">
-                             <span>05/2007</span>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </section>
+                <section class="additional-skills-title">
+                     <h2>Additional Skills</h2>
+                </section>
 
-        <section id="languagesSection" style="display:none;">
-            <h3>Languages</h3>
-            <ul id="languagesList"></ul>
-        </section>
-        <section id="referencesSection" style="display:none;">
-            <h3>References</h3>
-            <ul id="referencesList"></ul>
-         </section>
-         <section id="hobbiesSection" style="display:none;">
-             <h3>Hobbies & Interests</h3>
-             <p id="hobbiesText"></p>
-         </section>
-         <section id="portfolioSection" style="display:none;">
-             <h3>Portfolio</h3>
-             <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
-         </section>
 
-    </div> </body>
+                 <section id="languagesSection" style="display:none;">
+                    <h2>LANGUAGES</h2>
+                    <ul id="languagesList"></ul>
+                </section>
+                <section id="referencesSection" style="display:none;">
+                    <h2>REFERENCES</h2>
+                    <ul id="referencesList"></ul>
+                </section>
+                 <section id="hobbiesSection" style="display:none;">
+                    <h2>HOBBIES & INTERESTS</h2>
+                    <p id="hobbiesText"></p>
+                </section>
+                <section id="portfolioSection" style="display:none;">
+                    <h2>PORTFOLIO</h2>
+                    <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
+                </section>
+                 </div>
+        </main>
+    </div>
+</body>
 </html>

@@ -12,6 +12,7 @@ import { MwalimuOneTemplate } from './mwalimuOne';
 import { SerengetiFlowTemplate } from './serengetiFlow';
 import { SmartBongoTemplate } from './smartBongo';
 import { MadiniMobTemplate } from './madiniMob';
+import { MkaliModernTemplate } from './mkaliModern';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -90,6 +91,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'madiniMob',
     name: 'Madini Mob',
     render: MadiniMobTemplate
+  },
+  mkaliModern: {
+    id: 'mkaliModern',
+    name: 'Mkali Modern',
+    render: MkaliModernTemplate
   }
 };
 

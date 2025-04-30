@@ -151,6 +151,16 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Modern',
     popularity: 5,
     previewImage: templateImages.madiniMob
+  },
+  {
+    id: 'mkaliModern',
+    name: 'Mkali Modern',
+    description: 'Stylish teal template with timeline experience section and dashed skill bars',
+    contentPath: '/templates/mkali-modern.html',
+    isLocal: true,
+    category: 'Creative',
+    popularity: 5,
+    previewImage: templateImages.mkaliModern
   }
 ];
 
