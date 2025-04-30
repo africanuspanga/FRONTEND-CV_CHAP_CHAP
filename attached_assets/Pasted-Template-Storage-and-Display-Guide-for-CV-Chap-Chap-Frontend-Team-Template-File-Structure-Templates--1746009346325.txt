@@ -1,0 +1,81 @@
+Template Storage and Display Guide for CV Chap Chap Frontend Team
+Template File Structure
+Templates in CV Chap Chap are now fully client-side, which means the frontend is responsible for all aspects of template handling. Each template requires three key components:
+
+HTML Structure - Contains placeholders for dynamic content
+CSS Styling - Defines the visual appearance of the template
+PNG Preview Image - Shows how the template looks when filled with data
+Directory Organization
+public/
+├── templates/
+│   ├── mtaa-hustler.html
+│   ├── tanzanite.html
+│   ├── safari-pro.html
+│   ├── mwalimu-classic.html
+│   ├── previews/
+│   │   ├── mtaa-hustler.png
+│   │   ├── tanzanite.png
+│   │   ├── safari-pro.png
+│   │   └── mwalimu-classic.png
+Template Registry
+Templates are registered in client/src/lib/templates-registry.ts with the following properties:
+
+{
+  id: 'template-id',             // Unique identifier 
+  name: 'Template Name',         // Display name
+  description: 'Description...',  // Short description
+  contentPath: '/templates/template-id.html',  // Path to HTML file
+  isLocal: true,                 // Indicates client-side template
+  category: 'Modern',            // Category for filtering
+  popularity: 4,                 // Rating (1-5)
+  previewImage: '/templates/previews/template-id.png'  // Path to preview image
+}
+Template HTML Structure
+Each template HTML file must include:
+
+Placeholders with specific IDs - The renderer will target these elements to inject user data:
+
+id="first-name" - First name
+id="last-name" - Last name
+id="full-name" - Combined name
+id="email" - Email address
+id="phone" - Phone number
+id="location" - Location
+Container elements with specific IDs:
+id="experience-container" - Work experiences
+id="education-container" - Education history
+id="skills-container" - Skills list
+id="languages-container" - Languages
+id="references-container" - References
+id="additional-sections-container" - Extra sections
+Embedded CSS - Styling should be included directly in the HTML file
+
+Preview PNG Requirements
+Size: 1080×1527px (or 3:4 aspect ratio)
+Format: PNG with transparency
+Content: Show the template with sample data to illustrate its appearance
+Location: Store in /public/templates/previews/ directory
+Naming: Match the template ID (e.g., mtaa-hustler.png)
+Integration with UI
+Template Selection:
+
+Preview images are displayed in a grid on the Templates page
+Each template card shows the preview image, name, and description
+Selection is tracked in the CV Form context
+Live Preview:
+
+Once a template is selected, the preview automatically appears alongside form fields
+As users type in form fields, the preview updates in real-time
+Preview is hidden on mobile to optimize screen space, but available on tablets/desktops
+How Templates Are Rendered
+The ClientSideTemplateRenderer component:
+
+Loads the HTML content via fetch from the template's contentPath
+Creates an iframe to isolate the template's styles
+Injects the user's data into the template's placeholders
+Updates dynamically as form data changes
+Data injection happens through:
+
+Direct text content updates for simple fields
+Dynamic HTML generation for repeatable sections (experiences, education, etc.)
+This client-side approach eliminates backend dependencies for template rendering, improves performance, and allows for real-time preview as users complete their CV.

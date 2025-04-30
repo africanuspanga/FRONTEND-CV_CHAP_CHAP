@@ -1,0 +1,89 @@
+export interface TemplateDefinition {
+  id: string;
+  name: string;
+  description: string;
+  contentPath: string;
+  isLocal: boolean;
+  category: 'Modern' | 'Professional' | 'Creative' | 'Academic';
+  popularity: 1 | 2 | 3 | 4 | 5;
+  previewImage: string;
+}
+
+export const templateRegistry: TemplateDefinition[] = [
+  {
+    id: 'mtaa-hustler',
+    name: 'Mtaa Hustler',
+    description: 'A clean, modern CV template with a two-column layout. Perfect for professionals seeking a straightforward yet stylish presentation.',
+    contentPath: '/templates/mtaa-hustler.html',
+    isLocal: true,
+    category: 'Modern',
+    popularity: 4,
+    previewImage: '/templates/previews/mtaa-hustler.png'
+  },
+  {
+    id: 'tanzanite',
+    name: 'Tanzanite',
+    description: 'A professional, clean CV template with structured sections and a touch of blue. Perfect for administrative roles and business professionals.',
+    contentPath: '/templates/tanzanite.html',
+    isLocal: true,
+    category: 'Professional',
+    popularity: 5,
+    previewImage: '/templates/previews/tanzanite.png'
+  },
+  {
+    id: 'safari-pro',
+    name: 'Safari Pro',
+    description: 'Bold design with earthy tones inspired by African landscapes',
+    contentPath: '/templates/safari-pro.html',
+    isLocal: true,
+    category: 'Creative',
+    popularity: 4,
+    previewImage: '/templates/previews/safari-pro.png'
+  },
+  {
+    id: 'mwalimu-classic',
+    name: 'Mwalimu Classic',
+    description: 'Traditional academic-style template for educational professionals',
+    contentPath: '/templates/mwalimu-classic.html',
+    isLocal: true,
+    category: 'Academic',
+    popularity: 4,
+    previewImage: '/templates/previews/mwalimu-classic.png'
+  },
+  {
+    id: 'moonlight-sonata',
+    name: 'Moonlight Sonata',
+    description: 'A modern template with a warm orange sidebar and clean layout',
+    contentPath: '/templates/moonlight-sonata.html',
+    isLocal: true,
+    category: 'Modern',
+    popularity: 4,
+    previewImage: '/templates/previews/moonlight-sonata.png'
+  }
+];
+
+/**
+ * Retrieve a template by its ID
+ * @param id The template ID to look up
+ * @returns The template definition or undefined if not found
+ */
+export function getTemplateById(id: string): TemplateDefinition | undefined {
+  return templateRegistry.find(template => template.id === id);
+}
+
+/**
+ * Get all available templates
+ * @returns Array of all template definitions
+ */
+export function getAllTemplates(): TemplateDefinition[] {
+  return templateRegistry;
+}
+
+/**
+ * Filter templates by category
+ * @param category The category to filter by
+ * @returns Array of template definitions in that category
+ */
+export function getTemplatesByCategory(category: string): TemplateDefinition[] {
+  return templateRegistry.filter(template => template.category === category);
+}
