@@ -51,6 +51,16 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Creative',
     popularity: 5,
     previewImage: templateImages.kilimanjaro
+  },
+  {
+    id: 'brightDiamond',
+    name: 'Bright Diamond',
+    description: 'Clean modern template with teal accents and multi-column skills section',
+    contentPath: '/templates/bright-diamond.html',
+    isLocal: true,
+    category: 'Modern',
+    popularity: 5,
+    previewImage: templateImages.brightDiamond
   }
 ];
 

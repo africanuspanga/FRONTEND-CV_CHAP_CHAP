@@ -2,6 +2,7 @@ import { MoonlightSonataTemplate } from './moonlightSonata';
 import { KaziFastaTemplate } from './kaziFasta';
 import { JijengeClassicTemplate } from './jijengeClassic';
 import { KilimanjaroTemplate } from './kilimanjaro';
+import { BrightDiamondTemplate } from './brightDiamond';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -30,6 +31,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'kilimanjaro',
     name: 'Kilimanjaro',
     render: KilimanjaroTemplate
+  },
+  brightDiamond: {
+    id: 'brightDiamond',
+    name: 'Bright Diamond',
+    render: BrightDiamondTemplate
   }
 };
 

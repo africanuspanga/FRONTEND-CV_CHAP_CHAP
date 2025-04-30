@@ -4,7 +4,7 @@ body {
     margin: 0;
     padding: 20px;
     background-color: #f8f8f8; /* Light background */
-    color: #444; /* Default text color */
+    color: #4a4a4a; /* Default text color */
     line-height: 1.6;
     font-size: 10pt; /* Base font size */
     -webkit-font-smoothing: antialiased;
@@ -14,7 +14,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
     font-weight: 700; /* Bold headings */
-    color: #222; /* Dark heading color */
+    color: #2a2a2a; /* Dark heading color */
 }
 
 ul {
@@ -24,11 +24,12 @@ ul {
 }
 
 a {
-    color: #444; /* Match text color */
+    color: inherit; /* Inherit color */
     text-decoration: none;
 }
 
 a:hover {
+    color: #20c997; /* Accent color on hover */
     text-decoration: underline;
 }
 
@@ -36,140 +37,106 @@ strong {
     font-weight: 700;
 }
 
-/* === CV Container and Layout === */
+/* === CV Container === */
 .cv-container {
-    max-width: 900px; /* Adjust width as needed */
+    max-width: 850px; /* Adjust width as needed */
     margin: 20px auto;
     background-color: #ffffff;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    display: flex; /* Use flexbox for columns */
+    padding: 40px; /* Padding inside the container */
 }
 
-/* === Sidebar Styling (Left Column) === */
-.sidebar {
-    width: 35%; /* Adjust sidebar width */
-    background-color: #f0f0f0; /* Sidebar background color */
-    padding: 30px;
-    box-sizing: border-box;
-    border-right: 1px solid #e0e0e0; /* Separator line */
-}
-
-/* === Main Content Styling (Right Column) === */
-.main-content {
-    width: 65%; /* Adjust main content width */
-    padding: 30px;
-    box-sizing: border-box;
-}
-
-/* === CV Header (Main Content) === */
+/* === CV Header (Centered) === */
 .cv-header {
-    text-align: left; /* Align left */
-    margin-bottom: 25px;
+    text-align: center;
+    margin-bottom: 15px; /* Space below header */
+    padding-bottom: 15px;
+    border-bottom: 3px solid #20c997; /* Teal accent border */
 }
 
 .cv-header h1 {
-    font-size: 2.6em;
-    color: #111;
+    font-size: 2.8em;
+    color: #1a1a1a;
     margin-bottom: 0px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    line-height: 1.2;
+    font-weight: 900; /* Extra bold name */
 }
 
 .cv-header h2 {
     font-size: 1.2em;
     color: #555;
     font-weight: 400; /* Regular weight for title */
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
     margin-bottom: 0;
+}
+
+/* === Contact Info Bar === */
+.contact-bar {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 5px; /* Less padding */
+    font-size: 0.9em;
+    color: #555;
+    display: flex; /* Use flexbox for wrapping */
+    flex-wrap: wrap; /* Allow wrapping */
+    justify-content: center; /* Center items */
+    gap: 5px 8px; /* Row and column gap */
+}
+
+.contact-bar span,
+.contact-bar a {
+    white-space: nowrap; /* Prevent wrapping within an item */
+}
+.contact-bar .separator {
+    color: #ccc; /* Lighter color for separator */
+    display: none; /* Hide separators when wrapping */
+}
+/* Show separators only on larger screens if desired */
+@media (min-width: 768px) {
+  .contact-bar .separator {
+      display: inline;
+  }
+}
+
+
+/* === Summary Section === */
+.summary {
+    margin-bottom: 30px;
+}
+.summary p {
+    font-size: 0.95em;
+    color: #4a4a4a;
+    line-height: 1.7;
 }
 
 /* === Section Title Styling === */
 section h3 {
-    font-size: 1.1em;
-    color: #333;
+    font-size: 1.15em;
+    color: #20c997; /* Teal accent color */
     margin-bottom: 15px;
     padding-bottom: 5px;
-    border-bottom: 1px solid #ccc; /* Border under titles */
+    border-bottom: 1px solid #e0e0e0; /* Light grey border */
     text-transform: uppercase;
     letter-spacing: 1.5px;
-}
-.sidebar section h3 {
-     border-bottom-color: #d0d0d0; /* Slightly darker border in sidebar */
+    font-weight: 700;
 }
 
-
-/* === Sidebar Sections === */
-.sidebar section {
+/* === Experience & Education Section === */
+.experience, .education, .skills, .certifications {
     margin-bottom: 25px;
 }
-.sidebar section:last-child {
+.experience ul, .education ul, .skills ul, .certifications ul {
+    margin: 0;
+}
+.experience > ul > li, .education > ul > li { /* Space between entries */
+    margin-bottom: 25px;
+}
+.experience > ul > li:last-child, .education > ul > li:last-child {
     margin-bottom: 0;
 }
 
-/* Contact Info */
-.contact-info p {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-    font-size: 0.95em;
-    color: #444;
-}
-.contact-info .icon {
-    width: 18px; /* Space for icon */
-    margin-right: 8px;
-    text-align: center;
-    color: #777; /* Icon placeholder color */
-    flex-shrink: 0;
-}
-
-/* Profile */
-.profile p {
-    font-size: 0.95em;
-    color: #444;
-}
-
-/* Skills & Additional Skills (Tags) */
-.skills-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px; /* Space between tags */
-}
-.skills-tags li {
-    margin-bottom: 0; /* Remove bottom margin from list items */
-}
-.skills-tags .tag {
-    display: inline-block;
-    background-color: #e0e0e0; /* Tag background */
-    color: #444; /* Tag text color */
-    padding: 4px 10px; /* Tag padding */
-    border-radius: 15px; /* Pill shape */
-    font-size: 0.9em;
-    line-height: 1.4; /* Adjust line height */
-}
-
-/* Languages & Licenses */
-.languages ul li,
-.licenses ul li {
-    font-size: 0.95em;
-    color: #444;
-    margin-bottom: 6px;
-    padding-left: 0; /* No bullet needed */
-}
-.languages ul li::before, /* Remove bullets */
-.licenses ul li::before {
-    content: none;
-}
-
-
-/* === Main Content Sections === */
-.main-content section {
-     margin-bottom: 25px;
-}
-.main-content section:last-child {
-    margin-bottom: 0;
-}
-
-/* Experience & Education Section Headers */
 .entry-header {
     display: flex;
     justify-content: space-between;
@@ -184,7 +151,7 @@ section h3 {
 .title-company strong { /* Job Title / Degree */
     display: block;
     font-size: 1.1em;
-    color: #222;
+    color: #2a2a2a;
     margin-bottom: 2px;
 }
 .title-company span { /* Company / University / GPA */
@@ -193,15 +160,16 @@ section h3 {
     color: #555;
 }
 
-.location-date {
+.date-range { /* Changed class name */
     flex-shrink: 0;
     text-align: right;
     font-size: 0.9em;
-    color: #666;
+    color: #555;
     padding-left: 15px; /* Space from left content */
+    font-weight: 700; /* Bold date */
 }
-.location-date span {
-    display: block; /* Stack location and date */
+.date-range span {
+    display: block; /* Needed if stacking */
     line-height: 1.4;
 }
 
@@ -210,55 +178,47 @@ section h3 {
     list-style: none;
     padding-left: 0;
     margin-top: 5px;
-    margin-bottom: 0; /* Remove bottom margin */
 }
 .details-list li {
     font-size: 0.95em;
-    color: #444;
+    color: #4a4a4a;
     margin-bottom: 5px;
     padding-left: 18px; /* Indentation for bullet */
     position: relative;
 }
 .details-list li::before {
     content: '•';
-    color: #555; /* Bullet color */
+    color: #20c997; /* Teal bullet color */
     position: absolute;
     left: 0;
     top: 0.1em; /* Adjust vertical alignment */
     font-size: 1em;
 }
 
-/* Education Sub-Details (Coursework, Awards, etc.) */
-.sub-details {
-    margin-top: 10px;
-    padding-left: 10px; /* Indent sub-details slightly */
-    border-left: 2px solid #eee; /* Add a subtle left border */
-}
-.sub-details p {
-    font-weight: 700;
-    font-size: 0.95em;
-    color: #444;
-    margin-top: 10px;
-    margin-bottom: 5px;
-}
-.sub-details ul {
+/* === Skills & Certifications Section (Multi-column) === */
+.multi-column-list {
     list-style: none;
     padding-left: 0;
+    columns: 3; /* Use 3 columns */
+    -webkit-columns: 3;
+    -moz-columns: 3;
+    column-gap: 25px;
 }
-.sub-details ul li {
-    font-size: 0.9em;
-    color: #555;
-    margin-bottom: 4px;
-    padding-left: 15px; /* Indent for bullet */
+.multi-column-list li {
+    font-size: 0.95em;
+    color: #4a4a4a;
+    margin-bottom: 8px;
+    padding-left: 18px; /* Indentation for bullet */
     position: relative;
+    break-inside: avoid-column; /* Prevent breaking */
 }
-.sub-details ul li::before {
-    content: '◦'; /* Smaller circle bullet */
-    color: #777;
+.multi-column-list li::before {
+    content: '•';
+    color: #20c997; /* Teal bullet color */
     position: absolute;
     left: 0;
-    top: 0.1em;
-    font-size: 0.9em;
+    top: 0.1em; /* Adjust vertical alignment */
+    font-size: 1em;
 }
 
 
@@ -277,6 +237,15 @@ section h3 {
      color: #999;
      border-bottom-color: #eee;
 }
+#languagesSection h3::before, /* Example: Add indicator for hidden */
+#referencesSection h3::before,
+#hobbiesSection h3::before,
+#portfolioSection h3::before {
+    content: "[Hidden] ";
+    color: #ccc;
+    font-weight: 400;
+    font-size: 0.8em;
+}
 
 
 /* === Utility Class (for JS to show sections) === */
@@ -287,27 +256,40 @@ section h3 {
 /* === Responsive Adjustments (Example) === */
 @media (max-width: 768px) {
     .cv-container {
-        flex-direction: column; /* Stack columns */
+        padding: 25px; /* Reduce padding */
     }
-    .sidebar, .main-content {
-        width: 100%;
-        padding: 25px; /* Adjust padding */
+    .cv-header h1 { font-size: 2.2em; }
+    .cv-header h2 { font-size: 1em; }
+
+    .contact-bar {
+        gap: 5px; /* Reduce gap */
+        justify-content: flex-start; /* Align left */
+        text-align: left;
     }
-    .sidebar {
-        border-right: none; /* Remove border */
-        border-bottom: 1px solid #e0e0e0; /* Add bottom border */
+    .contact-bar .separator {
+        display: none; /* Always hide separators */
     }
-    .cv-header h1 { font-size: 2em; }
-    .cv-header h2 { font-size: 1.1em; }
+
+    section h3 { font-size: 1.05em; } /* Smaller section titles */
 
     .entry-header {
         flex-direction: column; /* Stack header elements */
         align-items: flex-start;
         margin-bottom: 10px;
     }
-    .location-date {
+    .date-range {
         text-align: left; /* Align date left */
         padding-left: 0;
-        margin-top: 5px;
+        margin-top: 3px;
+    }
+
+     .multi-column-list {
+        columns: 2; /* Reduce to 2 columns */
+        column-gap: 20px;
+    }
+}
+@media (max-width: 480px) {
+     .multi-column-list {
+        columns: 1; /* Single column on very small screens */
     }
 }
