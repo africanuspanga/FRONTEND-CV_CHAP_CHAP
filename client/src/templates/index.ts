@@ -4,6 +4,7 @@ import { JijengeClassicTemplate } from './jijengeClassic';
 import { KilimanjaroTemplate } from './kilimanjaro';
 import { BrightDiamondTemplate } from './brightDiamond';
 import { MjenziWaTaifaTemplate } from './mjenziWaTaifa';
+import { StreetHustlerTemplate } from './streetHustler';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -42,6 +43,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'mjenziWaTaifa',
     name: 'Mjenzi wa Taifa',
     render: MjenziWaTaifaTemplate
+  },
+  streetHustler: {
+    id: 'streetHustler',
+    name: 'Street Hustler',
+    render: StreetHustlerTemplate
   }
 };
 

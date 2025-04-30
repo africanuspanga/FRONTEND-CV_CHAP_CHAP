@@ -86,11 +86,9 @@ export function StreetHustlerTemplate({
           {/* Right Column */}
           <div>
             <span style={{ display: 'block', lineHeight: 1.4 }}>
-              {personalInfo?.address && personalInfo.address}
-              {personalInfo?.city && `, ${personalInfo.city}`}
-              {personalInfo?.zipCode && `, ${personalInfo.zipCode}`}
+              {personalInfo?.location}
             </span>
-            <a href={personalInfo?.github} style={{ display: 'block', lineHeight: 1.4, color: '#444', textDecoration: 'none' }}>{personalInfo?.github}</a>
+            <a href={personalInfo?.website} style={{ display: 'block', lineHeight: 1.4, color: '#444', textDecoration: 'none' }}>Twitter/Social</a>
           </div>
         </section>
 
@@ -244,7 +242,7 @@ export function StreetHustlerTemplate({
                       fontSize: '1em',
                       color: '#444'
                     }}>
-                      {edu.schoolName}{edu.location && `, ${edu.location}`}
+                      {edu.institution}{edu.location && `, ${edu.location}`}
                     </span>
                   </div>
                   <div style={{
@@ -266,7 +264,7 @@ export function StreetHustlerTemplate({
                       lineHeight: 1.4,
                       fontWeight: 600
                     }}>
-                      {edu.graduationDate}
+                      {edu.endDate || edu.startDate}
                     </span>
                   </div>
                 </div>
@@ -337,7 +335,7 @@ export function StreetHustlerTemplate({
                 }}>
                   •
                 </span>
-                {`${lang.language} - ${lang.proficiency}`}
+                {`${lang.name} ${lang.level ? `- ${lang.level}` : ''}`}
               </li>
             ))}
           </ul>
@@ -411,7 +409,7 @@ export function StreetHustlerTemplate({
                   marginBottom: '10px'
                 }}>
                   <div style={{ fontWeight: 'bold' }}>{ref.name}</div>
-                  <div>{ref.title}{ref.company && `, ${ref.company}`}</div>
+                  <div>{ref.position}{ref.company && `, ${ref.company}`}</div>
                   {ref.email && <div>{ref.email}</div>}
                   {ref.phone && <div>{ref.phone}</div>}
                 </div>
