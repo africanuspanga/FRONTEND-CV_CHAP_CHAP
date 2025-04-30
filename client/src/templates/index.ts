@@ -25,6 +25,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'jijengeClassic',
     name: 'Jijenge Classic',
     render: JijengeClassicTemplate
+  },
+  kilimanjaro: {
+    id: 'kilimanjaro',
+    name: 'Kilimanjaro',
+    render: KilimanjaroTemplate
   }
 };
 
