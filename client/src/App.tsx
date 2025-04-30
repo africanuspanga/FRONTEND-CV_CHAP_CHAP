@@ -13,6 +13,10 @@ import CreationMethod from "@/pages/CreationMethod";
 import PersonalInfoForm from "@/pages/PersonalInfoForm";
 import WorkExperienceForm from "@/pages/WorkExperienceForm";
 import EducationForm from "@/pages/EducationForm";
+import SkillsIntro from "@/pages/SkillsIntro";
+import SkillsRecommendations from "@/pages/SkillsRecommendations";
+import SkillsEditor from "@/pages/SkillsEditor";
+import LanguagesForm from "@/pages/LanguagesForm";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -27,6 +31,10 @@ function Router() {
           <Route path="/cv/:templateId/personal" component={PersonalInfoForm} />
           <Route path="/cv/:templateId/work" component={WorkExperienceForm} />
           <Route path="/cv/:templateId/education" component={EducationForm} />
+          <Route path="/cv/:templateId/skills" component={SkillsIntro} />
+          <Route path="/cv/:templateId/skills-recommendations" component={SkillsRecommendations} />
+          <Route path="/cv/:templateId/skills-editor" component={SkillsEditor} />
+          <Route path="/cv/:templateId/languages" component={LanguagesForm} />
           <Route path="/create/:step?" component={CreateCV} />
           <Route component={NotFound} />
         </Switch>
