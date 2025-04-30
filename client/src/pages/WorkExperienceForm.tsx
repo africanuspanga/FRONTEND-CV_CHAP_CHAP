@@ -80,8 +80,14 @@ const WorkExperienceForm = () => {
         },
         ...filteredExperiences
       ]);
+    } else if (!showJobForm || editingJobIndex !== null) {
+      // If form is hidden or we're editing, remove any preview items
+      const filteredExperiences = (formData.workExperience || []).filter(job => job.id !== 'preview-job');
+      if (filteredExperiences.length !== (formData.workExperience || []).length) {
+        updateFormField('workExperience', filteredExperiences);
+      }
     }
-  }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob, aiRecommendations, showJobForm, editingJobIndex]);
+  }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob, aiRecommendations, showJobForm, editingJobIndex, formData.workExperience, updateFormField]);
   
   // Add a new work experience to the form data
   const addWorkExperience = (achievements: string[] = []) => {
