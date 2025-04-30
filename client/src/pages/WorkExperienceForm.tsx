@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,12 +10,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 const WorkExperienceForm = () => {
   const [, navigate] = useLocation();
+  const params = useParams<{ templateId: string }>();
   const { formData, updateFormField, addItemToArray } = useCVForm();
   const [currentJob, setCurrentJob] = useState(false);
+  
+  // Get the template ID from the URL
+  const templateId = params.templateId;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/create/3'); // Go to Education form
+    // Note: For now, we're just showing the work experience form.
+    // In a complete implementation, you would add more routes for education, skills, etc.
+    navigate(`/cv/${templateId}/education`); 
   };
 
   // Generate month options
@@ -41,7 +47,7 @@ const WorkExperienceForm = () => {
       <div className="bg-white rounded-lg border p-8">
         {/* Back button */}
         <button
-          onClick={() => navigate('/create/1')}
+          onClick={() => navigate(`/cv/${templateId}/personal`)}
           className="text-blue-600 flex items-center mb-6"
         >
           <ChevronLeft className="h-4 w-4 mr-1" />

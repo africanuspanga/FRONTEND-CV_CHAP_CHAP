@@ -1,5 +1,5 @@
-import React from 'react';
-import { useLocation } from 'wouter';
+import React, { useEffect } from 'react';
+import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,11 +8,22 @@ import { useCVForm } from '@/contexts/cv-form-context';
 
 const PersonalInfoForm = () => {
   const [, navigate] = useLocation();
+  const params = useParams<{ templateId: string }>();
   const { formData, updateFormField, goToNextStep } = useCVForm();
+  
+  // Get the template ID from the URL
+  const templateId = params.templateId;
+  
+  // When the component loads, ensure the template is set
+  useEffect(() => {
+    if (templateId) {
+      updateFormField('templateId', templateId);
+    }
+  }, [templateId, updateFormField]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/create/2'); // Go to next step (work experience)
+    navigate(`/cv/${templateId}/work`); // Go to next step (work experience)
   };
 
   return (

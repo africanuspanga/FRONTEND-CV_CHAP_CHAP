@@ -27,14 +27,14 @@ const TemplateSelection = () => {
   const handleSelectTemplate = (templateId: string) => {
     setSelectedTemplateId(templateId);
     setTemplate(templateId);
-    navigate('/create/1'); // Go directly to Personal Information form
+    navigate(`/cv/${templateId}/personal`); // Go directly to Personal Information form with templateId in URL
   };
   
   // Proceed to next step (for the "Continue with Selected Template" button)
   const handleProceed = () => {
     if (selectedTemplateId) {
       setTemplate(selectedTemplateId);
-      navigate('/create/1'); // Go directly to Personal Information form
+      navigate(`/cv/${selectedTemplateId}/personal`); // Go directly to Personal Information form with templateId in URL
     }
   };
 

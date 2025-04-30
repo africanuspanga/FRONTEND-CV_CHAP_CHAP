@@ -23,8 +23,8 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/templates" component={TemplateSelection} />
           <Route path="/create/method" component={CreationMethod} />
-          <Route path="/create/1" component={PersonalInfoForm} />
-          <Route path="/create/2" component={WorkExperienceForm} />
+          <Route path="/cv/:templateId/personal" component={PersonalInfoForm} />
+          <Route path="/cv/:templateId/work" component={WorkExperienceForm} />
           <Route path="/create/:step?" component={CreateCV} />
           <Route component={NotFound} />
         </Switch>
