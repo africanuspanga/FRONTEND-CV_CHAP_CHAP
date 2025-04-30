@@ -76,7 +76,10 @@ export const ClientSideTemplateRenderer = ({
         updateElement('location', personalInfo.location || '');
         updateElement('website', personalInfo.website || '');
         updateElement('linkedin', personalInfo.linkedin || '');
-        updateElement('github', personalInfo.github || '');
+        // Optional fields that might not exist in all templates
+        if (doc.getElementById('github')) {
+          updateElement('github', personalInfo.website || ''); // Using website as fallback
+        }
         updateElement('job-title', personalInfo.jobTitle || '');
         updateElement('summary', cvData.summary || '');
 
@@ -90,7 +93,7 @@ export const ClientSideTemplateRenderer = ({
             expElement.className = 'experience-item';
             
             expElement.innerHTML = `
-              <h3 class="job-title">${exp.title || exp.jobTitle || ''}</h3>
+              <h3 class="job-title">${exp.jobTitle || ''}</h3>
               <div class="company">${exp.company || ''}</div>
               <div class="dates">${exp.startDate || ''} - ${exp.endDate || (exp.current ? 'Present' : '')}</div>
               <div class="location">${exp.location || ''}</div>
@@ -114,7 +117,7 @@ export const ClientSideTemplateRenderer = ({
               <h3 class="degree">${edu.degree || ''}</h3>
               <div class="institution">${edu.institution || ''}</div>
               <div class="dates">${edu.startDate || ''} - ${edu.endDate || (edu.current ? 'Present' : '')}</div>
-              <div class="location">${edu.location || ''}</div>
+              <div class="location">${''}</div>
               <div class="description">${edu.description || ''}</div>
             `;
             
@@ -169,7 +172,7 @@ export const ClientSideTemplateRenderer = ({
             
             refElement.innerHTML = `
               <h3 class="reference-name">${reference.name || ''}</h3>
-              <div class="reference-title">${reference.title || reference.position || ''}</div>
+              <div class="reference-title">${reference.position || ''}</div>
               <div class="reference-company">${reference.company || ''}</div>
               <div class="reference-email">${reference.email || ''}</div>
               <div class="reference-phone">${reference.phone || ''}</div>

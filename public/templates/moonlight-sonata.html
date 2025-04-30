@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moonlight Sonata CV Template</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Open Sans', Arial, sans-serif;
+    }
+    
+    body {
+      background-color: white;
+      color: #333;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+    
+    .cv-container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      min-height: 100vh;
+      background-color: #ffffff;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 38%;
+      background-color: #e87b3a;
+      color: #ffffff;
+      padding: 35px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar-header {
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    
+    .sidebar-header h1 {
+      font-size: 2.8em;
+      color: #ffffff;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      line-height: 1.1;
+      letter-spacing: 1px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+    }
+    
+    .sidebar-header h2 {
+      font-size: 1.1em;
+      color: #f0f0f0;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      border-top: 1px solid rgba(255, 255, 255, 0.5);
+      padding-top: 10px;
+      margin-top: 10px;
+      font-family: 'Open Sans', sans-serif;
+    }
+    
+    .contact-info {
+      margin-bottom: 25px;
+    }
+    
+    .contact-info h3, .summary h3, .languages h3, .references h3 {
+      font-size: 1.1em;
+      color: #ffffff;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+    }
+    
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      font-size: 0.95em;
+      line-height: 1.5;
+      font-family: 'Open Sans', sans-serif;
+    }
+    
+    .contact-icon {
+      width: 20px;
+      margin-right: 10px;
+      text-align: center;
+      color: #f0f0f0;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+    
+    .summary {
+      margin-bottom: 25px;
+    }
+    
+    .summary p {
+      font-size: 0.95em;
+      line-height: 1.7;
+      font-family: 'Open Sans', sans-serif;
+    }
+    
+    .languages, .references {
+      margin-bottom: 25px;
+    }
+    
+    .language-item, .reference-item {
+      margin-bottom: 8px;
+      font-size: 0.95em;
+      font-family: 'Open Sans', sans-serif;
+    }
+    
+    .language-name, .reference-name {
+      font-weight: 500;
+    }
+    
+    /* Main */
+    .main {
+      width: 62%;
+      padding: 35px;
+      box-sizing: border-box;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+    }
+    
+    .section h3 {
+      font-size: 1.2em;
+      color: #e87b3a;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #e87b3a;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+    }
+    
+    .experience-item, .education-item {
+      margin-bottom: 20px;
+    }
+    
+    .dates {
+      display: block;
+      font-size: 0.9em;
+      color: #777;
+      margin-bottom: 3px;
+      font-weight: 600;
+      font-family: 'Open Sans', sans-serif;
+    }
+    
+    .job-title, .degree {
+      display: block;
+      font-size: 1.15em;
+      color: #222;
+      margin-bottom: 2px;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 600;
+    }
+    
+    .company, .institution {
+      display: block;
+      font-size: 1em;
+      color: #555;
+      font-family: 'Open Sans', sans-serif;
+    }
+    
+    .description {
+      margin-top: 5px;
+      color: #444;
+      font-size: 0.95em;
+      line-height: 1.6;
+      font-family: 'Open Sans', sans-serif;
+    }
+    
+    .skills-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      columns: 2;
+      column-gap: 30px;
+      font-family: 'Open Sans', sans-serif;
+    }
+    
+    .skill-item {
+      font-size: 0.95em;
+      color: #444;
+      margin-bottom: 8px;
+      padding-left: 18px;
+      position: relative;
+      break-inside: avoid-column;
+    }
+    
+    .skill-item:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 0.1em;
+      color: #e87b3a;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  <div class="cv-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <header class="sidebar-header">
+        <h1>
+          <span id="first-name">John</span>
+          <span id="last-name">Doe</span>
+        </h1>
+        <h2 id="job-title">PROFESSIONAL</h2>
+      </header>
+      
+      <section class="contact-info">
+        <h3>CONTACT</h3>
+        <p class="contact-item">
+          <span class="contact-icon">[P]</span>
+          <span id="phone">+255 123 456 789</span>
+        </p>
+        <p class="contact-item">
+          <span class="contact-icon">[E]</span>
+          <span id="email">john.doe@example.com</span>
+        </p>
+        <p class="contact-item">
+          <span class="contact-icon">[A]</span>
+          <span id="location">Dar es Salaam, Tanzania</span>
+        </p>
+        <p class="contact-item">
+          <span class="contact-icon">[W]</span>
+          <span id="website">johndoe.com</span>
+        </p>
+        <p class="contact-item">
+          <span class="contact-icon">[L]</span>
+          <span id="linkedin">linkedin.com/in/johndoe</span>
+        </p>
+      </section>
+      
+      <section class="summary">
+        <h3>SUMMARY</h3>
+        <p id="summary">
+          Experienced professional with a passion for excellence. Strong communication skills and attention to detail.
+        </p>
+      </section>
+      
+      <section class="languages">
+        <h3>LANGUAGES</h3>
+        <div id="languages-container">
+          <!-- Languages will be injected here -->
+          <div class="language-item">
+            <span class="language-name">English:</span> Fluent
+          </div>
+          <div class="language-item">
+            <span class="language-name">Swahili:</span> Native
+          </div>
+        </div>
+      </section>
+      
+      <section class="references">
+        <h3>REFERENCES</h3>
+        <div id="references-container">
+          <!-- References will be injected here -->
+          <div class="reference-item">
+            <strong class="reference-name">Jane Smith</strong>
+            <div>Director of Operations</div>
+            <div>Global Company Inc.</div>
+            <div>jane.smith@example.com</div>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <!-- Main content -->
+    <div class="main">
+      <section class="section">
+        <h3>PROFESSIONAL EXPERIENCE</h3>
+        <div id="experience-container">
+          <!-- Experience items will be injected here -->
+          <div class="experience-item">
+            <span class="dates">Jan 2020 - Present</span>
+            <strong class="job-title">Senior Developer</strong>
+            <span class="company">Tech Solutions, Dar es Salaam</span>
+            <div class="description">
+              Leading development team and implementing best practices. Responsible for architecture decisions and mentoring junior developers.
+            </div>
+          </div>
+          <div class="experience-item">
+            <span class="dates">Mar 2018 - Dec 2019</span>
+            <strong class="job-title">Software Developer</strong>
+            <span class="company">Digital Innovations, Nairobi</span>
+            <div class="description">
+              Developed web applications using modern JavaScript frameworks. Collaborated with design team to implement responsive interfaces.
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section class="section">
+        <h3>EDUCATION</h3>
+        <div id="education-container">
+          <!-- Education items will be injected here -->
+          <div class="education-item">
+            <span class="dates">2014 - 2018</span>
+            <strong class="degree">Bachelor of Science, Computer Science</strong>
+            <span class="institution">University of Dar es Salaam</span>
+            <div class="description">
+              Graduated with honors. Specialized in software engineering and database systems.
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section class="section">
+        <h3>SKILLS</h3>
+        <div id="skills-container" class="skills-list">
+          <!-- Skills will be injected here -->
+          <div class="skill-item">JavaScript</div>
+          <div class="skill-item">React</div>
+          <div class="skill-item">Node.js</div>
+          <div class="skill-item">Python</div>
+          <div class="skill-item">SQL</div>
+          <div class="skill-item">Git</div>
+        </div>
+      </section>
+      
+      <div id="additional-sections-container">
+        <!-- Additional sections will be injected here -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>
