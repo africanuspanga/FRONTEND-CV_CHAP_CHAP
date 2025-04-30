@@ -9,6 +9,7 @@ import { SafariOriginalTemplate } from './safariOriginal';
 import { BigBossTemplate } from './bigBoss';
 import { TanzaniteProTemplate } from './tanzanitePro';
 import { MwalimuOneTemplate } from './mwalimuOne';
+import { SerengetiFlowTemplate } from './serengetiFlow';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -72,6 +73,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'mwalimuOne',
     name: 'Mwalimu One',
     render: MwalimuOneTemplate
+  },
+  serengetiFlow: {
+    id: 'serengetiFlow',
+    name: 'Serengeti Flow',
+    render: SerengetiFlowTemplate
   }
 };
 

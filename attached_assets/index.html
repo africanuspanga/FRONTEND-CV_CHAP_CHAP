@@ -3,126 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Template - Centered Layout</title>
-    <link rel="stylesheet" href="style.css">
+    <title>CV Template - Style 2</title> <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    </head>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+</head>
 <body>
-    <div class="cv-container">
-
-        <header class="cv-header">
-            <h1 id="fullName">Kelly Blackwell</h1>
-            <h2 id="profession">ADMINISTRATIVE ASSISTANT</h2>
+    <div class="resume-container">
+        <header class="resume-header">
+            <h1 id="fullName">RICHARD WILLIAMS</h1>
+            <div class="contact-info">
+                <span>3665 Margaret Street, Houston, TX 47587</span>
+                <span id="contactEmail">RichardWilliams@gmail.com</span>
+                <span id="contactPhone">(770) 625-9669</span>
+                <span id="contactLinkedin" style="display: none;"></span>
+            </div>
         </header>
 
-        <section class="contact-bar">
-            <span id="contactPhone">(210) 286-1624</span>
-            <span class="separator">|</span>
-            <span id="contactEmail">kelly.blackwell@gmail.com</span>
-            <span class="separator">|</span>
-            <span>San Antonio, TX 78023</span>
-            <a id="contactLinkedin" href="#" style="display:none;">LinkedIn</a>
-        </section>
+        <main class="resume-body">
 
-        <section class="summary">
-             <p id="careerObjective">Administrative assistant with 9+ years of experience organizing presentations, preparing facility reports, and maintaining the utmost confidentiality. Possess a B.A. in history and expertise in Microsoft Excel. Looking to leverage my wealth of knowledge and experience into the open administrative assistant role at your organization.</p>
-        </section>
+            <section class="summary section-row">
+                <div class="title-column">
+                    <h2>SUMMARY</h2>
+                </div>
+                <div class="content-column">
+                    <p id="careerObjective">
+                        Financial Advisor with 7+ years of experience delivering financial/investment advisory services to high value clients. Proven success in managing multi-million dollar portfolios, driving profitability, and increasing ROI through skillful strategic planning, consulting, and financial advisory services.
+                    </p>
+                </div>
+            </section>
 
-        <section class="skills">
-            <h3>SKILLS</h3>
-             <ul id="skillsList" class="skills-columns">
-                <li>Analytical Thinking</li>
-                <li>Team Leadership</li>
-                <li>Tolerant & Flexible</li>
-                <li>Organization & Prioritization</li>
-                </ul>
-        </section>
-
-        <section class="experience">
-            <h3>EXPERIENCE</h3>
-            <ul id="experienceList">
-                <li>
-                    <div class="entry-header">
-                        <div class="title-company">
-                            <strong>ADMINISTRATIVE ASSISTANT</strong>
-                            <span>Redford & Sons</span>
-                        </div>
-                        <div class="location-date">
-                            <span>Boston, MA</span>
-                            <span>September 2017 - Present</span>
-                        </div>
+            <section class="professional-experience section-row">
+                <div class="title-column">
+                    <h2>PROFESSIONAL EXPERIENCE</h2>
+                </div>
+                <div class="content-column">
+                    <div id="experienceList">
+                        <article class="job">
+                            <h3>Senior Financial Advisor</h3>
+                            <p class="meta">Wells Fargo Advisors, Houston, TX | August 2020-Present</p>
+                            <ul>
+                                <li>Deliver financial advice to clients, proposing strategies to achieve short- and long-term objectives for investments, insurance, business and estate planning with minimal risk</li>
+                                <li>Develop, review, and optimize investment portfolios for 300+ high value clients with over $190M AUM (Assets Under Management)</li>
+                                <li>Ensure maximum client satisfaction by providing exceptional and personalized service, enhancing client satisfaction ratings from 88% to 99.9% in less than 6 months</li>
+                            </ul>
+                        </article>
+                        <article class="job">
+                            <h3>Financial Advisor</h3>
+                            <p class="meta">Suntrust Investment Services, Inc., New Orleans, LA | July 2017–August 2020</p>
+                            <ul>
+                                <li>Served as knowledgeable financial advisor to clients, managing an over $20.75M investment portfolio of 90+ individual and corporate clients</li>
+                                <li>Partnered with cross-functional teams in consulting with clients to provide asset management risk strategy and mitigation, which increased AUM by 50%</li>
+                             </ul>
+                        </article>
+                         <article class="job">
+                            <h3>Financial Advisor</h3>
+                            <p class="meta">Maverick Capital Management, New Orleans, LA | July 2014–August 2017</p>
+                            <ul>
+                                <li>Served as the primary point of contact for over 15 clients</li>
+                                <li>Managed the portfolios of several major clients with over $8.5M in total assets</li>
+                            </ul>
+                        </article>
                     </div>
-                    <ul class="details-list">
-                        <li>Schedule and coordinate meetings, appointments, and travel arrangements for supervisors, managers, and C-level executives</li>
-                        <li>Trained 2 administrative assistants during a period of company expansion to ensure attention to detail and adherence to company</li>
-                        <li>Developed new filing and organizational practices, saving the company $3,000 per year in contracted labor expenses</li>
-                    </ul>
-                </li>
-                 <li>
-                    <div class="entry-header">
-                         <div class="title-company">
-                            <strong>SECRETARY</strong>
-                            <span>Bright Spot LTD</span>
-                        </div>
-                        <div class="location-date">
-                            <span>Boston</span> <span>June 2016 - August 2017</span>
-                        </div>
-                    </div>
-                    <ul class="details-list">
-                        <li>Typed documents such as correspondence, drafts, memos, and emails, and prepared 3 reports weekly for management</li>
-                        <li>Opened, sorted, and distributed incoming messages and correspondence to the appropriate personnel</li>
-                        <li>Purchased and maintained office supply inventories, and always careful to adhere to budgeting practices</li>
-                        <li>Greeted visitors and determined to whom and when they could speak with specific individuals</li>
-                    </ul>
-                </li>
-            </ul>
-        </section>
+                </div>
+            </section>
 
-        <section class="education">
-            <h3>EDUCATION</h3>
-            <ul id="educationList">
-                <li>
-                    <div class="entry-header">
-                        <div class="title-company">
-                            <strong>BACHELOR OF ARTS (B.A.) IN FINANCE</strong> <span>Brown University, Providence, RI</span>
-                        </div>
-                        <div class="location-date">
-                            <span>05/2009</span>
-                        </div>
-                    </div>
-                </li>
-                 <li>
-                    <div class="entry-header">
-                        <div class="title-company">
-                            <strong>ASSOCIATE OF ARTS IN BUSINESS</strong>
-                             <span>San Antonio Community College, San Antonio, TX</span>
-                        </div>
-                        <div class="location-date">
-                             <span>05/2007</span>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </section>
+            <section class="education section-row">
+                 <div class="title-column">
+                     <h2>EDUCATION</h2>
+                 </div>
+                 <div class="content-column">
+                     <div id="educationList">
+                         <article>
+                             <h3>Bachelor of Science in Business Administration (concentration: finance), May 2014</h3>
+                             <p>Honors: cum laude (GPA: 3.7/4.0)</p>
+                             <p class="meta">Louisiana State University, Baton Rouge, LA</p>
+                         </article>
+                     </div>
+                 </div>
+            </section>
 
-        <section id="languagesSection" style="display:none;">
-            <h3>Languages</h3>
-            <ul id="languagesList"></ul>
-        </section>
-        <section id="referencesSection" style="display:none;">
-            <h3>References</h3>
-            <ul id="referencesList"></ul>
-         </section>
-         <section id="hobbiesSection" style="display:none;">
-             <h3>Hobbies & Interests</h3>
-             <p id="hobbiesText"></p>
-         </section>
-         <section id="portfolioSection" style="display:none;">
-             <h3>Portfolio</h3>
-             <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
-         </section>
+            <section class="skills section-row">
+                 <div class="title-column">
+                     <h2>ADDITIONAL SKILLS</h2>
+                 </div>
+                 <div class="content-column">
+                     <ul id="skillsList">
+                        <li>Proficient in MS Office (Word, Excel, PowerPoint) Outlook, MS Project, Salesforce, TFS Project Management, Webex, and GoToMeeting</li>
+                        <li>Fluent in English, Spanish, and French</li>
+                     </ul>
+                 </div>
+            </section>
 
-    </div> </body>
+            <section id="languagesSection" class="section-row" style="display:none;">
+                <div class="title-column">
+                    <h2>LANGUAGES</h2>
+                </div>
+                <div class="content-column">
+                    <ul id="languagesList"></ul> </div>
+            </section>
+
+            <section id="referencesSection" class="section-row" style="display:none;">
+                <div class="title-column">
+                    <h2>REFERENCES</h2>
+                </div>
+                <div class="content-column">
+                    <ul id="referencesList"></ul> </div>
+            </section>
+
+            <section id="hobbiesSection" class="section-row" style="display:none;">
+                <div class="title-column">
+                    <h2>HOBBIES & INTERESTS</h2>
+                </div>
+                <div class="content-column">
+                    <p id="hobbiesText"></p> </div>
+            </section>
+
+            <section id="portfolioSection" class="section-row" style="display:none;">
+                 <div class="title-column">
+                     <h2>PORTFOLIO</h2>
+                 </div>
+                 <div class="content-column">
+                     <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
+                 </div>
+            </section>
+            </main>
+    </div>
+</body>
 </html>

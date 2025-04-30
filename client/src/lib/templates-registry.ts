@@ -121,6 +121,16 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Professional',
     popularity: 5,
     previewImage: templateImages.mwalimuOne
+  },
+  {
+    id: 'serengetiFlow',
+    name: 'Serengeti Flow',
+    description: 'Professional template with dark blue header and clean two-column content layout',
+    contentPath: '/templates/serengeti-flow.html',
+    isLocal: true,
+    category: 'Professional',
+    popularity: 5,
+    previewImage: templateImages.serengetiFlow
   }
 ];
 
