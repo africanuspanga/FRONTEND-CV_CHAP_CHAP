@@ -73,6 +73,7 @@ const CreateCVContent = () => {
     currentStep, 
     setCurrentStep, 
     formData, 
+    updateFormField,
     isFormValid,
     goToNextStep,
     goToPreviousStep,
@@ -85,8 +86,7 @@ const CreateCVContent = () => {
   useEffect(() => {
     if (!formData.templateId) {
       // Use a default template (first time load)
-      const defaultTemplate = 'moonlightSonata';
-      updateFormField('templateId', defaultTemplate);
+      updateFormField('templateId', 'moonlightSonata');
     }
   }, [formData.templateId, updateFormField]);
 
