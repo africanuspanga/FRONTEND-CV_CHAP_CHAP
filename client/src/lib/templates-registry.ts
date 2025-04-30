@@ -131,6 +131,16 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Professional',
     popularity: 5,
     previewImage: templateImages.serengetiFlow
+  },
+  {
+    id: 'smartBongo',
+    name: 'Smart Bongo',
+    description: 'Professional dark-gray sidebar template with modern grid layout and footer contact section',
+    contentPath: '/templates/smart-bongo.html',
+    isLocal: true,
+    category: 'Professional',
+    popularity: 5,
+    previewImage: templateImages.smartBongo
   }
 ];
 

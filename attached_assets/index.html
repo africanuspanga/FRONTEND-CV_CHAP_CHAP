@@ -3,131 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Template - Style 2</title> <link rel="stylesheet" href="style.css">
+    <title>CV Template - Style 3</title> <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="resume-container">
-        <header class="resume-header">
-            <h1 id="fullName">RICHARD WILLIAMS</h1>
-            <div class="contact-info">
-                <span>3665 Margaret Street, Houston, TX 47587</span>
-                <span id="contactEmail">RichardWilliams@gmail.com</span>
-                <span id="contactPhone">(770) 625-9669</span>
-                <span id="contactLinkedin" style="display: none;"></span>
+        <aside class="left-column">
+            <div class="header-info">
+                <h1 id="fullName">DENICE HARRIS</h1>
+                <p id="profession">Senior Graphic Design Specialist</p>
             </div>
-        </header>
 
-        <main class="resume-body">
-
-            <section class="summary section-row">
-                <div class="title-column">
-                    <h2>SUMMARY</h2>
-                </div>
-                <div class="content-column">
-                    <p id="careerObjective">
-                        Financial Advisor with 7+ years of experience delivering financial/investment advisory services to high value clients. Proven success in managing multi-million dollar portfolios, driving profitability, and increasing ROI through skillful strategic planning, consulting, and financial advisory services.
-                    </p>
-                </div>
-            </section>
-
-            <section class="professional-experience section-row">
-                <div class="title-column">
-                    <h2>PROFESSIONAL EXPERIENCE</h2>
-                </div>
-                <div class="content-column">
-                    <div id="experienceList">
-                        <article class="job">
-                            <h3>Senior Financial Advisor</h3>
-                            <p class="meta">Wells Fargo Advisors, Houston, TX | August 2020-Present</p>
-                            <ul>
-                                <li>Deliver financial advice to clients, proposing strategies to achieve short- and long-term objectives for investments, insurance, business and estate planning with minimal risk</li>
-                                <li>Develop, review, and optimize investment portfolios for 300+ high value clients with over $190M AUM (Assets Under Management)</li>
-                                <li>Ensure maximum client satisfaction by providing exceptional and personalized service, enhancing client satisfaction ratings from 88% to 99.9% in less than 6 months</li>
-                            </ul>
-                        </article>
-                        <article class="job">
-                            <h3>Financial Advisor</h3>
-                            <p class="meta">Suntrust Investment Services, Inc., New Orleans, LA | July 2017–August 2020</p>
-                            <ul>
-                                <li>Served as knowledgeable financial advisor to clients, managing an over $20.75M investment portfolio of 90+ individual and corporate clients</li>
-                                <li>Partnered with cross-functional teams in consulting with clients to provide asset management risk strategy and mitigation, which increased AUM by 50%</li>
-                             </ul>
-                        </article>
-                         <article class="job">
-                            <h3>Financial Advisor</h3>
-                            <p class="meta">Maverick Capital Management, New Orleans, LA | July 2014–August 2017</p>
-                            <ul>
-                                <li>Served as the primary point of contact for over 15 clients</li>
-                                <li>Managed the portfolios of several major clients with over $8.5M in total assets</li>
-                            </ul>
-                        </article>
-                    </div>
-                </div>
-            </section>
-
-            <section class="education section-row">
-                 <div class="title-column">
-                     <h2>EDUCATION</h2>
-                 </div>
-                 <div class="content-column">
-                     <div id="educationList">
-                         <article>
-                             <h3>Bachelor of Science in Business Administration (concentration: finance), May 2014</h3>
-                             <p>Honors: cum laude (GPA: 3.7/4.0)</p>
-                             <p class="meta">Louisiana State University, Baton Rouge, LA</p>
-                         </article>
+            <section class="education">
+                <h2>EDUCATION</h2>
+                <div id="educationList">
+                    <article>
+                        <h3>Bachelor of Arts, Communications</h3>
+                        <p class="meta">Rochester Technology, Rochester NY</p>
+                        <p>Design GPA: 3.7/4.0</p>
+                        <p>May 2015</p>
+                    </article>
                      </div>
-                 </div>
             </section>
 
-            <section class="skills section-row">
-                 <div class="title-column">
-                     <h2>ADDITIONAL SKILLS</h2>
-                 </div>
-                 <div class="content-column">
-                     <ul id="skillsList">
-                        <li>Proficient in MS Office (Word, Excel, PowerPoint) Outlook, MS Project, Salesforce, TFS Project Management, Webex, and GoToMeeting</li>
-                        <li>Fluent in English, Spanish, and French</li>
-                     </ul>
-                 </div>
+            <section class="skills">
+                 <h2>KEY SKILLS</h2>
+                 <ul id="skillsList">
+                    <li>InDesign</li>
+                    <li>Illustrator</li>
+                    <li>Photoshop</li>
+                    <li>Figma</li>
+                    <li>Fluent in Spanish</li>
+                    <li>Infographic design</li>
+                    <li>Branding & identity</li>
+                </ul>
             </section>
 
-            <section id="languagesSection" class="section-row" style="display:none;">
-                <div class="title-column">
-                    <h2>LANGUAGES</h2>
+             <section id="languagesSection" style="display:none;">
+                <h2>LANGUAGES</h2>
+                <ul id="languagesList"></ul> </section>
+
+            <section id="referencesSection" style="display:none;">
+                <h2>REFERENCES</h2>
+                <ul id="referencesList">
+                    </ul> </section>
+
+             <section id="hobbiesSection" style="display:none;">
+                <h2>HOBBIES & INTERESTS</h2>
+                <p id="hobbiesText"></p> </section>
+
+            <section id="portfolioSection" style="display:none;">
+                <h2>PORTFOLIO</h2>
+                <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
+            </section>
+            </aside>
+
+        <main class="right-column">
+            <section class="summary">
+                 <p id="careerObjective">
+                    Senior Graphic Design Specialist with 6+ years of experience managing design processes, from conceptualization to delivery. Skilled with Adobe Creative Suite (Illustrator, Photoshop, InDesign), Microsoft Office, and web design applications (Dreamweaver, HTML). Able to stretch the boundaries of web design and digital storytelling to help my client's brands stand out and grow.
+                </p>
+            </section>
+
+            <section class="professional-experience">
+                <h2>PROFESSIONAL EXPERIENCE</h2>
+                <div id="experienceList">
+                    <article class="job">
+                        <div class="job-header">
+                            <h3>Senior Graphic Design Specialist</h3>
+                            <p class="meta">Experion, New York, NY</p>
+                        </div>
+                        <p class="dates">2019 - Present</p>
+                        <ul>
+                           <li>Lead the design, development, and implementation of graphic, layout, and production communication materials while helping clients cut costs by an average of 12%</li>
+                           <li>Delegate tasks to a 7-member design team and provide counsel on all aspects of the project</li>
+                           <li>Oversee design project budgets ranging from $2,000 - $25,000</li>
+                        </ul>
+                    </article>
+                    <article class="job">
+                         <div class="job-header">
+                            <h3>Graphic Design Specialist</h3>
+                            <p class="meta">Stepping Stone Advertising, New York, NY</p>
+                         </div>
+                         <p class="dates">2017 - 2019</p>
+                         <ul>
+                            <li>Developed numerous marketing programs (logos, brochures, newsletters, infographics, presentations, and advertisements) and made sure they exceeded the expectations of our clients</li>
+                            <li>Managed up to 5 projects or tasks at a given time and ensured our team met its weekly deadlines</li>
+                         </ul>
+                    </article>
+                     <article class="job">
+                         <div class="job-header">
+                            <h3>Junior Graphic Designer</h3>
+                            <p class="meta">Redfin Technologies, New Rochelle, NY</p>
+                         </div>
+                          <p class="dates">2015 - 2017</p>
+                         <ul>
+                            <li>Worked with senior designers to develop unique product branding</li>
+                            <li>Created 15 original illustrations for a website redesign using Adobe Illustrator and Photoshop</li>
+                         </ul>
+                    </article>
                 </div>
-                <div class="content-column">
-                    <ul id="languagesList"></ul> </div>
             </section>
-
-            <section id="referencesSection" class="section-row" style="display:none;">
-                <div class="title-column">
-                    <h2>REFERENCES</h2>
-                </div>
-                <div class="content-column">
-                    <ul id="referencesList"></ul> </div>
-            </section>
-
-            <section id="hobbiesSection" class="section-row" style="display:none;">
-                <div class="title-column">
-                    <h2>HOBBIES & INTERESTS</h2>
-                </div>
-                <div class="content-column">
-                    <p id="hobbiesText"></p> </div>
-            </section>
-
-            <section id="portfolioSection" class="section-row" style="display:none;">
-                 <div class="title-column">
-                     <h2>PORTFOLIO</h2>
-                 </div>
-                 <div class="content-column">
-                     <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
-                 </div>
-            </section>
-            </main>
+        </main>
     </div>
+
+    <footer class="resume-footer">
+         <span><i class="fas fa-phone icon"></i><span id="contactPhone">(212) 256-1414</span></span>
+         <span><i class="fas fa-map-marker-alt icon"></i><span>Chicago, IL 60622</span></span>
+         <span><i class="fas fa-envelope icon"></i><span id="contactEmail">denice.harris@gmail.com</span></span>
+         <span><i class="fas fa-globe icon"></i><span>deniceharris.com</span></span>
+         <span id="contactLinkedin" style="display:none;"><i class="fab fa-linkedin icon"></i><span></span></span>
+    </footer>
 </body>
 </html>

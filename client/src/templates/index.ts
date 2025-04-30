@@ -10,6 +10,7 @@ import { BigBossTemplate } from './bigBoss';
 import { TanzaniteProTemplate } from './tanzanitePro';
 import { MwalimuOneTemplate } from './mwalimuOne';
 import { SerengetiFlowTemplate } from './serengetiFlow';
+import { SmartBongoTemplate } from './smartBongo';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -78,6 +79,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'serengetiFlow',
     name: 'Serengeti Flow',
     render: SerengetiFlowTemplate
+  },
+  smartBongo: {
+    id: 'smartBongo',
+    name: 'Smart Bongo',
+    render: SmartBongoTemplate
   }
 };
 

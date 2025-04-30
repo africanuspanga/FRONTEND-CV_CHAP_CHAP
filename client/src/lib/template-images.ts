@@ -10,6 +10,7 @@ import bigBossPreview from '@/assets/big-boss-preview.png';
 import tanzaniteProPreview from '@/assets/tanzanite-pro-preview.png';
 import mwalimuOnePreview from '@/assets/mwalimu-one-preview.png';
 import serengetiFlowPreview from '@/assets/serengeti-flow-preview.png';
+import smartBongoPreview from '@/assets/smart-bongo-preview.png';
 
 export const templateImages = {
   moonlightSonata: moonlightSonataPreview,
@@ -23,5 +24,6 @@ export const templateImages = {
   bigBoss: bigBossPreview,
   tanzanitePro: tanzaniteProPreview,
   mwalimuOne: mwalimuOnePreview,
-  serengetiFlow: serengetiFlowPreview
+  serengetiFlow: serengetiFlowPreview,
+  smartBongo: smartBongoPreview
 };
