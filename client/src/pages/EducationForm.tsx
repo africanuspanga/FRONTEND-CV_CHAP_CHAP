@@ -215,7 +215,7 @@ const EducationForm = () => {
               </Button>
             </div>
             
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-2 gap-4">
               <Button
                 type="button"
                 variant="outline"
@@ -236,15 +236,6 @@ const EducationForm = () => {
                 Dean's List
               </Button>
             </div>
-          </div>
-
-          <div className="mb-6">
-            <Label htmlFor="educationDescription" className="font-semibold">EDUCATION DESCRIPTION</Label>
-            <Textarea
-              id="educationDescription"
-              placeholder="Completed University-level Coursework: [Area of Study], [School Name]"
-              className="min-h-32"
-            />
           </div>
 
           <div className="flex justify-end">
