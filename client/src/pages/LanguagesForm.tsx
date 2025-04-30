@@ -75,7 +75,8 @@ const LanguagesForm = () => {
   };
 
   // Remove a language
-  const removeLanguage = (id: string) => {
+  const removeLanguage = (id: string | undefined) => {
+    if (!id) return;
     setSelectedLanguages(selectedLanguages.filter(lang => lang.id !== id));
   };
 
@@ -224,7 +225,7 @@ const LanguagesForm = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => removeLanguage(language.id)}
+                    onClick={() => removeLanguage(language.id || '')}
                     className="h-8 w-8 text-gray-400 hover:text-gray-700"
                   >
                     <X className="h-5 w-5" />

@@ -17,6 +17,11 @@ import SkillsIntro from "@/pages/SkillsIntro";
 import SkillsRecommendations from "@/pages/SkillsRecommendations";
 import SkillsEditor from "@/pages/SkillsEditor";
 import LanguagesForm from "@/pages/LanguagesForm";
+import SummaryIntro from "@/pages/SummaryIntro";
+import SummaryGeneration from "@/pages/SummaryGeneration";
+import SummaryEditor from "@/pages/SummaryEditor";
+import ReferencesForm from "@/pages/ReferencesForm";
+import AdditionalSectionsForm from "@/pages/AdditionalSectionsForm";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -35,6 +40,11 @@ function Router() {
           <Route path="/cv/:templateId/skills-recommendations" component={SkillsRecommendations} />
           <Route path="/cv/:templateId/skills-editor" component={SkillsEditor} />
           <Route path="/cv/:templateId/languages" component={LanguagesForm} />
+          <Route path="/cv/:templateId/summary" component={SummaryIntro} />
+          <Route path="/cv/:templateId/summary-generation" component={SummaryGeneration} />
+          <Route path="/cv/:templateId/summary-editor" component={SummaryEditor} />
+          <Route path="/cv/:templateId/references" component={ReferencesForm} />
+          <Route path="/cv/:templateId/additional-sections" component={AdditionalSectionsForm} />
           <Route path="/create/:step?" component={CreateCV} />
           <Route component={NotFound} />
         </Switch>
