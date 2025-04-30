@@ -10,15 +10,16 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { ChevronLeft, PlusCircle, Info } from 'lucide-react';
+import { ChevronLeft, PlusCircle, Info, Lightbulb, LightbulbIcon } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import EducationSummary from '@/components/EducationSummary';
 
 const EducationForm = () => {
   const [, navigate] = useLocation();
   const params = useParams<{ templateId: string }>();
-  const { formData, updateFormField, addItemToArray } = useCVForm();
+  const { formData, updateFormField, addItemToArray, removeItemFromArray } = useCVForm();
 
   // Generate degree options
   const degreeOptions = [
@@ -40,32 +41,53 @@ const EducationForm = () => {
   const [gradMonth, setGradMonth] = useState('');
   const [gradYear, setGradYear] = useState('');
   
+  // UI states
+  const [showEducationForm, setShowEducationForm] = useState(true);
+  const [showEducationSummary, setShowEducationSummary] = useState(false);
+  
+  // Editing state
+  const [editingEducationIndex, setEditingEducationIndex] = useState<number | null>(null);
+  
   // Get the template ID from the URL
   const templateId = params.templateId;
   
+  // Reset form fields
+  const resetFormFields = () => {
+    setInstitution('');
+    setDegree(degreeOptions[0]);
+    setFieldOfStudy('');
+    setSchoolLocation('');
+    setGradMonth('');
+    setGradYear('');
+    setEditingEducationIndex(null);
+  };
+  
   // Effect to update the live preview as user types
   useEffect(() => {
-    // Only create a preview entry if we have enough data
-    if (institution && degree) {
+    // Only create a preview entry if we have enough data and we're not editing
+    if (institution && degree && editingEducationIndex === null && showEducationForm) {
       const graduationDate = gradMonth && gradYear ? `${gradMonth} ${gradYear}` : '';
       
-      // Update the form data with the current education
+      // Update the form data with the current education preview
+      const filteredEducations = (formData.education || []).filter(edu => edu.id !== 'preview-education');
+      
       updateFormField('education', [
         {
           id: 'preview-education',
           institution,
           degree,
           fieldOfStudy,
+          location: schoolLocation,
           startDate: '',
           endDate: graduationDate,
         },
-        ...(formData.education || []).filter(edu => edu.id !== 'preview-education')
+        ...filteredEducations
       ]);
     }
-  }, [institution, degree, fieldOfStudy, schoolLocation, gradMonth, gradYear, updateFormField, formData.education]);
+  }, [institution, degree, fieldOfStudy, schoolLocation, gradMonth, gradYear, showEducationForm, editingEducationIndex]);
 
-  // Update education data in context when form is submitted
-  const updateEducation = () => {
+  // Add a new education to the form data
+  const addEducation = () => {
     // Only add if we have at least institution and degree
     if (institution && degree) {
       const graduationDate = gradMonth && gradYear ? `${gradMonth} ${gradYear}` : '';
@@ -76,22 +98,103 @@ const EducationForm = () => {
         institution,
         degree,
         fieldOfStudy,
+        location: schoolLocation,
         startDate: '',
         endDate: graduationDate,
       };
       
-      // Add to education array
-      addItemToArray('education', newEducation);
+      // Update education array without the preview
+      const filteredEducations = (formData.education || []).filter(edu => edu.id !== 'preview-education');
+      updateFormField('education', [...filteredEducations, newEducation]);
+      
+      // Reset form for adding another education
+      resetFormFields();
+      
+      // Show education summary after adding
+      setShowEducationSummary(true);
+      setShowEducationForm(false);
     }
+  };
+  
+  // Update an existing education
+  const updateExistingEducation = () => {
+    if (editingEducationIndex !== null && formData.education && formData.education[editingEducationIndex]) {
+      const graduationDate = gradMonth && gradYear ? `${gradMonth} ${gradYear}` : '';
+      
+      // Get current educations
+      const currentEducations = [...(formData.education || [])];
+      
+      // Update the specific education
+      currentEducations[editingEducationIndex] = {
+        ...currentEducations[editingEducationIndex],
+        institution,
+        degree,
+        fieldOfStudy,
+        location: schoolLocation,
+        endDate: graduationDate,
+      };
+      
+      // Update in form context
+      updateFormField('education', currentEducations);
+      
+      // Reset form and editing state
+      resetFormFields();
+      setShowEducationSummary(true);
+      setShowEducationForm(false);
+    }
+  };
+  
+  const handleEditEducation = (index: number) => {
+    if (formData.education && formData.education[index]) {
+      const edu = formData.education[index];
+      
+      // Fill the form with the education data
+      setInstitution(edu.institution || '');
+      setDegree(edu.degree || degreeOptions[0]);
+      setFieldOfStudy(edu.fieldOfStudy || '');
+      setSchoolLocation(edu.location || '');
+      
+      // Handle date fields
+      if (edu.endDate) {
+        const [month, year] = edu.endDate.split(' ');
+        setGradMonth(month);
+        setGradYear(year);
+      }
+      
+      // Set editing state
+      setEditingEducationIndex(index);
+      
+      // Show the education form
+      setShowEducationForm(true);
+      setShowEducationSummary(false);
+    }
+  };
+  
+  const handleDeleteEducation = (index: number) => {
+    // Remove the education at the specified index
+    removeItemFromArray('education', index);
+  };
+  
+  const handleAddAnotherEducation = () => {
+    // Reset form for adding a new education
+    resetFormFields();
+    setShowEducationForm(true);
+    setShowEducationSummary(false);
+  };
+  
+  const handleContinueToSkills = () => {
+    // Navigate to the skills form
+    navigate(`/cv/${templateId}/skills`);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Update education before navigating
-    updateEducation();
-    
-    navigate(`/cv/${templateId}/skills`); // Navigate to next step (skills)
+    if (editingEducationIndex !== null) {
+      updateExistingEducation();
+    } else {
+      addEducation();
+    }
   };
 
   // Generate month and year options for date select
@@ -123,196 +226,238 @@ const EducationForm = () => {
           Go Back
         </button>
 
-        <h1 className="text-2xl font-bold mb-2 text-center">Tell us about your education</h1>
-        <p className="text-gray-600 mb-6 text-center">
-          Enter your education experience so far, even if you are a current student or did not graduate.
-        </p>
+        {showEducationForm && (
+          <>
+            <h1 className="text-2xl font-bold mb-2 text-center">Tell us about your education</h1>
+            <p className="text-gray-600 mb-6 text-center">
+              Enter your education experience so far, even if you are a current student or did not graduate.
+            </p>
+            
+            <div className="text-sm text-gray-500 mb-4">* indicates a required field</div>
+
+            <form onSubmit={handleSubmit}>
+              <div className="mb-6">
+                <Label htmlFor="institution" className="font-semibold">
+                  INSTITUTION <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="institution"
+                  placeholder="e.g. University of Dar es Salaam"
+                  value={institution}
+                  onChange={(e) => setInstitution(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <Label htmlFor="degree" className="font-semibold">DEGREE</Label>
+                  <Select
+                    value={degree}
+                    onValueChange={setDegree}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="No Degree" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {degreeOptions.map(degreeOption => (
+                        <SelectItem key={degreeOption} value={degreeOption}>{degreeOption}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="fieldOfStudy" className="font-semibold">FIELD OF STUDY</Label>
+                  <Input
+                    id="fieldOfStudy"
+                    placeholder="e.g. Business"
+                    value={fieldOfStudy}
+                    onChange={(e) => setFieldOfStudy(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <Label htmlFor="schoolLocation" className="font-semibold">SCHOOL LOCATION</Label>
+                <Input
+                  id="schoolLocation"
+                  placeholder="e.g. Mwanza, Tanzania"
+                  value={schoolLocation}
+                  onChange={(e) => setSchoolLocation(e.target.value)}
+                />
+              </div>
+
+              <div className="mb-6">
+                <Label htmlFor="graduationDate" className="font-semibold">
+                  GRADUATION DATE (OR EXPECTED GRADUATION DATE) <span className="text-red-500">*</span>
+                </Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <Select
+                    value={gradMonth}
+                    onValueChange={setGradMonth}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Month" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map(month => (
+                        <SelectItem key={month} value={month}>{month}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select
+                    value={gradYear}
+                    onValueChange={setGradYear}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map(year => (
+                        <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <div className="flex justify-between">
+                  <Label htmlFor="additionalCourses" className="font-semibold text-indigo-900">
+                    ADD ANY ADDITIONAL COURSEWORK YOU'RE PROUD TO SHOWCASE
+                  </Label>
+                  <div className="text-sm text-blue-600 mb-2 cursor-pointer">
+                    Look here for sample CV references
+                  </div>
+                </div>
+                
+                <div className="bg-amber-50 p-4 rounded-md border border-amber-100 mb-6 mt-2">
+                  <div className="flex gap-2">
+                    <LightbulbIcon className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-amber-800 text-sm">
+                      Not enough work experience? This section can help you stand out. If your bachelor's degree is in-progress,
+                      you may include international schooling, educational achievements or any other certification that corresponds
+                      to the job you want.
+                    </p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold text-lg mb-3">Educational Achievements</h3>
+                  <p className="text-gray-600 mb-4">Would you like to include any honors or achievements?</p>
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex items-center justify-center py-6 text-blue-700 border-blue-200 hover:bg-blue-50"
+                      onClick={() => {}}
+                    >
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      GPA
+                    </Button>
+                    
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex items-center justify-center py-6 text-blue-700 border-blue-200 hover:bg-blue-50"
+                      onClick={() => {}}
+                    >
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Honors
+                    </Button>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex items-center justify-center py-6 w-full text-blue-700 border-blue-200 hover:bg-blue-50"
+                      onClick={() => {}}
+                    >
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      International Grade to GPA Equivalent
+                    </Button>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex items-center justify-center py-6 w-full text-blue-700 border-blue-200 hover:bg-blue-50"
+                      onClick={() => {}}
+                    >
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Achievement Tests
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex items-center justify-center py-6 text-blue-700 border-blue-200 hover:bg-blue-50"
+                      onClick={() => {}}
+                    >
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Min Average
+                    </Button>
+                    
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex items-center justify-center py-6 text-blue-700 border-blue-200 hover:bg-blue-50"
+                      onClick={() => {}}
+                    >
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Dean's List
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end mt-8">
+                <Button 
+                  type="submit" 
+                  className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-2"
+                >
+                  Save education
+                </Button>
+              </div>
+            </form>
+          </>
+        )}
         
-        <div className="text-sm text-gray-500 mb-4">* indicates a required field</div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-6">
-            <Label htmlFor="institution" className="font-semibold">
-              INSTITUTION <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="institution"
-              placeholder="e.g. University of Dar es Salaam"
-              value={institution}
-              onChange={(e) => setInstitution(e.target.value)}
-              required
+        {showEducationSummary && (
+          <>
+            <EducationSummary
+              educations={formData.education || []}
+              onEdit={handleEditEducation}
+              onDelete={handleDeleteEducation}
+              onAddAnother={handleAddAnotherEducation}
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <Label htmlFor="degree" className="font-semibold">DEGREE</Label>
-              <Select
-                value={degree}
-                onValueChange={setDegree}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="No Degree" />
-                </SelectTrigger>
-                <SelectContent>
-                  {degreeOptions.map(degreeOption => (
-                    <SelectItem key={degreeOption} value={degreeOption}>{degreeOption}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
             
-            <div>
-              <Label htmlFor="fieldOfStudy" className="font-semibold">FIELD OF STUDY</Label>
-              <Input
-                id="fieldOfStudy"
-                placeholder="e.g. Business"
-                value={fieldOfStudy}
-                onChange={(e) => setFieldOfStudy(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <Label htmlFor="schoolLocation" className="font-semibold">SCHOOL LOCATION</Label>
-            <Input
-              id="schoolLocation"
-              placeholder="e.g. Mwanza, Tanzania"
-              value={schoolLocation}
-              onChange={(e) => setSchoolLocation(e.target.value)}
-            />
-          </div>
-
-          <div className="mb-6">
-            <Label htmlFor="graduationDate" className="font-semibold">
-              GRADUATION DATE (OR EXPECTED GRADUATION DATE) <span className="text-red-500">*</span>
-            </Label>
-            <div className="grid grid-cols-2 gap-4">
-              <Select
-                value={gradMonth}
-                onValueChange={setGradMonth}
+            <div className="flex justify-between mt-8">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate(`/cv/${templateId}/work`)}
+                className="flex items-center"
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Month" />
-                </SelectTrigger>
-                <SelectContent>
-                  {months.map(month => (
-                    <SelectItem key={month} value={month}>{month}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Select
-                value={gradYear}
-                onValueChange={setGradYear}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map(year => (
-                    <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <Label htmlFor="additionalCourses" className="font-semibold">
-              ADD ANY ADDITIONAL COURSEWORK YOU'RE PROUD TO SHOWCASE
-            </Label>
-            <div className="flex justify-end text-sm text-blue-600 mb-2 cursor-pointer">
-              Look here for sample CV references
-            </div>
-          </div>
-
-          <Alert className="mb-6 bg-yellow-50 border-yellow-200">
-            <Info className="h-4 w-4 text-yellow-700" />
-            <AlertDescription className="text-yellow-800">
-              Not enough work experience? This section can help you stand out. If your bachelor's degree is in-progress,
-              you may include international schooling, educational achievements or any other certification that corresponds
-              to the job you want.
-            </AlertDescription>
-          </Alert>
-
-          <div className="mb-6">
-            <h3 className="font-semibold text-lg mb-3">Educational Achievements</h3>
-            <p className="text-gray-600 mb-4">Would you like to include any honors or achievements?</p>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex items-center justify-center py-6 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                onClick={() => {}}
-              >
-                <PlusCircle className="h-4 w-4 mr-2" />
-                GPA
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Previous
               </Button>
               
-              <Button
-                type="button"
-                variant="outline"
-                className="flex items-center justify-center py-6 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                onClick={() => {}}
+              <Button 
+                onClick={handleContinueToSkills}
+                className="bg-teal-600 hover:bg-teal-700 text-white"
               >
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Honors
+                Next
               </Button>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex items-center justify-center py-6 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                onClick={() => {}}
-              >
-                <PlusCircle className="h-4 w-4 mr-2" />
-                International Grade to GPA Equivalent
-              </Button>
-              
-              <Button
-                type="button"
-                variant="outline"
-                className="flex items-center justify-center py-6 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                onClick={() => {}}
-              >
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Achievement Tests
-              </Button>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex items-center justify-center py-6 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                onClick={() => {}}
-              >
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Min Average
-              </Button>
-              
-              <Button
-                type="button"
-                variant="outline"
-                className="flex items-center justify-center py-6 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                onClick={() => {}}
-              >
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Dean's List
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex justify-end">
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2">
-              Next
-            </Button>
-          </div>
-        </form>
+          </>
+        )}
         
         {/* Live CV Preview */}
         <LiveCVPreview cvData={formData} templateId={templateId} />
