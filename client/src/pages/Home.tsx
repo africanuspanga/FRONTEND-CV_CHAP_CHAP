@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { templateImages } from '@/lib/template-images';
 
 const Home = () => {
   return (
@@ -77,84 +78,74 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Templates Section */}
-      <section className="py-16">
+      {/* Popular CV Templates Section */}
+      <section className="py-16 bg-neutral">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-darkText mb-4">Featured Templates</h2>
+          <h2 className="text-3xl font-bold text-darkText mb-4">Popular CV Templates</h2>
           <p className="text-lightText max-w-2xl mx-auto">Professional designs to showcase your skills and experience</p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {/* Template Preview Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+          {/* Moonlight Sonata */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="h-64 bg-gray-50 flex items-center justify-center p-4">
-              <div className="w-full h-full bg-orange-100 rounded border border-gray-200 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1/3 h-full bg-orange-400"></div>
-                <div className="absolute top-4 left-4 right-4 text-white">
-                  <div className="text-lg font-bold">JOHN DOE</div>
-                  <div className="text-xs mt-1 border-t border-white pt-1">WEB DEVELOPER</div>
-                </div>
-              </div>
+            <div className="h-[350px] bg-gray-50 flex items-center justify-center p-3">
+              <img 
+                src={templateImages.moonlightSonata} 
+                alt="Moonlight Sonata CV Template" 
+                className="w-full h-full object-contain"
+              />
             </div>
-            <div className="p-4">
-              <h3 className="font-medium">Moonlight Sonata</h3>
-              <p className="text-sm text-gray-600">Modern template with warm orange sidebar</p>
+            <div className="p-4 text-center">
+              <h3 className="font-medium text-lg">Moonlight Sonata</h3>
             </div>
           </div>
           
+          {/* Kilimanjaro */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="h-64 bg-gray-50 flex items-center justify-center p-4">
-              <div className="w-full h-full bg-blue-50 rounded border border-gray-200 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-16 bg-primary"></div>
-                <div className="absolute top-20 left-4 right-4">
-                  <div className="text-lg font-bold text-darkText">JOHN DOE</div>
-                  <div className="text-xs text-primary mt-1">Web Developer</div>
-                </div>
-              </div>
+            <div className="h-[350px] bg-gray-50 flex items-center justify-center p-3">
+              <img 
+                src={templateImages.kilimanjaro} 
+                alt="Kilimanjaro CV Template" 
+                className="w-full h-full object-contain"
+              />
             </div>
-            <div className="p-4">
-              <h3 className="font-medium">Tanzanite</h3>
-              <p className="text-sm text-gray-600">Professional blue header template</p>
+            <div className="p-4 text-center">
+              <h3 className="font-medium text-lg">Kilimanjaro</h3>
             </div>
           </div>
           
+          {/* Bright Diamond */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="h-64 bg-gray-50 flex items-center justify-center p-4">
-              <div className="w-full h-full bg-amber-50 rounded border border-gray-200 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-24 bg-amber-700"></div>
-                <div className="absolute top-8 left-0 w-32 h-32 rounded-full bg-white ml-4 border-4 border-amber-700"></div>
-                <div className="absolute top-28 left-40 right-4">
-                  <div className="text-lg font-bold text-darkText">John Doe</div>
-                  <div className="text-xs text-amber-700 mt-1">Web Developer</div>
-                </div>
-              </div>
+            <div className="h-[350px] bg-gray-50 flex items-center justify-center p-3">
+              <img 
+                src={templateImages.brightDiamond} 
+                alt="Bright Diamond CV Template" 
+                className="w-full h-full object-contain"
+              />
             </div>
-            <div className="p-4">
-              <h3 className="font-medium">Safari Pro</h3>
-              <p className="text-sm text-gray-600">Bold design with earthy tones</p>
+            <div className="p-4 text-center">
+              <h3 className="font-medium text-lg">Bright Diamond</h3>
             </div>
           </div>
           
+          {/* Mjenzi wa Taifa */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="h-64 bg-gray-50 flex items-center justify-center p-4">
-              <div className="w-full h-full bg-gray-100 rounded border border-gray-200 relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 text-center pt-8">
-                  <div className="text-xl font-bold text-darkText uppercase">John Doe</div>
-                  <div className="text-sm text-gray-600 mt-1">Web Developer</div>
-                  <div className="mx-auto w-16 h-0.5 bg-primary mt-2"></div>
-                </div>
-              </div>
+            <div className="h-[350px] bg-gray-50 flex items-center justify-center p-3">
+              <img 
+                src={templateImages.mjenziWaTaifa} 
+                alt="Mjenzi wa Taifa CV Template" 
+                className="w-full h-full object-contain"
+              />
             </div>
-            <div className="p-4">
-              <h3 className="font-medium">Mwalimu Classic</h3>
-              <p className="text-sm text-gray-600">Traditional academic style</p>
+            <div className="p-4 text-center">
+              <h3 className="font-medium text-lg">Mjenzi wa Taifa</h3>
             </div>
           </div>
         </div>
         
         <div className="text-center mt-10">
-          <Button asChild variant="outline">
-            <Link href="/templates">View All Templates</Link>
+          <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white">
+            <Link href="/templates">View more templates</Link>
           </Button>
         </div>
       </section>
