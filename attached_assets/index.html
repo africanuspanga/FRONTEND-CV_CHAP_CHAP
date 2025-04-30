@@ -3,135 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Template - Teal Accent</title>
+    <title>CV Template - Beige Header</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     </head>
 <body>
     <div class="cv-container">
 
         <header class="cv-header">
             <h1 id="fullName">NELLY SMITH</h1>
-            <h2 id="profession">Graphic Designer</h2>
+            <h2 id="profession">Senior Graphic Designer</h2>
         </header>
 
-        <section class="contact-bar">
-            <span>Phone: <span id="contactPhone">(123) 456-7891</span></span>
-            <span class="separator">|</span>
-            <span>Address: New York, NY 10011</span>
-            <span class="separator">|</span>
-            <span>Email: <span id="contactEmail">nellysmith.email.com</span></span>
-            <span class="separator">|</span>
-            <span>Linkedin: <a id="contactLinkedin" href="#">linkedin.com/nellysmith</a></span>
-             <span class="separator">|</span>
-            <span>Website: <a href="#">nellysmith.com</a></span> </section>
-
-        <section class="summary">
-            <h3>PROFESSIONAL SUMMARY</h3>
-             <p id="careerObjective">Graphic Design Specialist with 5+ years of experience in the management of the complete design process, from conceptualization to delivery. Expert at interdepartmental coordination and communication. Skilled with Adobe Creative Suite (Illustrator, Photoshop, InDesign) as well as Figma and Sketch. Able to stretch the boundaries of web design and digital storytelling to help my clients' brands stand out.</p>
+        <section class="top-info-section">
+            <div class="column contact-column">
+                <h3 class="section-title">CONTACT</h3>
+                <div class="contact-info">
+                    <p><span class="icon">[P]</span> <span id="contactPhone">(123) 456-7891</span></p>
+                    <p><span class="icon">[E]</span> <span id="contactEmail">nellysmith.email.com</span></p>
+                    <p><span class="icon">[A]</span> 47 W 13th St, New York, NY 10011</p>
+                    <p><span class="icon">[L]</span> <a id="contactLinkedin" href="#">linkedin.com/in/nellysmith</a></p>
+                    <p><span class="icon">[W]</span> <a href="#">nellysmith.com</a></p> </div>
+            </div>
+            <div class="column summary-column">
+                 <h3 class="section-title">SUMMARY</h3>
+                 <p id="careerObjective">Graphic Design Specialist with 5+ years of experience in the management of the complete design process, from conceptualization to delivery. Expert at interdepartmental coordination and communication. Skilled with Adobe Creative Suite (Illustrator, Photoshop, InDesign) as well as Figma and Sketch. Able to stretch the boundaries of web design and digital storytelling to help my clients' brands stand out.</p>
+            </div>
+            <div class="column skills-column">
+                 <h3 class="section-title">SKILLS</h3>
+                 <ul id="skillsList">
+                     <li>
+                         <span class="skill-name">InDesign</span>
+                         <div class="skill-line-container">
+                             <div class="skill-line-fill" style="width: 100%;"></div>
+                         </div>
+                         <span class="skill-percent">100%</span>
+                     </li>
+                      <li>
+                         <span class="skill-name">Illustrator</span>
+                         <div class="skill-line-container">
+                             <div class="skill-line-fill" style="width: 90%;"></div>
+                         </div>
+                         <span class="skill-percent">90%</span>
+                     </li>
+                     <li>
+                         <span class="skill-name">Photoshop</span>
+                         <div class="skill-line-container">
+                             <div class="skill-line-fill" style="width: 88%;"></div>
+                         </div>
+                         <span class="skill-percent">88%</span>
+                     </li>
+                     </ul>
+            </div>
         </section>
 
-        <section class="experience">
-            <h3>EXPERIENCE</h3>
-            <ul id="experienceList">
-                <li>
-                    <div class="entry-header">
-                        <div class="title-company">
-                            <strong>Senior Graphic Design Specialist</strong>
-                            <span>Experion - New York, NY</span>
-                        </div>
-                        <div class="date-range">
-                            <span>20XX to Present</span>
-                        </div>
-                    </div>
-                    <ul class="details-list">
-                        <li>Lead in the design, development, and implementation of the graphic, layout, and production communication materials while helping clients cut their costs by an average of 12%</li>
-                        <li>Delegate tasks to the 7 members of the design team and provide counsel on all aspects of the project</li>
-                        <li>Supervise the assessment of all graphic materials in order to ensure quality and accuracy of the design</li>
-                        <li>Oversee the efficient use of production project budgets ranging from $2,000 - $25,000</li>
+        <div class="main-grid-area">
+
+            <div class="grid-left-column">
+                <section class="additional-skills">
+                    <h3 class="section-title">ADDITIONAL SKILLS</h3>
+                    <ul>
+                        <li>Typography</li>
+                        <li>Layout and Composition</li>
+                        <li>Branding & Identity</li>
                     </ul>
-                </li>
-                 <li>
-                    <div class="entry-header">
-                        <div class="title-company">
-                            <strong>Graphic Design Specialist</strong>
-                            <span>Stepping Stone Advertising - New York, NY</span>
-                        </div>
-                        <div class="date-range">
-                             <span>20XX to 20XX</span>
-                        </div>
-                    </div>
-                    <ul class="details-list">
-                        <li>Developed numerous marketing programs (logos, brochures, newsletters, infographics, presentations, and advertisements) and guaranteed that they exceeded the expectations of our clients</li>
-                        <li>Managed up to 5 projects or tasks at a given time while under pressure to meet weekly deadlines</li>
-                        <li>Recommended and consulted with clients on the most appropriate graphic design options based on their overall marketing goals</li>
+                </section>
+
+                <section class="languages">
+                     <h3 class="section-title">LANGUAGES</h3>
+                     <ul>
+                        <li>English | Native</li>
+                        <li>Spanish | Professional Proficiency</li>
+                     </ul>
+                </section>
+
+                <section class="licenses">
+                     <h3 class="section-title">LICENSES AND CERTIFICATIONS</h3>
+                     <ul>
+                        <li>Adobe Certified Expert (ACE) in Photoshop</li>
+                        <li>Certified User Experience Professional (CUXP)</li>
+                     </ul>
+                </section>
+
+                 <section class="awards">
+                     <h3 class="section-title">AWARDS</h3>
+                     <ul>
+                        <li>AIGA 50 Books | 50 Covers Award</li>
+                     </ul>
+                </section>
+
+                <section class="references">
+                     <h3 class="section-title">REFERENCES</h3>
+                     <ul>
+                         <li>
+                            <strong>Luis Perez</strong><br>
+                            Marketing Director, Experion - Direct Manager<br>
+                            (123) 456-7890
+                         </li>
+                         </ul>
+                </section>
+
+                 <section id="referencesSection" style="display:none;">
+                    <h3 class="section-title">References (Std)</h3>
+                    <ul id="referencesList"></ul>
+                 </section>
+                 <section id="hobbiesSection" style="display:none;">
+                     <h3 class="section-title">Hobbies & Interests</h3>
+                     <p id="hobbiesText"></p>
+                 </section>
+                 <section id="portfolioSection" style="display:none;">
+                     <h3 class="section-title">Portfolio</h3>
+                     <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
+                 </section>
+                 <section id="languagesSection" style="display:none;">
+                    <h3 class="section-title">Languages (Std)</h3>
+                    <ul id="languagesList"></ul>
+                 </section>
+
+            </div>
+
+            <div class="grid-right-column">
+                 <section class="experience">
+                    <h3 class="section-title">PROFESSIONAL EXPERIENCE</h3>
+                    <ul id="experienceList">
+                        <li>
+                            <div class="job-entry">
+                                <div class="job-details">
+                                    <strong>Senior Graphic Design Specialist</strong>
+                                    <span>Experion</span>
+                                    <ul>
+                                        <li>Lead in the design, development, and implementation of the graphic, layout, and production communication materials while helping clients cut their costs by an average of 12%</li>
+                                        <li>Delegate tasks to the 7 members of the design team and provide counsel on all aspects of the project</li>
+                                        <li>Supervise the assessment of all graphic materials in order to ensure quality and accuracy of the design</li>
+                                        <li>Oversee the efficient use of production project budgets ranging from $2,000 - $25,000</li>
+                                    </ul>
+                                </div>
+                                <div class="job-date">
+                                    <span>Jan 20XX - Present</span>
+                                    <span>New York, NY</span>
+                                </div>
+                            </div>
+                        </li>
+                         <li>
+                            <div class="job-entry">
+                                <div class="job-details">
+                                    <strong>Graphic Design Specialist</strong>
+                                    <span>Stepping Stone Advertising</span>
+                                    <ul>
+                                        <li>Developed numerous marketing programs (logos, brochures, newsletters, infographics, presentations, and advertisements) and guaranteed that they exceeded the expectations of our clients</li>
+                                        <li>Managed up to 5 projects or tasks at a given time while under pressure to meet weekly deadlines</li>
+                                        <li>Recommended and consulted with clients on the most appropriate graphic design options based on their overall marketing goals</li>
+                                    </ul>
+                                </div>
+                                <div class="job-date">
+                                    <span>Jun 20XX - Nov 20XX</span>
+                                    <span>New York, NY</span>
+                                </div>
+                            </div>
+                        </li>
                     </ul>
-                </li>
-            </ul>
-        </section>
+                </section>
 
-        <section class="education">
-            <h3>EDUCATION</h3>
-            <ul id="educationList">
-                <li>
-                    <div class="entry-header">
-                        <div class="title-company">
-                            <strong>Bachelor Of Fine Arts In Graphic Design</strong>
-                            <span>Rochester Institute Of Technology - Rochester, NY</span>
-                            <span>GPA: 3.8 / 4.0</span>
-                        </div>
-                        <div class="date-range">
-                             <span>20XX</span>
-                        </div>
-                    </div>
-                </li>
-                 </ul>
-        </section>
-
-        <section class="skills">
-            <h3>SKILLS</h3>
-             <ul id="skillsList" class="multi-column-list">
-                <li>InDesign</li>
-                <li>Figma</li>
-                <li>HTML and CSS</li>
-                <li>Branding</li>
-                <li>Illustrator</li>
-                <li>Blender</li>
-                <li>Print production</li>
-                <li>InVision</li>
-                <li>Photoshop</li>
-                <li>Sketchbook</li>
-                <li>Motion graphics</li>
-                </ul>
-        </section>
-
-         <section class="certifications">
-            <h3>CERTIFICATIONS</h3>
-            <ul class="multi-column-list">
-                <li>Adobe Certified Expert in Photoshop</li>
-                <li>Certified User Experience Professional</li>
-                </ul>
-        </section>
-
-
-        <section id="languagesSection" style="display:none;">
-            <h3>Languages</h3>
-            <ul id="languagesList"></ul>
-        </section>
-        <section id="referencesSection" style="display:none;">
-            <h3>References</h3>
-            <ul id="referencesList"></ul>
-         </section>
-         <section id="hobbiesSection" style="display:none;">
-             <h3>Hobbies & Interests</h3>
-             <p id="hobbiesText"></p>
-         </section>
-         <section id="portfolioSection" style="display:none;">
-             <h3>Portfolio</h3>
-             <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
-         </section>
-
-    </div> </body>
+                 <section class="education">
+                    <h3 class="section-title">EDUCATION</h3>
+                    <ul id="educationList">
+                        <li>
+                            <div class="education-entry">
+                                <div class="education-details">
+                                    <strong>Bachelor Of Fine Arts In Graphic Design</strong>
+                                    <span>School of Visual Arts</span>
+                                    <span>GPA: 3.8 / 4.0</span>
+                                    <p>Relevant Coursework:</p>
+                                    <ul>
+                                        <li>Advanced Typography and Branding</li>
+                                        <li>Interaction Design and Prototyping</li>
+                                        <li>Digital Product Design</li>
+                                    </ul>
+                                </div>
+                                <div class="education-date">
+                                    <span>May 20XX</span>
+                                    <span>New York, NY</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div> </div> </body>
 </html>

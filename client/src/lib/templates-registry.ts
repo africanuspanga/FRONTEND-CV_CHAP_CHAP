@@ -61,6 +61,16 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Modern',
     popularity: 5,
     previewImage: templateImages.brightDiamond
+  },
+  {
+    id: 'mjenziWaTaifa',
+    name: 'Mjenzi wa Taifa',
+    description: 'Elegant beige-header template with three-column layout and skill progress bars',
+    contentPath: '/templates/mjenzi-wa-taifa.html',
+    isLocal: true,
+    category: 'Professional',
+    popularity: 5,
+    previewImage: templateImages.mjenziWaTaifa
   }
 ];
 
