@@ -11,14 +11,14 @@ export interface TemplateDefinition {
 
 export const templateRegistry: TemplateDefinition[] = [
   {
-    id: 'mtaa-hustler',
-    name: 'Mtaa Hustler',
-    description: 'A clean, modern CV template with a two-column layout. Perfect for professionals seeking a straightforward yet stylish presentation.',
-    contentPath: '/templates/mtaa-hustler.html',
+    id: 'moonlightSonata',
+    name: 'Moonlight Sonata',
+    description: 'A modern template with a warm orange sidebar and clean layout',
+    contentPath: '/templates/moonlight-sonata.html',
     isLocal: true,
     category: 'Modern',
     popularity: 4,
-    previewImage: '/templates/previews/mtaa-hustler.png'
+    previewImage: '/templates/previews/moonlight-sonata.png'
   },
   {
     id: 'tanzanite',
@@ -31,7 +31,7 @@ export const templateRegistry: TemplateDefinition[] = [
     previewImage: '/templates/previews/tanzanite.png'
   },
   {
-    id: 'safari-pro',
+    id: 'safariPro',
     name: 'Safari Pro',
     description: 'Bold design with earthy tones inspired by African landscapes',
     contentPath: '/templates/safari-pro.html',
@@ -41,7 +41,7 @@ export const templateRegistry: TemplateDefinition[] = [
     previewImage: '/templates/previews/safari-pro.png'
   },
   {
-    id: 'mwalimu-classic',
+    id: 'mwalimuClassic',
     name: 'Mwalimu Classic',
     description: 'Traditional academic-style template for educational professionals',
     contentPath: '/templates/mwalimu-classic.html',
@@ -51,14 +51,14 @@ export const templateRegistry: TemplateDefinition[] = [
     previewImage: '/templates/previews/mwalimu-classic.png'
   },
   {
-    id: 'moonlight-sonata',
-    name: 'Moonlight Sonata',
-    description: 'A modern template with a warm orange sidebar and clean layout',
-    contentPath: '/templates/moonlight-sonata.html',
+    id: 'mtaaHustler',
+    name: 'Mtaa Hustler',
+    description: 'A clean, modern CV template with a two-column layout. Perfect for professionals seeking a straightforward yet stylish presentation.',
+    contentPath: '/templates/mtaa-hustler.html',
     isLocal: true,
     category: 'Modern',
     popularity: 4,
-    previewImage: '/templates/previews/moonlight-sonata.png'
+    previewImage: '/templates/previews/mtaa-hustler.png'
   }
 ];
 

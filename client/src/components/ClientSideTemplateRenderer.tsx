@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CVData } from '@shared/schema';
+import { getTemplateById } from '@/lib/templates-registry';
 
 interface ClientSideTemplateRendererProps {
   templateId: string;
@@ -8,24 +9,28 @@ interface ClientSideTemplateRendererProps {
 }
 
 export const ClientSideTemplateRenderer = ({ 
-  templateId, 
-  cvData, 
-  className = '' 
+  templateId,
+  cvData,
+  className = ''
 }: ClientSideTemplateRendererProps) => {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [templateHtml, setTemplateHtml] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch the template HTML content
   useEffect(() => {
-    const fetchTemplate = async () => {
-      setIsLoading(true);
-      setError(null);
-
+    async function loadTemplate() {
       try {
-        const response = await fetch(`/templates/${templateId}.html`);
+        setIsLoading(true);
+        setError(null);
         
+        // Get template definition
+        const templateDef = getTemplateById(templateId);
+        if (!templateDef) {
+          throw new Error(`Template with ID ${templateId} not found`);
+        }
+        
+        // Load the template HTML
+        const response = await fetch(templateDef.contentPath);
         if (!response.ok) {
           throw new Error(`Failed to load template: ${response.statusText}`);
         }
@@ -34,38 +39,31 @@ export const ClientSideTemplateRenderer = ({
         setTemplateHtml(html);
       } catch (err) {
         console.error('Error loading template:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load template');
+        setError(err instanceof Error ? err.message : 'Unknown error loading template');
       } finally {
         setIsLoading(false);
       }
-    };
-
-    fetchTemplate();
+    }
+    
+    loadTemplate();
   }, [templateId]);
-
-  // Update the template with CV data
+  
+  // Apply the CV data to the template HTML
   useEffect(() => {
-    if (!templateHtml || !iframeRef.current || !iframeRef.current.contentDocument) return;
-
-    const updateTemplate = () => {
-      const doc = iframeRef.current?.contentDocument;
-      if (!doc) return;
-
-      // Reset the document with the template HTML
-      doc.open();
-      doc.write(templateHtml);
-      doc.close();
-
-      // Wait for content to load
-      setTimeout(() => {
-        if (!doc.body) return;
-
-        // Update simple text fields
+    if (!templateHtml || !cvData) return;
+    
+    const applyDataToTemplate = () => {
+      try {
+        // Create a DOM parser to manipulate the HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(templateHtml, 'text/html');
+        
+        // Helper function to update element content
         const updateElement = (id: string, value: string) => {
           const element = doc.getElementById(id);
           if (element) element.textContent = value;
         };
-
+        
         // Personal Info
         const { personalInfo } = cvData;
         updateElement('first-name', personalInfo.firstName || '');
@@ -76,13 +74,9 @@ export const ClientSideTemplateRenderer = ({
         updateElement('location', personalInfo.location || '');
         updateElement('website', personalInfo.website || '');
         updateElement('linkedin', personalInfo.linkedin || '');
-        // Optional fields that might not exist in all templates
-        if (doc.getElementById('github')) {
-          updateElement('github', personalInfo.website || ''); // Using website as fallback
-        }
         updateElement('job-title', personalInfo.jobTitle || '');
         updateElement('summary', cvData.summary || '');
-
+        
         // Work Experience
         const experienceContainer = doc.getElementById('experience-container');
         if (experienceContainer && cvData.workExperience?.length) {
@@ -93,17 +87,16 @@ export const ClientSideTemplateRenderer = ({
             expElement.className = 'experience-item';
             
             expElement.innerHTML = `
-              <h3 class="job-title">${exp.jobTitle || ''}</h3>
-              <div class="company">${exp.company || ''}</div>
-              <div class="dates">${exp.startDate || ''} - ${exp.endDate || (exp.current ? 'Present' : '')}</div>
-              <div class="location">${exp.location || ''}</div>
+              <span class="dates">${exp.startDate || ''} - ${exp.endDate || (exp.current ? 'Present' : '')}</span>
+              <strong class="job-title">${exp.jobTitle || ''}</strong>
+              <span class="company">${exp.company || ''}</span>
               <div class="description">${exp.description || ''}</div>
             `;
             
             experienceContainer.appendChild(expElement);
           });
         }
-
+        
         // Education
         const educationContainer = doc.getElementById('education-container');
         if (educationContainer && cvData.education?.length) {
@@ -114,17 +107,16 @@ export const ClientSideTemplateRenderer = ({
             eduElement.className = 'education-item';
             
             eduElement.innerHTML = `
-              <h3 class="degree">${edu.degree || ''}</h3>
-              <div class="institution">${edu.institution || ''}</div>
-              <div class="dates">${edu.startDate || ''} - ${edu.endDate || (edu.current ? 'Present' : '')}</div>
-              <div class="location">${''}</div>
+              <span class="dates">${edu.startDate || ''} - ${edu.endDate || (edu.current ? 'Present' : '')}</span>
+              <strong class="degree">${edu.degree || ''}</strong>
+              <span class="institution">${edu.institution || ''}</span>
               <div class="description">${edu.description || ''}</div>
             `;
             
             educationContainer.appendChild(eduElement);
           });
         }
-
+        
         // Skills
         const skillsContainer = doc.getElementById('skills-container');
         if (skillsContainer && cvData.skills?.length) {
@@ -133,16 +125,12 @@ export const ClientSideTemplateRenderer = ({
           cvData.skills.forEach(skill => {
             const skillElement = doc.createElement('div');
             skillElement.className = 'skill-item';
-            
-            skillElement.innerHTML = `
-              <span class="skill-name">${skill.name || ''}</span>
-              ${skill.level ? `<span class="skill-level">${skill.level}</span>` : ''}
-            `;
+            skillElement.textContent = skill.name;
             
             skillsContainer.appendChild(skillElement);
           });
         }
-
+        
         // Languages
         const languagesContainer = doc.getElementById('languages-container');
         if (languagesContainer && cvData.languages?.length) {
@@ -153,14 +141,13 @@ export const ClientSideTemplateRenderer = ({
             langElement.className = 'language-item';
             
             langElement.innerHTML = `
-              <span class="language-name">${language.name || ''}</span>
-              ${language.proficiency ? `<span class="language-proficiency">${language.proficiency}</span>` : ''}
+              <span class="language-name">${language.name || ''}:</span> ${language.proficiency || ''}
             `;
             
             languagesContainer.appendChild(langElement);
           });
         }
-
+        
         // References
         const referencesContainer = doc.getElementById('references-container');
         if (referencesContainer && cvData.references?.length) {
@@ -171,108 +158,60 @@ export const ClientSideTemplateRenderer = ({
             refElement.className = 'reference-item';
             
             refElement.innerHTML = `
-              <h3 class="reference-name">${reference.name || ''}</h3>
-              <div class="reference-title">${reference.position || ''}</div>
-              <div class="reference-company">${reference.company || ''}</div>
-              <div class="reference-email">${reference.email || ''}</div>
-              <div class="reference-phone">${reference.phone || ''}</div>
+              <strong class="reference-name">${reference.name || ''}</strong>
+              <div>${reference.position || ''}</div>
+              <div>${reference.company || ''}</div>
+              <div>${reference.email || ''}</div>
             `;
             
             referencesContainer.appendChild(refElement);
           });
         }
-
-        // Additional Sections (Projects, Certifications, Hobbies)
-        const additionalContainer = doc.getElementById('additional-sections-container');
-        if (additionalContainer) {
-          additionalContainer.innerHTML = '';
-          
-          // Projects
-          if (cvData.projects?.length) {
-            const projectsSection = doc.createElement('div');
-            projectsSection.className = 'projects-section';
-            projectsSection.innerHTML = '<h2>Projects</h2>';
-            
-            const projectsList = doc.createElement('div');
-            projectsList.className = 'projects-list';
-            
-            cvData.projects.forEach(project => {
-              const projElement = doc.createElement('div');
-              projElement.className = 'project-item';
-              
-              projElement.innerHTML = `
-                <h3 class="project-name">${project.name || ''}</h3>
-                <div class="project-description">${project.description || ''}</div>
-                ${project.url ? `<div class="project-url">${project.url}</div>` : ''}
-              `;
-              
-              projectsList.appendChild(projElement);
-            });
-            
-            projectsSection.appendChild(projectsList);
-            additionalContainer.appendChild(projectsSection);
-          }
-          
-          // Certifications
-          if (cvData.certifications?.length) {
-            const certsSection = doc.createElement('div');
-            certsSection.className = 'certifications-section';
-            certsSection.innerHTML = '<h2>Certifications</h2>';
-            
-            const certsList = doc.createElement('div');
-            certsList.className = 'certifications-list';
-            
-            cvData.certifications.forEach(cert => {
-              const certElement = doc.createElement('div');
-              certElement.className = 'certification-item';
-              
-              certElement.innerHTML = `
-                <h3 class="certification-name">${cert.name || ''}</h3>
-                <div class="certification-issuer">${cert.issuer || ''}</div>
-                <div class="certification-date">${cert.date || ''}</div>
-              `;
-              
-              certsList.appendChild(certElement);
-            });
-            
-            certsSection.appendChild(certsList);
-            additionalContainer.appendChild(certsSection);
-          }
-          
-          // Hobbies
-          if (cvData.hobbies) {
-            const hobbiesSection = doc.createElement('div');
-            hobbiesSection.className = 'hobbies-section';
-            hobbiesSection.innerHTML = `
-              <h2>Hobbies & Interests</h2>
-              <div class="hobbies-content">${cvData.hobbies}</div>
-            `;
-            
-            additionalContainer.appendChild(hobbiesSection);
-          }
+        
+        // Get the iframe element and update its content
+        const iframe = document.getElementById('template-preview-frame') as HTMLIFrameElement;
+        if (iframe && iframe.contentDocument) {
+          iframe.contentDocument.open();
+          iframe.contentDocument.write(doc.documentElement.outerHTML);
+          iframe.contentDocument.close();
         }
-      }, 100);
+      } catch (err) {
+        console.error('Error applying data to template:', err);
+      }
     };
-
-    updateTemplate();
-  }, [templateHtml, cvData, iframeRef]);
+    
+    // Apply the data once the iframe is loaded
+    const iframe = document.getElementById('template-preview-frame') as HTMLIFrameElement;
+    if (iframe) {
+      iframe.onload = applyDataToTemplate;
+    }
+  }, [templateHtml, cvData]);
 
   if (isLoading) {
-    return <div className={`template-loading ${className}`}>Loading template...</div>;
+    return (
+      <div className={`flex items-center justify-center p-8 ${className}`}>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className={`template-error ${className}`}>Error: {error}</div>;
+    return (
+      <div className={`p-8 text-center ${className}`}>
+        <div className="text-red-500 mb-4">Failed to load template</div>
+        <div className="text-sm text-gray-500">{error}</div>
+      </div>
+    );
   }
 
   return (
     <div className={`template-container ${className}`}>
       <iframe
-        ref={iframeRef}
-        className="template-iframe"
-        title={`CV Template ${templateId}`}
-        style={{ width: '100%', height: '100%', border: 'none' }}
-        sandbox="allow-same-origin"
+        id="template-preview-frame"
+        title={`CV Template - ${templateId}`}
+        className="w-full h-full border-0"
+        style={{ minHeight: '842px' }}
+        srcDoc={templateHtml || ''}
       />
     </div>
   );
