@@ -65,7 +65,7 @@ export const skillSchema = z.object({
 export const languageSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Language name is required"),
-  proficiency: z.enum(["Basic", "Intermediate", "Fluent", "Native"]),
+  level: z.string().optional(),
   certification: z.string().optional(),
 });
 
