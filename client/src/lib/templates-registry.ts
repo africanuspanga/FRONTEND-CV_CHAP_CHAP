@@ -18,7 +18,7 @@ export const templateRegistry: TemplateDefinition[] = [
     isLocal: true,
     category: 'Modern',
     popularity: 5,
-    previewImage: '/images/template_preview_0.png'
+    previewImage: '/templates/previews/moonlight-sonata.png'
   },
   {
     id: 'kaziFasta',
@@ -28,7 +28,7 @@ export const templateRegistry: TemplateDefinition[] = [
     isLocal: true,
     category: 'Professional',
     popularity: 5,
-    previewImage: '/images/template_preview_1.png'
+    previewImage: '/templates/previews/kazi-fasta.png'
   }
 ];
 

@@ -41,7 +41,11 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
               <img
                 src={template.previewImage}
                 alt={`${template.name} template preview`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  console.error(`Failed to load image: ${template.previewImage}`);
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             </div>
             <CardContent className="p-4 flex flex-col justify-between flex-grow">
