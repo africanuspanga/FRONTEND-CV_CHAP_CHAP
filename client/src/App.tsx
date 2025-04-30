@@ -26,6 +26,10 @@ import AdditionalSectionsForm from "@/pages/AdditionalSectionsForm";
 import About from "@/pages/About";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import WebsitesPortfoliosForm from "@/pages/WebsitesPortfoliosForm";
+import CertificationsForm from "@/pages/CertificationsForm";
+import AccomplishmentsForm from "@/pages/AccomplishmentsForm";
+import HobbiesForm from "@/pages/HobbiesForm";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -49,6 +53,10 @@ function Router() {
           <Route path="/cv/:templateId/summary-editor" component={SummaryEditor} />
           <Route path="/cv/:templateId/references" component={ReferencesForm} />
           <Route path="/cv/:templateId/additional-sections" component={AdditionalSectionsForm} />
+          <Route path="/cv/:templateId/websites-portfolios" component={WebsitesPortfoliosForm} />
+          <Route path="/cv/:templateId/certifications" component={CertificationsForm} />
+          <Route path="/cv/:templateId/accomplishments" component={AccomplishmentsForm} />
+          <Route path="/cv/:templateId/hobbies" component={HobbiesForm} />
           <Route path="/create/:step?" component={CreateCV} />
           <Route path="/about" component={About} />
           <Route path="/login" component={Login} />

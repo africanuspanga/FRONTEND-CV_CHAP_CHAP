@@ -6,10 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { Helmet } from 'react-helmet';
-
-interface Hobby {
-  name: string;
-}
+import { Hobby } from '@shared/schema';
 
 const MAX_CHAR_LENGTH = 30;
 const MAX_HOBBIES = 3;
@@ -25,7 +22,7 @@ const HobbiesForm = () => {
       return formData.hobbies.slice(0, MAX_HOBBIES);
     }
     
-    return Array(MAX_HOBBIES).fill(null).map(() => ({ name: '' }));
+    return Array(MAX_HOBBIES).fill(null).map(() => ({ name: '', id: crypto.randomUUID() }));
   });
 
   const handleInputChange = (index: number, value: string) => {
@@ -35,7 +32,10 @@ const HobbiesForm = () => {
     }
 
     const updatedHobbies = [...hobbies];
-    updatedHobbies[index] = { name: value };
+    updatedHobbies[index] = { 
+      ...updatedHobbies[index],
+      name: value 
+    };
     setHobbies(updatedHobbies);
   };
 

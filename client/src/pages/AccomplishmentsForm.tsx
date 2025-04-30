@@ -7,10 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { Helmet } from 'react-helmet';
-
-interface Accomplishment {
-  text: string;
-}
+import { Accomplishment } from '@shared/schema';
 
 const AccomplishmentsForm = () => {
   const [, navigate] = useLocation();
@@ -21,7 +18,7 @@ const AccomplishmentsForm = () => {
   const [accomplishments, setAccomplishments] = useState<Accomplishment[]>(
     formData.accomplishments && formData.accomplishments.length > 0
       ? formData.accomplishments.slice(0, 2)
-      : [{ text: '' }]
+      : [{ title: '', description: '', id: crypto.randomUUID() }]
   );
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -76,13 +73,20 @@ const AccomplishmentsForm = () => {
 
   const handleInputChange = (index: number, value: string) => {
     const updatedAccomplishments = [...accomplishments];
-    updatedAccomplishments[index] = { text: value };
+    updatedAccomplishments[index] = { 
+      ...updatedAccomplishments[index],
+      description: value 
+    };
     setAccomplishments(updatedAccomplishments);
   };
 
   const handleAddAccomplishment = () => {
     if (accomplishments.length < 2) {
-      setAccomplishments([...accomplishments, { text: '' }]);
+      setAccomplishments([...accomplishments, { 
+        title: '', 
+        description: '', 
+        id: crypto.randomUUID() 
+      }]);
     }
   };
 
@@ -94,17 +98,29 @@ const AccomplishmentsForm = () => {
 
   const handleAddExample = (example: string) => {
     if (accomplishments.length < 2) {
-      setAccomplishments([...accomplishments, { text: example }]);
+      setAccomplishments([...accomplishments, { 
+        title: 'Professional Achievement', 
+        description: example,
+        id: crypto.randomUUID() 
+      }]);
     } else {
       // Replace the first empty one or the last one
-      const emptyIndex = accomplishments.findIndex(a => a.text.trim() === '');
+      const emptyIndex = accomplishments.findIndex(a => a.description.trim() === '');
       if (emptyIndex >= 0) {
         const updated = [...accomplishments];
-        updated[emptyIndex] = { text: example };
+        updated[emptyIndex] = { 
+          ...updated[emptyIndex],
+          title: 'Professional Achievement',
+          description: example
+        };
         setAccomplishments(updated);
       } else {
         const updated = [...accomplishments];
-        updated[accomplishments.length - 1] = { text: example };
+        updated[accomplishments.length - 1] = { 
+          ...updated[accomplishments.length - 1],
+          title: 'Professional Achievement',
+          description: example
+        };
         setAccomplishments(updated);
       }
     }
@@ -112,7 +128,7 @@ const AccomplishmentsForm = () => {
 
   const handleSave = () => {
     // Filter out empty accomplishments
-    const filteredAccomplishments = accomplishments.filter(a => a.text.trim() !== '');
+    const filteredAccomplishments = accomplishments.filter(a => a.description.trim() !== '');
     updateFormField('accomplishments', filteredAccomplishments);
     
     // Navigate back to additional sections

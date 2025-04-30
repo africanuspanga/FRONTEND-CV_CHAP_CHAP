@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CVData } from '@shared/schema';
+import { CVData, Accomplishment, Hobby } from '@shared/schema';
 
 // Define form data structure with additional template information
 export interface CVFormData extends CVData {
@@ -31,7 +31,9 @@ const initialFormData: CVFormData = {
   references: [],
   certifications: [],
   projects: [],
-  hobbies: '',
+  hobbies: [],
+  websites: [],
+  accomplishments: [],
 };
 
 interface CVFormContextType {
