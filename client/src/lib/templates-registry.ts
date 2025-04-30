@@ -31,6 +31,16 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Professional',
     popularity: 5,
     previewImage: templateImages.kaziFasta
+  },
+  {
+    id: 'jijengeClassic',
+    name: 'Jijenge Classic',
+    description: 'Professional template with clean layout and subtle gray sidebar',
+    contentPath: '/templates/jijenge-classic.html',
+    isLocal: true,
+    category: 'Professional',
+    popularity: 5,
+    previewImage: templateImages.jijengeClassic
   }
 ];
 
