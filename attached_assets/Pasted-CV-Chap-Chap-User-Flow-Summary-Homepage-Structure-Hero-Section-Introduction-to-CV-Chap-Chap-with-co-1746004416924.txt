@@ -1,0 +1,88 @@
+CV Chap Chap User Flow Summary
+Homepage Structure
+Hero Section: Introduction to CV Chap Chap with compelling headline and CTA (I have attached screenshots for you to copy and an image for the hero lady) 
+Three Easy Steps: Visual explainer of the process (Select Template → Fill Details → Download CV)
+Template Selection: Featured templates display with preview images and descriptions
+Footer: Contact info, links, and social media
+Note: I will provide the PNG, HTML, and CSS files for 15 Templates as we keep building 
+
+User Journey
+Step 1: Homepage → Build New CV
+User clicks "Build New CV" button and is taken to template selection page
+
+Step 2: Template Selection
+Grid of template options (Mtaa Hustler, Tanzanite, Safari Pro, Mwalimu Classic)
+Each template has preview, name, description, and "Select" button
+User selects preferred template and proceeds to creation method
+
+Step 3: Creation Method
+Two options presented: "Start Fresh" or "Upload Existing CV"
+For new users, "Start Fresh" is recommended
+Upon selection, the multi-step form begins
+Step 4: Multi-Step Form Process
+Personal Information
+
+Full name, job title, contact info (email, phone)
+Location, website/portfolio links
+Profile photo upload option
+Work Experience
+
+Job title, company name, location
+Start and end dates
+Responsibilities and achievements
+Option to add multiple entries
+AI Enhancement button to improve descriptions
+Education
+
+Institution name, degree/certification
+Field of study, graduation date
+Achievements, GPA (optional)
+Option to add multiple entries
+Skills
+
+Technical skills with proficiency ratings
+Soft skills
+Option to categorize skills
+AI Enhancement button for better skill descriptions
+Professional Summary
+
+Brief professional overview
+Career highlights
+AI Enhancement button to craft compelling summary
+Languages
+
+Language name
+Proficiency level (Basic, Intermediate, Fluent, Native)
+Option to add certification
+References
+
+Reference name, position, company
+Contact information
+Relationship to applicant
+Option to add multiple references
+Additional Sections (Optional)
+
+Projects
+Link (Linkeldn, website, instagram, github) 
+Certifications
+Hobbies and interests
+
+Final Preview & Download
+
+Complete preview of CV
+Options to download as PDF
+Share via link
+Save to account
+Live Preview Feature
+Web Only: Preview panel appears on desktop/tablet (not on mobile)
+Shows real-time updates as user inputs information
+Iframe-based rendering using the selected template
+Preview button always visible in sidebar/header on web
+Preview updates automatically as user fills forms
+Template Implementation Details
+For each template (Mtaa Hustler, Tanzanite, Safari Pro, Mwalimu Classic):
+
+PNG file for preview image
+HTML template structure with placeholders for user data
+CSS styling for the template
+The system injects user data from the forms directly into the template HTML for real-time preview.

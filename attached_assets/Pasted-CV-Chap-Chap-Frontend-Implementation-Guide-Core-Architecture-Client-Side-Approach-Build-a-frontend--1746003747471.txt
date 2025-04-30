@@ -1,0 +1,81 @@
+CV Chap Chap Frontend Implementation Guide
+Core Architecture
+Client-Side Approach: Build a frontend that handles templates, rendering, and preview entirely on the client side
+Minimal Backend Dependency: Only rely on backend for authentication, CV storage, and AI enhancement
+Mobile-First Design: Ensure 90% of functionality works flawlessly on mobile devices
+Step 1: Project Setup
+Create a React + TypeScript project using Vite
+Install necessary dependencies:
+UI libraries: Tailwind CSS, shadcn/ui components
+Routing: React Router or wouter
+State management: React Context or Zustand
+Form handling: react-hook-form with zod validation
+HTTP client: Axios or TanStack Query
+Step 2: Layout & Authentication
+Create responsive layout with mobile navigation
+Implement authentication screens (login/register)
+Set up protected routes for authenticated content
+Step 3: Templates Implementation
+Template Storage:
+
+Store template HTML/CSS directly in the frontend codebase
+Create a templates registry with metadata including:
+Template ID, name, description, category
+Preview image path
+Popularity rating (for sorting/filtering)
+Template Browser:
+
+Create a grid view of available templates
+Implement filtering by category/popularity
+Show template preview images and descriptions
+Add "Select Template" functionality
+Step 4: CV Creation Workflow
+Implement multi-step form with the following sequence:
+
+Template selection
+Creation method (start fresh or upload old CV)
+Personal details form
+Work experience form
+Education form
+Skills form
+Professional summary form
+Languages form
+References form
+Additional sections form
+Final preview & download
+Step 5: CV Form Context
+Create context to store all CV data as user progresses through steps
+Implement auto-save functionality to local storage
+Add validation for each form section
+Step 6: Client-Side CV Preview
+Create an iframe-based preview system that:
+Renders the selected template with current CV data
+Updates in real-time as user inputs information
+Displays accurately across devices
+Shows only on desktop/tablet (hidden on mobile)
+Step 7: AI Enhancement Integration
+Add AI enhancement buttons for key sections:
+Work experience enhancement
+Skills enhancement
+Professional summary enhancement
+Implement API calls to backend AI service
+Show loading states during enhancement
+Step 8: CV Management
+Create dashboard to view saved CVs
+Implement functionality to edit existing CVs
+Add download/share capabilities
+Step 9: Mobile Optimization
+Test and optimize for mobile devices
+Create specialized mobile UI for form steps
+Implement touch-friendly controls
+Step 10: Finalization
+Implement error handling and edge cases
+Add loading states and feedback mechanisms
+Polish UI/UX for a professional feel
+Template Structure
+For each template, implement the following structure:
+
+HTML Template: Basic structure with placeholders for content
+CSS Styling: Complete styling for the template
+Preview Image: Screenshot of the template with sample data
+JavaScript Injector: Function to inject user data into template

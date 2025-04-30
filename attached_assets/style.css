@@ -1,0 +1,272 @@
+/* === Basic Reset & Font === */
+body {
+    /* Using suggested fonts from HTML */
+    font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f8f8f8; /* Light background */
+    color: #333; /* Default text color */
+    line-height: 1.6;
+    font-size: 10pt; /* Base font size */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    font-family: 'Montserrat', sans-serif; /* Bolder font for headings */
+    font-weight: 700;
+    color: #222; /* Dark heading color */
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+a {
+    color: inherit; /* Inherit color from parent */
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+strong {
+    font-weight: 600; /* Slightly less bold strong tag */
+}
+
+/* === CV Container and Layout === */
+.cv-container {
+    max-width: 900px; /* Adjust width as needed */
+    margin: 20px auto;
+    background-color: #ffffff;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+    display: flex; /* Use flexbox for columns */
+    min-height: 100vh; /* Ensure container takes height */
+}
+
+/* === Sidebar Styling (Left Column - Orange) === */
+.sidebar {
+    width: 38%; /* Adjust sidebar width */
+    background-color: #e87b3a; /* Orange background color */
+    color: #ffffff; /* White text */
+    padding: 35px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+}
+.sidebar a {
+    color: #ffffff; /* White links */
+}
+
+/* Sidebar Header (Name/Title) */
+.sidebar-header {
+    margin-bottom: 30px;
+    text-align: left; /* Align left */
+}
+.sidebar-header h1 {
+    font-size: 2.8em;
+    color: #ffffff;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    line-height: 1.1;
+    letter-spacing: 1px;
+}
+.sidebar-header h1 span { /* Allow styling parts of name */
+    display: block;
+}
+.sidebar-header h2 {
+    font-size: 1.1em;
+    color: #f0f0f0; /* Lighter white for title */
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.5); /* Separator line */
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+/* Sidebar Section Title Styling */
+.sidebar section h3 {
+    font-size: 1.1em;
+    color: #ffffff;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5); /* White border */
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+/* Sidebar Sections */
+.sidebar section {
+    margin-bottom: 25px;
+}
+.sidebar section:last-child {
+    margin-bottom: 0;
+}
+
+/* Contact Info */
+.contact-info p {
+    display: flex;
+    align-items: flex-start; /* Align top for multi-line address */
+    margin-bottom: 10px;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+.contact-info .icon {
+    width: 20px; /* Space for icon */
+    margin-right: 10px;
+    text-align: center;
+    color: #f0f0f0; /* Icon placeholder color */
+    flex-shrink: 0;
+    padding-top: 2px; /* Align icon slightly */
+}
+
+/* Summary */
+.summary p {
+    font-size: 0.95em;
+    line-height: 1.7;
+}
+
+/* === Main Content Styling (Right Column) === */
+.main-content {
+    width: 62%; /* Adjust main content width */
+    padding: 35px;
+    box-sizing: border-box;
+}
+
+/* Main Content Section Title Styling */
+.main-content section h3 {
+    font-size: 1.2em;
+    color: #e87b3a; /* Orange section titles */
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #e87b3a; /* Orange border */
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+/* Main Content Sections */
+.main-content section {
+     margin-bottom: 30px;
+}
+.main-content section:last-child {
+    margin-bottom: 0;
+}
+
+/* Experience & Education Section Headers */
+.entry-header {
+    margin-bottom: 10px; /* Space below header */
+}
+.entry-header .date {
+    display: block;
+    font-size: 0.9em;
+    color: #777; /* Grey date */
+    margin-bottom: 3px;
+    font-weight: 600;
+}
+.entry-header strong { /* Job Title / Degree */
+    display: block;
+    font-size: 1.15em;
+    color: #222;
+    margin-bottom: 2px;
+}
+.entry-header span:not(.date) { /* Company / University */
+    display: block;
+    font-size: 1em;
+    color: #555;
+}
+
+/* Details list (responsibilities) */
+.details-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+.details-list li {
+    font-size: 0.95em;
+    color: #444;
+    margin-bottom: 6px;
+    padding-left: 18px; /* Indentation for bullet */
+    position: relative;
+}
+.details-list li::before {
+    content: '•';
+    color: #e87b3a; /* Orange bullet color */
+    position: absolute;
+    left: 0;
+    top: 0.1em; /* Adjust vertical alignment */
+    font-size: 1em;
+}
+
+/* Skills Section (2 Columns) */
+.skills ul.skills-columns {
+    columns: 2;
+    -webkit-columns: 2;
+    -moz-columns: 2;
+    column-gap: 30px;
+}
+.skills ul li {
+    font-size: 0.95em;
+    color: #444;
+    margin-bottom: 8px;
+    padding-left: 18px; /* Indentation for bullet */
+    position: relative;
+    break-inside: avoid-column;
+}
+.skills ul li::before {
+    content: '•';
+    color: #e87b3a; /* Orange bullet color */
+    position: absolute;
+    left: 0;
+    top: 0.1em;
+    font-size: 1em;
+}
+
+
+/* === Hidden Sections Rule === */
+#languagesSection,
+#referencesSection,
+#hobbiesSection,
+#portfolioSection {
+    display: none;
+}
+/* Optional: Style hidden section titles consistently for testing */
+#languagesSection h3,
+#referencesSection h3,
+#hobbiesSection h3,
+#portfolioSection h3 {
+     color: rgba(255, 255, 255, 0.6);
+     border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+
+/* === Utility Class (for JS to show sections) === */
+.visible {
+    display: block !important;
+}
+
+/* === Responsive Adjustments (Example) === */
+@media (max-width: 768px) {
+    .cv-container {
+        flex-direction: column; /* Stack columns */
+    }
+    .sidebar, .main-content {
+        width: 100%;
+        padding: 25px; /* Adjust padding */
+    }
+    .sidebar {
+        border-right: none; /* Remove border */
+    }
+    .sidebar-header h1 { font-size: 2.2em; }
+    .sidebar-header h2 { font-size: 1em; }
+
+    .main-content section h3 { font-size: 1.1em; }
+
+    .skills ul.skills-columns {
+        columns: 1; /* Single column for skills */
+    }
+}
