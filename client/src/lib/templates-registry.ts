@@ -141,6 +141,16 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Professional',
     popularity: 5,
     previewImage: templateImages.smartBongo
+  },
+  {
+    id: 'madiniMob',
+    name: 'Madini Mob',
+    description: 'Elegant minimalist template with grey accent headers and clean two-column skills layout',
+    contentPath: '/templates/madini-mob.html',
+    isLocal: true,
+    category: 'Modern',
+    popularity: 5,
+    previewImage: templateImages.madiniMob
   }
 ];
 

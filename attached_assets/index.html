@@ -3,119 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Template - Style 3</title> <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>CV Template - Grey Accent Header</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-</head>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+    </head>
 <body>
-    <div class="resume-container">
-        <aside class="left-column">
-            <div class="header-info">
-                <h1 id="fullName">DENICE HARRIS</h1>
-                <p id="profession">Senior Graphic Design Specialist</p>
-            </div>
+    <div class="cv-container">
 
-            <section class="education">
-                <h2>EDUCATION</h2>
-                <div id="educationList">
-                    <article>
-                        <h3>Bachelor of Arts, Communications</h3>
-                        <p class="meta">Rochester Technology, Rochester NY</p>
-                        <p>Design GPA: 3.7/4.0</p>
-                        <p>May 2015</p>
-                    </article>
-                     </div>
-            </section>
+        <header class="cv-header">
+            <h1 id="fullName">KELLY BLACKWELL</h1>
+            <h2 id="profession">Administrative Assistant</h2>
+        </header>
 
-            <section class="skills">
-                 <h2>KEY SKILLS</h2>
-                 <ul id="skillsList">
-                    <li>InDesign</li>
-                    <li>Illustrator</li>
-                    <li>Photoshop</li>
-                    <li>Figma</li>
-                    <li>Fluent in Spanish</li>
-                    <li>Infographic design</li>
-                    <li>Branding & identity</li>
+        <section class="contact-bar">
+            <span id="contactPhone">(210) 286-1624</span>
+            <span class="separator">•</span>
+            <span id="contactEmail">kelly.blackwell@gmail.com</span>
+            <span class="separator">•</span>
+            <span>San Antonio, TX 78023</span>
+            <a id="contactLinkedin" href="#" style="display:none;">LinkedIn</a>
+        </section>
+
+        <section class="summary">
+             <p id="careerObjective">Administrative assistant with 9+ years of experience organizing presentations, preparing facility reports, and maintaining the utmost confidentiality. Possess a B.A. in history and expertise in Microsoft Excel. Looking to leverage my wealth of knowledge and experience into the open administrative assistant role at your organization.</p>
+        </section>
+
+        <section class="skills">
+            <h3>Skills</h3>
+             <ul id="skillsList" class="skills-columns">
+                <li>Analytical Thinking</li>
+                <li>Team Leadership</li>
+                <li>Tolerant & Flexible</li>
+                <li>Organization & Prioritization</li>
                 </ul>
-            </section>
+        </section>
 
-             <section id="languagesSection" style="display:none;">
-                <h2>LANGUAGES</h2>
-                <ul id="languagesList"></ul> </section>
-
-            <section id="referencesSection" style="display:none;">
-                <h2>REFERENCES</h2>
-                <ul id="referencesList">
-                    </ul> </section>
-
-             <section id="hobbiesSection" style="display:none;">
-                <h2>HOBBIES & INTERESTS</h2>
-                <p id="hobbiesText"></p> </section>
-
-            <section id="portfolioSection" style="display:none;">
-                <h2>PORTFOLIO</h2>
-                <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
-            </section>
-            </aside>
-
-        <main class="right-column">
-            <section class="summary">
-                 <p id="careerObjective">
-                    Senior Graphic Design Specialist with 6+ years of experience managing design processes, from conceptualization to delivery. Skilled with Adobe Creative Suite (Illustrator, Photoshop, InDesign), Microsoft Office, and web design applications (Dreamweaver, HTML). Able to stretch the boundaries of web design and digital storytelling to help my client's brands stand out and grow.
-                </p>
-            </section>
-
-            <section class="professional-experience">
-                <h2>PROFESSIONAL EXPERIENCE</h2>
-                <div id="experienceList">
-                    <article class="job">
-                        <div class="job-header">
-                            <h3>Senior Graphic Design Specialist</h3>
-                            <p class="meta">Experion, New York, NY</p>
+        <section class="experience">
+            <h3>Experience</h3>
+            <ul id="experienceList">
+                <li>
+                    <div class="entry-header">
+                        <div class="title-location">
+                            <strong>Administrative Assistant</strong>
+                            <span>REDFORD & SONS, Boston, MA</span>
                         </div>
-                        <p class="dates">2019 - Present</p>
-                        <ul>
-                           <li>Lead the design, development, and implementation of graphic, layout, and production communication materials while helping clients cut costs by an average of 12%</li>
-                           <li>Delegate tasks to a 7-member design team and provide counsel on all aspects of the project</li>
-                           <li>Oversee design project budgets ranging from $2,000 - $25,000</li>
-                        </ul>
-                    </article>
-                    <article class="job">
-                         <div class="job-header">
-                            <h3>Graphic Design Specialist</h3>
-                            <p class="meta">Stepping Stone Advertising, New York, NY</p>
-                         </div>
-                         <p class="dates">2017 - 2019</p>
-                         <ul>
-                            <li>Developed numerous marketing programs (logos, brochures, newsletters, infographics, presentations, and advertisements) and made sure they exceeded the expectations of our clients</li>
-                            <li>Managed up to 5 projects or tasks at a given time and ensured our team met its weekly deadlines</li>
-                         </ul>
-                    </article>
-                     <article class="job">
-                         <div class="job-header">
-                            <h3>Junior Graphic Designer</h3>
-                            <p class="meta">Redfin Technologies, New Rochelle, NY</p>
-                         </div>
-                          <p class="dates">2015 - 2017</p>
-                         <ul>
-                            <li>Worked with senior designers to develop unique product branding</li>
-                            <li>Created 15 original illustrations for a website redesign using Adobe Illustrator and Photoshop</li>
-                         </ul>
-                    </article>
-                </div>
-            </section>
-        </main>
-    </div>
+                        <div class="date-range">
+                            <span>September 2017 - Present</span>
+                        </div>
+                    </div>
+                    <ul class="details-list">
+                        <li>Schedule and coordinate meetings, appointments, and travel arrangements for supervisors, managers, and C-level executives</li>
+                        <li>Trained 2 administrative assistants during a period of company expansion to ensure attention to detail and adherence to company</li>
+                        <li>Developed new filing and organizational practices, saving the company $3,000 per year in contracted labor expenses</li>
+                    </ul>
+                </li>
+                 <li>
+                    <div class="entry-header">
+                         <div class="title-location">
+                            <strong>Secretary</strong>
+                            <span>BRIGHT SPOT LTD, Boston</span>
+                        </div>
+                        <div class="date-range">
+                            <span>June 2016 - August 2017</span>
+                        </div>
+                    </div>
+                    <ul class="details-list">
+                        <li>Typed documents such as correspondence, drafts, memos, and emails, and prepared 3 reports weekly for management</li>
+                        <li>Opened, sorted, and distributed incoming messages and correspondence to the appropriate personnel</li>
+                        <li>Purchased and maintained office supply inventories, and always careful to adhere to budgeting practices</li>
+                        <li>Greeted visitors and determined to whom and when they could speak with specific individuals</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
 
-    <footer class="resume-footer">
-         <span><i class="fas fa-phone icon"></i><span id="contactPhone">(212) 256-1414</span></span>
-         <span><i class="fas fa-map-marker-alt icon"></i><span>Chicago, IL 60622</span></span>
-         <span><i class="fas fa-envelope icon"></i><span id="contactEmail">denice.harris@gmail.com</span></span>
-         <span><i class="fas fa-globe icon"></i><span>deniceharris.com</span></span>
-         <span id="contactLinkedin" style="display:none;"><i class="fab fa-linkedin icon"></i><span></span></span>
-    </footer>
-</body>
+        <section class="education">
+            <h3>Education</h3>
+            <ul id="educationList">
+                <li>
+                    <div class="entry-header">
+                        <div class="title-location"> <strong>Bachelor of Arts (B.A.) in Finance</strong> <span>Brown University, Providence, RI</span>
+                        </div>
+                        <div class="date-range"> <span>05/2009</span>
+                        </div>
+                    </div>
+                </li>
+                 <li>
+                    <div class="entry-header">
+                        <div class="title-location">
+                            <strong>Associate of Arts in Business</strong>
+                             <span>San Antonio Community College, San Antonio, TX</span>
+                        </div>
+                        <div class="date-range">
+                             <span>05/2007</span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <section id="languagesSection" style="display:none;">
+            <h3>Languages</h3>
+            <ul id="languagesList"></ul>
+        </section>
+        <section id="referencesSection" style="display:none;">
+            <h3>References</h3>
+            <ul id="referencesList"></ul>
+         </section>
+         <section id="hobbiesSection" style="display:none;">
+             <h3>Hobbies & Interests</h3>
+             <p id="hobbiesText"></p>
+         </section>
+         <section id="portfolioSection" style="display:none;">
+             <h3>Portfolio</h3>
+             <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
+         </section>
+
+    </div> </body>
 </html>

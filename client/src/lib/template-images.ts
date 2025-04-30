@@ -11,6 +11,7 @@ import tanzaniteProPreview from '@/assets/tanzanite-pro-preview.png';
 import mwalimuOnePreview from '@/assets/mwalimu-one-preview.png';
 import serengetiFlowPreview from '@/assets/serengeti-flow-preview.png';
 import smartBongoPreview from '@/assets/smart-bongo-preview.png';
+import madiniMobPreview from '@/assets/madini-mob-preview.png';
 
 export const templateImages = {
   moonlightSonata: moonlightSonataPreview,
@@ -25,5 +26,6 @@ export const templateImages = {
   tanzanitePro: tanzaniteProPreview,
   mwalimuOne: mwalimuOnePreview,
   serengetiFlow: serengetiFlowPreview,
-  smartBongo: smartBongoPreview
+  smartBongo: smartBongoPreview,
+  madiniMob: madiniMobPreview
 };

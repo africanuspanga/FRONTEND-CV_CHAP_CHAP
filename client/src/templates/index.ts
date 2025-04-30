@@ -11,6 +11,7 @@ import { TanzaniteProTemplate } from './tanzanitePro';
 import { MwalimuOneTemplate } from './mwalimuOne';
 import { SerengetiFlowTemplate } from './serengetiFlow';
 import { SmartBongoTemplate } from './smartBongo';
+import { MadiniMobTemplate } from './madiniMob';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -84,6 +85,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'smartBongo',
     name: 'Smart Bongo',
     render: SmartBongoTemplate
+  },
+  madiniMob: {
+    id: 'madiniMob',
+    name: 'Madini Mob',
+    render: MadiniMobTemplate
   }
 };
 
