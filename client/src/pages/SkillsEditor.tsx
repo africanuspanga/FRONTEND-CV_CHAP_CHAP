@@ -22,7 +22,7 @@ const SkillsEditor = () => {
   
   // Skills state (initialize from form data or defaults)
   const [skills, setSkills] = useState<Skill[]>(
-    formData.skills?.length > 0 
+    formData.skills && formData.skills.length > 0 
       ? formData.skills.map(skill => ({
           id: skill.id || String(Date.now() + Math.random()),
           name: skill.name,
