@@ -23,6 +23,7 @@ import SummaryGeneration from "@/pages/SummaryGeneration";
 import SummaryEditor from "@/pages/SummaryEditor";
 import ReferencesForm from "@/pages/ReferencesForm";
 import AdditionalSectionsForm from "@/pages/AdditionalSectionsForm";
+import FinalPreview from "@/pages/FinalPreview";
 import About from "@/pages/About";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
@@ -57,6 +58,7 @@ function Router() {
           <Route path="/cv/:templateId/certifications" component={CertificationsForm} />
           <Route path="/cv/:templateId/accomplishments" component={AccomplishmentsForm} />
           <Route path="/cv/:templateId/hobbies" component={HobbiesForm} />
+          <Route path="/cv/:templateId/final-preview" component={FinalPreview} />
           <Route path="/create/:step?" component={CreateCV} />
           <Route path="/about" component={About} />
           <Route path="/login" component={Login} />
