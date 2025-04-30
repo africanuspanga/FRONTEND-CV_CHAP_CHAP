@@ -1,5 +1,6 @@
 import { MoonlightSonataTemplate } from './moonlightSonata';
 import { KaziFastaTemplate } from './kaziFasta';
+import { JijengeClassicTemplate } from './jijengeClassic';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -18,6 +19,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'kaziFasta',
     name: 'Kazi Fasta',
     render: KaziFastaTemplate
+  },
+  jijengeClassic: {
+    id: 'jijengeClassic',
+    name: 'Jijenge Classic',
+    render: JijengeClassicTemplate
   }
 };
 

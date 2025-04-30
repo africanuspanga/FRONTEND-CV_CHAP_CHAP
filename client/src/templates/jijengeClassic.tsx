@@ -308,7 +308,7 @@ export function JijengeClassicTemplate({
                 color: '#666',
                 flexShrink: 0
               }}>[A]</span>
-              <span>{personalInfo.city}, {personalInfo.state} {personalInfo.zipCode}</span>
+              <span>{personalInfo.location || 'Location'}</span>
             </p>
             {personalInfo.linkedin && (
               <p style={{
