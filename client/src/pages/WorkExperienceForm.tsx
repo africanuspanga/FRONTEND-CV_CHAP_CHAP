@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronLeft } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import LiveCVPreview from '@/components/LiveCVPreview';
 
 const WorkExperienceForm = () => {
   const [, navigate] = useLocation();
@@ -159,6 +160,9 @@ const WorkExperienceForm = () => {
             </Button>
           </div>
         </form>
+        
+        {/* Live CV Preview */}
+        <LiveCVPreview cvData={formData} templateId={templateId} />
       </div>
     </div>
   );

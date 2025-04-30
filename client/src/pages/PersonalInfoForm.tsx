@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ChevronLeft } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
+import LiveCVPreview from '@/components/LiveCVPreview';
 
 const PersonalInfoForm = () => {
   const [, navigate] = useLocation();
@@ -128,6 +129,9 @@ const PersonalInfoForm = () => {
             </Button>
           </div>
         </form>
+        
+        {/* Live CV Preview */}
+        <LiveCVPreview cvData={formData} templateId={templateId} />
       </div>
     </div>
   );

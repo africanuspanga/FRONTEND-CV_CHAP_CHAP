@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import { ChevronLeft, PlusCircle, Info } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
+import LiveCVPreview from '@/components/LiveCVPreview';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const EducationForm = () => {
@@ -244,6 +245,9 @@ const EducationForm = () => {
             </Button>
           </div>
         </form>
+        
+        {/* Live CV Preview */}
+        <LiveCVPreview cvData={formData} templateId={templateId} />
       </div>
     </div>
   );
