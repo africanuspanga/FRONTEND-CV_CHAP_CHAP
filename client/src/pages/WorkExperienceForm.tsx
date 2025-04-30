@@ -68,7 +68,7 @@ const WorkExperienceForm = () => {
       
       updateFormField('workExperience', [
         {
-          id: 'preview-job',
+          id: 'preview-job' as string,
           jobTitle,
           company: employer,
           location: isRemote ? 'Remote' : location,
@@ -98,7 +98,7 @@ const WorkExperienceForm = () => {
       
       // Create a new work experience entry
       const newWorkExperience = {
-        id: Date.now().toString(),
+        id: Date.now().toString() as string,
         jobTitle,
         company: employer,
         location: isRemote ? 'Remote' : location,

@@ -73,7 +73,7 @@ const EducationForm = () => {
       
       updateFormField('education', [
         {
-          id: 'preview-education',
+          id: 'preview-education' as string,
           institution,
           degree,
           fieldOfStudy,
@@ -83,8 +83,14 @@ const EducationForm = () => {
         },
         ...filteredEducations
       ]);
+    } else if (!showEducationForm || editingEducationIndex !== null) {
+      // If form is hidden or we're editing, remove any preview items
+      const filteredEducations = (formData.education || []).filter(edu => edu.id !== 'preview-education');
+      if (filteredEducations.length !== (formData.education || []).length) {
+        updateFormField('education', filteredEducations);
+      }
     }
-  }, [institution, degree, fieldOfStudy, schoolLocation, gradMonth, gradYear, showEducationForm, editingEducationIndex]);
+  }, [institution, degree, fieldOfStudy, schoolLocation, gradMonth, gradYear, showEducationForm, editingEducationIndex, formData.education, updateFormField]);
 
   // Add a new education to the form data
   const addEducation = () => {
@@ -94,7 +100,7 @@ const EducationForm = () => {
       
       // Create a new education entry
       const newEducation = {
-        id: Date.now().toString(),
+        id: Date.now().toString() as string,
         institution,
         degree,
         fieldOfStudy,
