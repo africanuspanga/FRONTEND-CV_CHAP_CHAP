@@ -10,18 +10,15 @@ const CreationMethod = () => {
   const { cvData, setTemplate } = useCVData();
 
   const handleCreateNew = () => {
-    // Always set a default template (Moonlight Sonata)
-    setTemplate('moonlightSonata');
-    
-    // Proceed directly to the CV creation form
-    navigate('/create/1');
+    // Direct users to template selection first
+    navigate('/templates');
   };
 
   const handleUploadExisting = () => {
     // This would be implemented with file upload functionality
-    // For now, just show a notification and proceed to create
-    alert('File upload feature will be implemented in a future update. Proceeding to create a new CV.');
-    navigate('/create');
+    // For now, just show a notification and proceed to template selection
+    alert('File upload feature will be implemented in a future update. Proceeding to template selection.');
+    navigate('/templates');
   };
 
   return (

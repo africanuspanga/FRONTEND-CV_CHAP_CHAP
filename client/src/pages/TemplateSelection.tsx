@@ -23,18 +23,18 @@ const TemplateSelection = () => {
     ? templates.filter(template => template.category === selectedCategory)
     : templates;
 
-  // Select template and immediately proceed
+  // Select template and immediately proceed to Personal Information step
   const handleSelectTemplate = (templateId: string) => {
     setSelectedTemplateId(templateId);
     setTemplate(templateId);
-    navigate('/create/1'); // Go directly to step 1 of form
+    navigate('/create/1'); // Go directly to Personal Information step
   };
   
   // Proceed to next step (for the "Continue with Selected Template" button)
   const handleProceed = () => {
     if (selectedTemplateId) {
       setTemplate(selectedTemplateId);
-      navigate('/create/1'); // Go directly to step 1 of form
+      navigate('/create/1'); // Go directly to Personal Information step
     }
   };
 

@@ -1,0 +1,97 @@
+The Critical Importance of Template IDs in the CV Flow
+Why Template IDs Are the Foundation of Our System
+The template ID is much more than just a reference - it's the central pillar that connects every component of our CV creation flow. For our new frontend team, understanding this relationship is absolutely critical.
+
+Key Template ID Integration Points
+1. Data Persistence Chain
+As you can see from our console logs, the template ID (template_id: "mtaa-hustler") persists throughout the entire user journey. This ID:
+
+// From actual system logs
+{
+  "_id": "4c705262-6250-4642-98bc-e5a7d05e3e0e",
+  "created_at": "2025-04-30T13:44:32.606943",
+  "template_id": "mtaa-hustler",  // This value connects everything
+  "status": "draft",
+  "user_id": "60c032c5-cadc-4975-9b4e-515939fb9833"
+}
+2. Critical Frontend-Backend Synchronization
+The template ID must match exactly between:
+
+Frontend template registry in templates-registry.ts
+Backend database records
+Public directory template files
+Preview image filenames
+A single character mismatch in any of these locations will break the entire flow.
+
+3. Auto-Save Functionality
+Our auto-save system relies on the template ID to maintain continuity:
+
+// Example of how we link auto-save to template ID
+const autoSaveCV = async (cvData) => {
+  if (!cvData.template_id) {
+    console.error("Missing template_id - cannot auto-save");
+    return false;
+  }
+  
+  try {
+    const response = await fetch(`/api/cv/${cvData._id}`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        template_id: cvData.template_id,  // Must be included in every save
+        data: cvData.data,
+        current_step: cvData.current_step
+      })
+    });
+    
+    return await response.json();
+  } catch (error) {
+    console.error("Auto-save failed:", error);
+    return false;
+  }
+};
+Template ID Flow Integrity Requirements
+1. Consistent Naming Convention
+All template IDs must use kebab-case format (mtaa-hustler, not MtaaHustler or mtaa_hustler)
+IDs must be URL-safe (no spaces or special characters)
+Keep IDs short but descriptive
+2. Path Construction
+HTML templates and preview images must follow strict path patterns based on the ID:
+
+// How paths are constructed from template ID
+const getTemplatePath = (templateId) => `/templates/${templateId}.html`;
+const getPreviewPath = (templateId) => `/templates/previews/${templateId}.png`;
+3. Testing Critical ID Junctions
+Each template should be verified at these critical points:
+
+Can the template be loaded properly from the templates list?
+Is the correct preview image displayed in the selection screen?
+Does template selection correctly initialize a new CV draft with the right template_id?
+Does the preview renderer correctly load and render the template HTML?
+Do form updates correctly reflect in the preview with this template?
+Does saving retain the correct template_id association?
+Can a draft with this template_id be resumed correctly?
+Avoiding Common Template ID Failures
+Case Sensitivity Issues: Our system treats mtaa-hustler and Mtaa-Hustler as completely different templates.
+
+Mismatched References: If your template registry says safari-pro but the HTML file is named safari_pro.html, the template will never load.
+
+Orphaned Templates: Adding a template to the registry but forgetting to add the HTML file or preview image.
+
+Backend Synchronization: A template that exists in the frontend but was never added to the backend database won't be properly tracked or saved.
+
+ID Changes: Changing a template ID after CVs have been created with it will orphan all those CVs.
+
+Implementation Requirements for New Templates
+When adding a new template:
+
+Choose a clear, descriptive ID (e.g., professional-blue)
+Create the HTML file at /public/templates/professional-blue.html
+Add the preview image at /public/templates/previews/professional-blue.png
+Register in templates-registry.ts with the EXACT same ID
+Seed to backend database with matching ID
+Test the complete flow from selection to preview
+By maintaining strict discipline around template IDs, we ensure that users can seamlessly move through our CV creation flow with consistent, reliable results across all platforms - especially critical for our mobile-first audience.
