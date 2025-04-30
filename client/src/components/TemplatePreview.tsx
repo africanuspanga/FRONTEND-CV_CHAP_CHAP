@@ -21,7 +21,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = ({
       <ClientSideTemplateRenderer
         templateId={templateId}
         cvData={cvData}
-        className="scale-[0.5] origin-top transform w-[200%] mx-auto"
+        className="scale-[0.5] origin-top transform w-[200%] mx-auto max-h-[800px]"
       />
     </div>
   );

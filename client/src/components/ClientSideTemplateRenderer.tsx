@@ -209,13 +209,16 @@ export const ClientSideTemplateRenderer = ({
       <iframe
         id="template-preview-frame"
         title={`CV Template - ${templateId}`}
-        className="w-full h-full border-0"
+        className="w-full border-0"
         style={{ 
-          minHeight: '842px',
+          height: 'auto',
+          maxHeight: '842px',
           display: 'block',
-          margin: '0 auto'
+          margin: '0 auto',
+          overflow: 'hidden'
         }}
         srcDoc={templateHtml || ''}
+        scrolling="no"
       />
     </div>
   );

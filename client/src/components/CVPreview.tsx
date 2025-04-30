@@ -63,7 +63,7 @@ const CVPreview: React.FC<CVPreviewProps> = ({
         <ClientSideTemplateRenderer
           templateId={selectedTemplate}
           cvData={cvData}
-          className="h-full"
+          className="h-full mx-auto"
         />
       </div>
     </div>
