@@ -101,7 +101,7 @@ export function KaziFastaTemplate({ personalInfo, workExperience, education, ski
                   {references.map((reference, index) => (
                     <div key={index} className="reference-item">
                       <h3>{reference.name}</h3>
-                      <p className="reference-title">{reference.position || reference.jobTitle}</p>
+                      <p className="reference-title">{reference.position || ''}</p>
                       {reference.company && <p className="reference-company">{reference.company}</p>}
                       {reference.email && <p className="reference-contact">{reference.email}</p>}
                       {reference.phone && <p className="reference-contact">{reference.phone}</p>}
