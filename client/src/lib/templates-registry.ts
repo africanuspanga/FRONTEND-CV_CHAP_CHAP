@@ -111,6 +111,16 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Professional',
     popularity: 5,
     previewImage: templateImages.tanzanitePro
+  },
+  {
+    id: 'mwalimuOne',
+    name: 'Mwalimu One',
+    description: 'Clean centered CV with elegant section headers and balanced two-column skills layout',
+    contentPath: '/templates/mwalimu-one.html',
+    isLocal: true,
+    category: 'Professional',
+    popularity: 5,
+    previewImage: templateImages.mwalimuOne
   }
 ];
 

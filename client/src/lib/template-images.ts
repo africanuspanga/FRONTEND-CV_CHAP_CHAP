@@ -8,6 +8,7 @@ import streetHustlerPreview from '@/assets/street-hustler-preview.png';
 import safariOriginalPreview from '@/assets/safari-original-preview.png';
 import bigBossPreview from '@/assets/big-boss-preview.png';
 import tanzaniteProPreview from '@/assets/tanzanite-pro-preview.png';
+import mwalimuOnePreview from '@/assets/mwalimu-one-preview.png';
 
 export const templateImages = {
   moonlightSonata: moonlightSonataPreview,
@@ -19,5 +20,6 @@ export const templateImages = {
   streetHustler: streetHustlerPreview,
   safariOriginal: safariOriginalPreview,
   bigBoss: bigBossPreview,
-  tanzanitePro: tanzaniteProPreview
+  tanzanitePro: tanzaniteProPreview,
+  mwalimuOne: mwalimuOnePreview
 };
