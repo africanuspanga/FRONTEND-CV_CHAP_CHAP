@@ -36,8 +36,8 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
       <h2 className="text-2xl font-bold mb-6">New Templates</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {templates.map((template) => (
-          <Card key={template.id} className="overflow-hidden flex flex-col h-full">
-            <div className="relative aspect-[3/4] bg-[#e6f2ff]">
+          <Card key={template.id} className="overflow-hidden flex flex-col h-full border shadow-sm hover:shadow-md transition-shadow">
+            <div className="relative aspect-[3/4] bg-white">
               <img
                 src={template.previewImage}
                 alt={`${template.name} template preview`}
@@ -48,14 +48,14 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
                 }}
               />
             </div>
-            <CardContent className="p-4 flex flex-col justify-between flex-grow">
+            <CardContent className="p-4 flex flex-col justify-between flex-grow border-t">
               <div>
                 <h3 className="text-xl font-bold">{template.name}</h3>
                 <p className="text-gray-600 mt-2">{template.description}</p>
               </div>
               <div className="mt-4 flex justify-between items-center">
                 <div className="flex items-center space-x-2">
-                  <Badge variant="outline" className="bg-blue-100 text-blue-800">
+                  <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
                     {template.category}
                   </Badge>
                   {renderStarRating(template.popularity)}
