@@ -2,299 +2,310 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { useCVData } from '@/hooks/useCVData';
-import { useFormSteps } from '@/hooks/use-form-steps';
-import CVFormStepper from '@/components/CVFormStepper';
-import CVPreview from '@/components/CVPreview';
-import PersonalInfoForm from '@/components/form/PersonalInfoForm';
-import WorkExperienceForm from '@/components/form/WorkExperienceForm';
-import EducationForm from '@/components/form/EducationForm';
-import SkillsForm from '@/components/form/SkillsForm';
-import SummaryForm from '@/components/form/SummaryForm';
-import LanguagesForm from '@/components/form/LanguagesForm';
-import ReferencesForm from '@/components/form/ReferencesForm';
-import AdditionalSectionsForm from '@/components/form/AdditionalSectionsForm';
-import FinalPreviewForm from '@/components/form/FinalPreviewForm';
-import { Eye } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Eye, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { formSteps, useCVForm, CVFormProvider } from '@/contexts/cv-form-context';
+import CVFormStepper from '@/components/CVFormStepper';
+import ClientSideTemplateRenderer from '@/components/ClientSideTemplateRenderer';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-const CreateCV = () => {
+// Import form step components
+import PersonalInfoStep from '@/components/cv-form/PersonalInfoStep';
+import WorkExperienceStep from '@/components/cv-form/WorkExperienceStep';
+import EducationStep from '@/components/cv-form/EducationStep';
+import SkillsStep from '@/components/cv-form/SkillsStep';
+import SummaryStep from '@/components/cv-form/SummaryStep';
+import LanguagesStep from '@/components/cv-form/LanguagesStep';
+import ReferencesStep from '@/components/cv-form/ReferencesStep';
+import PreviewStep from '@/components/cv-form/PreviewStep';
+
+// Form Steps Mapping
+const stepComponents = [
+  { id: 'template', component: null }, // Handled by TemplateSelection page
+  { id: 'personal', component: PersonalInfoStep },
+  { id: 'experience', component: WorkExperienceStep },
+  { id: 'education', component: EducationStep },
+  { id: 'skills', component: SkillsStep },
+  { id: 'summary', component: SummaryStep },
+  { id: 'languages', component: LanguagesStep },
+  { id: 'references', component: ReferencesStep },
+  { id: 'preview', component: PreviewStep },
+];
+
+// Navigation button component for consistency
+const NavigationButton = ({ 
+  onClick, 
+  disabled = false, 
+  variant = 'default',
+  direction = 'next',
+  children 
+}: { 
+  onClick: () => void; 
+  disabled?: boolean; 
+  variant?: 'default' | 'outline' | 'secondary'; 
+  direction?: 'next' | 'prev';
+  children: React.ReactNode;
+}) => (
+  <Button
+    onClick={onClick}
+    disabled={disabled}
+    variant={variant}
+    className="px-6 py-2 flex items-center gap-2"
+  >
+    {direction === 'prev' && <ChevronLeft className="h-4 w-4" />}
+    {children}
+    {direction === 'next' && <ChevronRight className="h-4 w-4" />}
+  </Button>
+);
+
+// CreateCV component with form steps
+const CreateCVContent = () => {
   const { step } = useParams<{ step?: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const { cvData, updateCVData, setTemplate, isFormComplete } = useCVData();
-  const { steps, currentStepIndex, goToStep, nextStep, prevStep, progress } = useFormSteps();
-  const [isMobilePreviewVisible, setMobilePreviewVisible] = useState(false);
+  const isMobile = useIsMobile();
+  const [previewVisible, setPreviewVisible] = useState(false);
+  
+  // Get context values
+  const { 
+    currentStep, 
+    setCurrentStep, 
+    formData, 
+    isFormValid,
+    goToNextStep,
+    goToPreviousStep,
+  } = useCVForm();
 
-  // Ensure we have a template selected
+  // Calculate progress percentage
+  const progress = ((currentStep) / (formSteps.length - 1)) * 100;
+
+  // Ensure we have a template selected or redirect to template selection
   useEffect(() => {
-    if (!cvData.templateId) {
+    if (currentStep > 0 && !formData.templateId) {
       navigate('/templates');
     }
-  }, [cvData.templateId, navigate]);
+  }, [formData.templateId, currentStep, navigate]);
 
   // Handle URL-based navigation
   useEffect(() => {
     if (step) {
       const stepIndex = parseInt(step);
-      if (!isNaN(stepIndex) && stepIndex >= 0 && stepIndex < steps.length) {
-        goToStep(stepIndex);
+      if (!isNaN(stepIndex) && stepIndex >= 0 && stepIndex < formSteps.length) {
+        setCurrentStep(stepIndex);
       } else {
-        navigate('/create', { replace: true });
+        navigate('/create/1', { replace: true });
       }
     }
-  }, [step, navigate, goToStep, steps.length]);
+  }, [step, navigate, setCurrentStep]);
 
   // Update URL when step changes
   useEffect(() => {
-    navigate(`/create/${currentStepIndex}`, { replace: true });
-  }, [currentStepIndex, navigate]);
+    navigate(`/create/${currentStep}`, { replace: true });
+  }, [currentStep, navigate]);
 
-  const handleNextStep = () => {
-    nextStep();
-    window.scrollTo(0, 0);
-  };
-
-  const handlePrevStep = () => {
-    prevStep();
-    window.scrollTo(0, 0);
-  };
-
-  const handleCompleteCV = () => {
+  // Handle form submission
+  const handleComplete = () => {
     toast({
       title: "CV Created Successfully!",
-      description: "Your CV has been generated and downloaded successfully.",
+      description: "Your CV has been generated. You can now download it.",
     });
-    
-    // Navigate to home page after a slight delay
-    setTimeout(() => {
-      navigate('/');
-    }, 2000);
   };
 
-  const toggleMobilePreview = () => {
-    setMobilePreviewVisible(!isMobilePreviewVisible);
-  };
-
-  const renderCurrentStep = () => {
-    switch (currentStepIndex) {
-      case 0:
-        return (
-          <PersonalInfoForm
-            defaultValues={cvData.personalInfo || {
-              firstName: '',
-              lastName: '',
-              email: '',
-              phone: '',
-              location: '',
-              jobTitle: '',
-              website: '',
-              linkedin: '',
-              profilePicture: ''
-            }}
-            onSubmit={(data) => {
-              updateCVData({ personalInfo: data });
-              handleNextStep();
-            }}
-            onBack={() => navigate('/create/method')}
-          />
-        );
-      case 1:
-        return (
-          <WorkExperienceForm
-            defaultValues={cvData.workExperience || []}
-            onSubmit={(data) => updateCVData({ workExperience: data })}
-            onBack={handlePrevStep}
-            onNext={handleNextStep}
-          />
-        );
-      case 2:
-        return (
-          <EducationForm
-            defaultValues={cvData.education || []}
-            onSubmit={(data) => updateCVData({ education: data })}
-            onBack={handlePrevStep}
-            onNext={handleNextStep}
-          />
-        );
-      case 3:
-        return (
-          <SkillsForm
-            defaultValues={cvData.skills || []}
-            onSubmit={(data) => updateCVData({ skills: data })}
-            onBack={handlePrevStep}
-            onNext={handleNextStep}
-          />
-        );
-      case 4:
-        return (
-          <SummaryForm
-            defaultValue={cvData.summary || ''}
-            onSubmit={(data) => updateCVData({ summary: data.summary })}
-            onBack={handlePrevStep}
-            onNext={handleNextStep}
-          />
-        );
-      case 5:
-        return (
-          <LanguagesForm
-            defaultValues={cvData.languages || []}
-            onSubmit={(data) => updateCVData({ languages: data })}
-            onBack={handlePrevStep}
-            onNext={handleNextStep}
-          />
-        );
-      case 6:
-        return (
-          <ReferencesForm
-            defaultValues={cvData.references || []}
-            onSubmit={(data) => updateCVData({ references: data })}
-            onBack={handlePrevStep}
-            onNext={handleNextStep}
-          />
-        );
-      case 7:
-        return (
-          <AdditionalSectionsForm
-            defaultValues={{
-              hobbies: cvData.hobbies || '',
-              projects: cvData.projects || [],
-              certifications: cvData.certifications || []
-            }}
-            onSubmit={(data) => updateCVData(data)}
-            onBack={handlePrevStep}
-            onNext={handleNextStep}
-          />
-        );
-      case 8:
-        return (
-          <FinalPreviewForm
-            cvData={cvData}
-            templateId={cvData.templateId || 'moonlightSonata'}
-            onBack={handlePrevStep}
-            onEdit={goToStep}
-            onComplete={handleCompleteCV}
-            isComplete={isFormComplete}
-          />
-        );
-      default:
-        return <div>Unknown step</div>;
+  // Navigate to previous step
+  const handlePrevStep = () => {
+    if (currentStep === 1) {
+      // First step - go back to template selection
+      navigate('/templates');
+    } else {
+      goToPreviousStep();
+      window.scrollTo(0, 0);
     }
+  };
+
+  // Navigate to next step
+  const handleNextStep = () => {
+    if (isFormValid(currentStep)) {
+      goToNextStep();
+      window.scrollTo(0, 0);
+    } else {
+      toast({
+        title: "Please complete all required fields",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Render current step component
+  const renderCurrentStep = () => {
+    const CurrentStepComponent = stepComponents[currentStep]?.component;
+
+    if (!CurrentStepComponent) {
+      return <div>Loading...</div>;
+    }
+
+    return (
+      <CurrentStepComponent />
+    );
+  };
+
+  // Toggle mobile preview visibility
+  const togglePreview = () => {
+    setPreviewVisible(!previewVisible);
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col lg:flex-row">
-        {/* Left side: Form */}
-        <div className="w-full lg:w-1/2 lg:pr-8">
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h1 className="text-2xl font-semibold text-darkText mb-2">Create Your CV</h1>
-            <p className="text-lightText mb-6">Fill in the form to create your professional CV</p>
-            
-            {/* Progress Bar */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Form Section */}
+        <div className="lg:col-span-7">
+          <Card className="p-6 mb-6">
             <div className="mb-8">
-              <div className="flex justify-between text-sm text-lightText mb-2">
-                <span>Progress</span>
-                <span>{Math.round(progress)}%</span>
+              <h1 className="text-2xl font-semibold text-darkText mb-2">Create Your CV</h1>
+              <p className="text-lightText mb-6">Complete each section to create your professional CV</p>
+              
+              {/* Progress Indicator */}
+              <div className="mb-8">
+                <div className="flex justify-between text-sm text-gray-500 mb-2">
+                  <span>Step {currentStep} of {formSteps.length - 1}</span>
+                  <span>{Math.round(progress)}% Complete</span>
+                </div>
+                <Progress value={progress} className="h-2 bg-gray-100" />
               </div>
-              <Progress value={progress} className="progress-bar-container" />
-            </div>
-            
-            {/* Current Form Step */}
-            {renderCurrentStep()}
-          </div>
-          
-          {/* Mobile Preview Toggle (only visible on mobile) */}
-          <div className="lg:hidden mb-6">
-            <Button
-              variant="secondary"
-              className="w-full py-3 px-4 flex items-center justify-center"
-              onClick={toggleMobilePreview}
-            >
-              <Eye className="mr-2 h-5 w-5" />
-              {isMobilePreviewVisible ? 'Hide Preview' : 'Preview CV'}
-            </Button>
-          </div>
-          
-          {/* Mobile Preview (conditionally rendered) */}
-          {isMobilePreviewVisible && (
-            <div className="lg:hidden mb-6">
-              <div className="bg-white rounded-lg shadow-sm p-4 overflow-hidden" style={{ height: '400px' }}>
-                <CVPreview
-                  cvData={cvData}
-                  selectedTemplate={cvData.templateId || 'moonlightSonata'}
-                  onTemplateChange={(templateId) => setTemplate(templateId)}
-                  isFormComplete={isFormComplete}
+              
+              {/* Step Navigation (Desktop) */}
+              <div className="hidden md:block mb-8">
+                <CVFormStepper
+                  steps={formSteps}
+                  currentStep={currentStep}
+                  onStepClick={(idx) => {
+                    // Only allow clicking on completed steps or current step
+                    if (idx <= currentStep) {
+                      setCurrentStep(idx);
+                      window.scrollTo(0, 0);
+                    }
+                  }}
                 />
               </div>
+
+              {/* Current Form Step Title */}
+              <h2 className="text-xl font-medium text-darkText mb-6">
+                {formSteps[currentStep].title}
+              </h2>
             </div>
+            
+            {/* Current Form Step Content */}
+            {renderCurrentStep()}
+            
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-8 pt-4 border-t border-gray-100">
+              <NavigationButton 
+                onClick={handlePrevStep} 
+                variant="outline" 
+                direction="prev"
+              >
+                Back
+              </NavigationButton>
+              
+              {currentStep < formSteps.length - 1 ? (
+                <NavigationButton 
+                  onClick={handleNextStep}
+                  direction="next"
+                >
+                  Continue
+                </NavigationButton>
+              ) : (
+                <Button 
+                  onClick={handleComplete}
+                  className="px-6 py-2 bg-green-600 hover:bg-green-700 flex items-center gap-2"
+                >
+                  <Check className="h-4 w-4" />
+                  Complete & Download
+                </Button>
+              )}
+            </div>
+          </Card>
+          
+          {/* Mobile Preview Toggle */}
+          {isMobile && (
+            <Button
+              variant="outline"
+              className="w-full mb-6 flex items-center justify-center gap-2"
+              onClick={togglePreview}
+            >
+              <Eye className="h-4 w-4" />
+              {previewVisible ? 'Hide Preview' : 'Show Preview'}
+            </Button>
           )}
           
-          {/* Mobile Stepper */}
-          <div className="lg:hidden">
-            <CVFormStepper
-              steps={steps}
-              currentStep={currentStepIndex}
-              onStepClick={(idx) => {
-                // Only allow clicking on completed steps
-                if (idx < currentStepIndex) {
-                  goToStep(idx);
-                  window.scrollTo(0, 0);
-                }
-              }}
-            />
-          </div>
+          {/* Mobile Preview (conditionally rendered) */}
+          {isMobile && previewVisible && formData.templateId && (
+            <Card className="p-4 mb-6 overflow-hidden">
+              <h3 className="font-medium mb-2">Live Preview</h3>
+              <div className="border rounded overflow-hidden">
+                <ClientSideTemplateRenderer
+                  templateId={formData.templateId}
+                  cvData={formData}
+                  height={400}
+                />
+              </div>
+            </Card>
+          )}
         </div>
         
-        {/* Right side: CV Preview (desktop only) */}
-        <div className="hidden lg:block w-1/2 pl-8">
-          <CVPreview
-            cvData={cvData}
-            selectedTemplate={cvData.templateId || 'moonlightSonata'}
-            onTemplateChange={(templateId) => setTemplate(templateId)}
-            isFormComplete={isFormComplete}
-          />
-          
-          {/* Need Help Card */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-medium text-darkText mb-2">Need Help?</h3>
-            <p className="text-lightText mb-4">Some tips for creating an effective CV:</p>
-            <ul className="text-sm text-lightText space-y-2">
-              <li className="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                Keep your CV concise and relevant to the job you're applying for
-              </li>
-              <li className="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                Use action verbs to describe your achievements
-              </li>
-              <li className="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                Quantify your achievements with numbers where possible
-              </li>
-              <li className="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                Tailor your CV for each job application
-              </li>
-              <li className="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                Proofread carefully to catch spelling and grammatical errors
-              </li>
-            </ul>
+        {/* Preview Section (Desktop only) */}
+        {!isMobile && formData.templateId && (
+          <div className="hidden lg:block lg:col-span-5 sticky top-4 self-start">
+            <Card className="p-4">
+              <h3 className="text-lg font-medium mb-2">Live Preview</h3>
+              <div className="border rounded-md overflow-hidden">
+                <ClientSideTemplateRenderer
+                  templateId={formData.templateId}
+                  cvData={formData}
+                  height={700}
+                />
+              </div>
+            </Card>
+            
+            {/* Tips Card */}
+            <Card className="p-4 mt-6">
+              <h3 className="text-lg font-medium mb-4">CV Writing Tips</h3>
+              <ul className="space-y-3 text-sm">
+                <li className="flex gap-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span>Keep your CV concise and tailored to the job</span>
+                </li>
+                <li className="flex gap-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span>Use action verbs to describe achievements</span>
+                </li>
+                <li className="flex gap-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span>Quantify results with numbers when possible</span>
+                </li>
+                <li className="flex gap-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span>Ensure consistent formatting throughout</span>
+                </li>
+                <li className="flex gap-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span>Proofread carefully for errors</span>
+                </li>
+              </ul>
+            </Card>
           </div>
-        </div>
+        )}
       </div>
     </div>
+  );
+};
+
+// Wrap the component with the CV Form Provider
+const CreateCV = () => {
+  return (
+    <CVFormProvider>
+      <CreateCVContent />
+    </CVFormProvider>
   );
 };
 
