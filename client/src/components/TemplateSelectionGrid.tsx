@@ -41,7 +41,7 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
               <img
                 src={template.previewImage}
                 alt={`${template.name} template preview`}
-                className="w-full h-full object-cover object-top px-2"
+                className="w-full h-full object-contain object-top px-2"
                 style={{
                   maxWidth: '100%',
                   display: 'block',

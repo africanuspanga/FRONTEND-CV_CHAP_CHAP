@@ -215,7 +215,8 @@ export const ClientSideTemplateRenderer = ({
           maxHeight: '842px',
           display: 'block',
           margin: '0 auto',
-          overflow: 'hidden'
+          overflowX: 'visible',
+          overflowY: 'hidden'
         }}
         srcDoc={templateHtml || ''}
         scrolling="no"
