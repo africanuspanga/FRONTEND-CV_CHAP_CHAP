@@ -158,146 +158,178 @@ const CreateCVContent = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Form Section */}
-        <div className="lg:col-span-7">
-          <Card className="p-6 mb-6">
+    <div className="flex min-h-screen">
+      {/* Left Sidebar with Steps */}
+      <div className="hidden md:block w-64 bg-[#10243e] text-white">
+        <div className="p-4">
+          <h2 className="text-xl font-bold text-white mb-6 flex items-center">
+            <span className="text-[#e94f37]">my</span>perfect<span>resume</span>
+          </h2>
+        </div>
+        
+        {/* Step Navigation */}
+        <div className="mb-6">
+          {formSteps.slice(1).map((step, idx) => (
+            <div 
+              key={step.id}
+              className={`flex items-center px-6 py-3 ${currentStep === idx + 1 ? 'bg-[#1a3a5f]' : ''} ${idx + 1 < currentStep ? 'text-gray-300' : 'text-white'}`}
+              onClick={() => {
+                if (idx + 1 <= currentStep) {
+                  setCurrentStep(idx + 1);
+                  window.scrollTo(0, 0);
+                }
+              }}
+            >
+              <div className={`w-6 h-6 rounded-full mr-3 flex items-center justify-center ${currentStep === idx + 1 ? 'bg-[#e94f37]' : 'bg-gray-600'}`}>
+                {idx + 1}
+              </div>
+              <span className="text-sm">{step.title}</span>
+            </div>
+          ))}
+        </div>
+        
+        {/* Resume Completeness */}
+        <div className="px-4 mt-auto">
+          <div className="mb-1 text-xs uppercase">RESUME COMPLETENESS</div>
+          <div className="w-full bg-gray-700 h-2 rounded-full">
+            <div 
+              className="h-full bg-gradient-to-r from-[#3cba92] to-[#3cba92] rounded-full" 
+              style={{ width: `${Math.round(progress)}%` }}
+            ></div>
+          </div>
+          <div className="text-right text-xs mt-1">{Math.round(progress)}%</div>
+        </div>
+        
+        {/* Footer with links */}
+        <div className="mt-8 px-4 text-xs text-gray-400">
+          <div className="flex flex-col space-y-2">
+            <a href="#" className="hover:text-white">Terms & Conditions</a>
+            <a href="#" className="hover:text-white">Privacy Policy</a>
+            <a href="#" className="hover:text-white">Accessibility</a>
+            <a href="#" className="hover:text-white">Contact Us</a>
+          </div>
+          <div className="mt-4 text-[10px]">
+            © 2025, CV Chap Chap, All rights reserved.
+          </div>
+        </div>
+      </div>
+      
+      {/* Main Content Area */}
+      <div className="flex-1 bg-white">
+        <div className="flex min-h-screen">
+          {/* Form Section */}
+          <div className="flex-1 p-10">
+            {/* Back button */}
+            <button 
+              onClick={handlePrevStep}
+              className="text-blue-600 flex items-center mb-6" 
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Go Back
+            </button>
+            
+            {/* Form heading */}
             <div className="mb-8">
-              <h1 className="text-2xl font-semibold text-darkText mb-2">Create Your CV</h1>
-              <p className="text-lightText mb-6">Complete each section to create your professional CV</p>
-              
-              {/* Progress Indicator */}
-              <div className="mb-8">
-                <div className="flex justify-between text-sm text-gray-500 mb-2">
-                  <span>Step {currentStep} of {formSteps.length - 1}</span>
-                  <span>{Math.round(progress)}% Complete</span>
-                </div>
-                <Progress value={progress} className="h-2 bg-gray-100" />
-              </div>
-              
-              {/* Step Navigation (Desktop) */}
-              <div className="hidden md:block mb-8">
-                <CVFormStepper
-                  steps={formSteps}
-                  currentStep={currentStep}
-                  onStepClick={(idx) => {
-                    // Only allow clicking on completed steps or current step
-                    if (idx <= currentStep) {
-                      setCurrentStep(idx);
-                      window.scrollTo(0, 0);
-                    }
-                  }}
-                />
-              </div>
-
-              {/* Current Form Step Title */}
-              <h2 className="text-xl font-medium text-darkText mb-6">
+              <h1 className="text-3xl font-bold text-gray-800">
+                Great, let's work on your
+              </h1>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">
                 {formSteps[currentStep].title}
               </h2>
+              
+              <div className="text-gray-600">
+                <p className="mb-1">Here's what you need to know:</p>
+                <p>Employers quickly scan the {formSteps[currentStep].title.toLowerCase()} section.</p>
+                <p>We'll take care of the formatting so it's easy to find.</p>
+              </div>
             </div>
             
             {/* Current Form Step Content */}
-            {renderCurrentStep()}
+            <div className="mb-8">
+              {renderCurrentStep()}
+            </div>
             
             {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8 pt-4 border-t border-gray-100">
-              <NavigationButton 
-                onClick={handlePrevStep} 
-                variant="outline" 
-                direction="prev"
+            <div className="flex justify-between mt-12">
+              <Button 
+                variant="outline"
+                className="border-blue-600 text-blue-600 px-6 py-2 rounded-full hover:bg-blue-50"
+                onClick={() => {
+                  // TODO: Preview functionality 
+                  toast({
+                    title: "Preview functionality",
+                    description: "Preview in a new tab will be implemented soon."
+                  });
+                }}
               >
-                Back
-              </NavigationButton>
+                Preview
+              </Button>
               
               {currentStep < formSteps.length - 1 ? (
-                <NavigationButton 
+                <Button 
+                  className="bg-[#37889e] hover:bg-[#2a6a7a] text-white px-10 py-2 rounded-full"
                   onClick={handleNextStep}
-                  direction="next"
                 >
-                  Continue
-                </NavigationButton>
+                  Next
+                </Button>
               ) : (
                 <Button 
+                  className="bg-green-600 hover:bg-green-700 text-white px-10 py-2 rounded-full"
                   onClick={handleComplete}
-                  className="px-6 py-2 bg-green-600 hover:bg-green-700 flex items-center gap-2"
                 >
-                  <Check className="h-4 w-4" />
-                  Complete & Download
+                  Complete
                 </Button>
               )}
             </div>
-          </Card>
+          </div>
           
-          {/* Mobile Preview Toggle */}
-          {isMobile && (
-            <Button
-              variant="outline"
-              className="w-full mb-6 flex items-center justify-center gap-2"
-              onClick={togglePreview}
-            >
-              <Eye className="h-4 w-4" />
-              {previewVisible ? 'Hide Preview' : 'Show Preview'}
-            </Button>
-          )}
-          
-          {/* Mobile Preview (conditionally rendered) */}
-          {isMobile && previewVisible && formData.templateId && (
-            <Card className="p-4 mb-6 overflow-hidden">
-              <h3 className="font-medium mb-2">Live Preview</h3>
-              <div className="border rounded overflow-hidden">
+          {/* Preview Section (Desktop only) */}
+          {!isMobile && formData.templateId && (
+            <div className="w-[400px] border-l border-gray-200 p-4 flex flex-col items-center">
+              <div className="border rounded-md overflow-hidden mb-2 shadow-sm w-full">
                 <ClientSideTemplateRenderer
                   templateId={formData.templateId}
                   cvData={formData}
-                  height={400}
+                  height={600}
                 />
               </div>
-            </Card>
+              <a href="#" className="text-blue-600 text-sm mt-2" onClick={(e) => {
+                e.preventDefault();
+                // TODO: Template change functionality
+                toast({
+                  title: "Template change",
+                  description: "Template switch functionality will be implemented soon."
+                });
+              }}>
+                Change template
+              </a>
+            </div>
+          )}
+          
+          {/* Mobile Preview Toggle and View */}
+          {isMobile && (
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+              <Button
+                variant="outline"
+                className="w-full mb-2 flex items-center justify-center gap-2"
+                onClick={togglePreview}
+              >
+                <Eye className="h-4 w-4" />
+                {previewVisible ? 'Hide Preview' : 'Show Preview'}
+              </Button>
+              
+              {previewVisible && formData.templateId && (
+                <div className="border rounded overflow-hidden">
+                  <ClientSideTemplateRenderer
+                    templateId={formData.templateId}
+                    cvData={formData}
+                    height={300}
+                  />
+                </div>
+              )}
+            </div>
           )}
         </div>
-        
-        {/* Preview Section (Desktop only) */}
-        {!isMobile && formData.templateId && (
-          <div className="hidden lg:block lg:col-span-5 sticky top-4 self-start">
-            <Card className="p-4">
-              <h3 className="text-lg font-medium mb-2">Live Preview</h3>
-              <div className="border rounded-md overflow-hidden">
-                <ClientSideTemplateRenderer
-                  templateId={formData.templateId}
-                  cvData={formData}
-                  height={700}
-                />
-              </div>
-            </Card>
-            
-            {/* Tips Card */}
-            <Card className="p-4 mt-6">
-              <h3 className="text-lg font-medium mb-4">CV Writing Tips</h3>
-              <ul className="space-y-3 text-sm">
-                <li className="flex gap-2">
-                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Keep your CV concise and tailored to the job</span>
-                </li>
-                <li className="flex gap-2">
-                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Use action verbs to describe achievements</span>
-                </li>
-                <li className="flex gap-2">
-                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Quantify results with numbers when possible</span>
-                </li>
-                <li className="flex gap-2">
-                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Ensure consistent formatting throughout</span>
-                </li>
-                <li className="flex gap-2">
-                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Proofread carefully for errors</span>
-                </li>
-              </ul>
-            </Card>
-          </div>
-        )}
       </div>
     </div>
   );
