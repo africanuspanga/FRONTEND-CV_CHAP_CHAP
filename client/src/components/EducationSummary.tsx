@@ -2,18 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2, PlusCircle, LightbulbIcon } from 'lucide-react';
 
-interface Education {
-  id: string;
-  institution: string;
-  degree: string;
-  fieldOfStudy?: string;
-  location?: string;
-  startDate?: string;
-  endDate?: string;
-  description?: string;
-  achievements?: string[];
-  gpa?: string;
-}
+import { Education } from '@shared/schema';
 
 interface EducationSummaryProps {
   educations: Education[];

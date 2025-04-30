@@ -15,6 +15,7 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import EducationSummary from '@/components/EducationSummary';
+import { Education } from '@shared/schema';
 
 const EducationForm = () => {
   const [, navigate] = useLocation();
@@ -453,7 +454,10 @@ const EducationForm = () => {
         {showEducationSummary && (
           <>
             <EducationSummary
-              educations={formData.education || []}
+              educations={(formData.education || []).map(edu => ({
+                ...edu,
+                id: edu.id || Date.now().toString() // Ensure all education entries have an ID
+              }))}
               onEdit={handleEditEducation}
               onDelete={handleDeleteEducation}
               onAddAnother={handleAddAnotherEducation}

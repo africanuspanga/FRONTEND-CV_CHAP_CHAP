@@ -436,7 +436,10 @@ const WorkExperienceForm = () => {
         {showWorkHistory && (
           <>
             <WorkHistorySummary
-              workExperiences={formData.workExperience || []}
+              workExperiences={(formData.workExperience || []).map(job => ({
+                ...job,
+                id: job.id || Date.now().toString() // Ensure all jobs have an ID
+              }))}
               onEdit={handleEditJob}
               onDelete={handleDeleteJob}
               onAddAnother={handleAddAnotherPosition}

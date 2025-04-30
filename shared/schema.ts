@@ -30,7 +30,7 @@ export const cvs = pgTable("cvs", {
 // Zod Schemas for CV Data Validation
 
 export const workExperienceSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   jobTitle: z.string().min(1, "Job title is required"),
   company: z.string().min(1, "Company name is required"),
   location: z.string().optional(),
@@ -42,7 +42,7 @@ export const workExperienceSchema = z.object({
 });
 
 export const educationSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   institution: z.string().min(1, "Institution name is required"),
   degree: z.string().min(1, "Degree is required"),
   fieldOfStudy: z.string().optional(),
