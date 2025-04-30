@@ -218,8 +218,21 @@ const AccomplishmentsForm = () => {
             <div className="space-y-4">
               {accomplishments.map((accomplishment, index) => (
                 <div key={index} className="rounded-md border p-4">
+                  <Input
+                    value={accomplishment.title || ''}
+                    onChange={(e) => {
+                      const updatedAccomplishments = [...accomplishments];
+                      updatedAccomplishments[index] = { 
+                        ...updatedAccomplishments[index],
+                        title: e.target.value 
+                      };
+                      setAccomplishments(updatedAccomplishments);
+                    }}
+                    placeholder="Accomplishment Title"
+                    className="mb-2"
+                  />
                   <Textarea
-                    value={accomplishment.text}
+                    value={accomplishment.description || ''}
                     onChange={(e) => handleInputChange(index, e.target.value)}
                     placeholder="Write about your accomplishment here..."
                     className="min-h-[100px] mb-2"

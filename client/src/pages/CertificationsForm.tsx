@@ -7,13 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { Helmet } from 'react-helmet';
-
-interface Certification {
-  name: string;
-  issuer: string;
-  date: string;
-  description?: string;
-}
+import { Certification } from '@shared/schema';
 
 const CertificationsForm = () => {
   const [, navigate] = useLocation();
@@ -24,7 +18,7 @@ const CertificationsForm = () => {
   const [certifications, setCertifications] = useState<Certification[]>(
     formData.certifications && formData.certifications.length > 0 
       ? formData.certifications 
-      : [{ name: '', issuer: '', date: '', description: '' }]
+      : [{ name: '', issuer: '', date: '', url: '', id: crypto.randomUUID() }]
   );
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,7 +35,7 @@ const CertificationsForm = () => {
   const handleAddCertification = () => {
     setCertifications([
       ...certifications,
-      { name: '', issuer: '', date: '', description: '' }
+      { name: '', issuer: '', date: '', url: '', id: crypto.randomUUID() }
     ]);
   };
 
@@ -154,15 +148,15 @@ const CertificationsForm = () => {
               </div>
               
               <div>
-                <label htmlFor={`cert-desc-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                  Description (Optional)
+                <label htmlFor={`cert-url-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                  Certification URL (Optional)
                 </label>
-                <Textarea
-                  id={`cert-desc-${index}`}
-                  value={certification.description}
-                  onChange={(e) => handleInputChange(index, 'description', e.target.value)}
-                  placeholder="Briefly describe this certification"
-                  rows={3}
+                <Input
+                  id={`cert-url-${index}`}
+                  type="url"
+                  value={certification.url || ''}
+                  onChange={(e) => handleInputChange(index, 'url', e.target.value)}
+                  placeholder="https://www.credential.net/..."
                 />
               </div>
               

@@ -113,7 +113,8 @@ export const personalInfoSchema = z.object({
 
 export const accomplishmentSchema = z.object({
   id: z.string().optional(),
-  text: z.string().min(1, "Accomplishment text is required"),
+  title: z.string().optional(),
+  description: z.string().min(1, "Accomplishment description is required"),
 });
 
 export const hobbySchema = z.object({
