@@ -10,13 +10,12 @@ const CreationMethod = () => {
   const { cvData, setTemplate } = useCVData();
 
   const handleCreateNew = () => {
-    // If no template is selected yet, navigate to template selection
+    // Set a default template (Moonlight Sonata) if none is selected
     if (!cvData.templateId) {
-      navigate('/templates');
-    } else {
-      // Otherwise, proceed to create CV
-      navigate('/create');
+      setTemplate('moonlightSonata');
     }
+    // Proceed directly to the CV creation form
+    navigate('/create/1');
   };
 
   const handleUploadExisting = () => {

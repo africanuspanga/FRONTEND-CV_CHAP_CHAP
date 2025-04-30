@@ -81,12 +81,14 @@ const CreateCVContent = () => {
   // Calculate progress percentage
   const progress = ((currentStep) / (formSteps.length - 1)) * 100;
 
-  // Ensure we have a template selected or redirect to template selection
+  // Set a default template if none is selected
   useEffect(() => {
-    if (currentStep > 0 && !formData.templateId) {
-      navigate('/templates');
+    if (!formData.templateId) {
+      // Use a default template (first time load)
+      const defaultTemplate = 'moonlightSonata';
+      updateFormField('templateId', defaultTemplate);
     }
-  }, [formData.templateId, currentStep, navigate]);
+  }, [formData.templateId, updateFormField]);
 
   // Handle URL-based navigation
   useEffect(() => {
