@@ -5,6 +5,7 @@ import { KilimanjaroTemplate } from './kilimanjaro';
 import { BrightDiamondTemplate } from './brightDiamond';
 import { MjenziWaTaifaTemplate } from './mjenziWaTaifa';
 import { StreetHustlerTemplate } from './streetHustler';
+import { SafariOriginalTemplate } from './safariOriginal';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -48,6 +49,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'streetHustler',
     name: 'Street Hustler',
     render: StreetHustlerTemplate
+  },
+  safariOriginal: {
+    id: 'safariOriginal',
+    name: 'Safari Original',
+    render: SafariOriginalTemplate
   }
 };
 
