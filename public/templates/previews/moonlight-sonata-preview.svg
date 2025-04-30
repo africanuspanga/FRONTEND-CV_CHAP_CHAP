@@ -1,0 +1,9 @@
+<svg width="400" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="600" fill="#e6f2ff" />
+  
+  <!-- Placeholder text -->
+  <text x="200" y="300" font-family="Arial" font-size="20" text-anchor="middle" fill="#333">
+    Moonlight Sonata template preview
+  </text>
+</svg>

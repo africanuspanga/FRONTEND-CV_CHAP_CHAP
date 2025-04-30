@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Processing</title>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .canvas-container {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div>
+      <h2>Original Screenshot</h2>
+      <img id="sourceImage" src="/templates/previews/templates-preview.png" style="max-width: 100%;" />
+    </div>
+    
+    <div class="canvas-container">
+      <div>
+        <h2>Moonlight Sonata</h2>
+        <canvas id="moonlightCanvas" width="400" height="500"></canvas>
+        <br>
+        <a id="moonlightDownload" download="moonlight-sonata-preview.png">Download</a>
+      </div>
+      
+      <div>
+        <h2>Kazi Fasta</h2>
+        <canvas id="kaziCanvas" width="400" height="500"></canvas>
+        <br>
+        <a id="kaziDownload" download="kazi-fasta-preview.png">Download</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      const sourceImage = document.getElementById('sourceImage');
+      
+      sourceImage.onload = function() {
+        // Extract Moonlight Sonata (left part of the screenshot)
+        const moonlightCanvas = document.getElementById('moonlightCanvas');
+        const moonlightCtx = moonlightCanvas.getContext('2d');
+        // Assuming the image is split in half
+        moonlightCtx.drawImage(
+          sourceImage, 
+          0, 0, sourceImage.width / 2, sourceImage.height, // Source rectangle
+          0, 0, moonlightCanvas.width, moonlightCanvas.height // Destination rectangle
+        );
+        
+        // Extract Kazi Fasta (right part of the screenshot)
+        const kaziCanvas = document.getElementById('kaziCanvas');
+        const kaziCtx = kaziCanvas.getContext('2d');
+        kaziCtx.drawImage(
+          sourceImage, 
+          sourceImage.width / 2, 0, sourceImage.width / 2, sourceImage.height, // Source rectangle
+          0, 0, kaziCanvas.width, kaziCanvas.height // Destination rectangle
+        );
+        
+        // Set download links
+        document.getElementById('moonlightDownload').href = moonlightCanvas.toDataURL();
+        document.getElementById('kaziDownload').href = kaziCanvas.toDataURL();
+      };
+    };
+  </script>
+</body>
+</html>
