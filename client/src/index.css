@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 47.4% 11.2%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 47.4% 11.2%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  
+  /* Primary color: #6D8CFF (109, 140, 255) */
+  --primary: 228 100% 71%;
+  --primary-foreground: 210 40% 98%;
+  
+  /* Secondary color: #E5EAFF (229, 234, 255) */
+  --secondary: 228 100% 95%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  
+  /* Accent color: #4D6FFF (77, 111, 255) */
+  --accent: 228 100% 65%;
+  --accent-foreground: 210 40% 98%;
+  
+  --destructive: 0 100% 50%;
+  --destructive-foreground: 210 40% 98%;
+  
+  --ring: 215 20.2% 65.1%;
+  --radius: 0.5rem;
+
+  /* Chart colors */
+  --chart-1: 215 100% 60%;
+  --chart-2: 240 100% 70%;
+  --chart-3: 271 100% 71%;
+  --chart-4: 294 100% 65%;
+  --chart-5: 324 100% 65%;
+  
+  /* Text colors */
+  --dark-text: 218 23% 18%;
+  --light-text: 220 14% 46%;
+  
+  /* Status colors */
+  --success: 158 64% 40%;
+  --error: 346 87% 62%;
+}
+
+.dark {
+  --background: 224 71% 4%;
+  --foreground: 213 31% 91%;
+  --muted: 223 47% 11%;
+  --muted-foreground: 215.4 16.3% 56.9%;
+  --popover: 224 71% 4%;
+  --popover-foreground: 215 20.2% 65.1%;
+  --card: 224 71% 4%;
+  --card-foreground: 213 31% 91%;
+  --border: 216 34% 17%;
+  --input: 216 34% 17%;
+  
+  /* Primary color (adjusted for dark mode) */
+  --primary: 228 100% 71%;
+  --primary-foreground: 210 40% 98%;
+  
+  /* Secondary color (adjusted for dark mode) */
+  --secondary: 228 30% 20%;
+  --secondary-foreground: 210 40% 98%;
+  
+  /* Accent color (adjusted for dark mode) */
+  --accent: 228 100% 65%;
+  --accent-foreground: 210 40% 98%;
+  
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 210 40% 98%;
+  
+  --ring: 216 34% 17%;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-foreground font-medium;
+  }
+  
+  p {
+    @apply text-muted-foreground;
+  }
+}
+
+@layer components {
+  .progress-bar-container {
+    @apply bg-secondary rounded-full h-2 overflow-hidden;
+  }
+  
+  .progress-bar {
+    @apply bg-primary h-full rounded-full;
+  }
+  
+  .cv-preview-container iframe {
+    @apply border-none w-full h-full shadow-md;
+  }
+  
+  @media (max-width: 768px) {
+    .cv-preview-container {
+      display: none;
+    }
+  }
+}
