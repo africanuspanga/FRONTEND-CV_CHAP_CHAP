@@ -65,29 +65,36 @@ const EducationForm = () => {
   
   // Effect to update the live preview as user types
   useEffect(() => {
-    // Only create a preview entry if we have enough data and we're not editing
-    if (institution && degree && editingEducationIndex === null && showEducationForm) {
-      const graduationDate = gradMonth && gradYear ? `${gradMonth} ${gradYear}` : '';
-      
-      // Update the form data with the current education preview
-      const filteredEducations = (formData.education || []).filter(edu => edu.id !== 'preview-education');
-      
-      updateFormField('education', [
-        {
-          id: 'preview-education' as string,
-          institution,
-          degree,
-          fieldOfStudy,
-          location: schoolLocation,
-          startDate: '',
-          endDate: graduationDate,
-        },
-        ...filteredEducations
-      ]);
-    } else if (!showEducationForm || editingEducationIndex !== null) {
-      // If form is hidden or we're editing, remove any preview items
-      const filteredEducations = (formData.education || []).filter(edu => edu.id !== 'preview-education');
-      if (filteredEducations.length !== (formData.education || []).length) {
+    // Check if the preview already exists
+    const hasPreview = formData.education?.some(edu => edu.id === 'preview-education');
+    // Check if we should display a preview
+    const shouldShowPreview = institution && degree && editingEducationIndex === null && showEducationForm;
+    
+    // To prevent infinite loops, only update when the preview status changes
+    if (shouldShowPreview !== hasPreview) {
+      if (shouldShowPreview) {
+        // Create preview entry
+        const graduationDate = gradMonth && gradYear ? `${gradMonth} ${gradYear}` : '';
+        
+        // Filter out any existing preview
+        const filteredEducations = (formData.education || []).filter(edu => edu.id !== 'preview-education');
+        
+        // Add the new preview
+        updateFormField('education', [
+          {
+            id: 'preview-education' as string,
+            institution,
+            degree,
+            fieldOfStudy,
+            location: schoolLocation,
+            startDate: '',
+            endDate: graduationDate,
+          },
+          ...filteredEducations
+        ]);
+      } else {
+        // Remove any preview items
+        const filteredEducations = (formData.education || []).filter(edu => edu.id !== 'preview-education');
         updateFormField('education', filteredEducations);
       }
     }

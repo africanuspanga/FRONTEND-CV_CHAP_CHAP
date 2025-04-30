@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { getTemplateById } from '@/lib/templates-registry';
 import { CVData } from '@shared/schema';
 import { Loader2 } from 'lucide-react';
 import { getTemplateByID } from '@/templates';
