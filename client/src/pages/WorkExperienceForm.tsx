@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,7 +46,7 @@ const WorkExperienceForm = () => {
           description: '',
           achievements: []
         },
-        ...formData.workExperience.filter(job => job.id !== 'preview-job')
+        ...(formData.workExperience || []).filter(job => job.id !== 'preview-job')
       ]);
     }
   }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob]);

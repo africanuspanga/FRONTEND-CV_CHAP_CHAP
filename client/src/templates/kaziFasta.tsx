@@ -62,18 +62,23 @@ export function KaziFastaTemplate({ personalInfo, workExperience, education, ski
               )}
             </div>
 
-            <div className="right-column">
+            <div className="right-column" style={{ flex: '1', padding: '20px', backgroundColor: '#f0f0f0' }}>
               {skills && skills.length > 0 && (
-                <section className="skills">
-                  <h2>Skills</h2>
+                <section className="skills" style={{ marginBottom: '25px' }}>
+                  <h2 style={{ fontSize: '20px', color: '#333', borderBottom: '2px solid #ddd', paddingBottom: '5px', marginBottom: '15px' }}>SKILLS</h2>
                   <div className="skills-container">
                     {skills.map((skill, index) => (
-                      <div key={index} className="skill-item">
-                        <div className="skill-name">{skill.name}</div>
-                        <div className="skill-bar-container">
+                      <div key={`skill-${index}-${skill.id || ''}`} className="skill-item" style={{ marginBottom: '12px' }}>
+                        <div className="skill-name" style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>{skill.name}</div>
+                        <div className="skill-bar-container" style={{ height: '8px', backgroundColor: '#ddd', borderRadius: '4px', overflow: 'hidden' }}>
                           <div 
                             className="skill-bar" 
-                            style={{ width: `80%` }}
+                            style={{ 
+                              width: `${(skill.level || 3) * 20}%`, 
+                              height: '100%', 
+                              backgroundColor: '#3498db', 
+                              borderRadius: '4px' 
+                            }}
                           ></div>
                         </div>
                       </div>
@@ -83,13 +88,13 @@ export function KaziFastaTemplate({ personalInfo, workExperience, education, ski
               )}
 
               {languages && languages.length > 0 && (
-                <section className="languages">
-                  <h2>Languages</h2>
+                <section className="languages" style={{ marginBottom: '25px' }}>
+                  <h2 style={{ fontSize: '20px', color: '#333', borderBottom: '2px solid #ddd', paddingBottom: '5px', marginBottom: '15px' }}>LANGUAGES</h2>
                   <div className="languages-container">
                     {languages.map((language, index) => (
-                      <div key={index} className="language-item">
-                        <span className="language-name">{language.name}</span>
-                        <span className="language-level">{language.proficiency}</span>
+                      <div key={`lang-${index}-${language.id || ''}`} className="language-item" style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                        <span className="language-name" style={{ fontSize: '14px', fontWeight: 'bold' }}>{language.name}</span>
+                        <span className="language-level" style={{ fontSize: '14px', color: '#555' }}>{language.proficiency}</span>
                       </div>
                     ))}
                   </div>
@@ -97,15 +102,15 @@ export function KaziFastaTemplate({ personalInfo, workExperience, education, ski
               )}
 
               {references && references.length > 0 && (
-                <section className="references">
-                  <h2>References</h2>
+                <section className="references" style={{ marginBottom: '25px' }}>
+                  <h2 style={{ fontSize: '20px', color: '#333', borderBottom: '2px solid #ddd', paddingBottom: '5px', marginBottom: '15px' }}>REFERENCES</h2>
                   {references.map((reference, index) => (
-                    <div key={index} className="reference-item">
-                      <h3>{reference.name}</h3>
-                      <p className="reference-title">{reference.position || ''}</p>
-                      {reference.company && <p className="reference-company">{reference.company}</p>}
-                      {reference.email && <p className="reference-contact">{reference.email}</p>}
-                      {reference.phone && <p className="reference-contact">{reference.phone}</p>}
+                    <div key={`ref-${index}-${reference.id || ''}`} className="reference-item" style={{ marginBottom: '15px' }}>
+                      <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 5px 0' }}>{reference.name}</h3>
+                      {reference.position && <p style={{ fontSize: '14px', margin: '0 0 2px 0', fontStyle: 'italic' }}>{reference.position}</p>}
+                      {reference.company && <p style={{ fontSize: '14px', margin: '0 0 2px 0' }}>{reference.company}</p>}
+                      {reference.email && <p style={{ fontSize: '14px', margin: '0 0 2px 0' }}>{reference.email}</p>}
+                      {reference.phone && <p style={{ fontSize: '14px', margin: '0 0 2px 0' }}>{reference.phone}</p>}
                     </div>
                   ))}
                 </section>

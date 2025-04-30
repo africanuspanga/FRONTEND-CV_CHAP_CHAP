@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,8 +21,50 @@ const EducationForm = () => {
   const params = useParams<{ templateId: string }>();
   const { formData, updateFormField, addItemToArray } = useCVForm();
   
+  // Generate degree options
+  const degreeOptions = [
+    'No Degree',
+    'High School Diploma',
+    'Associate Degree',
+    'Bachelor\'s Degree',
+    'Master\'s Degree',
+    'MBA',
+    'Ph.D.',
+    'Other'
+  ];
+  
+  // State for education entry
+  const [institution, setInstitution] = useState('');
+  const [degree, setDegree] = useState(degreeOptions[0]);
+  const [fieldOfStudy, setFieldOfStudy] = useState('');
+  const [schoolLocation, setSchoolLocation] = useState('');
+  const [gradMonth, setGradMonth] = useState('');
+  const [gradYear, setGradYear] = useState('');
+  
   // Get the template ID from the URL
   const templateId = params.templateId;
+  
+  // Effect to update the live preview as user types
+  useEffect(() => {
+    // Only create a preview entry if we have enough data
+    if (institution && degree) {
+      const graduationDate = gradMonth && gradYear ? `${gradMonth} ${gradYear}` : '';
+      
+      // Update the form data with the current education
+      updateFormField('education', [
+        {
+          id: 'preview-education',
+          institution,
+          degree,
+          fieldOfStudy,
+          location: schoolLocation,
+          startDate: '',
+          endDate: graduationDate,
+        },
+        ...(formData.education || []).filter(edu => edu.id !== 'preview-education')
+      ]);
+    }
+  }, [institution, degree, fieldOfStudy, schoolLocation, gradMonth, gradYear]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,18 +79,6 @@ const EducationForm = () => {
   
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
-
-  // Generate degree options
-  const degreeOptions = [
-    'No Degree',
-    'High School Diploma',
-    'Associate Degree',
-    'Bachelor\'s Degree',
-    'Master\'s Degree',
-    'MBA',
-    'Ph.D.',
-    'Other'
-  ];
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
