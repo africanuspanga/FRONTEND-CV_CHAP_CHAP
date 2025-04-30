@@ -8,6 +8,8 @@ import { ChevronLeft } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LiveCVPreview from '@/components/LiveCVPreview';
+import WorkExperienceAIRecommendations from '@/components/WorkExperienceAIRecommendations';
+import WorkExperienceEditor from '@/components/WorkExperienceEditor';
 
 const WorkExperienceForm = () => {
   const [, navigate] = useLocation();
@@ -22,6 +24,11 @@ const WorkExperienceForm = () => {
   const [startYear, setStartYear] = useState('');
   const [endMonth, setEndMonth] = useState('');
   const [endYear, setEndYear] = useState('');
+  
+  // AI recommendation flow states
+  const [showAIRecommendations, setShowAIRecommendations] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
+  const [aiRecommendations, setAIRecommendations] = useState<string[]>([]);
   
   // Get the template ID from the URL
   const templateId = params.templateId;
@@ -44,15 +51,15 @@ const WorkExperienceForm = () => {
           endDate,
           current: currentJob,
           description: '',
-          achievements: []
+          achievements: aiRecommendations
         },
         ...(formData.workExperience || []).filter(job => job.id !== 'preview-job')
       ]);
     }
-  }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob]);
+  }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob, aiRecommendations]);
   
   // Update work experience data in context when form fields change
-  const updateWorkExperience = () => {
+  const updateWorkExperience = (achievements: string[] = []) => {
     // Only add if we have at least job title and employer
     if (jobTitle && employer) {
       const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
@@ -68,7 +75,7 @@ const WorkExperienceForm = () => {
         endDate,
         current: currentJob,
         description: '',
-        achievements: []
+        achievements: achievements.length > 0 ? achievements : aiRecommendations
       };
       
       // Add to work experience array
@@ -76,14 +83,29 @@ const WorkExperienceForm = () => {
     }
   };
 
+  const handleAddRecommendations = (recommendations: string[]) => {
+    setAIRecommendations(recommendations);
+    setShowAIRecommendations(false);
+    setShowEditor(true);
+  };
+
+  const handleSkipRecommendations = () => {
+    setShowAIRecommendations(false);
+    navigate(`/cv/${templateId}/education`);
+  };
+
+  const handleSaveAchievements = (achievements: string[]) => {
+    setAIRecommendations(achievements);
+    updateWorkExperience(achievements);
+    setShowEditor(false);
+    navigate(`/cv/${templateId}/education`);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Update work experience before navigating
-    updateWorkExperience();
-    
-    // Navigate to the education form
-    navigate(`/cv/${templateId}/education`); 
+    // Show AI recommendations instead of directly navigating
+    setShowAIRecommendations(true);
   };
 
   // Generate month options
@@ -95,6 +117,22 @@ const WorkExperienceForm = () => {
   // Generate year options
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
+
+  // Determine what to render based on the current state
+  if (showEditor) {
+    return (
+      <WorkExperienceEditor
+        jobTitle={jobTitle}
+        company={employer}
+        location={isRemote ? 'Remote' : location}
+        startDate={startMonth && startYear ? `${startMonth} ${startYear}` : ''}
+        endDate={currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '')}
+        initialAchievements={aiRecommendations}
+        onSave={handleSaveAchievements}
+        onBack={() => setShowEditor(false)}
+      />
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -251,6 +289,16 @@ const WorkExperienceForm = () => {
         {/* Live CV Preview */}
         <LiveCVPreview cvData={formData} templateId={templateId} />
       </div>
+      
+      {/* AI Recommendation Modal */}
+      {showAIRecommendations && (
+        <WorkExperienceAIRecommendations
+          jobTitle={jobTitle}
+          company={employer}
+          onAddRecommendations={handleAddRecommendations}
+          onSkip={handleSkipRecommendations}
+        />
+      )}
     </div>
   );
 };
