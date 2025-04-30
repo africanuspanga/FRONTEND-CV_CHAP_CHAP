@@ -37,7 +37,7 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {templates.map((template) => (
           <Card key={template.id} className="overflow-hidden flex flex-col h-full">
-            <div className="relative aspect-[3/4] bg-blue-200">
+            <div className="relative aspect-[3/4] bg-[#e6f2ff]">
               <img
                 src={template.previewImage}
                 alt={`${template.name} template preview`}
