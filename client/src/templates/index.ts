@@ -3,6 +3,7 @@ import { KaziFastaTemplate } from './kaziFasta';
 import { JijengeClassicTemplate } from './jijengeClassic';
 import { KilimanjaroTemplate } from './kilimanjaro';
 import { BrightDiamondTemplate } from './brightDiamond';
+import { MjenziWaTaifaTemplate } from './mjenziWaTaifa';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -36,6 +37,11 @@ export const templates: Record<string, CVTemplate> = {
     id: 'brightDiamond',
     name: 'Bright Diamond',
     render: BrightDiamondTemplate
+  },
+  mjenziWaTaifa: {
+    id: 'mjenziWaTaifa',
+    name: 'Mjenzi wa Taifa',
+    render: MjenziWaTaifaTemplate
   }
 };
 
