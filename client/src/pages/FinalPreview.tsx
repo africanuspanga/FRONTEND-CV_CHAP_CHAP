@@ -301,7 +301,7 @@ const FinalPreview = () => {
             disabled={isDownloading}
             className="w-full py-6 bg-teal-600 hover:bg-teal-700 text-white text-lg rounded-md"
           >
-            {isDownloading ? 'Downloading...' : 'Get My Resume'}
+            {isDownloading ? 'Downloading...' : 'Get My CV'}
           </Button>
           
           <Button 
@@ -309,7 +309,7 @@ const FinalPreview = () => {
             variant="outline" 
             className="w-full py-6 border-2 border-blue-900 text-blue-900 text-lg rounded-md"
           >
-            Update Content
+            Edit Content
           </Button>
         </div>
       )}
