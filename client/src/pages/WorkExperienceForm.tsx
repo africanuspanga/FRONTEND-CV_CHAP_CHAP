@@ -14,12 +14,74 @@ const WorkExperienceForm = () => {
   const params = useParams<{ templateId: string }>();
   const { formData, updateFormField, addItemToArray } = useCVForm();
   const [currentJob, setCurrentJob] = useState(false);
+  const [jobTitle, setJobTitle] = useState('');
+  const [employer, setEmployer] = useState('');
+  const [location, setLocation] = useState('');
+  const [isRemote, setIsRemote] = useState(false);
+  const [startMonth, setStartMonth] = useState('');
+  const [startYear, setStartYear] = useState('');
+  const [endMonth, setEndMonth] = useState('');
+  const [endYear, setEndYear] = useState('');
   
   // Get the template ID from the URL
   const templateId = params.templateId;
+  
+  // Effect to update the live preview as user types
+  useEffect(() => {
+    // Only create a preview entry if we have enough data
+    if (jobTitle && employer) {
+      const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
+      const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
+      
+      // Update the form data with the current work experience
+      updateFormField('workExperience', [
+        {
+          id: 'preview-job',
+          jobTitle,
+          company: employer,
+          location: isRemote ? 'Remote' : location,
+          startDate,
+          endDate,
+          current: currentJob,
+          description: '',
+          achievements: []
+        },
+        ...formData.workExperience.filter(job => job.id !== 'preview-job')
+      ]);
+    }
+  }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob]);
+  
+  // Update work experience data in context when form fields change
+  const updateWorkExperience = () => {
+    // Only add if we have at least job title and employer
+    if (jobTitle && employer) {
+      const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
+      const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
+      
+      // Create a new work experience entry
+      const newWorkExperience = {
+        id: Date.now().toString(),
+        jobTitle,
+        company: employer,
+        location: isRemote ? 'Remote' : location,
+        startDate,
+        endDate,
+        current: currentJob,
+        description: '',
+        achievements: []
+      };
+      
+      // Add to work experience array
+      addItemToArray('workExperience', newWorkExperience);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Update work experience before navigating
+    updateWorkExperience();
+    
     // Navigate to the education form
     navigate(`/cv/${templateId}/education`); 
   };
@@ -63,6 +125,8 @@ const WorkExperienceForm = () => {
             <Input
               id="title"
               placeholder="e.g. Chief Engineer"
+              value={jobTitle}
+              onChange={(e) => setJobTitle(e.target.value)}
               required
             />
           </div>
@@ -72,6 +136,8 @@ const WorkExperienceForm = () => {
             <Input
               id="employer"
               placeholder="e.g. Driftmark Technologies"
+              value={employer}
+              onChange={(e) => setEmployer(e.target.value)}
               required
             />
           </div>
@@ -81,11 +147,18 @@ const WorkExperienceForm = () => {
             <Input
               id="location"
               placeholder="e.g. Dar es Salaam, Tanzania"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              disabled={isRemote}
             />
           </div>
 
           <div className="flex items-center mb-6">
-            <Checkbox id="remote" />
+            <Checkbox 
+              id="remote" 
+              checked={isRemote}
+              onCheckedChange={(checked) => setIsRemote(checked as boolean)}
+            />
             <Label htmlFor="remote" className="ml-2 text-gray-700">Remote</Label>
           </div>
 
@@ -93,7 +166,10 @@ const WorkExperienceForm = () => {
             <div>
               <Label htmlFor="startMonth">START DATE <span className="text-red-500">*</span></Label>
               <div className="grid grid-cols-2 gap-4">
-                <Select>
+                <Select
+                  value={startMonth}
+                  onValueChange={setStartMonth}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Month" />
                   </SelectTrigger>
@@ -104,7 +180,10 @@ const WorkExperienceForm = () => {
                   </SelectContent>
                 </Select>
                 
-                <Select>
+                <Select
+                  value={startYear}
+                  onValueChange={setStartYear}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Year" />
                   </SelectTrigger>
@@ -120,7 +199,11 @@ const WorkExperienceForm = () => {
             <div>
               <Label htmlFor="endDate">END DATE <span className="text-red-500">*</span></Label>
               <div className="grid grid-cols-2 gap-4">
-                <Select disabled={currentJob}>
+                <Select 
+                  disabled={currentJob}
+                  value={endMonth}
+                  onValueChange={setEndMonth}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Month" />
                   </SelectTrigger>
@@ -131,7 +214,11 @@ const WorkExperienceForm = () => {
                   </SelectContent>
                 </Select>
                 
-                <Select disabled={currentJob}>
+                <Select 
+                  disabled={currentJob}
+                  value={endYear}
+                  onValueChange={setEndYear}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Year" />
                   </SelectTrigger>
