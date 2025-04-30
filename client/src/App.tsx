@@ -4,6 +4,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CVFormProvider } from "@/contexts/cv-form-context";
+import { AuthProvider } from "@/contexts/auth-context";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import Home from "@/pages/Home";
@@ -23,6 +24,8 @@ import SummaryEditor from "@/pages/SummaryEditor";
 import ReferencesForm from "@/pages/ReferencesForm";
 import AdditionalSectionsForm from "@/pages/AdditionalSectionsForm";
 import About from "@/pages/About";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -48,6 +51,8 @@ function Router() {
           <Route path="/cv/:templateId/additional-sections" component={AdditionalSectionsForm} />
           <Route path="/create/:step?" component={CreateCV} />
           <Route path="/about" component={About} />
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
           <Route component={NotFound} />
         </Switch>
       </div>
@@ -60,10 +65,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <CVFormProvider>
-          <Router />
-          <Toaster />
-        </CVFormProvider>
+        <AuthProvider>
+          <CVFormProvider>
+            <Router />
+            <Toaster />
+          </CVFormProvider>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

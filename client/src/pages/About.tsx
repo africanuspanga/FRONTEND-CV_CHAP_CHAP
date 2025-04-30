@@ -1,115 +1,178 @@
 import React from 'react';
-import { useLocation } from 'wouter';
-import { Button } from '@/components/ui/button';
 import { Helmet } from 'react-helmet';
 
 const About = () => {
-  const [, navigate] = useLocation();
-
   return (
     <>
       <Helmet>
-        <title>About CV Chap Chap - Empowering Tanzanian Job Seekers</title>
+        <title>About CV Chap Chap - Empowering Tanzanians to Achieve Career Success</title>
         <meta 
           name="description" 
-          content="CV Chap Chap provides fast, easy, and professional CV creation for Tanzanians. Learn about our mission to empower job seekers across Tanzania with affordable CV tools." 
+          content="Learn about CV Chap Chap, a platform dedicated to helping Tanzanian job seekers create professional CVs that stand out and help them achieve career success." 
         />
-        <meta name="keywords" content="CV creator Tanzania, Tanzanian resume builder, job application Tanzania, professional CV templates, affordable CV service" />
-        <link rel="canonical" href="/about" />
+        <meta name="keywords" content="CV builder, CV Chap Chap, Tanzania, career success, professional resume, job application" />
       </Helmet>
 
-      <div className="max-w-5xl mx-auto px-4 py-12">
-        <div className="bg-white shadow-lg rounded-xl overflow-hidden">
+      <div className="bg-gray-50 py-12 md:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero Section */}
-          <div className="bg-gradient-to-r from-blue-600 to-teal-500 text-white px-8 py-12 text-center">
-            <h1 className="text-4xl font-bold mb-2">About CV Chap Chap</h1>
-            <p className="text-xl font-medium">Empowering Tanzanians to Achieve Career Success</p>
+          <div className="text-center mb-16">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-indigo-900 mb-6">
+              About CV Chap Chap
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
+              Empowering Tanzanians to Achieve Career Success
+            </p>
           </div>
 
-          {/* Main Content */}
-          <div className="px-8 py-10">
-            <div className="prose prose-lg max-w-none">
-              <p className="text-gray-700 leading-relaxed">
-                At CV Chap Chap, our mission is to streamline the job application process for Tanzanians by providing a fast, user-friendly, and professional CV creation platform. We understand the challenges faced by job seekers in Tanzania, from recent graduates to seasoned professionals, and we're here to make the journey to employment smoother and more accessible.
-              </p>
+          {/* Mission Section */}
+          <div className="bg-white rounded-xl shadow-sm p-8 md:p-12 mb-12">
+            <h2 className="text-3xl font-bold text-indigo-900 mb-6">Our Mission</h2>
+            <p className="text-lg text-gray-700 mb-6">
+              At CV Chap Chap, our mission is to bridge the gap between talented Tanzanian professionals and meaningful career opportunities. We believe that everyone deserves access to tools that can help them showcase their qualifications effectively.
+            </p>
+            <p className="text-lg text-gray-700">
+              Our platform is designed to make the CV creation process simple, accessible, and empowering, allowing job seekers to present themselves professionally and confidently to potential employers.
+            </p>
+          </div>
 
-              <h2 className="text-2xl font-bold text-indigo-900 mt-10 mb-6">Why Choose CV Chap Chap?</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-                <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
-                  <h3 className="text-xl font-semibold text-blue-700 mb-3">Professional CV Templates Tailored for the Tanzanian Job Market</h3>
-                  <p className="text-gray-700">
-                    Our platform offers a diverse range of professional CV templates designed to meet the expectations of employers in Tanzania. Whether you're applying for positions in Dar es Salaam, Arusha, or Mwanza, our templates are crafted to highlight your strengths and align with local hiring standards.
+          {/* Why Choose Us Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            <div className="bg-white rounded-xl shadow-sm p-8">
+              <h2 className="text-2xl font-bold text-indigo-900 mb-4">Why Choose CV Chap Chap?</h2>
+              <ul className="space-y-4">
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center mt-1">
+                    <span className="text-white text-sm font-bold">✓</span>
+                  </div>
+                  <p className="ml-3 text-gray-700">
+                    <strong className="text-indigo-800">Tanzanian-focused templates:</strong> Our CV templates are specifically designed for the Tanzanian job market.
                   </p>
-                </div>
-
-                <div className="bg-teal-50 p-6 rounded-lg border border-teal-100">
-                  <h3 className="text-xl font-semibold text-teal-700 mb-3">Fast and Easy CV Creation</h3>
-                  <p className="text-gray-700">
-                    Time is of the essence when applying for jobs. With CV Chap Chap, you can create a professional CV online in just minutes. Our intuitive interface guides you through each step, ensuring that your CV is both comprehensive and compelling.
+                </li>
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center mt-1">
+                    <span className="text-white text-sm font-bold">✓</span>
+                  </div>
+                  <p className="ml-3 text-gray-700">
+                    <strong className="text-indigo-800">AI-powered assistance:</strong> Get smart recommendations for skills and job descriptions based on your industry.
                   </p>
-                </div>
-
-                <div className="bg-indigo-50 p-6 rounded-lg border border-indigo-100">
-                  <h3 className="text-xl font-semibold text-indigo-700 mb-3">Mobile-Friendly Platform</h3>
-                  <p className="text-gray-700">
-                    Recognizing that many of our users access the internet via mobile devices, CV Chap Chap is optimized for smartphones and tablets. This ensures that you can build and edit your CV anytime, anywhere—be it from your home in Dodoma or while commuting in Mbeya.
+                </li>
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center mt-1">
+                    <span className="text-white text-sm font-bold">✓</span>
+                  </div>
+                  <p className="ml-3 text-gray-700">
+                    <strong className="text-indigo-800">Real-time preview:</strong> See changes to your CV instantly as you create it.
                   </p>
-                </div>
-
-                <div className="bg-purple-50 p-6 rounded-lg border border-purple-100">
-                  <h3 className="text-xl font-semibold text-purple-700 mb-3">Affordable and Accessible</h3>
-                  <p className="text-gray-700">
-                    We believe that everyone deserves the opportunity to present themselves professionally. That's why our services are priced affordably, making it easier for job seekers across Tanzania to access high-quality CV creation tools without financial strain.
+                </li>
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center mt-1">
+                    <span className="text-white text-sm font-bold">✓</span>
+                  </div>
+                  <p className="ml-3 text-gray-700">
+                    <strong className="text-indigo-800">User-friendly interface:</strong> Our step-by-step process makes CV creation simple and stress-free.
                   </p>
-                </div>
-              </div>
-
-              <h2 className="text-2xl font-bold text-indigo-900 mt-10 mb-6">Our Commitment to Tanzanian Job Seekers</h2>
-              <p className="text-gray-700 leading-relaxed mb-10">
-                We are dedicated to supporting the Ajira (employment) journey of every Tanzanian. By providing tools that simplify the CV creation process, we aim to increase your chances of landing your desired kazi (job). Our platform is continuously updated to reflect the evolving needs of the job market, ensuring that your CV remains relevant and impactful.
-              </p>
-
-              <h2 className="text-2xl font-bold text-indigo-900 mt-10 mb-6">Frequently Asked Questions</h2>
-              <div className="space-y-6 mb-10">
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Can I customize my CV to suit different job applications?</h3>
-                  <p className="text-gray-700">
-                    Absolutely! Our platform allows you to edit and tailor your CV for various positions, ensuring that each application is targeted and effective.
-                  </p>
-                </div>
-
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Do you offer templates for specific industries?</h3>
-                  <p className="text-gray-700">
-                    Yes, we provide industry-specific templates catering to sectors such as healthcare, education, finance, and more, aligning with the diverse opportunities available in Tanzania.
-                  </p>
-                </div>
-
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Is my data secure on CV Chap Chap?</h3>
-                  <p className="text-gray-700">
-                    We prioritize your privacy and have implemented robust security measures to protect your personal information.
-                  </p>
-                </div>
-              </div>
-
-              <h2 className="text-2xl font-bold text-indigo-900 mt-10 mb-6">Join the CV Chap Chap Community</h2>
-              <p className="text-gray-700 leading-relaxed mb-10">
-                Thousands of Tanzanians have trusted CV Chap Chap to assist them in their job search. By choosing our platform, you're not only accessing top-notch CV creation tools but also joining a community committed to professional growth and success.
-              </p>
-              <p className="text-gray-700 leading-relaxed mb-10">
-                Start your journey to career success today with CV Chap Chap—where creating a standout CV is just a few clicks away.
-              </p>
+                </li>
+              </ul>
             </div>
 
-            <div className="text-center mt-12">
-              <Button 
-                onClick={() => navigate('/create/method')}
-                className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-6 text-lg font-medium rounded-lg transform transition hover:scale-105"
-              >
-                CREATE NEW CV
-              </Button>
+            <div className="bg-white rounded-xl shadow-sm p-8">
+              <h2 className="text-2xl font-bold text-indigo-900 mb-4">Our Values</h2>
+              <ul className="space-y-4">
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center mt-1">
+                    <span className="text-white text-sm font-bold">1</span>
+                  </div>
+                  <p className="ml-3 text-gray-700">
+                    <strong className="text-indigo-800">Accessibility:</strong> Making professional CV tools available to all Tanzanians regardless of technical expertise.
+                  </p>
+                </li>
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center mt-1">
+                    <span className="text-white text-sm font-bold">2</span>
+                  </div>
+                  <p className="ml-3 text-gray-700">
+                    <strong className="text-indigo-800">Quality:</strong> Helping job seekers create CVs that meet international standards while addressing local requirements.
+                  </p>
+                </li>
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center mt-1">
+                    <span className="text-white text-sm font-bold">3</span>
+                  </div>
+                  <p className="ml-3 text-gray-700">
+                    <strong className="text-indigo-800">Empowerment:</strong> Providing resources that help individuals take control of their career journey.
+                  </p>
+                </li>
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center mt-1">
+                    <span className="text-white text-sm font-bold">4</span>
+                  </div>
+                  <p className="ml-3 text-gray-700">
+                    <strong className="text-indigo-800">Innovation:</strong> Continuously improving our platform with cutting-edge technology to better serve our users.
+                  </p>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Our Team Section */}
+          <div className="bg-white rounded-xl shadow-sm p-8 md:p-12 mb-16">
+            <h2 className="text-3xl font-bold text-indigo-900 mb-10 text-center">Our Team</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="h-32 w-32 rounded-full bg-gray-200 mx-auto mb-4 flex items-center justify-center">
+                  <span className="text-gray-500 text-4xl">JP</span>
+                </div>
+                <h3 className="text-xl font-bold text-indigo-900">John Paul</h3>
+                <p className="text-gray-600">Founder & CEO</p>
+                <p className="mt-2 text-gray-700">
+                  HR professional with over 10 years of experience in Tanzania's job market.
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="h-32 w-32 rounded-full bg-gray-200 mx-auto mb-4 flex items-center justify-center">
+                  <span className="text-gray-500 text-4xl">MM</span>
+                </div>
+                <h3 className="text-xl font-bold text-indigo-900">Mary Msoka</h3>
+                <p className="text-gray-600">Senior CV Specialist</p>
+                <p className="mt-2 text-gray-700">
+                  Career coach with expertise in helping professionals in various industries.
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="h-32 w-32 rounded-full bg-gray-200 mx-auto mb-4 flex items-center justify-center">
+                  <span className="text-gray-500 text-4xl">EK</span>
+                </div>
+                <h3 className="text-xl font-bold text-indigo-900">Emmanuel Kimaro</h3>
+                <p className="text-gray-600">Technical Lead</p>
+                <p className="mt-2 text-gray-700">
+                  Software engineer passionate about creating tools that solve local challenges.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Section */}
+          <div className="bg-indigo-900 text-white rounded-xl shadow-md p-8 md:p-12">
+            <h2 className="text-3xl font-bold mb-6 text-center">Get in Touch</h2>
+            <p className="text-center text-xl mb-8">
+              We'd love to hear from you! Reach out to us with any questions or feedback.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div>
+                <h3 className="text-xl font-bold mb-2">Email</h3>
+                <p>contact@cvchapchap.co.tz</p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-2">Phone</h3>
+                <p>+255 755 123 456</p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-2">Location</h3>
+                <p>Mikocheni, Dar es Salaam, Tanzania</p>
+              </div>
             </div>
           </div>
         </div>

@@ -5,12 +5,15 @@ import { Button } from '@/components/ui/button';
 import { RefreshCcw } from 'lucide-react';
 import { useCVData } from '@/hooks/useCVData';
 import { useCVForm } from '@/contexts/cv-form-context';
+import { useAuth } from '@/contexts/auth-context';
+import UserProfileMenu from './UserProfileMenu';
 
 const NavBar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location, navigate] = useLocation();
   const { resetCVData } = useCVData();
   const { resetForm } = useCVForm();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -79,17 +82,23 @@ const NavBar: React.FC = () => {
               </Button>
             ) : null}
             
-            <Button asChild variant="outline">
-              <Link href="/login" className="px-3 py-2 rounded-md text-sm font-medium">
-                Login
-              </Link>
-            </Button>
-            
-            <Button asChild>
-              <Link href="/signup" className="px-4 py-2 rounded-md text-sm font-medium">
-                Sign Up
-              </Link>
-            </Button>
+            {isAuthenticated ? (
+              <UserProfileMenu username={user?.username || 'User'} />
+            ) : (
+              <>
+                <Button asChild variant="outline">
+                  <Link href="/login" className="px-3 py-2 rounded-md text-sm font-medium">
+                    Login
+                  </Link>
+                </Button>
+                
+                <Button asChild>
+                  <Link href="/register" className="px-4 py-2 rounded-md text-sm font-medium">
+                    Sign Up
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
           
           <div className="flex md:hidden items-center">
@@ -153,21 +162,53 @@ const NavBar: React.FC = () => {
             </button>
           ) : null}
           
-          <Link
-            href="/login"
-            className="block px-3 py-2 rounded-md text-base font-medium text-darkText hover:text-primary"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Login
-          </Link>
-          
-          <Link
-            href="/signup"
-            className="block px-3 py-2 rounded-md text-base font-medium bg-primary text-white"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Sign Up
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Link
+                href="/profile"
+                className="block px-3 py-2 rounded-md text-base font-medium text-darkText hover:text-primary"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                My Profile
+              </Link>
+              
+              <Link
+                href="/my-cvs"
+                className="block px-3 py-2 rounded-md text-base font-medium text-darkText hover:text-primary"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                My CVs
+              </Link>
+              
+              <button
+                className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-800"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  logout();
+                }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="block px-3 py-2 rounded-md text-base font-medium text-darkText hover:text-primary"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Login
+              </Link>
+              
+              <Link
+                href="/register"
+                className="block px-3 py-2 rounded-md text-base font-medium bg-primary text-white"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
