@@ -3,8 +3,8 @@ body {
     font-family: 'Lato', sans-serif;
     margin: 0;
     padding: 20px;
-    background-color: #f0f0f0; /* Light grey background */
-    color: #333; /* Default dark text color */
+    background-color: #f8f8f8; /* Light background */
+    color: #444; /* Default text color */
     line-height: 1.6;
     font-size: 10pt; /* Base font size */
     -webkit-font-smoothing: antialiased;
@@ -14,7 +14,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
     font-weight: 700; /* Bold headings */
-    color: #222; /* Slightly darker heading color */
+    color: #222; /* Dark heading color */
 }
 
 ul {
@@ -24,7 +24,7 @@ ul {
 }
 
 a {
-    color: #333; /* Match text color */
+    color: #444; /* Match text color */
     text-decoration: none;
 }
 
@@ -38,115 +38,188 @@ strong {
 
 /* === CV Container and Layout === */
 .cv-container {
-    max-width: 900px;
+    max-width: 900px; /* Adjust width as needed */
     margin: 20px auto;
     background-color: #ffffff;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-    display: flex;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    display: flex; /* Use flexbox for columns */
 }
 
-/* === Main Content Styling (Left Column) === */
-.main-content {
-    width: 68%; /* Adjust width */
-    padding: 35px;
-    box-sizing: border-box;
-}
-
-/* === Sidebar Styling (Right Column) === */
+/* === Sidebar Styling (Left Column) === */
 .sidebar {
-    width: 32%; /* Adjust width */
-    background-color: #e8e8e8; /* Sidebar background color */
-    padding: 35px;
+    width: 35%; /* Adjust sidebar width */
+    background-color: #f0f0f0; /* Sidebar background color */
+    padding: 30px;
+    box-sizing: border-box;
+    border-right: 1px solid #e0e0e0; /* Separator line */
+}
+
+/* === Main Content Styling (Right Column) === */
+.main-content {
+    width: 65%; /* Adjust main content width */
+    padding: 30px;
     box-sizing: border-box;
 }
 
 /* === CV Header (Main Content) === */
 .cv-header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #ccc; /* Header border */
+    text-align: left; /* Align left */
+    margin-bottom: 25px;
 }
 
 .cv-header h1 {
-    font-size: 2.5em;
+    font-size: 2.6em;
     color: #111;
-    margin-bottom: 3px;
+    margin-bottom: 0px;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
+    line-height: 1.2;
 }
 
 .cv-header h2 {
     font-size: 1.2em;
     color: #555;
     font-weight: 400; /* Regular weight for title */
-    text-transform: uppercase;
-    letter-spacing: 1px;
     margin-bottom: 0;
 }
 
-/* === Section Styling === */
-section {
-    margin-bottom: 25px;
-}
-section:last-child {
-    margin-bottom: 0;
-}
-
-section h3 { /* Section Titles */
+/* === Section Title Styling === */
+section h3 {
     font-size: 1.1em;
     color: #333;
     margin-bottom: 15px;
     padding-bottom: 5px;
-    border-bottom: 1px solid #ddd; /* Light border under titles */
+    border-bottom: 1px solid #ccc; /* Border under titles */
     text-transform: uppercase;
     letter-spacing: 1.5px;
 }
+.sidebar section h3 {
+     border-bottom-color: #d0d0d0; /* Slightly darker border in sidebar */
+}
 
-/* === Summary Section === */
-.summary p {
+
+/* === Sidebar Sections === */
+.sidebar section {
+    margin-bottom: 25px;
+}
+.sidebar section:last-child {
+    margin-bottom: 0;
+}
+
+/* Contact Info */
+.contact-info p {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+    color: #444;
+}
+.contact-info .icon {
+    width: 18px; /* Space for icon */
+    margin-right: 8px;
+    text-align: center;
+    color: #777; /* Icon placeholder color */
+    flex-shrink: 0;
+}
+
+/* Profile */
+.profile p {
     font-size: 0.95em;
     color: #444;
 }
 
-/* === Experience Section === */
-.experience ul {
-    margin: 0;
+/* Skills & Additional Skills (Tags) */
+.skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* Space between tags */
 }
-.experience > ul > li { /* Space between job entries */
-    margin-bottom: 20px;
+.skills-tags li {
+    margin-bottom: 0; /* Remove bottom margin from list items */
 }
-.experience > ul > li:last-child {
+.skills-tags .tag {
+    display: inline-block;
+    background-color: #e0e0e0; /* Tag background */
+    color: #444; /* Tag text color */
+    padding: 4px 10px; /* Tag padding */
+    border-radius: 15px; /* Pill shape */
+    font-size: 0.9em;
+    line-height: 1.4; /* Adjust line height */
+}
+
+/* Languages & Licenses */
+.languages ul li,
+.licenses ul li {
+    font-size: 0.95em;
+    color: #444;
+    margin-bottom: 6px;
+    padding-left: 0; /* No bullet needed */
+}
+.languages ul li::before, /* Remove bullets */
+.licenses ul li::before {
+    content: none;
+}
+
+
+/* === Main Content Sections === */
+.main-content section {
+     margin-bottom: 25px;
+}
+.main-content section:last-child {
     margin-bottom: 0;
 }
 
-.job-entry .job-header {
+/* Experience & Education Section Headers */
+.entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Align items to top */
     margin-bottom: 8px;
+    flex-wrap: wrap; /* Allow wrapping */
 }
-.job-entry .job-header strong { /* Job Title */
+
+.title-company {
+    flex-grow: 1;
+}
+.title-company strong { /* Job Title / Degree */
     display: block;
     font-size: 1.1em;
     color: #222;
+    margin-bottom: 2px;
 }
-.job-entry .job-header span { /* Date/Location */
+.title-company span { /* Company / University / GPA */
     display: block;
-    font-size: 0.9em;
-    color: #666;
+    font-size: 0.95em;
+    color: #555;
 }
 
-.job-entry .job-details { /* Responsibility list */
+.location-date {
+    flex-shrink: 0;
+    text-align: right;
+    font-size: 0.9em;
+    color: #666;
+    padding-left: 15px; /* Space from left content */
+}
+.location-date span {
+    display: block; /* Stack location and date */
+    line-height: 1.4;
+}
+
+/* Details list (responsibilities) */
+.details-list {
     list-style: none;
     padding-left: 0;
     margin-top: 5px;
+    margin-bottom: 0; /* Remove bottom margin */
 }
-.job-entry .job-details li {
+.details-list li {
     font-size: 0.95em;
     color: #444;
     margin-bottom: 5px;
     padding-left: 18px; /* Indentation for bullet */
     position: relative;
 }
-.job-entry .job-details li::before {
+.details-list li::before {
     content: '•';
     color: #555; /* Bullet color */
     position: absolute;
@@ -155,84 +228,52 @@ section h3 { /* Section Titles */
     font-size: 1em;
 }
 
-/* === Education Section === */
-.education ul {
-    margin: 0;
+/* Education Sub-Details (Coursework, Awards, etc.) */
+.sub-details {
+    margin-top: 10px;
+    padding-left: 10px; /* Indent sub-details slightly */
+    border-left: 2px solid #eee; /* Add a subtle left border */
 }
-.education-entry .education-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 3px;
+.sub-details p {
+    font-weight: 700;
+    font-size: 0.95em;
+    color: #444;
+    margin-top: 10px;
+    margin-bottom: 5px;
 }
-.education-entry .education-header strong { /* Degree */
-    font-size: 1.1em;
-    color: #222;
+.sub-details ul {
+    list-style: none;
+    padding-left: 0;
 }
-.education-entry .education-header span { /* Date */
+.sub-details ul li {
     font-size: 0.9em;
-    color: #666;
-}
-.education-entry .education-details span { /* University/Location */
-    display: block;
-    font-size: 0.95em;
     color: #555;
-}
-
-/* === Sidebar Section Styling === */
-.sidebar section h3 {
-    color: #444; /* Slightly softer title color in sidebar */
-    border-bottom-color: #ccc;
-}
-
-/* === Contact Info Styling === */
-.contact-info p {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    font-size: 0.95em;
-    color: #444;
-}
-.contact-info .icon {
-    width: 20px; /* Space for icon */
-    margin-right: 10px;
-    text-align: center;
-    color: #666; /* Icon placeholder color */
-    flex-shrink: 0;
-}
-
-/* === Skills & Languages Styling === */
-.skills ul li,
-.languages ul li {
-    font-size: 0.95em;
-    color: #444;
-    margin-bottom: 6px;
-    padding-left: 18px; /* Indent for bullet */
+    margin-bottom: 4px;
+    padding-left: 15px; /* Indent for bullet */
     position: relative;
 }
-.skills ul li::before,
-.languages ul li::before {
-    content: '•';
-    color: #555; /* Bullet color */
+.sub-details ul li::before {
+    content: '◦'; /* Smaller circle bullet */
+    color: #777;
     position: absolute;
     left: 0;
-    top: 0.1em; /* Adjust vertical alignment */
-    font-size: 1em;
+    top: 0.1em;
+    font-size: 0.9em;
 }
 
 
 /* === Hidden Sections Rule === */
+#languagesSection,
 #referencesSection,
 #hobbiesSection,
-#portfolioSection,
-#languagesSection { /* Standard hidden languages */
+#portfolioSection {
     display: none;
 }
-/* Optional: Style hidden section titles differently for testing */
+/* Optional: Style hidden section titles consistently for testing */
+#languagesSection h3,
 #referencesSection h3,
 #hobbiesSection h3,
-#portfolioSection h3,
-#languagesSection h3 {
+#portfolioSection h3 {
      color: #999;
      border-bottom-color: #eee;
 }
@@ -248,23 +289,25 @@ section h3 { /* Section Titles */
     .cv-container {
         flex-direction: column; /* Stack columns */
     }
-    .main-content, .sidebar {
+    .sidebar, .main-content {
         width: 100%;
         padding: 25px; /* Adjust padding */
     }
     .sidebar {
-        background-color: #f0f0f0; /* Match body background */
-        border-top: 1px solid #ddd;
+        border-right: none; /* Remove border */
+        border-bottom: 1px solid #e0e0e0; /* Add bottom border */
     }
     .cv-header h1 { font-size: 2em; }
     .cv-header h2 { font-size: 1.1em; }
 
-    .education-entry .education-header {
-        flex-direction: column;
+    .entry-header {
+        flex-direction: column; /* Stack header elements */
         align-items: flex-start;
+        margin-bottom: 10px;
     }
-     .education-entry .education-header span { /* Date */
-        font-size: 0.85em;
-     }
+    .location-date {
+        text-align: left; /* Align date left */
+        padding-left: 0;
+        margin-top: 5px;
+    }
 }
-

@@ -1,6 +1,7 @@
 import { MoonlightSonataTemplate } from './moonlightSonata';
 import { KaziFastaTemplate } from './kaziFasta';
 import { JijengeClassicTemplate } from './jijengeClassic';
+import { KilimanjaroTemplate } from './kilimanjaro';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {

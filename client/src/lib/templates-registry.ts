@@ -41,6 +41,16 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Professional',
     popularity: 5,
     previewImage: templateImages.jijengeClassic
+  },
+  {
+    id: 'kilimanjaro',
+    name: 'Kilimanjaro',
+    description: 'Modern left-sidebar CV with tag-style skills and detailed education section',
+    contentPath: '/templates/kilimanjaro.html',
+    isLocal: true,
+    category: 'Creative',
+    popularity: 5,
+    previewImage: templateImages.kilimanjaro
   }
 ];
 
