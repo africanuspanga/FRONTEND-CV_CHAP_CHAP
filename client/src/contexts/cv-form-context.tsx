@@ -4,6 +4,9 @@ import { CVData } from '@shared/schema';
 // Define form data structure with additional template information
 export interface CVFormData extends CVData {
   templateId: string;
+  websites?: string[];
+  accomplishments?: Accomplishment[];
+  hobbies?: Hobby[];
 }
 
 // Initial empty form state with required fields initialized

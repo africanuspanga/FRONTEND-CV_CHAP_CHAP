@@ -111,6 +111,16 @@ export const personalInfoSchema = z.object({
   profilePicture: z.string().optional(),
 });
 
+export const accomplishmentSchema = z.object({
+  id: z.string().optional(),
+  text: z.string().min(1, "Accomplishment text is required"),
+});
+
+export const hobbySchema = z.object({
+  id: z.string().optional(),
+  name: z.string().max(30, "Hobby name must be 30 characters or less"),
+});
+
 export const cvDataSchema = z.object({
   personalInfo: personalInfoSchema,
   workExperience: z.array(workExperienceSchema).optional(),
@@ -121,7 +131,9 @@ export const cvDataSchema = z.object({
   projects: z.array(projectSchema).optional(),
   certifications: z.array(certificationSchema).optional(),
   summary: z.string().optional(),
-  hobbies: z.string().optional(),
+  hobbies: z.array(hobbySchema).optional(),
+  websites: z.array(z.string()).optional(),
+  accomplishments: z.array(accomplishmentSchema).optional(),
 });
 
 export const insertCVSchema = createInsertSchema(cvs);
@@ -137,3 +149,5 @@ export type Reference = z.infer<typeof referenceSchema>;
 export type Project = z.infer<typeof projectSchema>;
 export type Certification = z.infer<typeof certificationSchema>;
 export type PersonalInfo = z.infer<typeof personalInfoSchema>;
+export type Accomplishment = z.infer<typeof accomplishmentSchema>;
+export type Hobby = z.infer<typeof hobbySchema>;
