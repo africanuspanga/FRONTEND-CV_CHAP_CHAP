@@ -110,21 +110,35 @@ const PersonalInfoForm = () => {
             </div>
           </div>
 
-          <div className="mb-8">
-            <Label htmlFor="location">Location</Label>
-            <Input
-              id="location"
-              value={formData.personalInfo.location || ''}
-              onChange={(e) => updateFormField('personalInfo', {
-                ...formData.personalInfo,
-                location: e.target.value
-              })}
-              placeholder="Dar es Salaam, Tanzania"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div>
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                value={formData.personalInfo.location || ''}
+                onChange={(e) => updateFormField('personalInfo', {
+                  ...formData.personalInfo,
+                  location: e.target.value
+                })}
+                placeholder="Dar es Salaam, Tanzania"
+              />
+            </div>
+            <div>
+              <Label htmlFor="jobTitle">Professional Title</Label>
+              <Input
+                id="jobTitle"
+                value={formData.personalInfo.jobTitle || ''}
+                onChange={(e) => updateFormField('personalInfo', {
+                  ...formData.personalInfo,
+                  jobTitle: e.target.value
+                })}
+                placeholder="Software Engineer"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2">
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-2 rounded-md">
               Next
             </Button>
           </div>
