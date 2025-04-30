@@ -3,7 +3,6 @@ import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { 
   Select, 
   SelectContent, 
@@ -14,13 +13,13 @@ import {
 import { ChevronLeft, PlusCircle, Info } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const EducationForm = () => {
   const [, navigate] = useLocation();
   const params = useParams<{ templateId: string }>();
   const { formData, updateFormField, addItemToArray } = useCVForm();
-  
+
   // Generate degree options
   const degreeOptions = [
     'No Degree',
@@ -57,17 +56,41 @@ const EducationForm = () => {
           institution,
           degree,
           fieldOfStudy,
-          location: schoolLocation,
           startDate: '',
           endDate: graduationDate,
         },
         ...(formData.education || []).filter(edu => edu.id !== 'preview-education')
       ]);
     }
-  }, [institution, degree, fieldOfStudy, schoolLocation, gradMonth, gradYear]);
+  }, [institution, degree, fieldOfStudy, schoolLocation, gradMonth, gradYear, updateFormField, formData.education]);
+
+  // Update education data in context when form is submitted
+  const updateEducation = () => {
+    // Only add if we have at least institution and degree
+    if (institution && degree) {
+      const graduationDate = gradMonth && gradYear ? `${gradMonth} ${gradYear}` : '';
+      
+      // Create a new education entry
+      const newEducation = {
+        id: Date.now().toString(),
+        institution,
+        degree,
+        fieldOfStudy,
+        startDate: '',
+        endDate: graduationDate,
+      };
+      
+      // Add to education array
+      addItemToArray('education', newEducation);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Update education before navigating
+    updateEducation();
+    
     navigate(`/cv/${templateId}/skills`); // Navigate to next step (skills)
   };
 
@@ -115,6 +138,8 @@ const EducationForm = () => {
             <Input
               id="institution"
               placeholder="e.g. University of Dar es Salaam"
+              value={institution}
+              onChange={(e) => setInstitution(e.target.value)}
               required
             />
           </div>
@@ -122,13 +147,16 @@ const EducationForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <Label htmlFor="degree" className="font-semibold">DEGREE</Label>
-              <Select>
+              <Select
+                value={degree}
+                onValueChange={setDegree}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="No Degree" />
                 </SelectTrigger>
                 <SelectContent>
-                  {degreeOptions.map(degree => (
-                    <SelectItem key={degree} value={degree}>{degree}</SelectItem>
+                  {degreeOptions.map(degreeOption => (
+                    <SelectItem key={degreeOption} value={degreeOption}>{degreeOption}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -139,6 +167,8 @@ const EducationForm = () => {
               <Input
                 id="fieldOfStudy"
                 placeholder="e.g. Business"
+                value={fieldOfStudy}
+                onChange={(e) => setFieldOfStudy(e.target.value)}
               />
             </div>
           </div>
@@ -148,6 +178,8 @@ const EducationForm = () => {
             <Input
               id="schoolLocation"
               placeholder="e.g. Mwanza, Tanzania"
+              value={schoolLocation}
+              onChange={(e) => setSchoolLocation(e.target.value)}
             />
           </div>
 
@@ -156,7 +188,10 @@ const EducationForm = () => {
               GRADUATION DATE (OR EXPECTED GRADUATION DATE) <span className="text-red-500">*</span>
             </Label>
             <div className="grid grid-cols-2 gap-4">
-              <Select>
+              <Select
+                value={gradMonth}
+                onValueChange={setGradMonth}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Month" />
                 </SelectTrigger>
@@ -167,7 +202,10 @@ const EducationForm = () => {
                 </SelectContent>
               </Select>
               
-              <Select>
+              <Select
+                value={gradYear}
+                onValueChange={setGradYear}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Year" />
                 </SelectTrigger>
