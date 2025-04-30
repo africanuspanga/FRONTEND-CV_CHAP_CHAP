@@ -68,7 +68,7 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
                 <Button 
                   variant={selectedTemplateId === template.id ? "default" : "outline"}
                   onClick={() => onSelectTemplate(template.id)}
-                  className="ml-auto"
+                  className={`ml-auto ${selectedTemplateId === template.id ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'border-gray-300 hover:bg-gray-50'}`}
                 >
                   {selectedTemplateId === template.id ? "Selected" : "Select"}
                 </Button>
