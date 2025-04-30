@@ -81,6 +81,26 @@ export const templateRegistry: TemplateDefinition[] = [
     category: 'Professional',
     popularity: 5,
     previewImage: templateImages.streetHustler
+  },
+  {
+    id: 'safariOriginal',
+    name: 'Safari Original',
+    description: 'Professional template with sidebar layout and detailed experience sections',
+    contentPath: '/templates/safari-original.html',
+    isLocal: true,
+    category: 'Professional',
+    popularity: 5,
+    previewImage: templateImages.safariOriginal
+  },
+  {
+    id: 'bigBoss',
+    name: 'Big Boss',
+    description: 'Bold template with dark header and elegant two-column top section',
+    contentPath: '/templates/big-boss.html',
+    isLocal: true,
+    category: 'Modern',
+    popularity: 5,
+    previewImage: templateImages.bigBoss
   }
 ];
 
