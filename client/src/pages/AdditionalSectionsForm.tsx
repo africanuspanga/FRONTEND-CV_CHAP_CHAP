@@ -20,7 +20,7 @@ const AdditionalSectionsForm = () => {
   const templateId = formData.templateId;
 
   const handleNext = () => {
-    navigate(`/cv/${templateId}/preview`);
+    navigate(`/cv/${templateId}/final-preview`);
   };
 
   const handlePrevious = () => {

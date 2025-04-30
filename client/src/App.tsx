@@ -36,37 +36,48 @@ import NotFound from "@/pages/not-found";
 function Router() {
   return (
     <div className="flex flex-col min-h-screen">
-      <NavBar />
-      <div className="flex-grow">
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/templates" component={TemplateSelection} />
-          <Route path="/create/method" component={CreationMethod} />
-          <Route path="/cv/:templateId/personal" component={PersonalInfoForm} />
-          <Route path="/cv/:templateId/work" component={WorkExperienceForm} />
-          <Route path="/cv/:templateId/education" component={EducationForm} />
-          <Route path="/cv/:templateId/skills" component={SkillsIntro} />
-          <Route path="/cv/:templateId/skills-recommendations" component={SkillsRecommendations} />
-          <Route path="/cv/:templateId/skills-editor" component={SkillsEditor} />
-          <Route path="/cv/:templateId/languages" component={LanguagesForm} />
-          <Route path="/cv/:templateId/summary" component={SummaryIntro} />
-          <Route path="/cv/:templateId/summary-generation" component={SummaryGeneration} />
-          <Route path="/cv/:templateId/summary-editor" component={SummaryEditor} />
-          <Route path="/cv/:templateId/references" component={ReferencesForm} />
-          <Route path="/cv/:templateId/additional-sections" component={AdditionalSectionsForm} />
-          <Route path="/cv/:templateId/websites-portfolios" component={WebsitesPortfoliosForm} />
-          <Route path="/cv/:templateId/certifications" component={CertificationsForm} />
-          <Route path="/cv/:templateId/accomplishments" component={AccomplishmentsForm} />
-          <Route path="/cv/:templateId/hobbies" component={HobbiesForm} />
-          <Route path="/cv/:templateId/final-preview" component={FinalPreview} />
-          <Route path="/create/:step?" component={CreateCV} />
-          <Route path="/about" component={About} />
-          <Route path="/login" component={Login} />
-          <Route path="/register" component={Register} />
-          <Route component={NotFound} />
-        </Switch>
-      </div>
-      <Footer />
+      <Switch>
+        {/* Final Preview route without navbar or footer */}
+        <Route path="/cv/:templateId/final-preview">
+          <FinalPreview />
+        </Route>
+        
+        {/* All other routes with navbar and footer */}
+        <Route>
+          <div className="flex flex-col min-h-screen">
+            <NavBar />
+            <div className="flex-grow">
+              <Switch>
+                <Route path="/" component={Home} />
+                <Route path="/templates" component={TemplateSelection} />
+                <Route path="/create/method" component={CreationMethod} />
+                <Route path="/cv/:templateId/personal" component={PersonalInfoForm} />
+                <Route path="/cv/:templateId/work" component={WorkExperienceForm} />
+                <Route path="/cv/:templateId/education" component={EducationForm} />
+                <Route path="/cv/:templateId/skills" component={SkillsIntro} />
+                <Route path="/cv/:templateId/skills-recommendations" component={SkillsRecommendations} />
+                <Route path="/cv/:templateId/skills-editor" component={SkillsEditor} />
+                <Route path="/cv/:templateId/languages" component={LanguagesForm} />
+                <Route path="/cv/:templateId/summary" component={SummaryIntro} />
+                <Route path="/cv/:templateId/summary-generation" component={SummaryGeneration} />
+                <Route path="/cv/:templateId/summary-editor" component={SummaryEditor} />
+                <Route path="/cv/:templateId/references" component={ReferencesForm} />
+                <Route path="/cv/:templateId/additional-sections" component={AdditionalSectionsForm} />
+                <Route path="/cv/:templateId/websites-portfolios" component={WebsitesPortfoliosForm} />
+                <Route path="/cv/:templateId/certifications" component={CertificationsForm} />
+                <Route path="/cv/:templateId/accomplishments" component={AccomplishmentsForm} />
+                <Route path="/cv/:templateId/hobbies" component={HobbiesForm} />
+                <Route path="/create/:step?" component={CreateCV} />
+                <Route path="/about" component={About} />
+                <Route path="/login" component={Login} />
+                <Route path="/register" component={Register} />
+                <Route component={NotFound} />
+              </Switch>
+            </div>
+            <Footer />
+          </div>
+        </Route>
+      </Switch>
     </div>
   );
 }
