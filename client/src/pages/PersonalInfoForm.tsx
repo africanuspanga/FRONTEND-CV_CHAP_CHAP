@@ -16,10 +16,10 @@ const PersonalInfoForm = () => {
   
   // When the component loads, ensure the template is set
   useEffect(() => {
-    if (templateId) {
+    if (templateId && formData.templateId !== templateId) {
       updateFormField('templateId', templateId);
     }
-  }, [templateId, updateFormField]);
+  }, [templateId, formData.templateId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

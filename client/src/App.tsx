@@ -12,6 +12,7 @@ import TemplateSelection from "@/pages/TemplateSelection";
 import CreationMethod from "@/pages/CreationMethod";
 import PersonalInfoForm from "@/pages/PersonalInfoForm";
 import WorkExperienceForm from "@/pages/WorkExperienceForm";
+import EducationForm from "@/pages/EducationForm";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -25,6 +26,7 @@ function Router() {
           <Route path="/create/method" component={CreationMethod} />
           <Route path="/cv/:templateId/personal" component={PersonalInfoForm} />
           <Route path="/cv/:templateId/work" component={WorkExperienceForm} />
+          <Route path="/cv/:templateId/education" component={EducationForm} />
           <Route path="/create/:step?" component={CreateCV} />
           <Route component={NotFound} />
         </Switch>

@@ -19,8 +19,7 @@ const WorkExperienceForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Note: For now, we're just showing the work experience form.
-    // In a complete implementation, you would add more routes for education, skills, etc.
+    // Navigate to the education form
     navigate(`/cv/${templateId}/education`); 
   };
 
