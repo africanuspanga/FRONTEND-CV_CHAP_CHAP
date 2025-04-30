@@ -59,32 +59,39 @@ const WorkExperienceForm = () => {
   
   // Effect to update the live preview as user types (only when adding a new job)
   useEffect(() => {
-    // Only create a preview entry if we have enough data and we're not editing
-    if (jobTitle && employer && editingJobIndex === null && showJobForm) {
-      const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
-      const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
-      
-      // Update the form data with the current work experience preview
-      const filteredExperiences = (formData.workExperience || []).filter(job => job.id !== 'preview-job');
-      
-      updateFormField('workExperience', [
-        {
-          id: 'preview-job' as string,
-          jobTitle,
-          company: employer,
-          location: isRemote ? 'Remote' : location,
-          startDate,
-          endDate,
-          current: currentJob,
-          description: '',
-          achievements: aiRecommendations
-        },
-        ...filteredExperiences
-      ]);
-    } else if (!showJobForm || editingJobIndex !== null) {
-      // If form is hidden or we're editing, remove any preview items
-      const filteredExperiences = (formData.workExperience || []).filter(job => job.id !== 'preview-job');
-      if (filteredExperiences.length !== (formData.workExperience || []).length) {
+    // Check if the preview already exists
+    const hasPreview = formData.workExperience?.some(job => job.id === 'preview-job');
+    // Check if we should display a preview
+    const shouldShowPreview = jobTitle && employer && editingJobIndex === null && showJobForm;
+    
+    // To prevent infinite loops, only update when the preview status changes
+    if (shouldShowPreview !== hasPreview) {
+      if (shouldShowPreview) {
+        // Create a preview entry
+        const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
+        const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
+        
+        // Filter out any existing preview
+        const filteredExperiences = (formData.workExperience || []).filter(job => job.id !== 'preview-job');
+        
+        // Add the new preview
+        updateFormField('workExperience', [
+          {
+            id: 'preview-job' as string,
+            jobTitle,
+            company: employer,
+            location: isRemote ? 'Remote' : location,
+            startDate,
+            endDate,
+            current: currentJob,
+            description: '',
+            achievements: aiRecommendations
+          },
+          ...filteredExperiences
+        ]);
+      } else {
+        // Remove any preview items
+        const filteredExperiences = (formData.workExperience || []).filter(job => job.id !== 'preview-job');
         updateFormField('workExperience', filteredExperiences);
       }
     }
