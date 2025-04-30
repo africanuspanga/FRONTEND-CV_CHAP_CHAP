@@ -1,4 +1,5 @@
 import { MoonlightSonataTemplate } from './moonlightSonata';
+import { KaziFastaTemplate } from './kaziFasta';
 import { CVData } from '@shared/schema';
 
 export interface CVTemplate {
@@ -13,7 +14,11 @@ export const templates: Record<string, CVTemplate> = {
     name: 'Moonlight Sonata',
     render: MoonlightSonataTemplate
   },
-  // Additional templates can be added here as they're created
+  kaziFasta: {
+    id: 'kaziFasta',
+    name: 'Kazi Fasta',
+    render: KaziFastaTemplate
+  }
 };
 
 export function getTemplateByID(id: string): CVTemplate | undefined {
