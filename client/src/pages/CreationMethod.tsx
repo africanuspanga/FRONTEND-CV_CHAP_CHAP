@@ -7,9 +7,16 @@ import { FileText, Upload } from 'lucide-react';
 
 const CreationMethod = () => {
   const [, navigate] = useLocation();
-  const { cvData, setTemplate } = useCVData();
+  const { cvData, setTemplate, resetCVData } = useCVData();
 
   const handleCreateNew = () => {
+    // Reset all form data before starting a new CV
+    resetCVData();
+    
+    // Also clear any form data saved in localStorage by the CV form context
+    localStorage.removeItem('cv-form-data');
+    localStorage.removeItem('cv-form-step');
+    
     // Direct users to template selection first
     navigate('/templates');
   };

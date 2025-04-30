@@ -2,10 +2,15 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { RefreshCcw } from 'lucide-react';
+import { useCVData } from '@/hooks/useCVData';
+import { useCVForm } from '@/contexts/cv-form-context';
 
 const NavBar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
+  const { resetCVData } = useCVData();
+  const { resetForm } = useCVForm();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -18,6 +23,21 @@ const NavBar: React.FC = () => {
   ];
 
   const isActive = (path: string) => location === path;
+  
+  const handleResetCV = () => {
+    if (window.confirm('Are you sure you want to reset your CV? This will clear all your data.')) {
+      // Reset both data stores
+      resetCVData();
+      resetForm();
+      
+      // Also clear any form data saved in localStorage
+      localStorage.removeItem('cv-form-data');
+      localStorage.removeItem('cv-form-step');
+      
+      // Navigate to the home page or creation method page
+      navigate('/create/method');
+    }
+  };
 
   return (
     <nav className="bg-white shadow-sm">
@@ -44,6 +64,19 @@ const NavBar: React.FC = () => {
                 {route.label}
               </Link>
             ))}
+            
+            {/* Only show Reset CV button on CV creation-related pages */}
+            {location.includes('/create') || location.includes('/templates') ? (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-1"
+                onClick={handleResetCV}
+              >
+                <RefreshCcw className="h-4 w-4" />
+                Reset CV
+              </Button>
+            ) : null}
             
             <Button asChild variant="outline">
               <Link href="/login" className="px-3 py-2 rounded-md text-sm font-medium">
@@ -102,6 +135,22 @@ const NavBar: React.FC = () => {
               {route.label}
             </Link>
           ))}
+          
+          {/* Only show Reset CV button on CV creation-related pages */}
+          {location.includes('/create') || location.includes('/templates') ? (
+            <button
+              className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-darkText hover:text-primary"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                handleResetCV();
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <RefreshCcw className="h-4 w-4" />
+                Reset CV
+              </div>
+            </button>
+          ) : null}
           
           <Link
             href="/login"
