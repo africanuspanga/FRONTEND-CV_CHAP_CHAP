@@ -1,0 +1,111 @@
+Key Actions:
+Selecting "Create New" proceeds to the multi-step form
+Selecting "Upload" proceeds to the document upload interface
+
+Multi-Step Form Navigation
+
+The form progresses through multiple steps in a defined sequence:
+
+Personal Information
+Work Experience
+Education
+Skills
+Professional Summary
+Languages (optional)
+References (optional)
+Additional Sections (optional)
+Final Preview
+Each form section includes:
+
+Progress indicator showing completion percentage
+Back/Next navigation buttons
+Clear section headings and descriptions
+Live preview panel (on desktop only)
+3. Personal Information Form
+Unsupported image
+
+Required Fields:
+First Name
+Last Name
+Email Address
+Phone Number
+Location (City/Country)
+Optional Fields:
+Professional Title
+LinkedIn URL
+Portfolio/Website URL
+Professional Photo Upload (with preview and cropping)
+Validation:
+Email format validation
+Phone number format validation (international format)
+Field completion checks before allowing "Next"
+4. Work Experience Form
+Unsupported image
+
+Features:
+Add multiple work experiences (limit of 3 positions recommended)
+Drag-and-drop reordering (most recent first)
+"Currently work here" toggle that affects date display
+AI enhancement option for responsibilities and achievements
+Fields per Experience:
+Job Title
+Company Name
+Location
+Start Date (month/year selector)
+End Date (month/year selector or "Present")
+Remote Work indicator
+Job Responsibilities (bulleted list)
+Key Achievements (optional bulleted list)
+UI Elements:
+"Add Another Experience" button
+Remove experience button
+Expand/collapse sections for multiple entries
+Warning when approaching experience limit
+5. Education Form
+Structured similarly to Work Experience, with fields for:
+
+Degree/Certification
+Institution
+Location
+Start/End Dates
+Currently Studying toggle
+Description (text area)
+Achievements/Activities (optional)
+6. Skills Form
+Grid or list of skills with rating/proficiency level
+Category grouping option
+Add/remove functionality
+AI suggestion feature for relevant skills based on work experience
+7. Professional Summary
+Text area for comprehensive career overview
+Character counter with recommended length
+AI enhancement tool to improve and professionalize content
+Tone selector (Professional, Confident, Creative, etc.)
+Important Implementation Notes
+Data Persistence:
+
+All form data is stored in the CV context provider
+Auto-save functionality triggers on field blur and step changes
+Local storage backup prevents data loss on page refresh
+Live Preview Integration:
+
+The template preview updates in real-time as users type
+Preview panel is fixed-position on desktop screens for continuous visibility
+Preview shows exactly how the final CV will appear
+Mobile Optimization:
+
+On mobile, preview is hidden to maximize form space
+Touch-friendly input controls (larger tap targets)
+Simplified navigation between steps
+AI Enhancement Integration:
+
+Each section offers an "Enhance with AI" button
+Enhancement requests are sent to the backend AI API
+Loading states while enhancements process
+Before/after comparison for user approval
+Accessibility Considerations:
+
+All forms must be fully keyboard navigable
+Error states are clearly indicated with descriptive messages
+Focus management between multi-step form sections
+By following this workflow, users are guided through a structured process that makes CV creation intuitive while ensuring all necessary information is captured for a professional result.
