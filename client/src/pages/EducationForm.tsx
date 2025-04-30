@@ -344,76 +344,90 @@ const EducationForm = () => {
                   </div>
                 </div>
                 
-                <div>
-                  <h3 className="font-semibold text-lg mb-3">Educational Achievements</h3>
-                  <p className="text-gray-600 mb-4">Would you like to include any honors or achievements?</p>
-                  
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex items-center justify-center py-6 text-blue-700 border-blue-200 hover:bg-blue-50"
-                      onClick={() => {}}
-                    >
-                      <PlusCircle className="h-4 w-4 mr-2" />
-                      GPA
-                    </Button>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-3">Educational Achievements</h3>
+                    <p className="text-gray-600 mb-4">Would you like to include any honors or achievements?</p>
                     
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex items-center justify-center py-6 text-blue-700 border-blue-200 hover:bg-blue-50"
-                      onClick={() => {}}
-                    >
-                      <PlusCircle className="h-4 w-4 mr-2" />
-                      Honors
-                    </Button>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex items-center justify-center py-6 w-full text-blue-700 border-blue-200 hover:bg-blue-50"
-                      onClick={() => {}}
-                    >
-                      <PlusCircle className="h-4 w-4 mr-2" />
-                      International Grade to GPA Equivalent
-                    </Button>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex items-center justify-center py-6 w-full text-blue-700 border-blue-200 hover:bg-blue-50"
-                      onClick={() => {}}
-                    >
-                      <PlusCircle className="h-4 w-4 mr-2" />
-                      Achievement Tests
-                    </Button>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex items-center justify-center py-6 text-blue-700 border-blue-200 hover:bg-blue-50"
-                      onClick={() => {}}
-                    >
-                      <PlusCircle className="h-4 w-4 mr-2" />
-                      Min Average
-                    </Button>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex items-center justify-center py-6 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                        onClick={() => {}}
+                      >
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        GPA
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex items-center justify-center py-6 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                        onClick={() => {}}
+                      >
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Honors
+                      </Button>
+                    </div>
                     
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex items-center justify-center py-6 text-blue-700 border-blue-200 hover:bg-blue-50"
-                      onClick={() => {}}
-                    >
-                      <PlusCircle className="h-4 w-4 mr-2" />
-                      Dean's List
-                    </Button>
+                    <div className="mb-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex items-center justify-center py-6 w-full bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                        onClick={() => {}}
+                      >
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        International Grade to GPA Equivalent
+                      </Button>
+                    </div>
+                    
+                    <div className="mb-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex items-center justify-center py-6 w-full bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                        onClick={() => {}}
+                      >
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Achievement Tests
+                      </Button>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex items-center justify-center py-6 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                        onClick={() => {}}
+                      >
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Min Average
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex items-center justify-center py-6 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                        onClick={() => {}}
+                      >
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Dean's List
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-semibold text-lg mb-3">EDUCATION DESCRIPTION</h3>
+                    <div className="bg-blue-100 p-6 rounded-md min-h-[200px]">
+                      <ul className="text-blue-900 space-y-4">
+                        <li className="flex">
+                          <span className="mr-2">•</span>
+                          <span>Completed University-level Coursework: [Area of Study], [School Name]</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
