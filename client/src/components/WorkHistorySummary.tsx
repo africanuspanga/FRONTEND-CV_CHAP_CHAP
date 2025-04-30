@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { PenLine, Trash2, ChevronDown, PlusCircle } from 'lucide-react';
 
-interface WorkExperience {
+export interface WorkExperience {
   id: string;
   jobTitle: string;
   company: string;

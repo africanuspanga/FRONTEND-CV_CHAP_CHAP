@@ -11,6 +11,7 @@ import LiveCVPreview from '@/components/LiveCVPreview';
 import WorkExperienceAIRecommendations from '@/components/WorkExperienceAIRecommendations';
 import WorkExperienceEditor from '@/components/WorkExperienceEditor';
 import WorkHistorySummary from '@/components/WorkHistorySummary';
+import { WorkExperience } from '@shared/schema';
 
 const WorkExperienceForm = () => {
   const [, navigate] = useLocation();
