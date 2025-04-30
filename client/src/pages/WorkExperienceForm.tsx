@@ -10,11 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import LiveCVPreview from '@/components/LiveCVPreview';
 import WorkExperienceAIRecommendations from '@/components/WorkExperienceAIRecommendations';
 import WorkExperienceEditor from '@/components/WorkExperienceEditor';
+import WorkHistorySummary from '@/components/WorkHistorySummary';
 
 const WorkExperienceForm = () => {
   const [, navigate] = useLocation();
   const params = useParams<{ templateId: string }>();
-  const { formData, updateFormField, addItemToArray } = useCVForm();
+  const { formData, updateFormField, addItemToArray, removeItemFromArray } = useCVForm();
   const [currentJob, setCurrentJob] = useState(false);
   const [jobTitle, setJobTitle] = useState('');
   const [employer, setEmployer] = useState('');
@@ -25,22 +26,46 @@ const WorkExperienceForm = () => {
   const [endMonth, setEndMonth] = useState('');
   const [endYear, setEndYear] = useState('');
   
+  // UI states
+  const [showJobForm, setShowJobForm] = useState(true);
+  const [showWorkHistory, setShowWorkHistory] = useState(false);
+  
   // AI recommendation flow states
   const [showAIRecommendations, setShowAIRecommendations] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
   const [aiRecommendations, setAIRecommendations] = useState<string[]>([]);
   
+  // Editing state
+  const [editingJobIndex, setEditingJobIndex] = useState<number | null>(null);
+  
   // Get the template ID from the URL
   const templateId = params.templateId;
   
-  // Effect to update the live preview as user types
+  // Reset form fields
+  const resetFormFields = () => {
+    setJobTitle('');
+    setEmployer('');
+    setLocation('');
+    setIsRemote(false);
+    setStartMonth('');
+    setStartYear('');
+    setEndMonth('');
+    setEndYear('');
+    setCurrentJob(false);
+    setAIRecommendations([]);
+    setEditingJobIndex(null);
+  };
+  
+  // Effect to update the live preview as user types (only when adding a new job)
   useEffect(() => {
-    // Only create a preview entry if we have enough data
-    if (jobTitle && employer) {
+    // Only create a preview entry if we have enough data and we're not editing
+    if (jobTitle && employer && editingJobIndex === null && showJobForm) {
       const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
       const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
       
-      // Update the form data with the current work experience
+      // Update the form data with the current work experience preview
+      const filteredExperiences = (formData.workExperience || []).filter(job => job.id !== 'preview-job');
+      
       updateFormField('workExperience', [
         {
           id: 'preview-job',
@@ -53,13 +78,13 @@ const WorkExperienceForm = () => {
           description: '',
           achievements: aiRecommendations
         },
-        ...(formData.workExperience || []).filter(job => job.id !== 'preview-job')
+        ...filteredExperiences
       ]);
     }
-  }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob, aiRecommendations]);
+  }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob, aiRecommendations, showJobForm, editingJobIndex]);
   
-  // Update work experience data in context when form fields change
-  const updateWorkExperience = (achievements: string[] = []) => {
+  // Add a new work experience to the form data
+  const addWorkExperience = (achievements: string[] = []) => {
     // Only add if we have at least job title and employer
     if (jobTitle && employer) {
       const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
@@ -78,8 +103,47 @@ const WorkExperienceForm = () => {
         achievements: achievements.length > 0 ? achievements : aiRecommendations
       };
       
-      // Add to work experience array
-      addItemToArray('workExperience', newWorkExperience);
+      // Update work experience array without the preview
+      const filteredExperiences = (formData.workExperience || []).filter(job => job.id !== 'preview-job');
+      updateFormField('workExperience', [...filteredExperiences, newWorkExperience]);
+      
+      // Reset form for adding another job
+      resetFormFields();
+      
+      // Show work history after adding
+      setShowWorkHistory(true);
+      setShowJobForm(false);
+    }
+  };
+  
+  // Update an existing work experience
+  const updateExistingWorkExperience = (achievements: string[] = []) => {
+    if (editingJobIndex !== null && formData.workExperience && formData.workExperience[editingJobIndex]) {
+      const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
+      const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
+      
+      // Get current work experiences
+      const currentExperiences = [...(formData.workExperience || [])];
+      
+      // Update the specific job
+      currentExperiences[editingJobIndex] = {
+        ...currentExperiences[editingJobIndex],
+        jobTitle,
+        company: employer,
+        location: isRemote ? 'Remote' : location,
+        startDate,
+        endDate,
+        current: currentJob,
+        achievements: achievements.length > 0 ? achievements : aiRecommendations
+      };
+      
+      // Update in form context
+      updateFormField('workExperience', currentExperiences);
+      
+      // Reset form and editing state
+      resetFormFields();
+      setShowWorkHistory(true);
+      setShowJobForm(false);
     }
   };
 
@@ -90,14 +154,86 @@ const WorkExperienceForm = () => {
   };
 
   const handleSkipRecommendations = () => {
+    if (editingJobIndex !== null) {
+      updateExistingWorkExperience();
+      setEditingJobIndex(null);
+    } else {
+      addWorkExperience();
+    }
     setShowAIRecommendations(false);
-    navigate(`/cv/${templateId}/education`);
+    setShowWorkHistory(true);
+    setShowJobForm(false);
   };
 
   const handleSaveAchievements = (achievements: string[]) => {
     setAIRecommendations(achievements);
-    updateWorkExperience(achievements);
+    
+    if (editingJobIndex !== null) {
+      updateExistingWorkExperience(achievements);
+      setEditingJobIndex(null);
+    } else {
+      addWorkExperience(achievements);
+    }
+    
     setShowEditor(false);
+    setShowWorkHistory(true);
+    setShowJobForm(false);
+  };
+  
+  const handleEditJob = (index: number) => {
+    if (formData.workExperience && formData.workExperience[index]) {
+      const job = formData.workExperience[index];
+      
+      // Fill the form with the job data
+      setJobTitle(job.jobTitle || '');
+      setEmployer(job.company || '');
+      setLocation(job.location || '');
+      setIsRemote(job.location === 'Remote');
+      
+      // Handle date fields
+      if (job.startDate) {
+        const [month, year] = job.startDate.split(' ');
+        setStartMonth(month);
+        setStartYear(year);
+      }
+      
+      if (job.endDate === 'Present') {
+        setCurrentJob(true);
+        setEndMonth('');
+        setEndYear('');
+      } else if (job.endDate) {
+        setCurrentJob(false);
+        const [month, year] = job.endDate.split(' ');
+        setEndMonth(month);
+        setEndYear(year);
+      }
+      
+      // Set achievements
+      setAIRecommendations(job.achievements || []);
+      
+      // Set editing state
+      setEditingJobIndex(index);
+      
+      // Show the job form
+      setShowJobForm(true);
+      setShowWorkHistory(false);
+    }
+  };
+  
+  const handleDeleteJob = (index: number) => {
+    // Remove the job at the specified index
+    removeItemFromArray('workExperience', index);
+  };
+  
+  const handleAddAnotherPosition = () => {
+    // Reset form for adding a new job
+    resetFormFields();
+    setShowJobForm(true);
+    setShowWorkHistory(false);
+  };
+  
+  const handleContinueToEducation = () => {
+    // Navigate to the education form
     navigate(`/cv/${templateId}/education`);
   };
 
@@ -154,137 +290,170 @@ const WorkExperienceForm = () => {
           Go Back
         </button>
 
-        <h1 className="text-2xl font-bold mb-2 text-center">Tell us about your job</h1>
-        <p className="text-gray-600 mb-8 text-center">Add your work experience details below.</p>
+        {showJobForm && (
+          <>
+            <h1 className="text-2xl font-bold mb-2 text-center">Tell us about your job</h1>
+            <p className="text-gray-600 mb-8 text-center">Add your work experience details below.</p>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-6">
-            <Label htmlFor="title">TITLE <span className="text-red-500">*</span></Label>
-            <Input
-              id="title"
-              placeholder="e.g. Chief Engineer"
-              value={jobTitle}
-              onChange={(e) => setJobTitle(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="mb-6">
-            <Label htmlFor="employer">EMPLOYER <span className="text-red-500">*</span></Label>
-            <Input
-              id="employer"
-              placeholder="e.g. Driftmark Technologies"
-              value={employer}
-              onChange={(e) => setEmployer(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="mb-6">
-            <Label htmlFor="location">LOCATION</Label>
-            <Input
-              id="location"
-              placeholder="e.g. Dar es Salaam, Tanzania"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              disabled={isRemote}
-            />
-          </div>
-
-          <div className="flex items-center mb-6">
-            <Checkbox 
-              id="remote" 
-              checked={isRemote}
-              onCheckedChange={(checked) => setIsRemote(checked as boolean)}
-            />
-            <Label htmlFor="remote" className="ml-2 text-gray-700">Remote</Label>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <Label htmlFor="startMonth">START DATE <span className="text-red-500">*</span></Label>
-              <div className="grid grid-cols-2 gap-4">
-                <Select
-                  value={startMonth}
-                  onValueChange={setStartMonth}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Month" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map(month => (
-                      <SelectItem key={month} value={month}>{month}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <Select
-                  value={startYear}
-                  onValueChange={setStartYear}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map(year => (
-                      <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-6">
+                <Label htmlFor="title">TITLE <span className="text-red-500">*</span></Label>
+                <Input
+                  id="title"
+                  placeholder="e.g. Chief Engineer"
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
+                  required
+                />
               </div>
-            </div>
+
+              <div className="mb-6">
+                <Label htmlFor="employer">EMPLOYER <span className="text-red-500">*</span></Label>
+                <Input
+                  id="employer"
+                  placeholder="e.g. Driftmark Technologies"
+                  value={employer}
+                  onChange={(e) => setEmployer(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="mb-6">
+                <Label htmlFor="location">LOCATION</Label>
+                <Input
+                  id="location"
+                  placeholder="e.g. Dar es Salaam, Tanzania"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  disabled={isRemote}
+                />
+              </div>
+
+              <div className="flex items-center mb-6">
+                <Checkbox 
+                  id="remote" 
+                  checked={isRemote}
+                  onCheckedChange={(checked) => setIsRemote(checked as boolean)}
+                />
+                <Label htmlFor="remote" className="ml-2 text-gray-700">Remote</Label>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <Label htmlFor="startMonth">START DATE <span className="text-red-500">*</span></Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Select
+                      value={startMonth}
+                      onValueChange={setStartMonth}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Month" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {months.map(month => (
+                          <SelectItem key={month} value={month}>{month}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select
+                      value={startYear}
+                      onValueChange={setStartYear}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {years.map(year => (
+                          <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="endDate">END DATE <span className="text-red-500">*</span></Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Select 
+                      disabled={currentJob}
+                      value={endMonth}
+                      onValueChange={setEndMonth}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Month" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {months.map(month => (
+                          <SelectItem key={month} value={month}>{month}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select 
+                      disabled={currentJob}
+                      value={endYear}
+                      onValueChange={setEndYear}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {years.map(year => (
+                          <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center mb-8">
+                <Checkbox 
+                  id="currentlyWork" 
+                  checked={currentJob}
+                  onCheckedChange={(checked) => setCurrentJob(checked as boolean)}
+                />
+                <Label htmlFor="currentlyWork" className="ml-2 text-gray-700">I currently work here</Label>
+              </div>
+
+              <div className="flex justify-end">
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2">
+                  Next
+                </Button>
+              </div>
+            </form>
+          </>
+        )}
+        
+        {showWorkHistory && (
+          <>
+            <WorkHistorySummary
+              workExperiences={formData.workExperience || []}
+              onEdit={handleEditJob}
+              onDelete={handleDeleteJob}
+              onAddAnother={handleAddAnotherPosition}
+            />
             
-            <div>
-              <Label htmlFor="endDate">END DATE <span className="text-red-500">*</span></Label>
-              <div className="grid grid-cols-2 gap-4">
-                <Select 
-                  disabled={currentJob}
-                  value={endMonth}
-                  onValueChange={setEndMonth}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Month" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map(month => (
-                      <SelectItem key={month} value={month}>{month}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <Select 
-                  disabled={currentJob}
-                  value={endYear}
-                  onValueChange={setEndYear}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map(year => (
-                      <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="flex justify-between mt-8">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate(`/cv/${templateId}/personal`)}
+                className="flex items-center"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Previous
+              </Button>
+              
+              <Button 
+                onClick={handleContinueToEducation}
+                className="bg-teal-600 hover:bg-teal-700 text-white"
+              >
+                Next
+              </Button>
             </div>
-          </div>
-
-          <div className="flex items-center mb-8">
-            <Checkbox 
-              id="currentlyWork" 
-              checked={currentJob}
-              onCheckedChange={(checked) => setCurrentJob(checked as boolean)}
-            />
-            <Label htmlFor="currentlyWork" className="ml-2 text-gray-700">I currently work here</Label>
-          </div>
-
-          <div className="flex justify-end">
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2">
-              Next
-            </Button>
-          </div>
-        </form>
+          </>
+        )}
         
         {/* Live CV Preview */}
         <LiveCVPreview cvData={formData} templateId={templateId} />
