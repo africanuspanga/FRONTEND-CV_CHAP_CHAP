@@ -1,0 +1,506 @@
+CV Chap Chap Admin Dashboard Implementation Guide
+This guide provides detailed instructions for implementing the frontend admin dashboard for CV Chap Chap, based on the recently simplified admin authentication system.
+
+Overview
+The CV Chap Chap admin dashboard provides comprehensive management tools for administrators, including user management, CV monitoring, template management, payment processing, and analytics. This guide explains how to connect to the backend API endpoints and implement the required frontend components.
+
+Authentication Changes
+The admin authentication system has been simplified to use a single master admin access without role-based permissions. The key changes are:
+
+Removed role field from the Admin model
+Updated admin_required middleware to check only for admin status (not specific roles)
+Modified all admin routes to use the simplified middleware
+Updated admin login endpoint to no longer require a role parameter
+Admin Login Implementation
+Login Endpoint
+POST /api/auth/admin/login
+Request body:
+
+{
+  "email": "admin@cvchapchap.com",
+  "password": "admin123"
+}
+Response:
+
+{
+  "access_token": "JWT_TOKEN",
+  "refresh_token": "REFRESH_TOKEN",
+  "admin": {
+    "id": "admin-uuid",
+    "email": "admin@cvchapchap.com",
+    "is_active": true,
+    "created_at": "2025-04-13T04:03:49.444961"
+  },
+  "expires_in": 86400,
+  "message": "Admin login successful"
+}
+JWT Token Storage
+Store the JWT token securely in localStorage or a state management system like Redux:
+
+// Example login function
+async function loginAdmin(email, password) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/admin/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Login failed');
+    }
+    
+    // Store tokens
+    localStorage.setItem('admin_access_token', data.access_token);
+    localStorage.setItem('admin_refresh_token', data.refresh_token);
+    localStorage.setItem('admin_info', JSON.stringify(data.admin));
+    
+    return data;
+  } catch (error) {
+    console.error('Admin login error:', error);
+    throw error;
+  }
+}
+Dashboard Components
+The admin dashboard should include the following main components:
+
+1. Dashboard Overview
+Endpoint: GET /api/admin/
+
+This component displays summary statistics about the system:
+
+Total users
+Total CVs
+Total templates
+Total payments
+Recent users (5)
+Recent CVs (5)
+Recent payments (5)
+async function fetchDashboardData() {
+  const response = await fetch(`${API_BASE_URL}/api/admin/`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('admin_access_token')}`
+    }
+  });
+  
+  return await response.json();
+}
+UI Components:
+
+Summary statistics cards (4 cards in a row)
+Recent users table (with pagination)
+Recent CVs table (with pagination)
+Recent payments table (with pagination)
+2. User Management
+Endpoints:
+
+List Users: GET /api/admin/users?page=1&per_page=20&search=term
+View User: GET /api/admin/users/{user_id}
+Update User: PUT /api/admin/users/{user_id}
+UI Components:
+
+User list with search and filtering
+User detail view with CV and payment history
+User edit form
+async function fetchUsers(page = 1, perPage = 20, search = '') {
+  const url = new URL(`${API_BASE_URL}/api/admin/users`);
+  url.searchParams.append('page', page);
+  url.searchParams.append('per_page', perPage);
+  if (search) url.searchParams.append('search', search);
+  
+  const response = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('admin_access_token')}`
+    }
+  });
+  
+  return await response.json();
+}
+3. Template Management
+Endpoints:
+
+List Templates: GET /api/admin/templates
+View Template: GET /api/admin/templates/{template_id}
+Create Template: POST /api/admin/templates
+Update Template: PUT /api/admin/templates/{template_id}
+Delete Template: DELETE /api/admin/templates/{template_id}
+UI Components:
+
+Template list with usage statistics
+Template detail view with edit form
+Template creation form
+Template preview component
+async function fetchTemplates() {
+  const response = await fetch(`${API_BASE_URL}/api/admin/templates`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('admin_access_token')}`
+    }
+  });
+  
+  return await response.json();
+}
+4. Payment Management
+Endpoints:
+
+List Payments: GET /api/admin/payments?page=1&per_page=20&status=pending
+Manual Payment Verification: PUT /api/admin/payments/{payment_id}/verify
+UI Components:
+
+Payment list with filtering by status, date, etc.
+Payment detail view
+Manual verification form for USSD payments
+async function verifyPayment(paymentId, verificationData) {
+  const response = await fetch(`${API_BASE_URL}/api/admin/payments/${paymentId}/verify`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('admin_access_token')}`
+    },
+    body: JSON.stringify(verificationData)
+  });
+  
+  return await response.json();
+}
+5. Analytics Dashboard
+Endpoints:
+
+Template Analytics: GET /api/admin/analytics/templates
+User Analytics: GET /api/admin/analytics/users
+UI Components:
+
+Chart showing template usage
+Chart showing user registrations over time
+Chart showing CV creations over time
+async function fetchTemplateAnalytics() {
+  const response = await fetch(`${API_BASE_URL}/api/admin/analytics/templates`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('admin_access_token')}`
+    }
+  });
+  
+  return await response.json();
+}
+UI Design Guidelines
+Layout Structure
+The admin dashboard should follow a standard layout structure:
+
+Sidebar Navigation:
+
+Dashboard overview
+User management
+Template management
+Payment management
+Analytics
+Settings
+Header:
+
+Admin user info & logout
+Notifications
+Main Content Area:
+
+Components for each section
+Component Library
+We recommend using Bootstrap or Material UI components for consistent design. The current backend templates use Bootstrap, so maintaining that consistency is recommended.
+
+// Example sidebar navigation component
+function Sidebar() {
+  return (
+    <div className="sidebar bg-dark text-light">
+      <div className="sidebar-header p-3">
+        <h3>CV Chap Chap Admin</h3>
+      </div>
+      <ul className="nav flex-column">
+        <li className="nav-item">
+          <Link to="/admin" className="nav-link">
+            <i className="bi bi-speedometer2"></i> Dashboard
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/admin/users" className="nav-link">
+            <i className="bi bi-people"></i> Users
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/admin/templates" className="nav-link">
+            <i className="bi bi-file-earmark-text"></i> Templates
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/admin/payments" className="nav-link">
+            <i className="bi bi-credit-card"></i> Payments
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/admin/analytics" className="nav-link">
+            <i className="bi bi-graph-up"></i> Analytics
+          </Link>
+        </li>
+      </ul>
+    </div>
+  );
+}
+Authentication Flow
+Login Page: Direct admin users to /admin/login
+Authentication Check: For all admin routes, check if admin token exists and is valid
+Token Refresh: Implement automatic token refresh when access token expires
+Logout: Clear admin tokens and redirect to login page
+// Example auth check component
+function AdminRoute({ children }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = localStorage.getItem('admin_access_token');
+        
+        if (!token) {
+          navigate('/admin/login');
+          return;
+        }
+        
+        // Verify token with backend
+        const response = await fetch(`${API_BASE_URL}/api/auth/admin/verify`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Token invalid');
+        }
+        
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        localStorage.removeItem('admin_access_token');
+        localStorage.removeItem('admin_refresh_token');
+        localStorage.removeItem('admin_info');
+        navigate('/admin/login');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
+  
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  
+  return isAuthenticated ? children : null;
+}
+Error Handling
+Implement consistent error handling for API requests:
+
+Network Errors: Display appropriate error message
+401 Unauthorized: Redirect to login page
+403 Forbidden: Display access denied message
+404 Not Found: Display resource not found message
+500 Server Error: Display server error message
+function handleApiError(error, navigate) {
+  if (error.status === 401) {
+    // Unauthorized - redirect to login
+    localStorage.removeItem('admin_access_token');
+    localStorage.removeItem('admin_refresh_token');
+    localStorage.removeItem('admin_info');
+    navigate('/admin/login');
+  } else if (error.status === 403) {
+    // Forbidden
+    return 'You do not have permission to access this resource';
+  } else if (error.status === 404) {
+    // Not found
+    return 'The requested resource was not found';
+  } else {
+    // Other errors
+    return error.message || 'An unexpected error occurred';
+  }
+}
+Sample Implementation: Dashboard Overview Page
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Table, Alert } from 'react-bootstrap';
+function DashboardOverview() {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('admin_access_token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/api/admin/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setStats(data);
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+  
+  if (loading) {
+    return <div className="text-center p-5"><div className="spinner-border"></div></div>;
+  }
+  
+  if (error) {
+    return <Alert variant="danger">{error}</Alert>;
+  }
+  
+  return (
+    <Container fluid>
+      <h1 className="mt-4 mb-4">Admin Dashboard</h1>
+      
+      {/* Summary Statistics */}
+      <Row className="mb-4">
+        <Col md={3}>
+          <Card className="bg-primary text-white mb-3">
+            <Card.Body>
+              <Card.Title>Total Users</Card.Title>
+              <Card.Text className="display-4">{stats.total_users}</Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={3}>
+          <Card className="bg-success text-white mb-3">
+            <Card.Body>
+              <Card.Title>Total CVs</Card.Title>
+              <Card.Text className="display-4">{stats.total_cvs}</Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={3}>
+          <Card className="bg-info text-white mb-3">
+            <Card.Body>
+              <Card.Title>Templates</Card.Title>
+              <Card.Text className="display-4">{stats.total_templates}</Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={3}>
+          <Card className="bg-warning text-white mb-3">
+            <Card.Body>
+              <Card.Title>Payments</Card.Title>
+              <Card.Text className="display-4">{stats.total_payments}</Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+      
+      {/* Recent Users */}
+      <Row className="mb-4">
+        <Col md={12}>
+          <Card>
+            <Card.Header>
+              <h5 className="mb-0">Recent Users</h5>
+            </Card.Header>
+            <Card.Body>
+              <Table striped hover responsive>
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Registered</th>
+                    <th>CV Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.recent_users.map(user => (
+                    <tr key={user.id}>
+                      <td>{user.username}</td>
+                      <td>{user.email}</td>
+                      <td>{new Date(user.created_at).toLocaleString()}</td>
+                      <td>{user.cv_count || 0}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+      
+      {/* Recent Payments */}
+      <Row className="mb-4">
+        <Col md={12}>
+          <Card>
+            <Card.Header>
+              <h5 className="mb-0">Recent Payments</h5>
+            </Card.Header>
+            <Card.Body>
+              <Table striped hover responsive>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.recent_payments.map(payment => (
+                    <tr key={payment.id}>
+                      <td>{payment.id}</td>
+                      <td>{payment.user_id}</td>
+                      <td>{payment.amount} {payment.currency}</td>
+                      <td>
+                        <span className={`badge bg-${payment.status === 'completed' ? 'success' : payment.status === 'pending' ? 'warning' : 'danger'}`}>
+                          {payment.status}
+                        </span>
+                      </td>
+                      <td>{new Date(payment.created_at).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
+  );
+}
+export default DashboardOverview;
+Implementation Steps
+Set up React Router: Configure routes for admin dashboard sections
+Create Authentication Components: Login form and protected routes
+Implement API Service: Create services for each API endpoint
+Build UI Components: Create all required UI components
+Connect Components to API: Wire up components to API services
+Add Error Handling: Implement consistent error handling
+Style the Dashboard: Apply consistent styling
+Testing
+Authentication: Test login, token refresh, and logout functionality
+API Integration: Test all API endpoints
+UI Components: Test all UI components
+Error Handling: Test error handling scenarios
+Default Admin Account
+Use the following default admin account for testing:
+
+Email: admin@cvchapchap.com
+Password: admin123
+Conclusion
+With this guide, your frontend team should be able to implement a fully-functional admin dashboard that integrates with the backend API. The simplified authentication system makes it easier to implement and maintain, with fewer role-based checks required.
