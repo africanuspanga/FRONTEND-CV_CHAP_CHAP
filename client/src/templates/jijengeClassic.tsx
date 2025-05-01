@@ -413,7 +413,7 @@ export function JijengeClassicTemplate({
             </ul>
           </section>
 
-          {languages.length > 0 && (
+          {languages?.length > 0 && (
             <section style={{
               marginBottom: '25px'
             }}>
@@ -433,7 +433,7 @@ export function JijengeClassicTemplate({
                 padding: 0,
                 margin: 0
               }}>
-                {languages.map((language, index) => (
+                {languages?.map((language, index) => (
                   <li key={index} style={{
                     fontSize: '0.95em',
                     color: '#444',
@@ -455,7 +455,7 @@ export function JijengeClassicTemplate({
             </section>
           )}
 
-          {references.length > 0 && (
+          {references?.length > 0 && (
             <section style={{
               marginBottom: '25px'
             }}>
@@ -475,7 +475,7 @@ export function JijengeClassicTemplate({
                 padding: 0,
                 margin: 0
               }}>
-                {references.map((reference, index) => (
+                {references?.map((reference, index) => (
                   <li key={index} style={{
                     fontSize: '0.95em',
                     color: '#444',
