@@ -54,15 +54,19 @@ export async function getCVById(req: Request, res: Response) {
 export async function createCV(req: Request, res: Response) {
   try {
     // Parse CV data from request
+    console.log('Request body:', JSON.stringify(req.body));
     const cvData = req.body.cvData ? JSON.parse(req.body.cvData) : null;
+    console.log('Parsed CV data:', cvData);
     const data = cvDataSchema.parse(cvData);
+    console.log('Validated data:', data);
     const templateId = z.string().parse(req.body.templateId);
     
     // Generate a UUID for the CV
     const cvId = uuidv4();
     
-    // If user is authenticated, associate the CV with the user
-    const userId = req.isAuthenticated() && req.user ? req.user.id : null;
+    // TODO: Implement proper authentication
+    // For now, all CVs will be created without a user association for testing
+    const userId = null; // req.isAuthenticated() && req.user ? req.user.id : null;
     
     const cv = await storage.createCV({
       userId,
