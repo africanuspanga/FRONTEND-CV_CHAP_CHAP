@@ -53,7 +53,9 @@ export async function getCVById(req: Request, res: Response) {
  */
 export async function createCV(req: Request, res: Response) {
   try {
-    const data = cvDataSchema.parse(req.body.data);
+    // Parse CV data from request
+    const cvData = req.body.cvData ? JSON.parse(req.body.cvData) : null;
+    const data = cvDataSchema.parse(cvData);
     const templateId = z.string().parse(req.body.templateId);
     
     // Generate a UUID for the CV
@@ -118,7 +120,9 @@ export async function updateCV(req: Request, res: Response) {
       }
     }
 
-    const data = cvDataSchema.parse(req.body.data);
+    // Parse CV data from request
+    const cvData = req.body.cvData ? JSON.parse(req.body.cvData) : null;
+    const data = cvDataSchema.parse(cvData);
     const templateId = z.string().parse(req.body.templateId);
     
     const updatedCV = await storage.updateCV(id, {
