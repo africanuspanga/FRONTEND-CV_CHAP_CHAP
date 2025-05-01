@@ -16,8 +16,8 @@
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
   
-  /* Primary color: #6D8CFF (109, 140, 255) */
-  --primary: 228 100% 71%;
+  /* Primary color: #034694 (Chelsea Blue) */
+  --primary: 212 96% 29%;
   --primary-foreground: 210 40% 98%;
   
   /* Secondary color: #E5EAFF (229, 234, 255) */
@@ -63,7 +63,7 @@
   --input: 216 34% 17%;
   
   /* Primary color (adjusted for dark mode) */
-  --primary: 228 100% 71%;
+  --primary: 212 96% 29%;
   --primary-foreground: 210 40% 98%;
   
   /* Secondary color (adjusted for dark mode) */
