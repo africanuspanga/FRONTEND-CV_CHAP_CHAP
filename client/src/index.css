@@ -118,6 +118,19 @@
     @apply text-xs sm:text-sm mt-1;
   }
   
+  .form-description {
+    @apply text-xs sm:text-sm;
+  }
+  
+  /* Mobile optimized card spacing */
+  .card-form-container {
+    @apply space-y-3 sm:space-y-4;
+  }
+  
+  .mobile-card {
+    @apply rounded-md sm:rounded-lg border-[0.5px] sm:border;
+  }
+  
   @media (max-width: 768px) {
     .cv-preview-container {
       display: none;

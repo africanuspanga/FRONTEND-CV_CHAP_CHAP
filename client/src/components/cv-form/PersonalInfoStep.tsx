@@ -65,7 +65,7 @@ const PersonalInfoStep: React.FC = () => {
 
   return (
     <Form {...form}>
-      <form onChange={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6 px-1 sm:px-0">
+      <form onChange={form.handleSubmit(onSubmit)} className="card-form-container px-1 sm:px-0">
         {/* Basic Information Section */}
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
