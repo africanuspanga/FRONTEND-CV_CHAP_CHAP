@@ -15,6 +15,7 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import EducationSummary from '@/components/EducationSummary';
+import UniversitySelect from '@/components/UniversitySelect';
 import { Education } from '@shared/schema';
 
 const EducationForm = () => {
@@ -37,7 +38,7 @@ const EducationForm = () => {
   // State for education entry
   const [institution, setInstitution] = useState('');
   const [degree, setDegree] = useState(degreeOptions[0]);
-  const [fieldOfStudy, setFieldOfStudy] = useState('');
+  const [field, setField] = useState('');
   const [schoolLocation, setSchoolLocation] = useState('');
   const [gradMonth, setGradMonth] = useState('');
   const [gradYear, setGradYear] = useState('');
@@ -254,12 +255,10 @@ const EducationForm = () => {
                 <Label htmlFor="institution" className="font-semibold">
                   INSTITUTION <span className="text-red-500">*</span>
                 </Label>
-                <Input
-                  id="institution"
-                  placeholder="e.g. University of Dar es Salaam"
+                <UniversitySelect
                   value={institution}
-                  onChange={(e) => setInstitution(e.target.value)}
-                  required
+                  onChange={setInstitution}
+                  placeholder="Search for your university or college"
                 />
               </div>
 
