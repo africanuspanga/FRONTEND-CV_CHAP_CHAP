@@ -1,8 +1,41 @@
 import React from 'react';
 import type { CVData } from '@shared/schema';
 
+interface JijengeClassicTemplateProps extends Partial<CVData> {
+  personalInfo?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+    professionalTitle?: string;
+    address?: string;
+    city?: string;
+    region?: string;
+    country?: string;
+    postalCode?: string;
+    summary?: string;
+    location?: string;
+    linkedin?: string;
+  };
+  workExperience?: any[];
+  education?: any[];
+  skills?: any[];
+  summary?: string;
+  languages?: any[];
+  references?: any[];
+  hobbies?: any;
+}
+
 export function JijengeClassicTemplate({ 
-  personalInfo, 
+  personalInfo = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    professionalTitle: '',
+    location: '',
+    linkedin: ''
+  }, 
   workExperience = [], 
   education = [], 
   skills = [], 
@@ -10,7 +43,7 @@ export function JijengeClassicTemplate({
   languages = [], 
   references = [],
   hobbies
-}: CVData): JSX.Element {
+}: JijengeClassicTemplateProps): JSX.Element {
   return (
     <div style={{ 
       fontFamily: "'Lato', sans-serif",
@@ -61,7 +94,7 @@ export function JijengeClassicTemplate({
               marginBottom: 0,
               marginTop: 0
             }}>
-              {personalInfo.jobTitle || 'Professional'}
+              {personalInfo.professionalTitle || 'Professional'}
             </h2>
           </header>
 

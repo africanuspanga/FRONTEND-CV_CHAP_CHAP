@@ -149,7 +149,7 @@ export const ClientSideTemplateRenderer = ({
           marginRight: 'auto'
         }}
       >
-        <Template {...cvData} />
+        <Template {...(cvData || {})} />
       </div>
     </div>
   );
