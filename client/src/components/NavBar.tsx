@@ -49,7 +49,7 @@ const NavBar: React.FC = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <h1 className="text-2xl font-bold text-primary">CV Chap Chap</h1>
+              <h1 className="text-3xl font-bold text-primary">CV Chap Chap</h1>
             </Link>
           </div>
           
