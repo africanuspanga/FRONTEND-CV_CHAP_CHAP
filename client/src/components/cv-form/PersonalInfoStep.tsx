@@ -215,15 +215,21 @@ const PersonalInfoStep: React.FC = () => {
                 <FormItem>
                   <FormLabel className="text-base sm:text-sm">Location <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="e.g. Dar es Salaam, Tanzania" 
-                      {...field}
-                      onChange={(e) => handleFieldChange('location', e.target.value)}
-                      className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
-                      autoCapitalize="words"
-                      inputMode="text"
+                    <Autocomplete
+                      options={tanzanianRegionsOptions}
+                      value={field.value}
+                      onChange={(value) => handleFieldChange('location', value)}
+                      placeholder="Start typing a region, e.g. Dar es Salaam"
+                      emptyMessage="No regions found"
+                      inputClassName="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
+                      popoverWidth="w-full max-w-[300px] md:max-w-none"
+                      maxDisplayItems={5}
+                      minimumInputLength={2}
                     />
                   </FormControl>
+                  <FormDescription className="text-xs sm:text-sm">
+                    Enter your city/region in Tanzania
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
