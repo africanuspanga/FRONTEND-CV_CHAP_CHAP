@@ -1,0 +1,86 @@
+Anonymous CV Creation Guide
+Overview
+This document explains the implementation of anonymous CV creation in CV Chap Chap, allowing users to create and edit CVs without requiring authentication.
+
+Database Changes
+We've modified the database schema to make the user_id field nullable in the cvs table. This allows CVs to be created without being associated with a user account. The change was implemented via the following steps:
+
+Updated the CV model class in models/psql_cv.py to make the user_id field nullable:
+
+user_id = Column(String(36), ForeignKey('users.id'), nullable=True)
+Executed a migration script (make_cv_user_id_nullable.py) to alter the database table:
+
+ALTER TABLE cvs ALTER COLUMN user_id DROP NOT NULL;
+New API Methods
+We've added a new method to the CV model for creating anonymous CVs:
+
+@staticmethod
+def create_anonymous(template_id=None, data=None):
+    """Create a new anonymous CV (without user authentication)
+    
+    Args:
+        template_id (str, optional): Template ID.
+        data (dict, optional): Initial CV data.
+        
+    Returns:
+        CV: The created CV object.
+    """
+    return CV.create(user_id=None, template_id=template_id, data=data)
+We also updated the original create method to accept an optional user_id:
+
+@staticmethod
+def create(user_id=None, template_id=None, data=None):
+    """Create a new CV
+    
+    Args:
+        user_id (str, optional): User ID. If None, creates an anonymous CV.
+        template_id (str, optional): Template ID.
+        data (dict, optional): Initial CV data.
+        
+    Returns:
+        CV: The created CV object.
+    """
+    # Method implementation...
+Usage in Routes
+To create an anonymous CV in your route handlers, use the create_anonymous method:
+
+from models.psql_cv import CV
+@bp.route('/api/cv/anonymous', methods=['POST'])
+def create_anonymous_cv():
+    # Get data from request
+    data = request.json
+    template_id = data.get('template_id')
+    
+    # Create the anonymous CV
+    cv = CV.create_anonymous(template_id=template_id, data=data)
+    
+    # Return the CV data
+    return jsonify({
+        "status": "success",
+        "message": "Anonymous CV created successfully",
+        "data": cv.to_dict()
+    }), 201
+CV Lifecycle
+The anonymous CV workflow is designed to enable the following user experience:
+
+User selects a template and begins creating a CV without logging in
+CV is stored with user_id=NULL in the database
+User can edit and preview the CV without authentication
+When the user attempts to download the CV, they are prompted to:
+Register/login to create an account
+Make a payment
+After authentication, the anonymous CV is associated with the user account by updating the user_id field
+Session Management
+To maintain the connection between an anonymous user and their CV, consider using:
+
+Browser session storage to keep track of the CV ID
+Cookies to maintain the user's session
+Security Considerations
+Anonymous CVs should have limited retention (consider adding a background job to clean up old anonymous CVs)
+Implement rate limiting to prevent abuse
+Only allow basic operations for anonymous CVs (create, edit, preview)
+Require authentication for sensitive operations (download, share, delete)
+Future Enhancements
+Add a feature to claim anonymous CVs when a user registers
+Implement stronger session validation
+Add analytics tracking for anonymous CV conversion rates
