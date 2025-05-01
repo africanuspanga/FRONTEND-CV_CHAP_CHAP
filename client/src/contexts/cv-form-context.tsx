@@ -25,7 +25,7 @@ const initialFormData: CVFormData = {
     summary: '',
   },
   summary: '',
-  workExperience: [],
+  workExperiences: [],
   education: [],
   skills: [],
   languages: [],
@@ -190,8 +190,7 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
           formData.personalInfo.firstName &&
           formData.personalInfo.lastName &&
           formData.personalInfo.email &&
-          formData.personalInfo.phone &&
-          formData.personalInfo.location
+          formData.personalInfo.phone
         );
         
       // Add validation for other steps as needed
