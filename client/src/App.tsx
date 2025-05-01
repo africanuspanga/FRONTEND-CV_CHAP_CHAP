@@ -5,8 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CVFormProvider } from "@/contexts/cv-form-context";
 import { AuthProvider } from "@/contexts/auth-context";
+import { AdminAuthProvider } from "@/contexts/admin-auth-context";
+import { ProtectedAdminRoute } from "@/components/admin/ProtectedAdminRoute";
+
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
+import AdminLoginLink from "@/components/AdminLoginLink";
 import Home from "@/pages/Home";
 import CreateCV from "@/pages/CreateCV";
 import TemplateSelection from "@/pages/TemplateSelection";
@@ -33,10 +37,31 @@ import AccomplishmentsForm from "@/pages/AccomplishmentsForm";
 import HobbiesForm from "@/pages/HobbiesForm";
 import NotFound from "@/pages/not-found";
 
+// Admin pages
+import AdminLoginPage from "@/pages/admin-login";
+import AdminDashboardPage from "@/pages/admin-dashboard";
+import AdminUsersPage from "@/pages/admin-users";
+import AdminTemplatesPage from "@/pages/admin-templates";
+import AdminPaymentsPage from "@/pages/admin-payments";
+import AdminUSSDVerificationPage from "@/pages/admin-ussd-verification";
+import AdminAnalyticsPage from "@/pages/admin-analytics";
+import AdminSettingsPage from "@/pages/admin-settings";
+
 function Router() {
   return (
     <div className="flex flex-col min-h-screen">
+      <AdminLoginLink />
       <Switch>
+        {/* Admin Dashboard Routes */}
+        <Route path="/admin-dashboard/login" component={AdminLoginPage} />
+        <ProtectedAdminRoute path="/admin-dashboard" component={AdminDashboardPage} />
+        <ProtectedAdminRoute path="/admin-dashboard/users" component={AdminUsersPage} />
+        <ProtectedAdminRoute path="/admin-dashboard/templates" component={AdminTemplatesPage} />
+        <ProtectedAdminRoute path="/admin-dashboard/payments" component={AdminPaymentsPage} />
+        <ProtectedAdminRoute path="/admin-dashboard/ussd-verification" component={AdminUSSDVerificationPage} />
+        <ProtectedAdminRoute path="/admin-dashboard/analytics" component={AdminAnalyticsPage} />
+        <ProtectedAdminRoute path="/admin-dashboard/settings" component={AdminSettingsPage} />
+        
         {/* Final Preview route without navbar or footer */}
         <Route path="/cv/:templateId/final-preview">
           <FinalPreview />
@@ -87,10 +112,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
-          <CVFormProvider>
-            <Router />
-            <Toaster />
-          </CVFormProvider>
+          <AdminAuthProvider>
+            <CVFormProvider>
+              <Router />
+              <Toaster />
+            </CVFormProvider>
+          </AdminAuthProvider>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
