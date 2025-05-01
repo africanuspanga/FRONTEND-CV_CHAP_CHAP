@@ -1,0 +1,315 @@
+Admin Dashboard Frontend Implementation Guide
+This guide provides comprehensive instructions for implementing the CV Chap Chap admin dashboard frontend, including authentication, data visualization, and management interfaces.
+
+Overview
+The admin dashboard provides a centralized interface for administrators to:
+
+Monitor system statistics and user activity
+Manage users and their CVs
+Review and process payments
+Manage CV templates
+View analytics on platform usage
+Authentication
+Admin Login
+Endpoint: POST /api/auth/admin/login
+
+Request:
+
+{
+  "email": "admin@cvchapchap.com",
+  "password": "admin_password"
+}
+Response:
+
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "email": "admin@cvchapchap.com"
+}
+Token Verification
+Endpoint: GET /api/auth/admin/verify
+
+Headers: Authorization: Bearer {access_token}
+
+Response:
+
+{
+  "admin": {
+    "id": "admin-uuid",
+    "email": "admin@cvchapchap.com",
+    "is_active": true,
+    "created_at": "2025-04-13T04:03:49.444961"
+  }
+}
+Authentication Flow Implementation
+Create a login form component with email and password fields
+On submission, call the login endpoint
+Store the returned access token in localStorage or cookies
+Redirect to the dashboard homepage
+For secured routes, verify the token is valid and belongs to an admin
+// Example login function
+async function loginAdmin(email, password) {
+  try {
+    const response = await fetch('/api/auth/admin/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Login failed');
+    }
+    
+    // Store token and admin info
+    localStorage.setItem('adminToken', data.access_token);
+    localStorage.setItem('adminEmail', data.email);
+    
+    return data;
+  } catch (error) {
+    console.error('Admin login error:', error);
+    throw error;
+  }
+}
+Dashboard Components
+1. Dashboard Home
+Endpoint: GET /api/admin/
+
+Response: Summary statistics including user counts, CV counts, recent users, etc.
+
+Implementation:
+
+Create a dashboard overview page with statistics cards
+Display key metrics and recent activity
+Add quick navigation to other sections
+2. User Management
+List Users Endpoint: GET /api/admin/users?page=1&per_page=20&search=term
+
+User Details Endpoint: GET /api/admin/users/{user_id}
+
+Update User Endpoint: PUT /api/admin/users/{user_id}
+
+Implementation:
+
+Create a paginated user list table component
+Add search functionality
+Implement user detail view with CV and payment history
+Add edit capability for user information
+// Example user list component
+function UserList() {
+  const [users, setUsers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  async function fetchUsers() {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `/api/admin/users?page=${page}&per_page=20&search=${search}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          }
+        }
+      );
+      
+      const data = await response.json();
+      setUsers(data.users);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  
+  // Implementation continues...
+}
+3. Template Management
+List Templates Endpoint: GET /api/admin/templates
+
+Template Details Endpoint: GET /api/admin/templates/{template_id}
+
+Create Template Endpoint: POST /api/admin/templates
+
+Update Template Endpoint: PUT /api/admin/templates/{template_id}
+
+Delete Template Endpoint: DELETE /api/admin/templates/{template_id}
+
+Implementation:
+
+Create a grid view of all templates with usage statistics
+Add template detail view showing HTML/CSS content
+Implement template metadata editing
+Show template usage statistics
+4. Analytics Dashboard
+Template Analytics Endpoint: GET /api/admin/analytics/templates
+
+User Analytics Endpoint: GET /api/admin/analytics/users
+
+Implementation:
+
+Use a charting library like Chart.js or Recharts
+Create a template usage chart showing most popular templates
+Implement user activity charts showing registrations and CV creations over time
+Add filterable date ranges
+// Example analytics component with Chart.js
+import { Line, Bar } from 'react-chartjs-2';
+function AnalyticsDashboard() {
+  const [templateData, setTemplateData] = useState(null);
+  const [userData, setUserData] = useState(null);
+  
+  useEffect(() => {
+    async function fetchAnalytics() {
+      // Fetch template analytics
+      const templateResponse = await fetch('/api/admin/analytics/templates', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      
+      // Fetch user analytics
+      const userResponse = await fetch('/api/admin/analytics/users', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      
+      const templateData = await templateResponse.json();
+      const userData = await userResponse.json();
+      
+      setTemplateData(templateData);
+      setUserData(userData);
+    }
+    
+    fetchAnalytics();
+  }, []);
+  
+  // Prepare chart data and render charts...
+}
+Frontend Router Structure
+Create a router structure that enforces admin authentication:
+
+function AdminRouter() {
+  return (
+    <Router>
+      <AdminAuthGuard>
+        <Routes>
+          <Route path="/admin" element={<Navigate replace to="/admin/dashboard" />} />
+          <Route path="/admin/dashboard" element={<DashboardHome />} />
+          <Route path="/admin/users" element={<UsersList />} />
+          <Route path="/admin/users/:userId" element={<UserDetail />} />
+          <Route path="/admin/templates" element={<TemplatesList />} />
+          <Route path="/admin/templates/:templateId" element={<TemplateDetail />} />
+          <Route path="/admin/analytics" element={<AnalyticsDashboard />} />
+        </Routes>
+      </AdminAuthGuard>
+    </Router>
+  );
+}
+// Component to protect admin routes
+function AdminAuthGuard({ children }) {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    async function verifyAdmin() {
+      try {
+        const response = await fetch('/api/auth/admin/verify', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          }
+        });
+        
+        if (response.ok) {
+          setIsAdmin(true);
+        } else {
+          // Redirect to login if verification fails
+          window.location.href = '/admin/login';
+        }
+      } catch (error) {
+        window.location.href = '/admin/login';
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    verifyAdmin();
+  }, []);
+  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  
+  return isAdmin ? children : null;
+}
+Styling Guidelines
+Use the Bootstrap CSS framework with the Replit dark theme: https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css
+Focus on a clean, professional dashboard look with consistent spacing
+Use cards for individual sections and statistics
+Implement responsive designs that work on different screen sizes
+Use clear visual hierarchies to highlight important information
+Error Handling
+Implement consistent error handling throughout the admin dashboard:
+
+async function makeAdminApiCall(endpoint, options = {}) {
+  try {
+    const response = await fetch(endpoint, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+        'Content-Type': 'application/json',
+        ...options.headers
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      // If unauthorized, redirect to login
+      if (response.status === 401) {
+        window.location.href = '/admin/login';
+        return null;
+      }
+      
+      // Handle other errors
+      throw new Error(data.message || `Error: ${response.status}`);
+    }
+    
+    return data;
+  } catch (error) {
+    // Show error notification
+    showErrorNotification(error.message);
+    console.error('API call failed:', error);
+    return null;
+  }
+}
+Testing Guidelines
+Admin Login: Test with valid and invalid credentials
+Authorization: Verify protected routes redirect unauthorized users
+Data Loading: Test data loading states and error handling
+CRUD Operations: Test creating, reading, updating, and deleting resources
+Filter and Search: Test search functionality across all sections
+Pagination: Test navigation between pages of results
+Default Admin Credentials
+For testing purposes, use the default admin account:
+
+Email: admin@cvchapchap.com
+Password: admin123
+Recommendations for Implementation
+Use a state management library like Redux or Context API for global admin state
+Implement API middleware to handle token refreshing and error handling
+Create reusable components for common dashboard elements like tables and cards
+Add loading states and skeleton loaders for better user experience
+Implement proper form validation for all input fields
+Security Considerations
+Never store admin credentials in client-side code
+Implement automatic logout after a period of inactivity
+Use HTTPS for all API requests
+Sanitize all user inputs to prevent XSS attacks
+Don't display sensitive user information unless necessary
+Conclusion
+This guide provides all the necessary information to build a comprehensive admin dashboard for CV Chap Chap. By following these instructions, your frontend team can create a secure, functional, and user-friendly interface for managing the platform.
+

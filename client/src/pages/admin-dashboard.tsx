@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAdminAuth } from '@/contexts/admin-auth-context';
+import { useAdminApi } from '@/hooks/use-admin-api';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Users, FileText, CreditCard, PercentIcon } from 'lucide-react';
@@ -28,6 +29,7 @@ interface DashboardStats {
 
 const AdminDashboardPage: React.FC = () => {
   const { isAuthenticated } = useAdminAuth();
+  const { fetchDashboardStats } = useAdminApi();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeTimeFrame, setActiveTimeFrame] = useState<string>('24h');
@@ -36,21 +38,18 @@ const AdminDashboardPage: React.FC = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        // This would be a real API call in production
-        // const token = localStorage.getItem('admin_access_token');
-        // const response = await fetch(`${API_BASE_URL}/api/admin/`, {
-        //   headers: {
-        //     'Authorization': `Bearer ${token}`
-        //   }
-        // });
-        // const data = await response.json();
         
-        // For demo purposes, we're using mock data
-        setTimeout(() => {
+        // Call the actual API
+        try {
+          const data = await fetchDashboardStats();
+          setStats(data);
+        } catch (error) {
+          console.error('Error fetching real dashboard data:', error);
+          // Fallback to initial stats if API fails
           setStats({
             total_users: 0,
             total_cvs: 0,
-            total_templates: 15, // We have 15 templates in the system
+            total_templates: 15,
             total_payments: 0,
             cv_completion_rate: 0,
             payment_success_rate: 0,
@@ -59,10 +58,11 @@ const AdminDashboardPage: React.FC = () => {
             recent_users: [],
             recent_payments: []
           });
-          setLoading(false);
-        }, 1000);
+        }
+        
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+        console.error('Error in dashboard data handling:', error);
         setLoading(false);
       }
     };
@@ -70,7 +70,7 @@ const AdminDashboardPage: React.FC = () => {
     if (isAuthenticated) {
       fetchDashboardData();
     }
-  }, [isAuthenticated, activeTimeFrame]);
+  }, [isAuthenticated, activeTimeFrame, fetchDashboardStats]);
 
   if (loading) {
     return (

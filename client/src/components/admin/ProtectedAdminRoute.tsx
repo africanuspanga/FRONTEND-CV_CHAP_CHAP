@@ -26,7 +26,7 @@ export const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({
 
   return (
     <Route path={path}>
-      {isAuthenticated ? <Component /> : <Redirect to="/admin-dashboard/login" />}
+      {isAuthenticated ? <Component /> : <Redirect to="/admin-login" />}
     </Route>
   );
 };

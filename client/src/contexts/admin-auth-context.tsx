@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { ADMIN_API, makeAdminApiCall } from '@/lib/api-config';
 
 interface Admin {
   id: string;
@@ -18,8 +19,6 @@ interface AdminAuthContextType {
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | null>(null);
-
-export const API_BASE_URL = '';
 
 export const useAdminAuth = () => {
   const context = useContext(AdminAuthContext);
@@ -42,17 +41,17 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
   useEffect(() => {
     // Check if the admin is already logged in
     const checkAdminAuth = async () => {
-      const adminData = localStorage.getItem('admin_info');
-      const token = localStorage.getItem('admin_access_token');
+      const token = localStorage.getItem('adminToken');
 
-      if (adminData && token) {
+      if (token) {
         try {
-          setAdmin(JSON.parse(adminData));
+          // Verify the token with the backend
+          const adminData = await makeAdminApiCall(ADMIN_API.VERIFY);
+          setAdmin(adminData.admin);
         } catch (error) {
-          console.error('Failed to parse admin data:', error);
-          localStorage.removeItem('admin_info');
-          localStorage.removeItem('admin_access_token');
-          localStorage.removeItem('admin_refresh_token');
+          console.error('Failed to verify admin token:', error);
+          localStorage.removeItem('adminToken');
+          localStorage.removeItem('adminEmail');
         }
       }
       setIsLoading(false);
@@ -66,7 +65,7 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
       setIsLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_BASE_URL}/api/auth/admin/login`, {
+      const response = await fetch(ADMIN_API.LOGIN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,12 +79,14 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
         throw new Error(data.message || 'Login failed');
       }
       
-      // Store the tokens and admin info
-      localStorage.setItem('admin_access_token', data.access_token);
-      localStorage.setItem('admin_refresh_token', data.refresh_token);
-      localStorage.setItem('admin_info', JSON.stringify(data.admin));
+      // Store the token and admin email
+      localStorage.setItem('adminToken', data.access_token);
+      localStorage.setItem('adminEmail', data.email);
       
-      setAdmin(data.admin);
+      // Fetch admin details
+      const adminData = await makeAdminApiCall(ADMIN_API.VERIFY);
+      setAdmin(adminData.admin);
+      
       toast({
         title: 'Login successful',
         description: 'Welcome to the admin dashboard',
@@ -105,9 +106,8 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('admin_access_token');
-    localStorage.removeItem('admin_refresh_token');
-    localStorage.removeItem('admin_info');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminEmail');
     setAdmin(null);
     toast({
       title: 'Logged out',
