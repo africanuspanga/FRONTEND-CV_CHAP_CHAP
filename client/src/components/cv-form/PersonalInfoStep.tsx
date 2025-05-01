@@ -90,13 +90,13 @@ const PersonalInfoStep: React.FC = () => {
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-base sm:text-sm">First Name <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel className="text-base sm:text-sm form-label">First Name <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="Enter your first name" 
                       {...field} 
                       onChange={(e) => handleFieldChange('firstName', e.target.value)}
-                      className="h-10 text-base sm:h-10 sm:text-sm"
+                      className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
                       autoCapitalize="words"
                       inputMode="text"
                     />
@@ -117,7 +117,7 @@ const PersonalInfoStep: React.FC = () => {
                       placeholder="Enter your last name" 
                       {...field} 
                       onChange={(e) => handleFieldChange('lastName', e.target.value)}
-                      className="h-10 text-base sm:h-10 sm:text-sm"
+                      className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
                       autoCapitalize="words"
                       inputMode="text"
                     />
@@ -139,7 +139,7 @@ const PersonalInfoStep: React.FC = () => {
                     placeholder="e.g. Senior Software Engineer" 
                     {...field}
                     onChange={(e) => handleFieldChange('jobTitle', e.target.value)}
-                    className="h-10 text-base sm:h-10 sm:text-sm"
+                    className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
                     autoCapitalize="words"
                     inputMode="text"
                   />
@@ -170,7 +170,7 @@ const PersonalInfoStep: React.FC = () => {
                         placeholder="Your email address" 
                         {...field}
                         onChange={(e) => handleFieldChange('email', e.target.value)}
-                        className="h-10 text-base sm:h-10 sm:text-sm"
+                        className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
                         autoCapitalize="none"
                         autoCorrect="off"
                         inputMode="email"
@@ -193,7 +193,7 @@ const PersonalInfoStep: React.FC = () => {
                         placeholder="Your phone number" 
                         {...field}
                         onChange={(e) => handleFieldChange('phone', e.target.value)}
-                        className="h-10 text-base sm:h-10 sm:text-sm"
+                        className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
                         type="tel"
                         inputMode="tel"
                         autoComplete="tel"
@@ -217,7 +217,7 @@ const PersonalInfoStep: React.FC = () => {
                       placeholder="e.g. Dar es Salaam, Tanzania" 
                       {...field}
                       onChange={(e) => handleFieldChange('location', e.target.value)}
-                      className="h-10 text-base sm:h-10 sm:text-sm"
+                      className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
                       autoCapitalize="words"
                       inputMode="text"
                     />
@@ -244,7 +244,7 @@ const PersonalInfoStep: React.FC = () => {
                       placeholder="https://linkedin.com/in/username" 
                       {...field}
                       onChange={(e) => handleFieldChange('linkedin', e.target.value)}
-                      className="h-10 text-base sm:h-10 sm:text-sm"
+                      className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
                       autoCapitalize="none"
                       autoCorrect="off"
                       inputMode="url"
@@ -267,7 +267,7 @@ const PersonalInfoStep: React.FC = () => {
                       placeholder="https://yourwebsite.com" 
                       {...field}
                       onChange={(e) => handleFieldChange('website', e.target.value)}
-                      className="h-10 text-base sm:h-10 sm:text-sm"
+                      className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
                       autoCapitalize="none"
                       autoCorrect="off"
                       inputMode="url"
