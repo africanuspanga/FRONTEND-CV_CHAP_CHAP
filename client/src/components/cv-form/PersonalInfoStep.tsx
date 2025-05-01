@@ -12,6 +12,8 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Autocomplete } from '@/components/ui/autocomplete';
+import { tanzanianRegionsOptions } from '@/lib/location-data';
 
 // Extend the schema with client-side validation
 const formSchema = personalInfoSchema.extend({

@@ -1,0 +1,47 @@
+Implementation Guide: Clean Autocomplete for Tanzanian Regions
+Overview
+For the CV Chap Chap application, implement an efficient autocomplete component that displays matching Tanzanian regions only when the user begins typing. This minimizes visual clutter and provides a smooth user experience.
+
+Basic Implementation
+1. Region Data Structure
+Store the region data in a simple array:
+
+const tanzanianRegions = [
+  "Arusha", "Dar es Salaam", "Dodoma", "Geita", "Iringa", 
+  "Kagera", "Katavi", "Kigoma", "Kilimanjaro", "Lindi", 
+  "Manyara", "Mara", "Mbeya", "Morogoro", "Mtwara", 
+  "Mwanza", "Njombe", "Pemba North", "Pemba South", "Pwani", 
+  "Rukwa", "Ruvuma", "Shinyanga", "Simiyu", "Singida", 
+  "Songwe", "Tabora", "Tanga", "Zanzibar Central/South", 
+  "Zanzibar North", "Zanzibar Urban/West"
+];
+2. Autocomplete Component
+Create a reusable component that:
+
+Shows no suggestions initially
+Displays matching regions only after typing begins
+Filters results based on input text
+Allows selecting from matches
+Implementation Steps
+Start with an empty input field with an appropriate placeholder
+Only query the region list when the user types at least 2 characters
+Filter regions that include the typed characters (case-insensitive)
+Display matching results in a dropdown below the input
+Enable keyboard navigation and mouse selection of results
+Update the input with the selected region
+Key Performance Considerations
+Debounce the input to prevent excessive filtering on every keystroke
+Limit the number of displayed results (maximum 5-7) for mobile screens
+Cache filter results to avoid redundant calculations
+Close the suggestion dropdown when clicking elsewhere
+Accessibility Requirements
+Make the component fully keyboard navigable
+Implement proper ARIA attributes for screen readers
+Ensure sufficient color contrast for all visual elements
+Add clear focus states for keyboard users
+Mobile-Specific Enhancements
+Increase touch target sizes for the dropdown items
+Show fewer suggestions on smaller screens
+Position the dropdown to avoid keyboard overlap
+Add a clear button to reset the input field
+By following these guidelines, you'll create a clean, efficient autocomplete that enhances the user experience while entering location information throughout the CV creation process.
