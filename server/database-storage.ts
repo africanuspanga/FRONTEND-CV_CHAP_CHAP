@@ -66,6 +66,23 @@ export class DatabaseStorage implements IStorage {
     return newCV;
   }
 
+  async createRawCV(cv: { id: string, templateId: string, cvData: string, userId?: number }): Promise<CV> {
+    const now = new Date();
+    // Use raw SQL for direct insertion without FK constraint
+    const query = `
+      INSERT INTO cvs (id, template_id, cv_data, created_at, updated_at)
+      VALUES ('${cv.id}', '${cv.templateId}', '${cv.cvData.replace(/'/g, "''")}', '${now.toISOString()}', '${now.toISOString()}')
+      RETURNING *;
+    `;
+    
+    const result = await db.execute(query);
+    if (result.rows && result.rows.length > 0) {
+      return result.rows[0] as CV;
+    }
+    
+    throw new Error('Failed to create anonymous CV');
+  }
+
   async updateCV(
     id: string, 
     updateData: Partial<Omit<CV, 'id' | 'userId' | 'createdAt' | 'updatedAt'>>

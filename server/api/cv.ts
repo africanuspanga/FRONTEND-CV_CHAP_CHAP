@@ -66,7 +66,7 @@ export async function createCV(req: Request, res: Response) {
     
     // TODO: Implement proper authentication
     // For now, all CVs will be created without a user association for testing
-    const userId = null; // req.isAuthenticated() && req.user ? req.user.id : null;
+    const userId = undefined; // req.isAuthenticated() && req.user ? req.user.id : undefined;
     
     const cv = await storage.createCV({
       userId,

@@ -40,6 +40,8 @@ export interface IStorage {
   getCVsByUserId(userId: number): Promise<CV[]>;
   getAllCVs(): Promise<CV[]>;
   createCV(cv: Omit<InsertCV, 'id'>): Promise<CV>;
+  // Create a CV bypassing userId foreign key constraint for anonymous users
+  createRawCV(cv: { id: string, templateId: string, cvData: string, userId?: number }): Promise<CV>;
   updateCV(id: string, updateData: Partial<Omit<CV, 'id' | 'userId' | 'createdAt' | 'updatedAt'>>): Promise<CV | undefined>;
   deleteCV(id: string): Promise<boolean>;
   
@@ -182,6 +184,17 @@ export class MemStorage implements IStorage {
       updatedAt: now 
     };
     this.cvs.set(id, newCV);
+    return newCV;
+  }
+
+  async createRawCV(cv: { id: string, templateId: string, cvData: string, userId?: number }): Promise<CV> {
+    const now = new Date();
+    const newCV: CV = { 
+      ...cv as any,
+      createdAt: now, 
+      updatedAt: now 
+    };
+    this.cvs.set(cv.id, newCV);
     return newCV;
   }
 

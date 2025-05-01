@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import * as templateAPI from "./api/templates";
 import * as cvAPI from "./api/cv";
 import * as simpleCvAPI from "./api/simple-cv";
+import * as anonymousCvAPI from "./api/anonymous-cv";
 import { storage } from "./storage";
 import { cvDataSchema } from "@shared/schema";
 import { z } from "zod";
@@ -22,7 +23,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // CV routes
   app.get("/api/cv/:id", simpleCvAPI.getCV);
-  app.post("/api/cv", simpleCvAPI.createCV);
+  app.post("/api/cv", anonymousCvAPI.createAnonymousCV); // Use anonymous CV creation
   app.get("/api/cv", simpleCvAPI.getAllCVs);
   
   // CV preview routes
