@@ -65,7 +65,7 @@ const PersonalInfoStep: React.FC = () => {
 
   return (
     <Form {...form}>
-      <form onChange={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onChange={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6 px-1 sm:px-0">
         {/* Basic Information Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-4 mb-6">
@@ -117,6 +117,9 @@ const PersonalInfoStep: React.FC = () => {
                       placeholder="Enter your last name" 
                       {...field} 
                       onChange={(e) => handleFieldChange('lastName', e.target.value)}
+                      className="h-10 text-base sm:h-10 sm:text-sm"
+                      autoCapitalize="words"
+                      inputMode="text"
                     />
                   </FormControl>
                   <FormMessage />
@@ -136,6 +139,9 @@ const PersonalInfoStep: React.FC = () => {
                     placeholder="e.g. Senior Software Engineer" 
                     {...field}
                     onChange={(e) => handleFieldChange('jobTitle', e.target.value)}
+                    className="h-10 text-base sm:h-10 sm:text-sm"
+                    autoCapitalize="words"
+                    inputMode="text"
                   />
                 </FormControl>
                 <FormDescription>
@@ -148,7 +154,7 @@ const PersonalInfoStep: React.FC = () => {
         </div>
 
         {/* Contact Information Section */}
-        <Card className="p-4">
+        <Card className="p-3 sm:p-4">
           <h3 className="font-medium text-lg mb-4">Contact Information</h3>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -164,6 +170,11 @@ const PersonalInfoStep: React.FC = () => {
                         placeholder="Your email address" 
                         {...field}
                         onChange={(e) => handleFieldChange('email', e.target.value)}
+                        className="h-10 text-base sm:h-10 sm:text-sm"
+                        autoCapitalize="none"
+                        autoCorrect="off"
+                        inputMode="email"
+                        spellCheck="false"
                       />
                     </FormControl>
                     <FormMessage />
@@ -182,6 +193,11 @@ const PersonalInfoStep: React.FC = () => {
                         placeholder="Your phone number" 
                         {...field}
                         onChange={(e) => handleFieldChange('phone', e.target.value)}
+                        className="h-10 text-base sm:h-10 sm:text-sm"
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        pattern="[0-9+\-\s]*"
                       />
                     </FormControl>
                     <FormMessage />
@@ -201,6 +217,9 @@ const PersonalInfoStep: React.FC = () => {
                       placeholder="e.g. Dar es Salaam, Tanzania" 
                       {...field}
                       onChange={(e) => handleFieldChange('location', e.target.value)}
+                      className="h-10 text-base sm:h-10 sm:text-sm"
+                      autoCapitalize="words"
+                      inputMode="text"
                     />
                   </FormControl>
                   <FormMessage />
@@ -225,6 +244,11 @@ const PersonalInfoStep: React.FC = () => {
                       placeholder="https://linkedin.com/in/username" 
                       {...field}
                       onChange={(e) => handleFieldChange('linkedin', e.target.value)}
+                      className="h-10 text-base sm:h-10 sm:text-sm"
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      inputMode="url"
+                      spellCheck="false"
                     />
                   </FormControl>
                   <FormMessage />
@@ -243,6 +267,11 @@ const PersonalInfoStep: React.FC = () => {
                       placeholder="https://yourwebsite.com" 
                       {...field}
                       onChange={(e) => handleFieldChange('website', e.target.value)}
+                      className="h-10 text-base sm:h-10 sm:text-sm"
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      inputMode="url"
+                      spellCheck="false"
                     />
                   </FormControl>
                   <FormMessage />
