@@ -40,6 +40,7 @@ interface CVFormContextType {
   currentStep: number;
   setCurrentStep: (step: number) => void;
   formData: CVFormData;
+  formSteps: {id: string, title: string}[];
   updateFormField: <K extends keyof CVFormData>(section: K, value: CVFormData[K]) => void;
   updateNestedArray: <K extends keyof CVFormData>(
     section: K,
@@ -62,7 +63,7 @@ interface CVFormContextType {
 const CVFormContext = createContext<CVFormContextType | undefined>(undefined);
 
 // Form steps definition
-export const formSteps = [
+const formSteps = [
   { id: 'template', title: 'Select Template' },
   { id: 'personal', title: 'Personal Information' },
   { id: 'experience', title: 'Work Experience' },
@@ -215,6 +216,7 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
     currentStep,
     setCurrentStep,
     formData,
+    formSteps,
     updateFormField,
     updateNestedArray,
     addItemToArray,

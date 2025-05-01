@@ -5,7 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { Eye, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { formSteps, useCVForm, CVFormProvider } from '@/contexts/cv-form-context';
+import { useCVForm, CVFormProvider } from '@/contexts/cv-form-context';
 import CVFormStepper from '@/components/CVFormStepper';
 import ClientSideTemplateRenderer from '@/components/ClientSideTemplateRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -73,6 +73,7 @@ const CreateCVContent = () => {
     currentStep, 
     setCurrentStep, 
     formData, 
+    formSteps,
     updateFormField,
     isFormValid,
     goToNextStep,
