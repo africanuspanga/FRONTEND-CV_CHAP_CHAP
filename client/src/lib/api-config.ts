@@ -1,54 +1,66 @@
-// API Configuration for CV Chap Chap
+// API configuration for admin backend integration
 
-export const API_BASE_URL = "https://cv-screener-africanuspanga.replit.app";
+// API base URL - adjust this to match your external API
+const API_BASE_URL = 'https://cv-screener-africanuspanga.replit.app';
 
-// Admin API endpoints
+// API endpoints for admin functionality
 export const ADMIN_API = {
-  LOGIN: `${API_BASE_URL}/api/auth/admin/login`,
-  VERIFY: `${API_BASE_URL}/api/auth/admin/verify`,
-  DASHBOARD: `${API_BASE_URL}/api/admin`,
-  USERS: `${API_BASE_URL}/api/admin/users`,
-  TEMPLATES: `${API_BASE_URL}/api/admin/templates`,
+  // Auth endpoints
+  LOGIN: '/api/admin/auth/login',
+  LOGOUT: '/api/admin/auth/logout',
+  CURRENT_USER: '/api/admin/auth/me',
+  
+  // Dashboard endpoints
+  DASHBOARD: '/api/admin/dashboard',
+  
+  // User management
+  USERS: '/api/admin/users',
+  
+  // Template management
+  TEMPLATES: '/api/admin/templates',
+  
+  // Payment management
+  PAYMENTS: '/api/admin/payments',
+  PAYMENT_VERIFICATION: '/api/admin/payments/verify',
+  
+  // Analytics
   ANALYTICS: {
-    TEMPLATES: `${API_BASE_URL}/api/admin/analytics/templates`,
-    USERS: `${API_BASE_URL}/api/admin/analytics/users`
+    USERS: '/api/admin/analytics/users',
+    TEMPLATES: '/api/admin/analytics/templates',
+    PAYMENTS: '/api/admin/analytics/payments',
   }
 };
 
-// General API endpoints
-export const API = {
-  TEMPLATES: `${API_BASE_URL}/api/templates`,
-  CV: `${API_BASE_URL}/api/cv`
-};
-
-// Helper function to make authenticated admin API calls
-export async function makeAdminApiCall(endpoint: string, options: RequestInit = {}) {
+// Function to make API calls with authentication
+export async function makeAdminApiCall(endpoint: string, options?: RequestInit): Promise<any> {
   try {
-    const adminToken = localStorage.getItem('adminToken');
+    // Get auth token from localStorage
+    const token = localStorage.getItem('admin_access_token');
     
-    const response = await fetch(endpoint, {
-      ...options,
-      headers: {
-        'Authorization': `Bearer ${adminToken}`,
-        'Content-Type': 'application/json',
-        ...(options.headers || {})
-      }
+    const url = `${API_BASE_URL}${endpoint}`;
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      ...(options?.headers || {})
     });
     
-    const data = await response.json();
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
     
     if (!response.ok) {
-      // If unauthorized, clear token and return error
-      if (response.status === 401) {
-        localStorage.removeItem('adminToken');
-        throw new Error('Authentication failed. Please log in again.');
+      // Try to parse error response
+      try {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `API error: ${response.status} ${response.statusText}`);
+      } catch (parseError) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
-      
-      // Handle other errors
-      throw new Error(data.message || `Error: ${response.status}`);
     }
     
-    return data;
+    // Return JSON response or null for 204 No Content
+    return response.status === 204 ? null : await response.json();
   } catch (error) {
     console.error('API call failed:', error);
     throw error;

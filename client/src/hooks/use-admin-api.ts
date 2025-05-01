@@ -1,163 +1,151 @@
-import { useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { ADMIN_API, makeAdminApiCall } from '@/lib/api-config';
-import { useToast } from '@/hooks/use-toast';
+import { useAdminAuth } from '@/contexts/admin-auth-context';
 
-// Hook to interact with admin API endpoints
+// Hook for managing admin API operations
 export function useAdminApi() {
-  const { toast } = useToast();
-
-  // Fetch dashboard statistics
+  const { isAuthenticated } = useAdminAuth();
+  
+  // Dashboard
   const fetchDashboardStats = useCallback(async () => {
-    try {
-      return await makeAdminApiCall(ADMIN_API.DASHBOARD);
-    } catch (error) {
-      toast({
-        title: 'Error fetching dashboard data',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
-      });
-      throw error;
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
     }
-  }, [toast]);
-
-  // Fetch users
-  const fetchUsers = useCallback(async (page = 1, perPage = 20, search = '') => {
-    try {
-      const queryParams = new URLSearchParams({
-        page: page.toString(),
-        per_page: perPage.toString(),
-      });
-      
-      if (search) {
-        queryParams.append('search', search);
-      }
-      
-      return await makeAdminApiCall(`${ADMIN_API.USERS}?${queryParams.toString()}`);
-    } catch (error) {
-      toast({
-        title: 'Error fetching users',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
-      });
-      throw error;
+    return await makeAdminApiCall(ADMIN_API.DASHBOARD);
+  }, [isAuthenticated]);
+  
+  // User management
+  const fetchUsers = useCallback(async (page = 1, perPage = 10, search = '') => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
     }
-  }, [toast]);
-
-  // Fetch user details
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      perPage: perPage.toString(),
+      ...(search ? { search } : {})
+    }).toString();
+    
+    return await makeAdminApiCall(`${ADMIN_API.USERS}?${queryParams}`);
+  }, [isAuthenticated]);
+  
   const fetchUserDetails = useCallback(async (userId: string) => {
-    try {
-      return await makeAdminApiCall(`${ADMIN_API.USERS}/${userId}`);
-    } catch (error) {
-      toast({
-        title: 'Error fetching user details',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
-      });
-      throw error;
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
     }
-  }, [toast]);
-
-  // Fetch templates
+    return await makeAdminApiCall(`${ADMIN_API.USERS}/${userId}`);
+  }, [isAuthenticated]);
+  
+  // Template management
   const fetchTemplates = useCallback(async () => {
-    try {
-      return await makeAdminApiCall(ADMIN_API.TEMPLATES);
-    } catch (error) {
-      toast({
-        title: 'Error fetching templates',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
-      });
-      throw error;
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
     }
-  }, [toast]);
-
-  // Fetch template details
+    return await makeAdminApiCall(ADMIN_API.TEMPLATES);
+  }, [isAuthenticated]);
+  
   const fetchTemplateDetails = useCallback(async (templateId: string) => {
-    try {
-      return await makeAdminApiCall(`${ADMIN_API.TEMPLATES}/${templateId}`);
-    } catch (error) {
-      toast({
-        title: 'Error fetching template details',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
-      });
-      throw error;
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
     }
-  }, [toast]);
-
-  // Create template
-  const createTemplate = useCallback(async (templateData: any) => {
-    try {
-      return await makeAdminApiCall(ADMIN_API.TEMPLATES, {
-        method: 'POST',
-        body: JSON.stringify(templateData),
-      });
-    } catch (error) {
-      toast({
-        title: 'Error creating template',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
-      });
-      throw error;
+    return await makeAdminApiCall(`${ADMIN_API.TEMPLATES}/${templateId}`);
+  }, [isAuthenticated]);
+  
+  const createTemplate = useCallback(async (template: { name: string; description: string; thumbnail: string }) => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
     }
-  }, [toast]);
-
-  // Update template
-  const updateTemplate = useCallback(async (templateId: string, templateData: any) => {
-    try {
-      return await makeAdminApiCall(`${ADMIN_API.TEMPLATES}/${templateId}`, {
-        method: 'PUT',
-        body: JSON.stringify(templateData),
-      });
-    } catch (error) {
-      toast({
-        title: 'Error updating template',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
-      });
-      throw error;
+    return await makeAdminApiCall(ADMIN_API.TEMPLATES, {
+      method: 'POST',
+      body: JSON.stringify(template)
+    });
+  }, [isAuthenticated]);
+  
+  const updateTemplate = useCallback(async (templateId: string, template: any) => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
     }
-  }, [toast]);
-
-  // Delete template
+    return await makeAdminApiCall(`${ADMIN_API.TEMPLATES}/${templateId}`, {
+      method: 'PUT',
+      body: JSON.stringify(template)
+    });
+  }, [isAuthenticated]);
+  
   const deleteTemplate = useCallback(async (templateId: string) => {
-    try {
-      return await makeAdminApiCall(`${ADMIN_API.TEMPLATES}/${templateId}`, {
-        method: 'DELETE',
-      });
-    } catch (error) {
-      toast({
-        title: 'Error deleting template',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
-      });
-      throw error;
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
     }
-  }, [toast]);
-
-  // Fetch analytics data
-  const fetchAnalytics = useCallback(async (type: 'templates' | 'users') => {
-    try {
-      return await makeAdminApiCall(type === 'templates' ? ADMIN_API.ANALYTICS.TEMPLATES : ADMIN_API.ANALYTICS.USERS);
-    } catch (error) {
-      toast({
-        title: `Error fetching ${type} analytics`,
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
-      });
-      throw error;
+    return await makeAdminApiCall(`${ADMIN_API.TEMPLATES}/${templateId}`, {
+      method: 'DELETE'
+    });
+  }, [isAuthenticated]);
+  
+  // Payment management
+  const fetchPayments = useCallback(async (page = 1, perPage = 10, status?: string) => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
     }
-  }, [toast]);
-
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      perPage: perPage.toString(),
+      ...(status ? { status } : {})
+    }).toString();
+    
+    return await makeAdminApiCall(`${ADMIN_API.PAYMENTS}?${queryParams}`);
+  }, [isAuthenticated]);
+  
+  const verifyPayment = useCallback(async (paymentId: string) => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
+    }
+    return await makeAdminApiCall(`${ADMIN_API.PAYMENT_VERIFICATION}/${paymentId}`, {
+      method: 'POST'
+    });
+  }, [isAuthenticated]);
+  
+  // Analytics
+  const fetchUserAnalytics = useCallback(async (period = '30d') => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
+    }
+    return await makeAdminApiCall(`${ADMIN_API.ANALYTICS.USERS}?period=${period}`);
+  }, [isAuthenticated]);
+  
+  const fetchTemplateAnalytics = useCallback(async (period = '30d') => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
+    }
+    return await makeAdminApiCall(`${ADMIN_API.ANALYTICS.TEMPLATES}?period=${period}`);
+  }, [isAuthenticated]);
+  
+  const fetchPaymentAnalytics = useCallback(async (period = '30d') => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required');
+    }
+    return await makeAdminApiCall(`${ADMIN_API.ANALYTICS.PAYMENTS}?period=${period}`);
+  }, [isAuthenticated]);
+  
   return {
+    // Dashboard
     fetchDashboardStats,
+    
+    // User management
     fetchUsers,
     fetchUserDetails,
+    
+    // Template management
     fetchTemplates,
     fetchTemplateDetails,
     createTemplate,
     updateTemplate,
     deleteTemplate,
-    fetchAnalytics,
+    
+    // Payment management
+    fetchPayments,
+    verifyPayment,
+    
+    // Analytics
+    fetchUserAnalytics,
+    fetchTemplateAnalytics,
+    fetchPaymentAnalytics,
   };
 }

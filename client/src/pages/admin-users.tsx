@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { useAdminApi } from '@/hooks/use-admin-api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ interface User {
 const ITEMS_PER_PAGE = 10;
 
 const AdminUsersPage: React.FC = () => {
+  const { fetchUsers } = useAdminApi();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalUsers, setTotalUsers] = useState(0);
@@ -33,33 +35,29 @@ const AdminUsersPage: React.FC = () => {
   const [searchLoading, setSearchLoading] = useState(false);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const loadUsers = async () => {
       try {
         setLoading(true);
-        // This would be the real API call
-        // const response = await fetch(`/api/admin/users?page=${page}&perPage=${ITEMS_PER_PAGE}&search=${searchTerm}`, {
-        //   headers: {
-        //     'Authorization': `Bearer ${localStorage.getItem('admin_access_token')}`
-        //   }
-        // });
-        // const data = await response.json();
-        // setUsers(data.users);
-        // setTotalUsers(data.total);
-        
-        // Using mock data for now
-        setTimeout(() => {
+        // Call the actual API
+        try {
+          const data = await fetchUsers(page, ITEMS_PER_PAGE, searchTerm);
+          setUsers(data.users || []);
+          setTotalUsers(data.total || 0);
+        } catch (error) {
+          console.error('Error fetching users from API:', error);
+          // Fallback to empty state if API fails
           setUsers([]);
           setTotalUsers(0);
-          setLoading(false);
-        }, 1000);
+        }
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error in users data handling:', error);
         setLoading(false);
       }
     };
 
-    fetchUsers();
-  }, [page, searchTerm]);
+    loadUsers();
+  }, [page, searchTerm, fetchUsers]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

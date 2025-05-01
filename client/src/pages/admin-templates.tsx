@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { useAdminApi } from '@/hooks/use-admin-api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Loader2, Plus, Edit, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface Template {
   id: string;
@@ -17,6 +19,9 @@ interface Template {
 }
 
 const AdminTemplatesPage: React.FC = () => {
+  const { fetchTemplates, createTemplate, updateTemplate, deleteTemplate } = useAdminApi();
+  const { toast } = useToast();
+  
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -29,80 +34,54 @@ const AdminTemplatesPage: React.FC = () => {
   });
 
   useEffect(() => {
-    const fetchTemplates = async () => {
+    const loadTemplates = async () => {
       try {
         setLoading(true);
-        // This would be the real API call
-        // const response = await fetch('/api/admin/templates', {
-        //   headers: {
-        //     'Authorization': `Bearer ${localStorage.getItem('admin_access_token')}`
-        //   }
-        // });
-        // const data = await response.json();
-        // setTemplates(data.templates);
-        
-        // Using mock data for now
-        setTimeout(() => {
-          setTemplates([
-            {
-              id: '1',
-              name: 'Professional CV',
-              description: 'A clean and professional CV template suited for corporate environments.',
-              thumbnail: '/templates/professional-cv-thumb.jpg',
-              usage_count: 125
-            },
-            {
-              id: '2',
-              name: 'Creative CV',
-              description: 'A colorful and bold template for creative professionals.',
-              thumbnail: '/templates/creative-cv-thumb.jpg',
-              usage_count: 87
-            },
-            {
-              id: '3',
-              name: 'Academic CV',
-              description: 'A comprehensive template focusing on educational achievements and publications.',
-              thumbnail: '/templates/academic-cv-thumb.jpg',
-              usage_count: 64
-            },
-          ]);
-          setLoading(false);
-        }, 1000);
+        // Call the actual API
+        try {
+          const data = await fetchTemplates();
+          setTemplates(data.templates || []);
+        } catch (error) {
+          console.error('Error fetching templates from API:', error);
+          // Fallback to empty state if API fails
+          setTemplates([]);
+          toast({
+            title: 'Error loading templates',
+            description: 'Could not load templates from the server',
+            variant: 'destructive',
+          });
+        }
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching templates:', error);
+        console.error('Error in templates data handling:', error);
         setLoading(false);
       }
     };
 
-    fetchTemplates();
-  }, []);
+    loadTemplates();
+  }, [fetchTemplates, toast]);
 
   const handleAddTemplate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // This would be the real API call
-      // const response = await fetch('/api/admin/templates', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${localStorage.getItem('admin_access_token')}`
-      //   },
-      //   body: JSON.stringify(newTemplate)
-      // });
-      // const data = await response.json();
-      // setTemplates([...templates, data.template]);
-      
-      // Simulating the API call
-      const mockNewTemplate = {
-        ...newTemplate,
-        id: `${Date.now()}`,
-        usage_count: 0
-      };
-      setTemplates([...templates, mockNewTemplate]);
-      setNewTemplate({ name: '', description: '', thumbnail: '' });
-      setIsAddDialogOpen(false);
+      const result = await createTemplate(newTemplate);
+      if (result) {
+        setTemplates([...templates, { ...result, usage_count: 0 }]);
+        setNewTemplate({ name: '', description: '', thumbnail: '' });
+        setIsAddDialogOpen(false);
+        toast({
+          title: 'Template created',
+          description: 'New template has been added successfully',
+          variant: 'default',
+        });
+      }
     } catch (error) {
       console.error('Error adding template:', error);
+      toast({
+        title: 'Error creating template',
+        description: error instanceof Error ? error.message : 'Failed to create template',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -111,26 +90,27 @@ const AdminTemplatesPage: React.FC = () => {
     if (!selectedTemplate) return;
     
     try {
-      // This would be the real API call
-      // const response = await fetch(`/api/admin/templates/${selectedTemplate.id}`, {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${localStorage.getItem('admin_access_token')}`
-      //   },
-      //   body: JSON.stringify(selectedTemplate)
-      // });
-      // const data = await response.json();
-      
-      // Simulating the API call
-      const updatedTemplates = templates.map(template =>
-        template.id === selectedTemplate.id ? selectedTemplate : template
-      );
-      setTemplates(updatedTemplates);
-      setSelectedTemplate(null);
-      setIsEditDialogOpen(false);
+      const result = await updateTemplate(selectedTemplate.id, selectedTemplate);
+      if (result) {
+        const updatedTemplates = templates.map(template =>
+          template.id === selectedTemplate.id ? { ...result, usage_count: template.usage_count } : template
+        );
+        setTemplates(updatedTemplates);
+        setSelectedTemplate(null);
+        setIsEditDialogOpen(false);
+        toast({
+          title: 'Template updated',
+          description: 'Template has been updated successfully',
+          variant: 'default',
+        });
+      }
     } catch (error) {
       console.error('Error updating template:', error);
+      toast({
+        title: 'Error updating template',
+        description: error instanceof Error ? error.message : 'Failed to update template',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -138,19 +118,21 @@ const AdminTemplatesPage: React.FC = () => {
     if (!window.confirm('Are you sure you want to delete this template?')) return;
     
     try {
-      // This would be the real API call
-      // await fetch(`/api/admin/templates/${templateId}`, {
-      //   method: 'DELETE',
-      //   headers: {
-      //     'Authorization': `Bearer ${localStorage.getItem('admin_access_token')}`
-      //   }
-      // });
-      
-      // Simulating the API call
+      await deleteTemplate(templateId);
       const filteredTemplates = templates.filter(template => template.id !== templateId);
       setTemplates(filteredTemplates);
+      toast({
+        title: 'Template deleted',
+        description: 'Template has been removed successfully',
+        variant: 'default',
+      });
     } catch (error) {
       console.error('Error deleting template:', error);
+      toast({
+        title: 'Error deleting template',
+        description: error instanceof Error ? error.message : 'Failed to delete template',
+        variant: 'destructive',
+      });
     }
   };
 
