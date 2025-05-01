@@ -1,0 +1,52 @@
+SEO Implementation Guide for CV Chap Chap Pages
+Core SEO Components for All Pages
+1. Meta Tag Implementation
+Implement essential meta tags in the document head including title, description, and canonical URLs. Use concise, keyword-rich titles that follow the pattern of "Page-Specific Title | CV Chap Chap" and descriptions under 160 characters that accurately summarize page content.
+
+2. Structured Data (JSON-LD)
+Implement schema.org structured data appropriate to each page type. For the application as a whole, use WebApplication schema, and incorporate Organization schema for company information.
+
+3. Open Graph & Twitter Card Tags
+Include OG tags for title, description, URL, type, and image to optimize social sharing. Implement twitter:card (summary_large_image recommended), twitter:title, and twitter:description tags for Twitter optimization.
+
+4. Semantic HTML Structure
+Use semantic elements (header, main, nav, section, footer) with proper heading hierarchy. Ensure a single H1 per page that contains the primary keyword.
+
+Page-Specific SEO Implementation
+Home Page
+Title Focus: Target primary conversion keywords like "professional CV builder" and "AI-enhanced resumes"
+Meta Description: Emphasize unique value proposition and primary CTA
+Structured Data: Implement WebApplication schema with applicationCategory
+Content Optimization: Include keyword-rich section headers targeting user pain points and solutions
+Technical Elements: Implement preconnect/prefetch for critical resources like template images
+About Page
+Title Strategy: Focus on trust-building terms like "trusted CV builder in Tanzania"
+Description Approach: Emphasize company mission and local relevance
+Schema Type: Use Organization schema with foundingSite and local business attributes
+Content Structure: Implement FAQ schema for common questions about the service
+Technical Elements: Implement lower cache times as this content changes less frequently
+Login Page
+Meta Robots Directive: Consider "noindex,follow" for this utility page
+Title Pattern: Keep functional with "Account Login | CV Chap Chap"
+Technical Requirements: Implement autocomplete attributes on form fields
+Security Headers: Include proper CSP directives for form submission
+Schema Type: Not typically necessary for authentication pages
+Registration/Sign Up Page
+Meta Robots Handling: Similar to login page, consider "noindex,follow"
+Title Structure: Action-oriented like "Create Your Account | CV Chap Chap"
+Meta Description: Focus on benefits of registration rather than process
+Technical Elements: Implement form validation accessibility attributes
+Performance Elements: Minimize scripts to ensure fast form load times
+Templates Page
+Title Strategy: Use collection-focused title like "Professional CV Templates"
+Description Approach: Highlight variety, quality and customization options
+Schema Implementation: Use ItemList schema for template gallery
+Image Optimization: Implement srcset and sizes attributes for template previews
+Technical Elements: Implement lazy loading for template images below the fold
+Technical SEO Fundamentals
+Performance Optimization: Implement core web vitals optimization including LCP, FID, and CLS improvements
+Mobile Responsiveness: Ensure viewport configuration and tap target sizing for mobile users
+Internal Linking: Implement proper breadcrumb navigation with schema markup
+Accessibility Compliance: Ensure ARIA attributes for interactive elements and proper color contrast
+Internationalization: Implement hreflang tags if offering multiple language versions
+This framework provides the technical architecture for implementing SEO across all key pages of the CV Chap Chap platform while maintaining focus on performance and user experience.
