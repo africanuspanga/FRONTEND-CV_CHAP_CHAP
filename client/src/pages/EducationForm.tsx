@@ -57,7 +57,7 @@ const EducationForm = () => {
   const resetFormFields = () => {
     setInstitution('');
     setDegree(degreeOptions[0]);
-    setFieldOfStudy('');
+    setField('');
     setSchoolLocation('');
     setGradMonth('');
     setGradYear('');
@@ -86,7 +86,7 @@ const EducationForm = () => {
             id: 'preview-education' as string,
             institution,
             degree,
-            fieldOfStudy,
+            field,
             location: schoolLocation,
             startDate: '',
             endDate: graduationDate,
@@ -99,7 +99,7 @@ const EducationForm = () => {
         updateFormField('education', filteredEducations);
       }
     }
-  }, [institution, degree, fieldOfStudy, schoolLocation, gradMonth, gradYear, showEducationForm, editingEducationIndex, formData.education, updateFormField]);
+  }, [institution, degree, field, schoolLocation, gradMonth, gradYear, showEducationForm, editingEducationIndex, formData.education, updateFormField]);
 
   // Add a new education to the form data
   const addEducation = () => {
@@ -112,7 +112,7 @@ const EducationForm = () => {
         id: Date.now().toString() as string,
         institution,
         degree,
-        fieldOfStudy,
+        field,
         location: schoolLocation,
         startDate: '',
         endDate: graduationDate,
@@ -144,7 +144,7 @@ const EducationForm = () => {
         ...currentEducations[editingEducationIndex],
         institution,
         degree,
-        fieldOfStudy,
+        field,
         location: schoolLocation,
         endDate: graduationDate,
       };
@@ -166,7 +166,7 @@ const EducationForm = () => {
       // Fill the form with the education data
       setInstitution(edu.institution || '');
       setDegree(edu.degree || degreeOptions[0]);
-      setFieldOfStudy(edu.fieldOfStudy || '');
+      setField(edu.field || '');
       setSchoolLocation(edu.location || '');
       
       // Handle date fields
@@ -281,12 +281,12 @@ const EducationForm = () => {
                 </div>
                 
                 <div>
-                  <Label htmlFor="fieldOfStudy" className="font-semibold">FIELD OF STUDY</Label>
+                  <Label htmlFor="field" className="font-semibold">FIELD OF STUDY</Label>
                   <Input
-                    id="fieldOfStudy"
+                    id="field"
                     placeholder="e.g. Business"
-                    value={fieldOfStudy}
-                    onChange={(e) => setFieldOfStudy(e.target.value)}
+                    value={field}
+                    onChange={(e) => setField(e.target.value)}
                   />
                 </div>
               </div>
