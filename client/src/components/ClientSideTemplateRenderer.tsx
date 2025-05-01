@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CVData } from '@shared/schema';
 import { Loader2 } from 'lucide-react';
 import { getTemplateByID } from '@/templates';
@@ -19,10 +19,15 @@ export const ClientSideTemplateRenderer = ({
   className = '',
   height = 600
 }: ClientSideTemplateRendererProps) => {
+  // All state hooks must be defined at the top level
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [scale, setScale] = useState(1);
+  const [isMounted, setIsMounted] = useState(false);
+  const [template, setTemplate] = useState<any>(null);
 
+  // Handle template loading
   useEffect(() => {
     if (!templateId) {
       setError('No template selected');
@@ -32,72 +37,27 @@ export const ClientSideTemplateRenderer = ({
 
     setLoading(true);
     
-    // Short delay to allow for state updates to complete
-    const timer = setTimeout(() => {
-      try {
-        // Get the template component function
-        const template = getTemplateByID(templateId);
-        
-        if (!template) {
-          setError(`Template "${templateId}" not found`);
-          setLoading(false);
-          return;
-        }
-
-        setError(null);
+    try {
+      // Get the template component function
+      const templateObj = getTemplateByID(templateId);
+      
+      if (!templateObj) {
+        setError(`Template "${templateId}" not found`);
         setLoading(false);
-      } catch (err) {
-        console.error('Error loading template:', err);
-        setError('Failed to load template');
-        setLoading(false);
+        return;
       }
-    }, 100);
 
-    return () => clearTimeout(timer);
+      setTemplate(templateObj.render);
+      setError(null);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error loading template:', err);
+      setError('Failed to load template');
+      setLoading(false);
+    }
   }, [templateId]);
 
-  // This is a React component rendering approach rather than iframe
-  if (loading) {
-    return (
-      <div 
-        className={`w-full flex items-center justify-center bg-gray-50 ${className}`} 
-        style={{ height: `${height}px` }}
-      >
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div 
-        className={`w-full flex items-center justify-center bg-gray-50 ${className}`}
-        style={{ height: `${height}px` }}
-      >
-        <div className="text-red-500">{error}</div>
-      </div>
-    );
-  }
-
-  // Get the template component
-  const Template = getTemplateByID(templateId)?.render;
-  
-  if (!Template) {
-    return (
-      <div 
-        className={`w-full flex items-center justify-center bg-gray-50 ${className}`}
-        style={{ height: `${height}px` }}
-      >
-        <div className="text-red-500">Template not found</div>
-      </div>
-    );
-  }
-
-  // Check if we need responsive scaling for mobile
-  const [scale, setScale] = useState(1);
-  const [isMounted, setIsMounted] = useState(false);
-
-  // Calculate optimal scale factor on mount and window resize
+  // Handle responsive scaling
   useEffect(() => {
     setIsMounted(true);
     
@@ -134,7 +94,45 @@ export const ClientSideTemplateRenderer = ({
       clearTimeout(resizeTimer);
     };
   }, []);
-  
+
+  // Render loading state
+  if (loading) {
+    return (
+      <div 
+        className={`w-full flex items-center justify-center bg-gray-50 ${className}`} 
+        style={{ height: `${height}px` }}
+      >
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Render error state
+  if (error) {
+    return (
+      <div 
+        className={`w-full flex items-center justify-center bg-gray-50 ${className}`}
+        style={{ height: `${height}px` }}
+      >
+        <div className="text-red-500">{error}</div>
+      </div>
+    );
+  }
+
+  // Render template not found state
+  if (!template) {
+    return (
+      <div 
+        className={`w-full flex items-center justify-center bg-gray-50 ${className}`}
+        style={{ height: `${height}px` }}
+      >
+        <div className="text-red-500">Template not found</div>
+      </div>
+    );
+  }
+
+  // Render template
+  const Template = template;
   return (
     <div 
       ref={containerRef}

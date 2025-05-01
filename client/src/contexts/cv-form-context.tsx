@@ -24,7 +24,6 @@ const initialFormData: CVFormData = {
     postalCode: '',
     summary: '',
   },
-  summary: '',
   workExperiences: [],
   education: [],
   skills: [],
