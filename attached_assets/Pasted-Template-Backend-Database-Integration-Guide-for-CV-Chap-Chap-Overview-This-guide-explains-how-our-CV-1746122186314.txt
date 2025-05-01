@@ -1,0 +1,268 @@
+Template Backend Database Integration Guide for CV Chap Chap
+Overview
+This guide explains how our CV Chap Chap platform now handles CV templates through a client-side template system with backend payment verification. It provides details on the API endpoints, database schema, and recommended frontend implementation approaches.
+
+Template System Architecture
+Our system uses a hybrid approach where:
+
+Templates are stored in the backend database with full HTML/CSS content
+Frontend can directly render templates without backend processing
+Authentication is optional for template preview but required for downloads
+Payment verification is enforced before allowing final document downloads
+Database Schema
+Templates are stored in the templates table with the following structure:
+
+CREATE TABLE templates (
+    id VARCHAR(64) PRIMARY KEY,
+    name VARCHAR(128) NOT NULL,
+    description VARCHAR(512),
+    html_content TEXT NOT NULL,
+    css_content TEXT NOT NULL,
+    preview_image VARCHAR(256),
+    is_default BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CV records link to templates using the template_id field:
+
+CREATE TABLE cvs (
+    id VARCHAR(64) PRIMARY KEY,
+    user_id VARCHAR(64) NOT NULL,
+    template_id VARCHAR(64) REFERENCES templates(id),
+    -- other fields omitted for brevity
+);
+Payment records are linked to both users and CVs:
+
+CREATE TABLE payments (
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36) NOT NULL,
+    cv_id VARCHAR(36) REFERENCES cvs(id),
+    status VARCHAR(20) DEFAULT 'pending',
+    -- other fields omitted for brevity
+);
+API Endpoints
+Template Access
+Endpoint	Method	Auth Required	Description
+/api/cv/templates	GET	No	List all available templates
+/api/cv/templates/:template_id	GET	No	Get specific template details
+CV Preview
+Endpoint	Method	Auth Required	Description
+/api/cv/:cv_id/preview	GET	Optional	Get JSON with HTML/CSS for CV preview
+/api/cv/:cv_id/html-preview	GET	Optional	Get standalone HTML with inlined CSS
+Payment & Download Flow
+Endpoint	Method	Auth Required	Description
+/api/cv/:cv_id/payment-status	GET	Yes	Check if CV has approved payment
+/api/cv/:cv_id/generate-pdf	POST	Yes + Payment	Generate and download PDF
+/api/cv/:cv_id/generate-docx	POST	Yes + Payment	Generate and download DOCX
+/api/cv/:cv_id/document-status/:task_id	GET	Yes	Check document generation status
+User Flow Implementation Guide
+1. Template Browsing
+Allow users to browse templates without requiring authentication:
+
+// Example frontend code
+async function fetchTemplates() {
+  const response = await fetch('/api/cv/templates');
+  const data = await response.json();
+  return data.templates;
+}
+2. CV Creation with Template
+When creating a CV, store the selected template ID:
+
+// Example frontend code
+async function createCV(templateId, userData) {
+  const response = await fetch('/api/cv', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${userToken}` // Only needed if user is logged in
+    },
+    body: JSON.stringify({
+      template_id: templateId,
+      data: userData
+    })
+  });
+  return await response.json();
+}
+3. CV Preview Implementation
+Implement CV preview by fetching and rendering the template:
+
+// Example frontend code
+async function fetchCVPreview(cvId) {
+  const response = await fetch(`/api/cv/${cvId}/preview`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch CV preview');
+  }
+  const data = await response.json();
+  return {
+    templateId: data.template_id,
+    html: data.html,
+    css: data.css
+  };
+}
+function renderPreview(previewData, containerElement) {
+  // Create a scoped container for the CV styling
+  const previewContainer = document.createElement('div');
+  previewContainer.className = 'cv-preview-container';
+  
+  // Add style element with template CSS
+  const styleElement = document.createElement('style');
+  styleElement.textContent = previewData.css;
+  previewContainer.appendChild(styleElement);
+  
+  // Add the HTML content
+  previewContainer.innerHTML += previewData.html;
+  
+  // Add to the container
+  containerElement.appendChild(previewContainer);
+}
+4. Download Flow with Authentication and Payment Check
+Implement the full download flow with authentication and payment verification:
+
+// Example frontend code
+async function downloadCV(cvId, format = 'pdf') {
+  try {
+    // Step 1: Check authentication status
+    if (!isUserLoggedIn()) {
+      // Redirect to login page with return URL
+      redirectToLogin(`/cv/${cvId}`);
+      return;
+    }
+    
+    // Step 2: Check payment status
+    const paymentStatus = await checkPaymentStatus(cvId);
+    
+    if (paymentStatus.status === 'auth_required') {
+      // User token expired, redirect to login
+      redirectToLogin(`/cv/${cvId}`);
+      return;
+    }
+    
+    if (!paymentStatus.has_payment) {
+      if (paymentStatus.status === 'pending') {
+        // Show pending payment message with link to payment page
+        showPaymentPendingMessage(paymentStatus.payment_url);
+        return;
+      } else {
+        // Redirect to payment page
+        redirectToPayment(cvId);
+        return;
+      }
+    }
+    
+    // Step 3: User is authenticated and has payment, generate download
+    const downloadEndpoint = format === 'pdf' 
+      ? `/api/cv/${cvId}/generate-pdf` 
+      : `/api/cv/${cvId}/generate-docx`;
+    
+    const response = await fetch(downloadEndpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${userToken}`
+      }
+    });
+    
+    if (response.status === 402) {
+      // Payment required
+      const data = await response.json();
+      redirectToPayment(cvId);
+      return;
+    }
+    
+    if (!response.ok) {
+      throw new Error('Download generation failed');
+    }
+    
+    const data = await response.json();
+    
+    // Handle synchronous or asynchronous response
+    if (data.status === 'processing') {
+      // Show processing message and start polling
+      showProcessingMessage();
+      pollDocumentStatus(cvId, data.task_id);
+    } else {
+      // Direct download available
+      const downloadUrl = format === 'pdf' ? data.pdf_url : data.docx_url;
+      triggerDownload(downloadUrl);
+    }
+  } catch (error) {
+    console.error('Error downloading CV:', error);
+    showErrorMessage('Failed to download CV. Please try again.');
+  }
+}
+async function checkPaymentStatus(cvId) {
+  try {
+    const response = await fetch(`/api/cv/${cvId}/payment-status`, {
+      headers: {
+        'Authorization': `Bearer ${userToken}`
+      }
+    });
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error checking payment status:', error);
+    return { status: 'error', has_payment: false };
+  }
+}
+async function pollDocumentStatus(cvId, taskId) {
+  try {
+    const response = await fetch(`/api/cv/${cvId}/document-status/${taskId}`, {
+      headers: {
+        'Authorization': `Bearer ${userToken}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to check document status');
+    }
+    
+    const data = await response.json();
+    
+    if (data.status === 'completed') {
+      // Document is ready for download
+      const downloadUrl = data.pdf_url || data.docx_url;
+      stopPolling();
+      hideProcessingMessage();
+      triggerDownload(downloadUrl);
+    } else if (data.status === 'failed') {
+      // Generation failed
+      stopPolling();
+      hideProcessingMessage();
+      showErrorMessage('Document generation failed. Please try again.');
+    } else {
+      // Still processing, continue polling
+      setTimeout(() => pollDocumentStatus(cvId, taskId), 2000);
+    }
+  } catch (error) {
+    console.error('Error polling document status:', error);
+    stopPolling();
+    hideProcessingMessage();
+    showErrorMessage('Failed to check document status. Please try again.');
+  }
+}
+Error Handling
+The backend returns specific error codes to guide the user experience:
+
+HTTP Status	Error Code	Description
+401	auth_required	Authentication required
+402	payment_required	Payment required before download
+403	unauthorized	User not authorized to access this CV
+404	cv_not_found	CV not found
+404	template_not_found	Template not found
+500	processing_error	Error processing the request
+Handle these errors appropriately in your frontend code to provide a smooth user experience.
+
+Testing the Integration
+Test template browsing and preview without authentication
+Test CV creation with selected template
+Test preview rendering with various CV data
+Test download flow with unauthenticated user (should redirect to login)
+Test download flow with authenticated user but no payment (should redirect to payment)
+Test download flow with authenticated user and completed payment (should download)
+Best Practices
+Caching: Cache template HTML/CSS on the client side to improve performance
+Progressive Enhancement: Show a simple preview if JavaScript is disabled
+Error Handling: Provide clear error messages for all possible failure states
+Loading States: Show loading indicators during template fetching and rendering
+Payment Feedback: Clearly communicate payment requirements and status
+Questions?
+If you have any questions or encounter issues with the integration, please contact the backend team at backend@cvchapchap.com or create an issue in our internal ticketing system.
