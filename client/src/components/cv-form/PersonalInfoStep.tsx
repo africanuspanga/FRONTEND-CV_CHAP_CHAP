@@ -67,7 +67,7 @@ const PersonalInfoStep: React.FC = () => {
     <Form {...form}>
       <form onChange={form.handleSubmit(onSubmit)} className="card-form-container px-1 sm:px-0">
         {/* Basic Information Section */}
-        <div className="space-y-4">
+        <div className="form-field-group space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
             <Avatar className="h-14 w-14 sm:h-16 sm:w-16">
               <AvatarImage src={formData.personalInfo.profilePicture || ''} alt="Profile" />

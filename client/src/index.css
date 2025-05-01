@@ -131,6 +131,39 @@
     @apply rounded-md sm:rounded-lg border-[0.5px] sm:border;
   }
   
+  /* Enhanced focus states for mobile */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply outline-offset-0 ring-2 ring-primary ring-offset-1;
+  }
+  
+  /* Improved touch targets for mobile */
+  .mobile-touch-target {
+    @apply min-h-10 min-w-10;
+  }
+  
+  /* Easier to tap buttons on mobile */
+  button, [role="button"] {
+    @apply touch-manipulation;
+  }
+  
+  /* Mobile optimized form validation */
+  .mobile-error-message {
+    @apply text-xs font-medium text-destructive mt-1 animate-in fade-in-50 slide-in-from-bottom-1;
+  }
+  
+  /* Better input spacing for mobile */
+  @media (max-width: 640px) {
+    .form-field-group {
+      @apply space-y-3;
+    }
+    
+    .input-group {
+      @apply gap-3;
+    }
+  }
+  
   @media (max-width: 768px) {
     .cv-preview-container {
       display: none;
