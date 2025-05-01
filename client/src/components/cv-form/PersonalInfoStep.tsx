@@ -65,11 +65,11 @@ const PersonalInfoStep: React.FC = () => {
 
   return (
     <Form {...form}>
-      <form onChange={form.handleSubmit(onSubmit)} className="card-form-container px-1 sm:px-0">
+      <form onChange={form.handleSubmit(onSubmit)} className="card-form-container px-1 sm:px-0 space-y-4 sm:space-y-6 mobile-optimized-form">
         {/* Basic Information Section */}
         <div className="form-field-group space-y-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-            <Avatar className="h-14 w-14 sm:h-16 sm:w-16">
+          <div className="profile-photo-section flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-5 sm:mb-6 mt-2 sm:mt-0">
+            <Avatar className="h-16 w-16 sm:h-18 sm:w-18 touch-area-avatar">
               <AvatarImage src={formData.personalInfo.profilePicture || ''} alt="Profile" />
               <AvatarFallback className="bg-primary text-white">
                 {getInitials(formData.personalInfo.firstName, formData.personalInfo.lastName)}
@@ -84,7 +84,7 @@ const PersonalInfoStep: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="input-group grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <FormField
               control={form.control}
               name="firstName"
@@ -154,10 +154,10 @@ const PersonalInfoStep: React.FC = () => {
         </div>
 
         {/* Contact Information Section */}
-        <Card className="p-3 sm:p-4">
+        <Card className="p-3 sm:p-4 mb-4 sm:mb-6 mobile-card">
           <h3 className="font-medium text-base sm:text-lg mb-3 sm:mb-4">Contact Information</h3>
           <div className="form-field-group space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="input-group grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -230,7 +230,7 @@ const PersonalInfoStep: React.FC = () => {
         </Card>
 
         {/* Online Profiles Section */}
-        <Card className="p-3 sm:p-4">
+        <Card className="p-3 sm:p-4 mb-4 sm:mb-6 mobile-card">
           <h3 className="font-medium text-base sm:text-lg mb-3 sm:mb-4">Online Profiles</h3>
           <div className="form-field-group space-y-4">
             <FormField

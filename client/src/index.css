@@ -162,6 +162,31 @@
     .input-group {
       @apply gap-3;
     }
+    
+    /* Larger touch targets for mobile */
+    .touch-area-avatar {
+      @apply h-20 w-20 cursor-pointer;
+    }
+    
+    /* Improved form labels for better readability */
+    .form-label {
+      @apply text-base font-medium mb-1.5;
+    }
+    
+    /* Larger form inputs for easier interaction */
+    .form-input-mobile {
+      @apply h-12 text-base px-4;
+    }
+    
+    /* Improved card spacing for mobile */
+    .mobile-card {
+      @apply p-4 mb-5;
+    }
+    
+    /* Bottom fixed action buttons for mobile */
+    .mobile-action-buttons {
+      @apply fixed bottom-0 left-0 right-0 flex justify-between p-3 bg-background border-t z-50;
+    }
   }
   
   @media (max-width: 768px) {
