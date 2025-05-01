@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { templateImages } from '@/lib/template-images';
 // Import the hero image
-import heroWomanImage from '@assets/Professional Confidence in a Chic Setting (1).png';
+import heroWomanImage from '../assets/hero-woman.png';
 
 const Home = () => {
   return (
