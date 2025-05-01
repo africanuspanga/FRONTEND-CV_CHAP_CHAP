@@ -70,8 +70,8 @@ export class DatabaseStorage implements IStorage {
     const now = new Date();
     // Use raw SQL for direct insertion without FK constraint
     const query = `
-      INSERT INTO cvs (id, template_id, cv_data, created_at, updated_at)
-      VALUES ('${cv.id}', '${cv.templateId}', '${cv.cvData.replace(/'/g, "''")}', '${now.toISOString()}', '${now.toISOString()}')
+      INSERT INTO cvs (id, template_id, cv_data, user_id, created_at, updated_at)
+      VALUES ('${cv.id}', '${cv.templateId}', '${cv.cvData.replace(/'/g, "''")}', NULL, '${now.toISOString()}', '${now.toISOString()}')
       RETURNING *;
     `;
     
