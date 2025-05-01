@@ -3,6 +3,8 @@ import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { templateImages } from '@/lib/template-images';
+// Import the hero image
+import heroWomanImage from '@assets/Professional Confidence in a Chic Setting (1).png';
 
 const Home = () => {
   return (
@@ -29,7 +31,7 @@ const Home = () => {
               <div className="absolute inset-0 bg-primary rounded-lg opacity-10 transform rotate-3"></div>
               <div className="absolute inset-0 bg-primary rounded-lg opacity-10 transform -rotate-3"></div>
               <img
-                src="/assets/images/hero-woman.png"
+                src={heroWomanImage}
                 alt="Professional woman in business attire"
                 className="relative z-10 w-full h-auto rounded-lg shadow-lg object-cover"
               />
