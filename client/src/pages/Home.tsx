@@ -13,9 +13,11 @@ const Home = () => {
       <section className="py-12 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-darkText mb-6">Create Your Professional CV in Minutes</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="text-primary">Enjoy Less</span> <span className="text-darkText">Hustle,</span> <span className="text-primary">More</span> <span className="text-darkText">Job Offers Fast</span>
+            </h1>
             <p className="text-lg text-lightText mb-8">
-              Build a standout CV that gets you noticed. Our easy-to-use platform helps you create a professional CV quickly and efficiently.
+              Build your CV in minutes and land interviews faster. CV Chap Chap makes it easy for Job seekers to create job-ready CVs with zero stress.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg" className="px-8">
