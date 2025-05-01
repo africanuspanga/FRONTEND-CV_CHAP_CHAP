@@ -53,14 +53,14 @@ function Router() {
       <AdminLoginLink />
       <Switch>
         {/* Admin Dashboard Routes */}
-        <Route path="/admin-dashboard/login" component={AdminLoginPage} />
+        <Route path="/admin-login" component={AdminLoginPage} />
         <ProtectedAdminRoute path="/admin-dashboard" component={AdminDashboardPage} />
-        <ProtectedAdminRoute path="/admin-dashboard/users" component={AdminUsersPage} />
-        <ProtectedAdminRoute path="/admin-dashboard/templates" component={AdminTemplatesPage} />
-        <ProtectedAdminRoute path="/admin-dashboard/payments" component={AdminPaymentsPage} />
-        <ProtectedAdminRoute path="/admin-dashboard/ussd-verification" component={AdminUSSDVerificationPage} />
-        <ProtectedAdminRoute path="/admin-dashboard/analytics" component={AdminAnalyticsPage} />
-        <ProtectedAdminRoute path="/admin-dashboard/settings" component={AdminSettingsPage} />
+        <ProtectedAdminRoute path="/admin-users" component={AdminUsersPage} />
+        <ProtectedAdminRoute path="/admin-templates" component={AdminTemplatesPage} />
+        <ProtectedAdminRoute path="/admin-payments" component={AdminPaymentsPage} />
+        <ProtectedAdminRoute path="/admin-ussd-verification" component={AdminUSSDVerificationPage} />
+        <ProtectedAdminRoute path="/admin-analytics" component={AdminAnalyticsPage} />
+        <ProtectedAdminRoute path="/admin-settings" component={AdminSettingsPage} />
         
         {/* Final Preview route without navbar or footer */}
         <Route path="/cv/:templateId/final-preview">

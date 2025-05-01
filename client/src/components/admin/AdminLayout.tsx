@@ -1,151 +1,150 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useAdminAuth } from '@/contexts/admin-auth-context';
 import {
-  LayoutDashboard,
   Users,
   FileText,
-  Settings,
   CreditCard,
-  BarChart3,
-  LogOut,
-  MessageSquare,
+  BarChart,
+  Settings,
+  QrCode,
   Menu,
-  X
+  X,
+  LogOut,
+  User,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-  const { admin, logout } = useAdminAuth();
-  const [location] = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [location, navigate] = useLocation();
+  const { user, logout } = useAdminAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
+    navigate('/admin-login');
   };
 
-  const menuItems = [
-    { name: 'Dashboard', path: '/admin-dashboard', icon: <LayoutDashboard size={20} /> },
-    { name: 'Users', path: '/admin-dashboard/users', icon: <Users size={20} /> },
-    { name: 'Templates', path: '/admin-dashboard/templates', icon: <FileText size={20} /> },
-    { name: 'Payments', path: '/admin-dashboard/payments', icon: <CreditCard size={20} /> },
-    { name: 'USSD Verification', path: '/admin-dashboard/ussd-verification', icon: <MessageSquare size={20} /> },
-    { name: 'Analytics', path: '/admin-dashboard/analytics', icon: <BarChart3 size={20} /> },
-    { name: 'Settings', path: '/admin-dashboard/settings', icon: <Settings size={20} /> },
+  const navItems = [
+    { name: 'Dashboard', href: '/admin-dashboard', icon: BarChart },
+    { name: 'Users', href: '/admin-users', icon: Users },
+    { name: 'Templates', href: '/admin-templates', icon: FileText },
+    { name: 'Payments', href: '/admin-payments', icon: CreditCard },
+    { name: 'USSD Verification', href: '/admin-ussd-verification', icon: QrCode },
+    { name: 'Analytics', href: '/admin-analytics', icon: BarChart },
+    { name: 'Settings', href: '/admin-settings', icon: Settings },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Top header for mobile */}
-      <header className="bg-white border-b p-4 flex justify-between items-center md:hidden">
-        <div className="flex items-center">
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="mr-2">
-                <Menu size={24} />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="p-0">
-              <div className="p-6 border-b">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold">CV Chap Chap Admin</h2>
-                  <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
-                    <X size={20} />
-                  </Button>
-                </div>
-              </div>
-              <nav className="px-2 py-4">
-                <ul className="space-y-2">
-                  {menuItems.map((item) => (
-                    <li key={item.path}>
-                      <Link href={item.path}>
-                        <a
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className={cn(
-                            'flex items-center py-2 px-4 rounded-md text-sm font-medium transition-colors',
-                            location === item.path
-                              ? 'bg-primary/10 text-primary'
-                              : 'text-gray-700 hover:bg-gray-100'
-                          )}
-                        >
-                          {item.icon}
-                          <span className="ml-3">{item.name}</span>
-                        </a>
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Mobile sidebar backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden" 
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r transition-transform duration-300 transform lg:translate-x-0 lg:static lg:z-auto ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        <div className="flex items-center justify-between h-16 px-6 border-b">
+          <h1 className="text-xl font-bold">CV Chap Chap</h1>
+          <button
+            className="p-1 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+        <nav className="p-4 space-y-1">
+          {navItems.map((item) => {
+            const isActive = location === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${isActive ? 'bg-primary text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+              >
+                <item.icon className={`mr-3 h-5 w-5 ${isActive ? 'text-white' : 'text-gray-400'}`} />
+                {item.name}
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+        {/* Header */}
+        <header className="bg-white border-b shadow-sm z-10">
+          <div className="flex items-center justify-between h-16 px-4 sm:px-6">
+            <button
+              className="p-1 mr-4 lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+
+            <div className="ml-auto flex items-center space-x-4">
+              {user && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white">
+                        {user.username.charAt(0).toUpperCase()}
+                      </div>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="flex items-center justify-start gap-2 p-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white">
+                        {user.username.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex flex-col space-y-0.5">
+                        <p className="text-sm font-medium">{user.username}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                      </div>
+                    </div>
+                    <DropdownMenuItem asChild>
+                      <Link 
+                        href="/admin-settings"
+                        className="cursor-pointer flex w-full items-center"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Account Settings
                       </Link>
-                    </li>
-                  ))}
-                  <li>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-red-500 hover:bg-red-50 hover:text-red-600"
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="text-red-600 cursor-pointer focus:text-red-700 focus:bg-red-50"
                       onClick={handleLogout}
                     >
-                      <LogOut size={20} />
-                      <span className="ml-3">Logout</span>
-                    </Button>
-                  </li>
-                </ul>
-              </nav>
-            </SheetContent>
-          </Sheet>
-          <h1 className="text-xl font-bold">CV Chap Chap Admin</h1>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="text-sm font-medium">{admin?.email}</div>
-        </div>
-      </header>
-
-      <div className="flex flex-1">
-        {/* Sidebar for desktop */}
-        <aside className="hidden md:flex md:w-64 md:flex-col border-r bg-white">
-          <div className="flex-1 flex flex-col min-h-0">
-            <div className="flex items-center h-16 flex-shrink-0 px-4 border-b">
-              <h2 className="text-lg font-bold">CV Chap Chap Admin</h2>
-            </div>
-            <div className="flex-1 flex flex-col overflow-y-auto">
-              <nav className="flex-1 px-4 py-6 space-y-1">
-                {menuItems.map((item) => (
-                  <Link key={item.path} href={item.path}>
-                    <a
-                      className={cn(
-                        'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
-                        location === item.path
-                          ? 'bg-primary/10 text-primary'
-                          : 'text-gray-700 hover:bg-gray-100'
-                      )}
-                    >
-                      {item.icon}
-                      <span className="ml-3">{item.name}</span>
-                    </a>
-                  </Link>
-                ))}
-              </nav>
-              <div className="p-4 border-t">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-red-500 hover:bg-red-50 hover:text-red-600"
-                  onClick={handleLogout}
-                >
-                  <LogOut size={20} />
-                  <span className="ml-3">Logout</span>
-                </Button>
-              </div>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
-        </aside>
+        </header>
 
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50">
-          <div className="hidden md:flex items-center justify-end h-16 px-6 border-b bg-white">
-            <div className="text-sm font-medium">{admin?.email}</div>
+        {/* Content */}
+        <main className="flex-1 px-4 sm:px-6 py-6">
+          <div className="container mx-auto">
+            {children}
           </div>
-          <div className="px-4 py-6 sm:px-6 lg:px-8">{children}</div>
         </main>
       </div>
     </div>
