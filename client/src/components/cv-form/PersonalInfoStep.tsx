@@ -11,6 +11,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Extend the schema with client-side validation
 const formSchema = personalInfoSchema.extend({
@@ -21,6 +22,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const PersonalInfoStep: React.FC = () => {
   const { formData, updateFormField } = useCVForm();
+  const isMobile = useIsMobile();
   
   // Get default values from context
   const defaultValues: FormValues = {
@@ -94,6 +96,9 @@ const PersonalInfoStep: React.FC = () => {
                       placeholder="Enter your first name" 
                       {...field} 
                       onChange={(e) => handleFieldChange('firstName', e.target.value)}
+                      className="h-10 text-base sm:h-10 sm:text-sm"
+                      autoCapitalize="words"
+                      inputMode="text"
                     />
                   </FormControl>
                   <FormMessage />

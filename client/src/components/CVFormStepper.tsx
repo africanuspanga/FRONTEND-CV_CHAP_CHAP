@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Check, ChevronRight } from 'lucide-react';
+import { Check, ChevronRight, ChevronLeft } from 'lucide-react';
 
 // Interface for the step structure
 export interface Step {
@@ -89,15 +89,32 @@ const CVFormStepper = ({ steps, currentStep, onStepClick }: CVFormStepperProps) 
         })}
       </div>
 
-      {/* Mobile view - just show current step title with next/prev indicator */}
-      <div className="md:hidden flex items-center justify-between">
-        <div className="text-sm text-gray-500">
-          Step {currentStep + 1} of {steps.length}
+      {/* Enhanced Mobile view with better visual hierarchy */}
+      <div className="md:hidden">
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm font-medium text-gray-500 bg-gray-50 px-2 py-1 rounded-full">
+            Step {currentStep + 1} of {steps.length}
+          </div>
+          
+          {currentStep > 0 && (
+            <button 
+              onClick={() => onStepClick && onStepClick(currentStep - 1)}
+              className="text-xs text-primary flex items-center touch-manipulation" 
+              aria-label="Previous step"
+            >
+              <ChevronLeft className="mr-1 w-3 h-3" />
+              Back
+            </button>
+          )}
         </div>
-        <div className="flex items-center text-primary font-medium">
-          {steps[currentStep].title}
+        
+        <div className="flex items-center py-2 px-3 bg-blue-50 text-primary font-medium rounded-md">
+          <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center mr-2 text-sm">
+            {currentStep + 1}
+          </div>
+          <div className="text-sm">{steps[currentStep].title}</div>
           {currentStep < steps.length - 1 && (
-            <ChevronRight className="ml-1 w-4 h-4" />
+            <ChevronRight className="ml-auto w-4 h-4" />
           )}
         </div>
       </div>
