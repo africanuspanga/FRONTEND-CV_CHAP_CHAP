@@ -1,7 +1,7 @@
 import React from 'react';
 import type { CVData } from '@shared/schema';
 
-interface JijengeClassicTemplateProps extends Partial<CVData> {
+interface JijengeClassicTemplateProps {
   personalInfo?: {
     firstName?: string;
     lastName?: string;
@@ -16,27 +16,21 @@ interface JijengeClassicTemplateProps extends Partial<CVData> {
     summary?: string;
     location?: string;
     linkedin?: string;
-  };
-  workExperience?: any[];
-  education?: any[];
-  skills?: any[];
-  summary?: string;
-  languages?: any[];
-  references?: any[];
-  hobbies?: any;
+  } | null;
+  workExperience?: any[] | null;
+  workExperiences?: any[] | null;
+  education?: any[] | null;
+  skills?: any[] | null;
+  summary?: string | null;
+  languages?: any[] | null;
+  references?: any[] | null;
+  hobbies?: any | null;
 }
 
 export function JijengeClassicTemplate({ 
-  personalInfo = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    professionalTitle: '',
-    location: '',
-    linkedin: ''
-  }, 
-  workExperience = [], 
+  personalInfo = null, 
+  workExperience = null, 
+  workExperiences = null,
   education = [], 
   skills = [], 
   summary = "", 
@@ -44,6 +38,19 @@ export function JijengeClassicTemplate({
   references = [],
   hobbies
 }: JijengeClassicTemplateProps): JSX.Element {
+  // Set default values if personalInfo is null
+  const personInfo = personalInfo || {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    professionalTitle: '',
+    location: '',
+    linkedin: ''
+  };
+  
+  // Handle both workExperience and workExperiences naming
+  const workItems = workExperiences || workExperience || [];
   return (
     <div style={{ 
       fontFamily: "'Lato', sans-serif",
@@ -83,7 +90,7 @@ export function JijengeClassicTemplate({
               fontWeight: 700,
               marginTop: 0
             }}>
-              {personalInfo.firstName} {personalInfo.lastName}
+              {personInfo.firstName} {personInfo.lastName}
             </h1>
             <h2 style={{
               fontSize: '1.2em',
@@ -94,7 +101,7 @@ export function JijengeClassicTemplate({
               marginBottom: 0,
               marginTop: 0
             }}>
-              {personalInfo.professionalTitle || 'Professional'}
+              {personInfo.professionalTitle || 'Professional'}
             </h2>
           </header>
 
@@ -139,9 +146,9 @@ export function JijengeClassicTemplate({
               padding: 0,
               margin: 0
             }}>
-              {workExperience.map((job, index) => (
+              {workItems.map((job, index) => (
                 <li key={index} style={{
-                  marginBottom: index === workExperience.length - 1 ? 0 : '20px'
+                  marginBottom: index === workItems.length - 1 ? 0 : '20px'
                 }}>
                   <div>
                     <div style={{
@@ -168,7 +175,7 @@ export function JijengeClassicTemplate({
                       paddingLeft: 0,
                       marginTop: '5px'
                     }}>
-                      {job.description ? job.description.split('\\n').map((bullet, bulletIndex) => (
+                      {job.description ? job.description.split('\\n').map((bullet: string, bulletIndex: number) => (
                         <li key={bulletIndex} style={{
                           fontSize: '0.95em',
                           color: '#444',
@@ -212,7 +219,7 @@ export function JijengeClassicTemplate({
               padding: 0,
               margin: 0
             }}>
-              {education.map((edu, index) => (
+              {education?.map((edu, index) => (
                 <li key={index}>
                   <div>
                     <div style={{
@@ -309,7 +316,7 @@ export function JijengeClassicTemplate({
                 color: '#666',
                 flexShrink: 0
               }}>[P]</span>
-              <span>{personalInfo.phone}</span>
+              <span>{personInfo.phone}</span>
             </p>
             <p style={{
               display: 'flex',
@@ -325,7 +332,7 @@ export function JijengeClassicTemplate({
                 color: '#666',
                 flexShrink: 0
               }}>[E]</span>
-              <span>{personalInfo.email}</span>
+              <span>{personInfo.email}</span>
             </p>
             <p style={{
               display: 'flex',
@@ -341,9 +348,9 @@ export function JijengeClassicTemplate({
                 color: '#666',
                 flexShrink: 0
               }}>[A]</span>
-              <span>{personalInfo.location || 'Location'}</span>
+              <span>{personInfo.location || 'Location'}</span>
             </p>
-            {personalInfo.linkedin && (
+            {personInfo.linkedin && (
               <p style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -358,7 +365,7 @@ export function JijengeClassicTemplate({
                   color: '#666',
                   flexShrink: 0
                 }}>[L]</span>
-                <a href={personalInfo.linkedin} style={{
+                <a href={personInfo.linkedin} style={{
                   color: '#333',
                   textDecoration: 'none'
                 }}>LinkedIn Profile</a>
@@ -385,7 +392,7 @@ export function JijengeClassicTemplate({
               padding: 0,
               margin: 0
             }}>
-              {skills.map((skill, index) => (
+              {skills?.map((skill, index) => (
                 <li key={index} style={{
                   fontSize: '0.95em',
                   color: '#444',
