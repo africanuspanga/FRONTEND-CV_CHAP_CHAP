@@ -63,15 +63,11 @@ export async function createCV(req: Request, res: Response) {
     const userId = req.isAuthenticated() && req.user ? req.user.id : null;
     
     const cv = await storage.createCV({
-      id: cvId,
       userId,
       templateId,
-      data,
-      status: 'draft',
-      payment_status: 'unpaid',
-      downloadUrl: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      cvData: JSON.stringify(data),
+      // Note: Other fields like status and payment_status would need to be added to the schema
+      // if they're required
     });
 
     res.status(201).json(cv);
@@ -127,9 +123,8 @@ export async function updateCV(req: Request, res: Response) {
     
     const updatedCV = await storage.updateCV(id, {
       templateId,
-      data,
-      status: req.body.status || 'draft',
-      updatedAt: new Date(),
+      cvData: JSON.stringify(data)
+      // Other fields like status would need to be added to the schema if required
     });
 
     if (!updatedCV) {
@@ -179,6 +174,10 @@ export async function getCVPreview(req: Request, res: Response) {
     }
 
     // Get template data
+    if (!cv.templateId) {
+      return res.status(400).json({ message: 'CV has no template associated with it' });
+    }
+    
     const template = await storage.getTemplate(cv.templateId);
     if (!template) {
       return res.status(404).json({ message: 'Template not found' });
@@ -225,17 +224,21 @@ export async function getHTMLPreview(req: Request, res: Response) {
     }
 
     // Get template data
+    if (!cv.templateId) {
+      return res.status(400).json({ message: 'CV has no template associated with it' });
+    }
+    
     const template = await storage.getTemplate(cv.templateId);
     if (!template) {
       return res.status(404).json({ message: 'Template not found' });
     }
 
     // Generate HTML by injecting CV data into template
-    let htmlContent = template.html_content;
+    let htmlContent = template.htmlContent;
     
     // This is a simplified version - in production you would use a proper template engine
-    // Replace placeholders with actual data
-    const data = cv.data;
+    // Parse the JSON-stored CV data
+    const parsedData = JSON.parse(cv.cvData);
     
     // Return HTML content with CSS
     res.send(`
@@ -244,8 +247,8 @@ export async function getHTMLPreview(req: Request, res: Response) {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>${data.personalInfo?.firstName || ''} ${data.personalInfo?.lastName || ''} - CV</title>
-        <style>${template.css_content}</style>
+        <title>${parsedData.personalInfo?.firstName || ''} ${parsedData.personalInfo?.lastName || ''} - CV</title>
+        <style>${template.cssContent}</style>
       </head>
       <body>
         ${htmlContent}

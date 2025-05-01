@@ -53,10 +53,10 @@ export async function createTemplate(req: Request, res: Response) {
     const template = await storage.createTemplate({
       name: templateData.name,
       description: templateData.description,
-      html_content: templateData.html_content,
-      css_content: templateData.css_content,
-      preview_image: templateData.preview_image,
-      is_default: templateData.is_default ?? false
+      htmlContent: templateData.htmlContent,
+      cssContent: templateData.cssContent,
+      previewImage: templateData.previewImage,
+      isDefault: templateData.isDefault ?? false
     });
 
     res.status(201).json(template);
