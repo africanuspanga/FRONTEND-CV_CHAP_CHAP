@@ -10,18 +10,36 @@ export function useIsMobile(): boolean {
   useEffect(() => {
     // Function to check if viewport is mobile-sized
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768); // Standard breakpoint for mobile
+      // Prioritize detecting mobile devices via user agent first for better accuracy
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|windows phone/i.test(userAgent);
+      
+      // Then check viewport width as fallback - prioritize mobile first approach
+      const isMobileViewport = window.innerWidth < 768; // Standard breakpoint for mobile
+      
+      setIsMobile(isMobileDevice || isMobileViewport);
     };
 
     // Initial check
     checkMobile();
 
-    // Listen for window resize events
-    window.addEventListener('resize', checkMobile);
+    // Listen for window resize events with throttling for performance
+    let resizeTimer: number;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(checkMobile, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
+
+    // Also listen for orientation changes for mobile devices
+    window.addEventListener('orientationchange', checkMobile);
 
     // Cleanup
     return () => {
-      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', checkMobile);
+      clearTimeout(resizeTimer);
     };
   }, []);
 

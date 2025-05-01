@@ -93,13 +93,64 @@ export const ClientSideTemplateRenderer = ({
     );
   }
 
+  // Check if we need responsive scaling for mobile
+  const [scale, setScale] = useState(1);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Calculate optimal scale factor on mount and window resize
+  useEffect(() => {
+    setIsMounted(true);
+    
+    const calculateOptimalScale = () => {
+      if (containerRef.current) {
+        // Get container width (accounting for padding)
+        const containerWidth = containerRef.current.clientWidth - 20; // Subtract padding
+        
+        // Our templates are designed for A4 (595px width in standard screen density)
+        const templateWidth = 595;
+        
+        // Calculate scale factor (with a minimum to ensure readability)
+        const newScale = Math.max(0.6, Math.min(1, containerWidth / templateWidth));
+        setScale(newScale);
+      }
+    };
+    
+    // Calculate on mount
+    calculateOptimalScale();
+    
+    // Listen for resize events with throttling
+    let resizeTimer: number;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(calculateOptimalScale, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', calculateOptimalScale);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', calculateOptimalScale);
+      clearTimeout(resizeTimer);
+    };
+  }, []);
+  
   return (
     <div 
       ref={containerRef}
       className={`template-preview-container overflow-auto bg-white ${className}`} 
       style={{ height: `${height}px` }}
     >
-      <div className="template-scale-container transform-origin-top-left" style={{ transform: 'scale(1)' }}>
+      <div 
+        className="template-scale-container transform-origin-top-left" 
+        style={{ 
+          transform: `scale(${scale})`,
+          transformOrigin: 'top center', 
+          width: isMounted ? `${100 / scale}%` : '100%',
+          marginLeft: 'auto',
+          marginRight: 'auto'
+        }}
+      >
         <Template {...cvData} />
       </div>
     </div>
