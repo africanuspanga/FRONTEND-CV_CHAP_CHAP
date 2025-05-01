@@ -113,6 +113,11 @@
     @apply border-none w-full h-full shadow-md;
   }
   
+  /* Mobile optimized form elements */
+  .form-message {
+    @apply text-xs sm:text-sm mt-1;
+  }
+  
   @media (max-width: 768px) {
     .cv-preview-container {
       display: none;

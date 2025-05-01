@@ -68,16 +68,16 @@ const PersonalInfoStep: React.FC = () => {
       <form onChange={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6 px-1 sm:px-0">
         {/* Basic Information Section */}
         <div className="space-y-4">
-          <div className="flex items-center gap-4 mb-6">
-            <Avatar className="h-16 w-16">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <Avatar className="h-14 w-14 sm:h-16 sm:w-16">
               <AvatarImage src={formData.personalInfo.profilePicture || ''} alt="Profile" />
               <AvatarFallback className="bg-primary text-white">
                 {getInitials(formData.personalInfo.firstName, formData.personalInfo.lastName)}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-medium">Profile Photo</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-medium text-base sm:text-sm">Profile Photo</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Upload a professional photo (optional)
               </p>
               {/* Photo upload functionality would go here */}
@@ -238,7 +238,7 @@ const PersonalInfoStep: React.FC = () => {
               name="linkedin"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>LinkedIn URL</FormLabel>
+                  <FormLabel className="text-base sm:text-sm">LinkedIn URL</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="https://linkedin.com/in/username" 
@@ -261,7 +261,7 @@ const PersonalInfoStep: React.FC = () => {
               name="website"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Personal Website/Portfolio</FormLabel>
+                  <FormLabel className="text-base sm:text-sm">Personal Website/Portfolio</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="https://yourwebsite.com" 
