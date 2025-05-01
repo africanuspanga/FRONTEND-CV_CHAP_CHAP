@@ -4,7 +4,6 @@ import { CVData, Accomplishment, Hobby } from '@shared/schema';
 // Define form data structure with additional template information
 export interface CVFormData extends CVData {
   templateId: string;
-  websites?: string[];
   accomplishments?: Accomplishment[];
   hobbies?: Hobby[];
 }
@@ -17,11 +16,13 @@ const initialFormData: CVFormData = {
     lastName: '',
     email: '',
     phone: '',
-    jobTitle: '',
-    location: '', 
-    linkedin: '',
-    website: '',
-    profilePicture: '',
+    professionalTitle: '',
+    address: '',
+    city: '',
+    region: '',
+    country: '',
+    postalCode: '',
+    summary: '',
   },
   summary: '',
   workExperience: [],
@@ -32,7 +33,7 @@ const initialFormData: CVFormData = {
   certifications: [],
   projects: [],
   hobbies: [],
-  websites: [],
+  websites: [], // Should be Website[] (objects with id, name, url)
   accomplishments: [],
 };
 

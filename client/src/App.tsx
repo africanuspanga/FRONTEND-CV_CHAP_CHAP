@@ -7,6 +7,8 @@ import { CVFormProvider } from "@/contexts/cv-form-context";
 import { AuthProvider } from "@/contexts/auth-context";
 import { AdminAuthProvider } from "@/contexts/admin-auth-context";
 import { ProtectedAdminRoute } from "@/components/admin/ProtectedAdminRoute";
+import SEO from "@/components/SEO";
+import StructuredData from "@/components/StructuredData";
 
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -114,6 +116,12 @@ function App() {
         <AuthProvider>
           <AdminAuthProvider>
             <CVFormProvider>
+              {/* SEO Components */}
+              <SEO />
+              <StructuredData type="website" />
+              <StructuredData type="organization" />
+              <StructuredData type="webApplication" />
+              
               <Router />
               <Toaster />
             </CVFormProvider>
