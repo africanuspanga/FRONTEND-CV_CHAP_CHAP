@@ -50,7 +50,7 @@ export const insertTemplateSchema = createInsertSchema(templates).omit({
 // CV schema
 export const cvs = pgTable("cvs", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  userId: serial("user_id").references(() => users.id).notNull(),
+  userId: serial("user_id").references(() => users.id),
   templateId: varchar("template_id", { length: 64 }).references(() => templates.id),
   cvData: text("cv_data").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
