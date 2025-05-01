@@ -156,7 +156,7 @@ const PersonalInfoStep: React.FC = () => {
         {/* Contact Information Section */}
         <Card className="p-3 sm:p-4">
           <h3 className="font-medium text-base sm:text-lg mb-3 sm:mb-4">Contact Information</h3>
-          <div className="space-y-4">
+          <div className="form-field-group space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -232,7 +232,7 @@ const PersonalInfoStep: React.FC = () => {
         {/* Online Profiles Section */}
         <Card className="p-3 sm:p-4">
           <h3 className="font-medium text-base sm:text-lg mb-3 sm:mb-4">Online Profiles</h3>
-          <div className="space-y-4">
+          <div className="form-field-group space-y-4">
             <FormField
               control={form.control}
               name="linkedin"
