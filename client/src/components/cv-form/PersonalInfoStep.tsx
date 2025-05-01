@@ -90,7 +90,7 @@ const PersonalInfoStep: React.FC = () => {
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>First Name <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel className="text-base sm:text-sm">First Name <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="Enter your first name" 
@@ -111,7 +111,7 @@ const PersonalInfoStep: React.FC = () => {
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Last Name <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel className="text-base sm:text-sm">Last Name <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="Enter your last name" 
@@ -133,7 +133,7 @@ const PersonalInfoStep: React.FC = () => {
             name="jobTitle"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Professional Title</FormLabel>
+                <FormLabel className="text-base sm:text-sm">Professional Title</FormLabel>
                 <FormControl>
                   <Input 
                     placeholder="e.g. Senior Software Engineer" 
@@ -144,7 +144,7 @@ const PersonalInfoStep: React.FC = () => {
                     inputMode="text"
                   />
                 </FormControl>
-                <FormDescription>
+                <FormDescription className="text-xs sm:text-sm">
                   Your current job title or the position you're seeking
                 </FormDescription>
                 <FormMessage />
@@ -155,7 +155,7 @@ const PersonalInfoStep: React.FC = () => {
 
         {/* Contact Information Section */}
         <Card className="p-3 sm:p-4">
-          <h3 className="font-medium text-lg mb-4">Contact Information</h3>
+          <h3 className="font-medium text-base sm:text-lg mb-3 sm:mb-4">Contact Information</h3>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -163,7 +163,7 @@ const PersonalInfoStep: React.FC = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel className="text-base sm:text-sm">Email <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input 
                         type="email" 
@@ -187,7 +187,7 @@ const PersonalInfoStep: React.FC = () => {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel className="text-base sm:text-sm">Phone <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="Your phone number" 
@@ -211,7 +211,7 @@ const PersonalInfoStep: React.FC = () => {
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel className="text-base sm:text-sm">Location <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="e.g. Dar es Salaam, Tanzania" 
@@ -230,8 +230,8 @@ const PersonalInfoStep: React.FC = () => {
         </Card>
 
         {/* Online Profiles Section */}
-        <Card className="p-4">
-          <h3 className="font-medium text-lg mb-4">Online Profiles</h3>
+        <Card className="p-3 sm:p-4">
+          <h3 className="font-medium text-base sm:text-lg mb-3 sm:mb-4">Online Profiles</h3>
           <div className="space-y-4">
             <FormField
               control={form.control}
