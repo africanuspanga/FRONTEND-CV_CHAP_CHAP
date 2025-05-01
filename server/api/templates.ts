@@ -56,7 +56,6 @@ export async function createTemplate(req: Request, res: Response) {
     const templateId = uuidv4();
     
     const template = await storage.createTemplate({
-      id: templateId,
       name: templateData.name,
       description: templateData.description,
       htmlContent: templateData.htmlContent,

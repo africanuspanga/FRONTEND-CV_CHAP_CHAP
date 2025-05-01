@@ -41,7 +41,11 @@ export const templateRelations = relations(templates, ({ many }) => ({
   cvs: many(cvs),
 }));
 
-export const insertTemplateSchema = createInsertSchema(templates);
+export const insertTemplateSchema = createInsertSchema(templates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
 
 // CV schema
 export const cvs = pgTable("cvs", {
@@ -65,7 +69,11 @@ export const cvRelations = relations(cvs, ({ one, many }) => ({
   payments: many(payments),
 }));
 
-export const insertCVSchema = createInsertSchema(cvs);
+export const insertCVSchema = createInsertSchema(cvs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
 
 // Payment status enum
 export const paymentStatusEnum = pgEnum("payment_status", [
@@ -101,7 +109,11 @@ export const paymentRelations = relations(payments, ({ one }) => ({
   }),
 }));
 
-export const insertPaymentSchema = createInsertSchema(payments);
+export const insertPaymentSchema = createInsertSchema(payments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
 
 // Zod schemas for CV data structure
 export const workExperienceSchema = z.object({
