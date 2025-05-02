@@ -10,6 +10,10 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { AlertCircle, Lightbulb, Wand2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { enhanceProfessionalSummary } from '@/lib/openai-service';
+import { useAIStatus } from '@/hooks/use-ai-status';
 import { debounce } from '@/lib/utils';
 
 // Form schema definition
@@ -39,6 +43,11 @@ const SummaryStep: React.FC = () => {
   const { formData, updateFormField } = useCVForm();
   const [summaryLength, setSummaryLength] = useState(0);
   const [selectedTone, setSelectedTone] = useState<string | null>(null);
+  const [isEnhanceDialogOpen, setIsEnhanceDialogOpen] = useState(false);
+  const [isEnhancing, setIsEnhancing] = useState(false);
+  const [enhancedSummary, setEnhancedSummary] = useState<string>('');
+  const { hasOpenAI, isLoading: isCheckingAI } = useAIStatus();
+  const { toast } = useToast();
   
   // Initialize form with values from context
   const form = useForm<FormValues>({
@@ -78,6 +87,82 @@ const SummaryStep: React.FC = () => {
     // but rather show it as a reference for the user
   };
 
+  // Handle AI enhancement of summary
+  const handleEnhanceSummary = async () => {
+    // Get current summary text from form
+    const currentSummary = form.getValues('summary');
+    
+    // Validate that there's text to enhance
+    if (!currentSummary || currentSummary.trim().length < 10) {
+      toast({
+        title: 'Summary Too Short',
+        description: 'Please add more content to your summary before enhancing it.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    setIsEnhancing(true);
+    try {
+      // Call the OpenAI service to enhance the summary
+      const jobTitle = formData.personalInfo?.professionalTitle || '';
+      const yearsOfExperience = formData.workExperiences?.length > 0 
+        ? calculateTotalYearsExperience(formData.workExperiences) 
+        : undefined;
+      
+      const enhanced = await enhanceProfessionalSummary(
+        currentSummary,
+        jobTitle,
+        yearsOfExperience
+      );
+      
+      setEnhancedSummary(enhanced);
+      setIsEnhanceDialogOpen(true);
+    } catch (error) {
+      toast({
+        title: 'Enhancement Failed',
+        description: error instanceof Error ? error.message : 'Failed to enhance your summary. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsEnhancing(false);
+    }
+  };
+  
+  // Calculate total years of experience from work history
+  const calculateTotalYearsExperience = (workExperiences: any[]) => {
+    if (!workExperiences || workExperiences.length === 0) return undefined;
+    
+    let totalMonths = 0;
+    
+    workExperiences.forEach((job: any) => {
+      if (job.startDate) {
+        const startDate = new Date(job.startDate);
+        const endDate = job.current ? new Date() : job.endDate ? new Date(job.endDate) : new Date();
+        
+        // Calculate months between dates
+        const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                       (endDate.getMonth() - startDate.getMonth());
+        
+        if (months > 0) totalMonths += months;
+      }
+    });
+    
+    // Convert months to years (rounded to nearest half year)
+    return Math.round(totalMonths / 6) / 2;
+  };
+  
+  // Apply the enhanced summary
+  const handleApplyEnhancedSummary = () => {
+    form.setValue('summary', enhancedSummary);
+    updateFormField('summary', enhancedSummary);
+    setIsEnhanceDialogOpen(false);
+    toast({
+      title: 'Summary Enhanced',
+      description: 'Your professional summary has been enhanced with AI.',
+    });
+  };
+  
   // Handle summary text change with debounce
   const handleSummaryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -96,6 +181,48 @@ const SummaryStep: React.FC = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* AI Enhancement Dialog */}
+        <Dialog open={isEnhanceDialogOpen} onOpenChange={setIsEnhanceDialogOpen}>
+          <DialogContent className="max-w-xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Wand2 className="h-5 w-5" />
+                AI Enhanced Summary
+              </DialogTitle>
+              <DialogDescription>
+                Review your AI-enhanced professional summary below.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="border rounded-md p-3 bg-muted/50">
+                <h3 className="text-sm font-medium mb-2">Original Summary</h3>
+                <p className="text-sm text-muted-foreground">
+                  {form.getValues('summary')}
+                </p>
+              </div>
+              
+              <div className="border rounded-md p-3 bg-green-50">
+                <h3 className="text-sm font-medium mb-2 text-green-800">Enhanced Summary</h3>
+                <Textarea 
+                  value={enhancedSummary} 
+                  onChange={(e) => setEnhancedSummary(e.target.value)}
+                  className="min-h-[120px] bg-white"
+                />
+              </div>
+              
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsEnhanceDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleApplyEnhancedSummary}>
+                  Apply Enhanced Summary
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+        
         {/* Introduction */}
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">
@@ -175,14 +302,21 @@ const SummaryStep: React.FC = () => {
                 type="button" 
                 variant="secondary" 
                 size="sm"
-                onClick={() => {
-                  // Open AI enhancement dialog or panel here
-                  // This will be implemented after this fix
-                }}
+                onClick={handleEnhanceSummary}
+                disabled={isEnhancing || isCheckingAI}
                 className="text-xs"
               >
-                <Wand2 className="mr-1 h-3 w-3" />
-                AI Enhancement
+                {isEnhancing ? (
+                  <>
+                    <Wand2 className="mr-1 h-3 w-3 animate-pulse" />
+                    Enhancing...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="mr-1 h-3 w-3" />
+                    AI Enhancement
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>
