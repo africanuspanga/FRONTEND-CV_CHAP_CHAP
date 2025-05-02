@@ -184,28 +184,74 @@ Please provide a list of professional skills relevant for this position.`;
 }
 
 /**
- * Enhance a professional summary with AI
+ * Enhance a professional summary with AI using CV data
  */
 export async function enhanceProfessionalSummary(
   currentSummary: string,
   jobTitle?: string,
   yearsOfExperience?: number,
+  workExperiences?: any[] | null,
+  education?: any[] | null,
+  skills?: any[] | null,
   tone: ToneType = 'professional'
 ): Promise<string> {
+  // Build a comprehensive context from CV data
   const jobContext = jobTitle ? `for a ${jobTitle}` : 'for a professional';
   const experienceContext = yearsOfExperience 
     ? `with ${yearsOfExperience} years of experience` 
     : 'with relevant experience';
 
+  // Process work experiences into a useful string
+  let workExperienceContext = '';
+  if (workExperiences && workExperiences.length > 0) {
+    workExperienceContext = 'Work Experience:\n';
+    workExperiences.slice(0, 3).forEach((job, index) => {
+      workExperienceContext += `- ${job.jobTitle || 'Position'} at ${job.company || 'Company'}`;
+      if (job.achievements && job.achievements.length > 0) {
+        // Include 1-2 achievements for context
+        const achievements = job.achievements.slice(0, 2);
+        workExperienceContext += `: ${achievements.join(', ')}`;
+      }
+      workExperienceContext += '\n';
+    });
+  }
+
+  // Process education into a useful string
+  let educationContext = '';
+  if (education && education.length > 0) {
+    educationContext = 'Education:\n';
+    education.slice(0, 2).forEach((edu, index) => {
+      educationContext += `- ${edu.degree || 'Degree'} from ${edu.institution || 'Institution'}`;
+      if (edu.fieldOfStudy) {
+        educationContext += ` in ${edu.fieldOfStudy}`;
+      }
+      educationContext += '\n';
+    });
+  }
+
+  // Process skills into a useful string
+  let skillsContext = '';
+  if (skills && skills.length > 0) {
+    const skillNames = skills.map(skill => skill.name).filter(Boolean).slice(0, 10);
+    if (skillNames.length > 0) {
+      skillsContext = `Key Skills: ${skillNames.join(', ')}`;
+    }
+  }
+
+  // Build a comprehensive prompt with all the context
   const prompt = `Professional Summary: ${currentSummary}
 Job Title: ${jobTitle || 'Not specified'}
 Experience: ${yearsOfExperience ? `${yearsOfExperience} years` : 'Not specified'}
 
-Please provide an enhanced professional summary for this person.`;
+${workExperienceContext}
+${educationContext}
+${skillsContext}
+
+Please provide an enhanced, personalized professional summary for this person based on all the information above. Focus on their actual experiences, skills, and education to create a tailored summary.`;
 
   return await makeOpenAIRequest({
     prompt,
-    maxTokens: 300,
+    maxTokens: 350,
     type: 'summary',
     tone
   });

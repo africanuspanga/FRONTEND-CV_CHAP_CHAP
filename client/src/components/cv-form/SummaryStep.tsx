@@ -110,10 +110,15 @@ const SummaryStep: React.FC = () => {
         ? calculateTotalYearsExperience(formData.workExperiences) 
         : undefined;
       
+      // Pass comprehensive CV data to get a personalized summary
       const enhanced = await enhanceProfessionalSummary(
         currentSummary,
         jobTitle,
-        yearsOfExperience
+        yearsOfExperience,
+        formData.workExperiences || null,
+        formData.education || null,
+        formData.skills || null,
+        selectedTone as ToneType || 'professional'
       );
       
       setEnhancedSummary(enhanced);
