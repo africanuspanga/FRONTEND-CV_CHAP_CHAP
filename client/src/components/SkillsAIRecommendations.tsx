@@ -1,217 +1,185 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * Skills AI Recommendations Component
+ * This component provides AI-powered recommendations for CV skills
+ */
+
 import { Button } from '@/components/ui/button';
-import { Loader2, RefreshCw } from 'lucide-react';
-import { generateSkillsRecommendations, hasOpenAIApiKey } from '@/lib/openai-service';
-import AIKeyInput from '@/components/AIKeyInput';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { hasOpenAIApiKey, getSkillRecommendations } from '@/lib/openai-service';
+import { AlertCircle, Brain, CheckCircle2, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface SkillsAIRecommendationsProps {
   jobTitle: string;
-  workExperience: string;
-  onAddSkills: (skills: string[]) => void;
+  yearsOfExperience?: number;
+  industry?: string;
+  onAddRecommendations: (recommendations: string[]) => void;
   onSkip: () => void;
 }
 
-// Fallback recommendations based on job title (used if no API key is provided)
-const getFallbackSkills = (jobTitle: string): string[] => {
-  if (jobTitle.toLowerCase().includes('software') || jobTitle.toLowerCase().includes('developer') || jobTitle.toLowerCase().includes('engineer')) {
-    return [
-      'JavaScript',
-      'React',
-      'Node.js',
-      'SQL',
-      'Git',
-      'Problem Solving',
-      'Communication',
-      'Team Collaboration',
-      'Agile Methodology',
-      'Unit Testing'
-    ];
-  } else if (jobTitle.toLowerCase().includes('manager') || jobTitle.toLowerCase().includes('lead')) {
-    return [
-      'Leadership',
-      'Strategic Planning',
-      'Team Management',
-      'Project Management',
-      'Budgeting',
-      'Stakeholder Management',
-      'Communication',
-      'Conflict Resolution',
-      'Performance Analysis',
-      'Process Improvement'
-    ];
-  } else if (jobTitle.toLowerCase().includes('marketing')) {
-    return [
-      'Digital Marketing',
-      'Social Media Management',
-      'Content Creation',
-      'SEO/SEM',
-      'Analytics',
-      'Campaign Management',
-      'Market Research',
-      'Brand Development',
-      'Adobe Creative Suite',
-      'Email Marketing'
-    ];
-  } else {
-    return [
-      'Communication',
-      'Time Management',
-      'Problem Solving',
-      'Microsoft Office Suite',
-      'Teamwork',
-      'Analytical Skills',
-      'Adaptability',
-      'Customer Service',
-      'Leadership',
-      'Project Management'
-    ];
-  }
-};
-
+/**
+ * Component for getting AI recommendations for skills
+ */
 const SkillsAIRecommendations: React.FC<SkillsAIRecommendationsProps> = ({
   jobTitle,
-  workExperience,
-  onAddSkills,
-  onSkip
+  yearsOfExperience,
+  industry,
+  onAddRecommendations,
+  onSkip,
 }) => {
-  const [isGenerating, setIsGenerating] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [recommendations, setRecommendations] = useState<string[]>([]);
-  const [apiKeySet, setApiKeySet] = useState(hasOpenAIApiKey());
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  
-  const generateRecommendations = async () => {
-    setIsGenerating(true);
+  const [selectedRecommendations, setSelectedRecommendations] = useState<Record<number, boolean>>({});
+  const { toast } = useToast();
+
+  const handleGenerateRecommendations = async () => {
+    if (!hasOpenAIApiKey()) {
+      setError('OpenAI API key not found. Please add your API key to use AI features.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
     try {
-      // If we have an API key, use the OpenAI service
-      if (apiKeySet) {
-        const aiRecommendations = await generateSkillsRecommendations(jobTitle, workExperience);
-        setRecommendations(aiRecommendations);
-      } else {
-        // Otherwise use our fallback function
-        const fallbackRecommendations = getFallbackSkills(jobTitle);
-        setRecommendations(fallbackRecommendations);
-      }
-    } catch (error) {
-      console.error('Error generating skills:', error);
-      // Fallback to local recommendations if AI generation fails
-      const fallbackRecommendations = getFallbackSkills(jobTitle);
-      setRecommendations(fallbackRecommendations);
+      const skills = await getSkillRecommendations(jobTitle, yearsOfExperience, industry);
+      setRecommendations(skills);
+      
+      // Select all recommendations by default
+      const initialSelected: Record<number, boolean> = {};
+      skills.forEach((_, index) => {
+        initialSelected[index] = true;
+      });
+      setSelectedRecommendations(initialSelected);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate skills recommendations';
+      setError(errorMessage);
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive',
+      });
     } finally {
-      setIsGenerating(false);
+      setIsLoading(false);
     }
   };
-  
-  // Generate recommendations when component mounts or when API key status changes
-  useEffect(() => {
-    generateRecommendations();
-  }, [jobTitle, workExperience, apiKeySet]);
-  
-  // Toggle skill selection
-  const toggleSkill = (skill: string) => {
-    if (selectedSkills.includes(skill)) {
-      setSelectedSkills(selectedSkills.filter(s => s !== skill));
-    } else {
-      setSelectedSkills([...selectedSkills, skill]);
-    }
+
+  const handleToggleRecommendation = (index: number) => {
+    setSelectedRecommendations(prev => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
   };
-  
-  // Handle add all skills
-  const handleAddAll = () => {
-    onAddSkills(recommendations);
-  };
-  
-  // Handle add selected skills
+
   const handleAddSelected = () => {
-    if (selectedSkills.length > 0) {
-      onAddSkills(selectedSkills);
-    } else {
-      // If no skills are selected, just skip
-      onSkip();
-    }
+    const selected = recommendations.filter((_, index) => selectedRecommendations[index]);
+    onAddRecommendations(selected);
   };
-  
-  if (isGenerating) {
+
+  if (recommendations.length > 0) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
-        <div className="bg-blue-50 rounded-lg p-6 flex items-center gap-4 text-blue-700">
-          <Loader2 className="h-8 w-8 animate-spin" />
-          <span className="text-xl">Generating Skill Recommendations...</span>
-        </div>
-      </div>
-    );
-  }
-  
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-90 z-50">
-      <div className="bg-white rounded-lg border p-6 shadow-lg max-w-md w-full">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Recommended Skills for {jobTitle}</h2>
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="p-1" 
-            onClick={generateRecommendations}
-            disabled={isGenerating}
-          >
-            <RefreshCw className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
-        
-        <div className="flex justify-end mb-3">
-          <AIKeyInput onApiKeySet={setApiKeySet} />
-        </div>
-        
-        <p className="text-gray-600 mb-4 text-sm">
-          {apiKeySet 
-            ? 'Using OpenAI to generate personalized skill recommendations.'
-            : 'Add your OpenAI API key for personalized AI recommendations.'}
-        </p>
-        
-        <div className="mb-6">
-          <div className="flex flex-wrap gap-2">
-            {recommendations.map((skill, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                size="sm"
-                className={`${selectedSkills.includes(skill) ? 'bg-green-50 border-green-500 text-green-700' : ''}`}
-                onClick={() => toggleSkill(skill)}
-              >
-                {selectedSkills.includes(skill) ? '✓ ' : ''}{skill}
-              </Button>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <CheckCircle2 className="mr-2 h-5 w-5" /> AI Skill Recommendations
+          </CardTitle>
+          <CardDescription>
+            Select the skills you'd like to include in your CV.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {recommendations.map((recommendation, index) => (
+              <div key={index} className="flex items-start space-x-2">
+                <Checkbox
+                  id={`skill-${index}`}
+                  checked={selectedRecommendations[index] || false}
+                  onCheckedChange={() => handleToggleRecommendation(index)}
+                />
+                <Label
+                  htmlFor={`skill-${index}`}
+                  className="text-sm leading-tight cursor-pointer"
+                >
+                  {recommendation}
+                </Label>
+              </div>
             ))}
           </div>
-        </div>
-        
-        <div className="flex justify-between">
-          <Button 
-            variant="outline" 
-            onClick={onSkip}
-            className="text-gray-700"
-          >
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline" onClick={onSkip}>
             Skip
           </Button>
-          
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handleAddAll}
-              className="text-blue-600 border-blue-300"
-            >
-              Add All
-            </Button>
-            
-            <Button 
-              onClick={handleAddSelected}
-              className="bg-teal-600 hover:bg-teal-700 text-white"
-              disabled={selectedSkills.length === 0}
-            >
-              {selectedSkills.length > 0 ? `Add ${selectedSkills.length} Selected` : 'Select Skills'}
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+          <Button onClick={handleAddSelected}>
+            Add Selected
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="border-destructive">
+        <CardHeader>
+          <CardTitle className="flex items-center text-destructive">
+            <AlertCircle className="mr-2 h-5 w-5" /> Error
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm">{error}</p>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline" onClick={onSkip}>
+            Skip AI Features
+          </Button>
+          <Button variant="default" onClick={handleGenerateRecommendations}>
+            Try Again
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Brain className="mr-2 h-5 w-5" /> AI Skill Recommendations
+        </CardTitle>
+        <CardDescription>
+          Get AI-powered skill suggestions for your position as {jobTitle}.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm">
+          Our AI can help you identify the most relevant technical and soft skills
+          for your role. Click the button below to generate suggestions.
+        </p>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button variant="outline" onClick={onSkip}>
+          Skip
+        </Button>
+        <Button 
+          onClick={handleGenerateRecommendations}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>Generate Skills</>
+          )}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 

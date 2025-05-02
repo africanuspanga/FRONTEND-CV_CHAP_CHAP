@@ -5,7 +5,8 @@
  * Templates are loaded dynamically from the templates directory and cached for performance.
  */
 
-import { CVTemplate, getAllTemplates, getTemplateByID } from '@/templates/index';
+import { getAllTemplates as getBaseTemplates, getTemplateByID as getBaseTemplateByID } from './simple-template-registry';
+import type { CVTemplate } from './simple-template-registry';
 
 // Define color scheme options
 export interface ColorScheme {
@@ -19,7 +20,10 @@ export interface ColorScheme {
 }
 
 // Define template with additional metadata
-export interface TemplateWithMetadata extends CVTemplate {
+export interface TemplateWithMetadata {
+  id: string;
+  name: string;
+  render: (data: any) => JSX.Element | null;
   description: string;
   colorSchemes: ColorScheme[];
   previewImage?: string;
@@ -27,6 +31,10 @@ export interface TemplateWithMetadata extends CVTemplate {
   isNew?: boolean;
   isPro?: boolean;
 }
+
+// Re-export the base functions
+export const getAllTemplates = getBaseTemplates;
+export const getTemplateByID = getBaseTemplateByID;
 
 // Color scheme presets that can be applied to any template
 const colorSchemes: Record<string, ColorScheme[]> = {
@@ -196,7 +204,7 @@ const getTemplateMetadata = (templateId: string): Partial<TemplateWithMetadata> 
 
 // Get all templates with metadata
 export const getAllTemplatesWithMetadata = (): TemplateWithMetadata[] => {
-  const templates = getAllTemplates();
+  const templates = getBaseTemplates();
   
   return templates.map(template => {
     const metadata = getTemplateMetadata(template.id);
@@ -213,7 +221,7 @@ export const getAllTemplatesWithMetadata = (): TemplateWithMetadata[] => {
 
 // Get template by ID with metadata
 export const getTemplateWithMetadata = (id: string): TemplateWithMetadata | undefined => {
-  const template = getTemplateByID(id);
+  const template = getBaseTemplateByID(id);
   if (!template) return undefined;
   
   const metadata = getTemplateMetadata(id);
@@ -253,4 +261,9 @@ export const applyColorScheme = (templateId: string, colorSchemeId: string): Tem
   // Here we could modify the template render function to apply the color scheme
   // This is a placeholder for actual implementation
   return template;
+};
+
+// Add exact function with lowercase 'id' for compatibility
+export const getTemplateById = (id: string): TemplateWithMetadata | undefined => {
+  return getTemplateWithMetadata(id);
 };

@@ -19,7 +19,7 @@ This architecture is optimized for the target audience in Tanzania and East Afri
 
 ```tsx
 // Import templates directly from the frontend registry
-import { getTemplateByID, getAllTemplates } from '@/templates/index';
+import { getTemplateByID, getAllTemplates } from '@/lib';
 import { ClientSideTemplateRenderer } from '@/components/ClientSideTemplateRenderer';
 
 // Later in your component:

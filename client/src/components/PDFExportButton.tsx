@@ -1,46 +1,50 @@
-import React from 'react';
+/**
+ * PDF Export Button Component
+ * This component provides a button for exporting CVs to PDF
+ */
+
 import { Button } from '@/components/ui/button';
-import { FileDown, Loader2 } from 'lucide-react';
 import { useCVExport } from '@/hooks/use-cv-export';
-import { useCVForm } from '@/contexts/cv-form-context';
+import { CVData } from '@shared/schema';
+import { Loader2, Download } from 'lucide-react';
+import React from 'react';
 
 interface PDFExportButtonProps {
+  cvData: CVData;
+  templateId: string;
+  filename?: string;
   className?: string;
-  variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive';
-  size?: 'default' | 'sm' | 'lg' | 'icon';
   children?: React.ReactNode;
 }
 
 /**
- * Button component to export CV data to PDF
- * Uses the local template renderer and HTML2PDF for client-side PDF generation
+ * Button component for exporting CVs to PDF
  */
 const PDFExportButton: React.FC<PDFExportButtonProps> = ({
+  cvData,
+  templateId,
+  filename,
   className = '',
-  variant = 'default',
-  size = 'default',
-  children
+  children = 'Download CV',
 }) => {
-  const { isExporting, exportToPDF } = useCVExport();
-  const { formData } = useCVForm();
-  
+  const { exportToPDF, isExporting } = useCVExport();
+
   const handleExport = async () => {
-    // Ensure we have template ID and some data
-    if (!formData.templateId || !formData.personalInfo) {
-      console.error('Cannot export: missing template ID or personal info');
-      return;
+    try {
+      await exportToPDF(cvData, templateId, filename);
+    } catch (error) {
+      // Error handling is done in the hook
+      console.error('Export failed:', error);
     }
-    
-    await exportToPDF(formData, formData.templateId);
   };
-  
+
   return (
     <Button
-      className={className}
-      variant={variant}
-      size={size}
+      type="button"
+      className={`${className}`}
       onClick={handleExport}
       disabled={isExporting}
+      variant="default"
     >
       {isExporting ? (
         <>
@@ -49,8 +53,8 @@ const PDFExportButton: React.FC<PDFExportButtonProps> = ({
         </>
       ) : (
         <>
-          <FileDown className="mr-2 h-4 w-4" />
-          {children || 'Download CV'}
+          <Download className="mr-2 h-4 w-4" />
+          {children}
         </>
       )}
     </Button>

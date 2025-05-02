@@ -1,126 +1,166 @@
-import React, { useState } from 'react';
+/**
+ * Summary AI Enhancement Component
+ * This component provides AI-powered enhancement for CV professional summaries
+ */
+
 import { Button } from '@/components/ui/button';
-import { Loader2, Wand2 } from 'lucide-react';
-import { enhanceProfessionalSummary, hasOpenAIApiKey } from '@/lib/openai-service';
-import AIKeyInput from '@/components/AIKeyInput';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { hasOpenAIApiKey, enhanceProfessionalSummary } from '@/lib/openai-service';
+import { AlertCircle, Brain, Loader2, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface SummaryAIEnhancementProps {
   currentSummary: string;
-  jobTitle?: string;
-  workExperience?: string;
-  onApplyEnhancement: (enhancedSummary: string) => void;
-  onCancel: () => void;
+  jobTitle: string;
+  yearsOfExperience?: number;
+  onUpdateSummary: (summary: string) => void;
+  onSkip: () => void;
 }
 
+/**
+ * Component for enhancing CV professional summaries with AI
+ */
 const SummaryAIEnhancement: React.FC<SummaryAIEnhancementProps> = ({
   currentSummary,
   jobTitle,
-  workExperience,
-  onApplyEnhancement,
-  onCancel
+  yearsOfExperience,
+  onUpdateSummary,
+  onSkip,
 }) => {
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [enhancedSummary, setEnhancedSummary] = useState<string>('');
-  const [apiKeySet, setApiKeySet] = useState(hasOpenAIApiKey());
-  
-  const generateEnhancement = async () => {
-    setIsGenerating(true);
+  const { toast } = useToast();
+
+  const handleEnhanceSummary = async () => {
+    if (!hasOpenAIApiKey()) {
+      setError('OpenAI API key not found. Please add your API key to use AI features.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const enhanced = await enhanceProfessionalSummary(currentSummary, jobTitle, workExperience);
+      // Make sure we have a summary to enhance
+      const summaryToEnhance = currentSummary || `Professional ${jobTitle} with experience in the field.`;
+      
+      // Handle undefined yearsOfExperience
+      const enhanced = await enhanceProfessionalSummary(summaryToEnhance, jobTitle, yearsOfExperience || undefined);
       setEnhancedSummary(enhanced);
-    } catch (error) {
-      console.error('Error enhancing summary:', error);
-      // If there's an error, at least show the original summary
-      setEnhancedSummary(currentSummary);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to enhance summary';
+      setError(errorMessage);
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive',
+      });
     } finally {
-      setIsGenerating(false);
+      setIsLoading(false);
     }
   };
-  
-  // Start generating when the component mounts
-  React.useEffect(() => {
-    generateEnhancement();
-  }, [apiKeySet]);
-  
+
+  const handleUseSummary = () => {
+    onUpdateSummary(enhancedSummary);
+  };
+
+  if (enhancedSummary) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Sparkles className="mr-2 h-5 w-5" /> Enhanced Summary
+          </CardTitle>
+          <CardDescription>
+            Review your AI-enhanced professional summary below.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            value={enhancedSummary}
+            onChange={(e) => setEnhancedSummary(e.target.value)}
+            className="min-h-[150px] resize-none"
+          />
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline" onClick={onSkip}>
+            Use Original
+          </Button>
+          <Button onClick={handleUseSummary}>
+            Use Enhanced Summary
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="border-destructive">
+        <CardHeader>
+          <CardTitle className="flex items-center text-destructive">
+            <AlertCircle className="mr-2 h-5 w-5" /> Error
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm">{error}</p>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline" onClick={onSkip}>
+            Skip AI Features
+          </Button>
+          <Button variant="default" onClick={handleEnhanceSummary}>
+            Try Again
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-90 z-50">
-      <div className="bg-white rounded-lg border p-6 shadow-lg max-w-3xl w-full">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">AI-Enhanced Professional Summary</h2>
-          <div className="flex items-center gap-2">
-            <AIKeyInput onApiKeySet={(hasKey) => {
-              setApiKeySet(hasKey);
-              // Re-run enhancement if API key changes
-              if (hasKey) {
-                generateEnhancement();
-              }
-            }} />
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="p-2" 
-              onClick={generateEnhancement}
-              disabled={isGenerating}
-            >
-              <Wand2 className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
-              Regenerate
-            </Button>
-          </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Brain className="mr-2 h-5 w-5" /> Enhance Your Professional Summary
+        </CardTitle>
+        <CardDescription>
+          Let AI help you craft a more impactful professional summary for your CV.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm mb-4">
+          Your current summary:
+        </p>
+        <div className="bg-muted p-3 rounded-md text-sm mb-4">
+          {currentSummary || <span className="text-muted-foreground italic">No summary provided yet</span>}
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <Card>
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-2">Original Summary</h3>
-              <div className="bg-gray-50 p-4 rounded-md h-[200px] overflow-auto">
-                {currentSummary ? currentSummary : 
-                <span className="text-gray-400 italic">No summary provided</span>}
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-2">Enhanced Summary</h3>
-              {isGenerating ? (
-                <div className="flex items-center justify-center h-[200px] bg-gray-50 rounded-md">
-                  <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                    <span className="text-sm text-gray-500">Creating enhanced summary...</span>
-                  </div>
-                </div>
-              ) : (
-                <Textarea
-                  className="h-[200px] bg-gray-50"
-                  value={enhancedSummary}
-                  onChange={(e) => setEnhancedSummary(e.target.value)}
-                  placeholder="Enhanced summary will appear here"
-                />
-              )}
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="flex justify-between">
-          <Button 
-            variant="outline" 
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
-          
-          <Button 
-            onClick={() => onApplyEnhancement(enhancedSummary)}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            disabled={isGenerating || !enhancedSummary}
-          >
-            Apply Enhancement
-          </Button>
-        </div>
-      </div>
-    </div>
+        <p className="text-sm">
+          Our AI can enhance your professional summary to make it more compelling
+          and tailored to your {jobTitle} position.
+        </p>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button variant="outline" onClick={onSkip}>
+          Skip
+        </Button>
+        <Button 
+          onClick={handleEnhanceSummary}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Enhancing...
+            </>
+          ) : (
+            <>Enhance Summary</>
+          )}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 

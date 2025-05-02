@@ -18,7 +18,7 @@ import {
   Phone
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { getTemplateById } from '@/lib/templates-registry';
+import { getTemplateWithMetadata } from '@/lib/templates-registry';
 import { Badge } from '@/components/ui/badge';
 import { generatePDF } from '@/lib/pdf-generator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -34,7 +34,7 @@ const PreviewStep: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('preview');
   
   // Get template info
-  const template = getTemplateById(formData.templateId);
+  const template = getTemplateWithMetadata(formData.templateId);
   
   // Handle PDF download
   const handleDownloadPDF = async () => {
@@ -67,8 +67,8 @@ const PreviewStep: React.FC = () => {
         return 'partial';
         
       case 'workExperience':
-        if (!formData.workExperience || formData.workExperience.length === 0) return 'empty';
-        const allWorkComplete = formData.workExperience.every(exp => 
+        if (!formData.workExperiences || formData.workExperiences.length === 0) return 'empty';
+        const allWorkComplete = formData.workExperiences.every((exp: any) => 
           exp.jobTitle && exp.company && exp.startDate);
         return allWorkComplete ? 'complete' : 'partial';
         
@@ -83,8 +83,8 @@ const PreviewStep: React.FC = () => {
         return formData.skills.length >= 3 ? 'complete' : 'partial';
         
       case 'summary':
-        if (!formData.summary) return 'empty';
-        return formData.summary.length >= 50 ? 'complete' : 'partial';
+        if (!formData.personalInfo?.summary) return 'empty';
+        return formData.personalInfo.summary.length >= 50 ? 'complete' : 'partial';
         
       case 'languages':
         if (!formData.languages || formData.languages.length === 0) return 'empty';

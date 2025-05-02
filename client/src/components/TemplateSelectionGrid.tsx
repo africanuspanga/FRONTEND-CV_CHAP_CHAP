@@ -1,5 +1,6 @@
 import React from 'react';
-import { getAllTemplates, getTemplatesByCategory, TemplateDefinition } from '@/lib/templates-registry';
+import { getAllTemplatesWithMetadata as getAllTemplates, TemplateWithMetadata } from '@/lib/templates-registry';
+import { getTemplatesByCategory } from '@/lib/simple-template-registry';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,9 +16,20 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
   selectedTemplateId,
   filterCategory
 }) => {
+  // Get templates from either filtered category or all templates
   const templates = filterCategory 
-    ? getTemplatesByCategory(filterCategory) 
-    : getAllTemplates();
+    ? getTemplatesByCategory(filterCategory).map(template => ({
+        ...template,
+        description: 'Professional CV template with clean design.',
+        previewImage: '',
+        category: filterCategory,
+        popularity: 4
+      }))
+    : getAllTemplates().map(template => ({
+        ...template,
+        category: 'Modern',
+        popularity: template.isPopular ? 5 : 4
+      }));
 
   const renderStarRating = (rating: number) => {
     return (

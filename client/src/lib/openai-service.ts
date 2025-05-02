@@ -1,245 +1,160 @@
-import OpenAI from 'openai';
-import { toast } from '@/hooks/use-toast';
+/**
+ * OpenAI Service for CV Chap Chap
+ * This module provides utility functions for interacting with the OpenAI API
+ */
 
-// Store API key in memory during the session
-let openAIApiKey: string | null = null;
+// Storage key for the OpenAI API key in localStorage
+const OPENAI_API_KEY_STORAGE_KEY = 'cv-chap-chap-openai-api-key';
 
 /**
- * Set the OpenAI API key
+ * Check if an OpenAI API key exists in localStorage
  */
-export const setOpenAIApiKey = (apiKey: string) => {
-  openAIApiKey = apiKey;
-  // Store in session storage to preserve during page refreshes
-  // but not permanently
-  sessionStorage.setItem('openai_api_key', apiKey);
-};
-
-/**
- * Get the OpenAI API key
- */
-export const getOpenAIApiKey = (): string | null => {
-  // Try to get from memory first
-  if (openAIApiKey) return openAIApiKey;
-  
-  // Then try session storage
-  const storedKey = sessionStorage.getItem('openai_api_key');
-  if (storedKey) {
-    openAIApiKey = storedKey;
-    return storedKey;
-  }
-  
-  return null;
-};
-
-/**
- * Clear the stored API key
- */
-export const clearOpenAIApiKey = () => {
-  openAIApiKey = null;
-  sessionStorage.removeItem('openai_api_key');
-};
-
-/**
- * Check if OpenAI API key is available
- */
-export const hasOpenAIApiKey = (): boolean => {
+export function hasOpenAIApiKey(): boolean {
   return !!getOpenAIApiKey();
-};
+}
 
 /**
- * Initialize the OpenAI client
+ * Get the OpenAI API key from localStorage
  */
-const getOpenAIClient = () => {
+export function getOpenAIApiKey(): string | null {
+  return localStorage.getItem(OPENAI_API_KEY_STORAGE_KEY);
+}
+
+/**
+ * Set the OpenAI API key in localStorage
+ */
+export function setOpenAIApiKey(apiKey: string): void {
+  localStorage.setItem(OPENAI_API_KEY_STORAGE_KEY, apiKey);
+}
+
+/**
+ * Clear the OpenAI API key from localStorage
+ */
+export function clearOpenAIApiKey(): void {
+  localStorage.removeItem(OPENAI_API_KEY_STORAGE_KEY);
+}
+
+/**
+ * Make a request to the OpenAI API
+ */
+async function makeOpenAIRequest(prompt: string, maxTokens: number = 500): Promise<string> {
   const apiKey = getOpenAIApiKey();
   if (!apiKey) {
-    throw new Error('OpenAI API key not set');
+    throw new Error('No OpenAI API key found');
   }
-  
-  return new OpenAI({ apiKey: apiKey, dangerouslyAllowBrowser: true });
-};
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a professional CV writing assistant. Provide clear, concise, and professional content.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: maxTokens,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'Failed to get response from OpenAI');
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content.trim();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Unknown error occurred while making OpenAI request');
+  }
+}
 
 /**
- * Generate work experience bullet points based on job title and company
+ * Get AI-generated work experience bullet points
  */
-export const generateWorkExperienceBullets = async (
+export async function getWorkExperienceRecommendations(
   jobTitle: string,
   company: string,
-  additionalContext?: string
-): Promise<string[]> => {
-  try {
-    if (!hasOpenAIApiKey()) {
-      return [
-        `Led cross-functional teams in ${company} to deliver innovative solutions on time and within budget`,
-        `Implemented process improvements resulting in 25% efficiency gain at ${company}`,
-        `Developed and maintained strong client relationships, contributing to 30% year-over-year business growth`,
-        `Collaborated with internal teams to streamline operations and enhance service delivery`,
-      ];
-    }
-    
-    const openai = getOpenAIClient();
-    
-    const prompt = `Generate 4-5 professional and impressive bullet points for a resume/CV for someone who worked as a ${jobTitle} at ${company}.${additionalContext ? ` Additional context: ${additionalContext}` : ''}`;
-    
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      messages: [{
-        role: "system",
-        content: "You are a professional CV writer that specializes in creating powerful, impactful bullet points for work experience sections. Generate 4-5 accomplishment-focused bullet points that emphasize achievements, skills, and impact. Use action verbs and quantify results when possible. Format as a JSON array of strings without numbers or bullets."
-      }, {
-        role: "user",
-        content: prompt
-      }],
-      response_format: { type: "json_object" }
-    });
-    
-    const content = response.choices[0].message.content || '{"bullets":[]}';
-    const result = JSON.parse(content);
-    return result.bullets || [];
-    
-  } catch (error) {
-    console.error('Error generating work experience bullets:', error);
-    toast({
-      title: 'AI Enhancement Failed',
-      description: error instanceof Error ? error.message : 'Unknown error occurred',
-      variant: 'destructive',
-    });
-    
-    // Return fallback suggestions that don't look AI-generated
-    return [
-      `Led key initiatives at ${company} to improve operational efficiency`,
-      `Collaborated with cross-functional teams to deliver high-quality results`,
-      `Developed innovative solutions to address complex business challenges`,
-      `Maintained strong relationships with stakeholders and team members`,
-    ];
-  }
-};
+  industry?: string
+): Promise<string[]> {
+  const industryContext = industry ? ` in the ${industry} industry` : '';
+  const prompt = `Generate 5 professional bullet points for a ${jobTitle} position at ${company}${industryContext}. 
+  Focus on achievements and responsibilities. Make each point start with a strong action verb. 
+  Format the response as a plain list with one bullet point per line, without numbering. 
+  Each bullet point should be concise (15-20 words), impactful, and highlight transferable skills.`;
+
+  const result = await makeOpenAIRequest(prompt, 600);
+  
+  // Split the result into individual bullet points
+  return result
+    .split('\n')
+    .map(line => line.replace(/^[\s•\-*]+/, '').trim())
+    .filter(line => line.length > 0);
+}
 
 /**
- * Generate skills recommendations based on job title and experience
+ * Get AI-generated skills recommendations
  */
-export const generateSkillsRecommendations = async (
+export async function getSkillRecommendations(
   jobTitle: string,
-  workExperience: string
-): Promise<string[]> => {
-  try {
-    if (!hasOpenAIApiKey()) {
-      return [
-        'Project Management',
-        'Team Leadership',
-        'Strategic Planning',
-        'Communication',
-        'Problem Solving',
-        'Data Analysis',
-        'Microsoft Office Suite',
-        'CRM Software',
-      ];
-    }
-    
-    const openai = getOpenAIClient();
-    
-    const prompt = `Generate a list of 8-10 relevant skills for someone who worked as a ${jobTitle} with the following work experience: ${workExperience}`;
-    
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      messages: [{
-        role: "system",
-        content: "You are a professional CV writer specializing in identifying relevant skills based on job titles and work experience. Generate a list of 8-10 skills that would be valuable to include in a CV. Focus on both hard skills and soft skills. Format as a JSON array of strings."
-      }, {
-        role: "user",
-        content: prompt
-      }],
-      response_format: { type: "json_object" }
-    });
-    
-    const content = response.choices[0].message.content || '{"skills":[]}';
-    const result = JSON.parse(content);
-    return result.skills || [];
-    
-  } catch (error) {
-    console.error('Error generating skills recommendations:', error);
-    toast({
-      title: 'AI Enhancement Failed',
-      description: error instanceof Error ? error.message : 'Unknown error occurred',
-      variant: 'destructive',
-    });
-    
-    // Return fallback suggestions
-    return [
-      'Project Management',
-      'Team Leadership',
-      'Communication',
-      'Problem Solving',
-      'Strategic Planning',
-      'Data Analysis',
-      'Microsoft Office Suite',
-      'Customer Relationship Management',
-    ];
-  }
-};
+  yearsOfExperience?: number,
+  industry?: string
+): Promise<string[]> {
+  const experienceLevel = yearsOfExperience 
+    ? yearsOfExperience < 2 
+      ? 'entry-level'
+      : yearsOfExperience < 5
+      ? 'mid-level'
+      : 'senior-level'
+    : 'various experience levels';
+
+  const industryContext = industry ? ` in the ${industry} industry` : '';
+  const prompt = `Generate 10 relevant skills for a ${experienceLevel} ${jobTitle}${industryContext}.
+  Include both technical and soft skills.
+  Format the response as a plain list with one skill per line, without numbering.
+  Each skill should be concise (1-3 words when possible).`;
+
+  const result = await makeOpenAIRequest(prompt, 400);
+  
+  // Split the result into individual skills
+  return result
+    .split('\n')
+    .map(line => line.replace(/^[\s•\-*]+/, '').trim())
+    .filter(line => line.length > 0);
+}
 
 /**
  * Enhance a professional summary with AI
  */
-export const enhanceProfessionalSummary = async (
+export async function enhanceProfessionalSummary(
   currentSummary: string,
-  jobTitle?: string,
-  experience?: string
-): Promise<string> => {
-  try {
-    if (!hasOpenAIApiKey()) {
-      return currentSummary.length > 0
-        ? `${currentSummary} with a proven track record of achieving results through innovative thinking and leadership. Skilled in developing strategic initiatives that drive organizational growth while fostering a collaborative team environment.`
-        : 'Accomplished professional with extensive experience in delivering high-impact results through strategic planning and exemplary leadership. Adept at identifying opportunities for improvement and implementing solutions that drive business growth while maintaining operational excellence.';
-    }
-    
-    const openai = getOpenAIClient();
-    
-    let prompt = 'Enhance the following professional summary to make it more impactful, professional, and engaging:';
-    
-    if (currentSummary.trim().length > 0) {
-      prompt += `\n\nCurrent summary: ${currentSummary}`;
-    } else {
-      prompt += '\n\nThe current summary is empty. Please generate a professional summary';
-    }
-    
-    if (jobTitle) {
-      prompt += `\n\nJob title: ${jobTitle}`;
-    }
-    
-    if (experience) {
-      prompt += `\n\nWork experience: ${experience}`;
-    }
-    
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      messages: [{
-        role: "system",
-        content: "You are a professional CV writer specializing in creating powerful, concise, and impactful professional summaries. Enhance or create a summary that is compelling, highlights value, and avoids clichés. Keep the length to 3-5 sentences maximum. Return just the summary text without any additional commentary or formatting."
-      }, {
-        role: "user",
-        content: prompt
-      }]
-    });
-    
-    if (!response.choices?.[0]?.message?.content) {
-      return currentSummary || 'Experienced professional with strong skills in communication and problem-solving.';
-    }
-    
-    return response.choices[0].message.content.trim();
-    
-  } catch (error) {
-    console.error('Error enhancing professional summary:', error);
-    toast({
-      title: 'AI Enhancement Failed',
-      description: error instanceof Error ? error.message : 'Unknown error occurred',
-      variant: 'destructive',
-    });
-    
-    // Return slightly enhanced original or a default if empty
-    if (currentSummary.trim().length > 0) {
-      return currentSummary;
-    } else {
-      return 'Professional with experience in delivering results through strategic planning and collaboration. Dedicated to continuous improvement and achieving organizational objectives while maintaining high standards of quality and service.';
-    }
-  }
-};
+  jobTitle: string,
+  yearsOfExperience?: number,
+): Promise<string> {
+  const experienceContext = yearsOfExperience 
+    ? `with ${yearsOfExperience} years of experience` 
+    : 'with relevant experience';
+
+  const prompt = `Enhance the following professional summary for a ${jobTitle} ${experienceContext}:
+
+"${currentSummary}"
+
+Make it more impactful, professional, and concise (100-150 words). Highlight strengths and career achievements.
+Focus on value proposition. Use active voice and first-person perspective.
+Avoid clichés and generic statements. Keep the tone professional but personable.`;
+
+  return await makeOpenAIRequest(prompt, 300);
+}
