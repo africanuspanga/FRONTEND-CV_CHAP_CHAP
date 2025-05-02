@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CVData } from '@shared/schema';
 import { Loader2 } from 'lucide-react';
-import { getTemplateByID } from '@/templates';
+import { getTemplateByID } from '@/templates/index';
 
 interface ClientSideTemplateRendererProps {
   templateId: string;

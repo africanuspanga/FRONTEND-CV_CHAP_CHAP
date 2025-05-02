@@ -1,191 +1,256 @@
-import { templateImages } from './template-images';
+/**
+ * Client-side template registry for CV Chap Chap
+ * 
+ * This module provides access to all available CV templates without any backend dependencies.
+ * Templates are loaded dynamically from the templates directory and cached for performance.
+ */
 
-export interface TemplateDefinition {
+import { CVTemplate, getAllTemplates, getTemplateByID } from '@/templates/index';
+
+// Define color scheme options
+export interface ColorScheme {
   id: string;
   name: string;
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  text: string;
+}
+
+// Define template with additional metadata
+export interface TemplateWithMetadata extends CVTemplate {
   description: string;
-  contentPath: string;
-  isLocal: boolean;
-  category: 'Modern' | 'Professional' | 'Creative' | 'Academic';
-  popularity: 1 | 2 | 3 | 4 | 5;
-  previewImage: string;
+  colorSchemes: ColorScheme[];
+  previewImage?: string;
+  isPopular?: boolean;
+  isNew?: boolean;
+  isPro?: boolean;
 }
 
-export const templateRegistry: TemplateDefinition[] = [
-  {
-    id: 'moonlightSonata',
-    name: 'Moonlight Sonata',
-    description: 'A modern template with a warm orange sidebar and clean layout',
-    contentPath: '/templates/moonlight-sonata.html',
-    isLocal: true,
-    category: 'Modern',
-    popularity: 5,
-    previewImage: templateImages.moonlightSonata
-  },
-  {
-    id: 'kaziFasta',
-    name: 'Kazi Fasta',
-    description: 'Clean two-column layout with skill bars and detailed professional experience sections',
-    contentPath: '/templates/kazi-fasta.html',
-    isLocal: true,
-    category: 'Professional',
-    popularity: 5,
-    previewImage: templateImages.kaziFasta
-  },
-  {
-    id: 'jijengeClassic',
-    name: 'Jijenge Classic',
-    description: 'Professional template with clean layout and subtle gray sidebar',
-    contentPath: '/templates/jijenge-classic.html',
-    isLocal: true,
-    category: 'Professional',
-    popularity: 5,
-    previewImage: templateImages.jijengeClassic
-  },
-  {
-    id: 'kilimanjaro',
-    name: 'Kilimanjaro',
-    description: 'Modern left-sidebar CV with tag-style skills and detailed education section',
-    contentPath: '/templates/kilimanjaro.html',
-    isLocal: true,
-    category: 'Creative',
-    popularity: 5,
-    previewImage: templateImages.kilimanjaro
-  },
-  {
-    id: 'brightDiamond',
-    name: 'Bright Diamond',
-    description: 'Clean modern template with teal accents and multi-column skills section',
-    contentPath: '/templates/bright-diamond.html',
-    isLocal: true,
-    category: 'Modern',
-    popularity: 5,
-    previewImage: templateImages.brightDiamond
-  },
-  {
-    id: 'mjenziWaTaifa',
-    name: 'Mjenzi wa Taifa',
-    description: 'Elegant beige-header template with three-column layout and skill progress bars',
-    contentPath: '/templates/mjenzi-wa-taifa.html',
-    isLocal: true,
-    category: 'Professional',
-    popularity: 5,
-    previewImage: templateImages.mjenziWaTaifa
-  },
-  {
-    id: 'streetHustler',
-    name: 'Street Hustler',
-    description: 'Clean professional template with centered header and detailed work experience sections',
-    contentPath: '/templates/street-hustler.html',
-    isLocal: true,
-    category: 'Professional',
-    popularity: 5,
-    previewImage: templateImages.streetHustler
-  },
-  {
-    id: 'safariOriginal',
-    name: 'Safari Original',
-    description: 'Professional template with sidebar layout and detailed experience sections',
-    contentPath: '/templates/safari-original.html',
-    isLocal: true,
-    category: 'Professional',
-    popularity: 5,
-    previewImage: templateImages.safariOriginal
-  },
-  {
-    id: 'bigBoss',
-    name: 'Big Boss',
-    description: 'Bold template with dark header and elegant two-column top section',
-    contentPath: '/templates/big-boss.html',
-    isLocal: true,
-    category: 'Modern',
-    popularity: 5,
-    previewImage: templateImages.bigBoss
-  },
-  {
-    id: 'tanzanitePro',
-    name: 'Tanzanite Pro',
-    description: 'Elegant template with clean circular initials and professional two-column layout',
-    contentPath: '/templates/tanzanite-pro.html',
-    isLocal: true,
-    category: 'Professional',
-    popularity: 5,
-    previewImage: templateImages.tanzanitePro
-  },
-  {
-    id: 'mwalimuOne',
-    name: 'Mwalimu One',
-    description: 'Clean centered CV with elegant section headers and balanced two-column skills layout',
-    contentPath: '/templates/mwalimu-one.html',
-    isLocal: true,
-    category: 'Professional',
-    popularity: 5,
-    previewImage: templateImages.mwalimuOne
-  },
-  {
-    id: 'serengetiFlow',
-    name: 'Serengeti Flow',
-    description: 'Professional template with dark blue header and clean two-column content layout',
-    contentPath: '/templates/serengeti-flow.html',
-    isLocal: true,
-    category: 'Professional',
-    popularity: 5,
-    previewImage: templateImages.serengetiFlow
-  },
-  {
-    id: 'smartBongo',
-    name: 'Smart Bongo',
-    description: 'Professional dark-gray sidebar template with modern grid layout and footer contact section',
-    contentPath: '/templates/smart-bongo.html',
-    isLocal: true,
-    category: 'Professional',
-    popularity: 5,
-    previewImage: templateImages.smartBongo
-  },
-  {
-    id: 'madiniMob',
-    name: 'Madini Mob',
-    description: 'Elegant minimalist template with grey accent headers and clean two-column skills layout',
-    contentPath: '/templates/madini-mob.html',
-    isLocal: true,
-    category: 'Modern',
-    popularity: 5,
-    previewImage: templateImages.madiniMob
-  },
-  {
-    id: 'mkaliModern',
-    name: 'Mkali Modern',
-    description: 'Stylish teal template with timeline experience section and dashed skill bars',
-    contentPath: '/templates/mkali-modern.html',
-    isLocal: true,
-    category: 'Creative',
-    popularity: 5,
-    previewImage: templateImages.mkaliModern
-  }
-];
+// Color scheme presets that can be applied to any template
+const colorSchemes: Record<string, ColorScheme[]> = {
+  standard: [
+    {
+      id: 'blue',
+      name: 'Professional Blue',
+      primary: '#034694',
+      secondary: '#f8f9fa',
+      accent: '#6c757d',
+      background: '#ffffff',
+      text: '#212529'
+    },
+    {
+      id: 'green',
+      name: 'Forest Green',
+      primary: '#2E7D32',
+      secondary: '#f1f8e9',
+      accent: '#689f38',
+      background: '#ffffff',
+      text: '#212529'
+    },
+    {
+      id: 'red',
+      name: 'Bold Red',
+      primary: '#c62828',
+      secondary: '#ffebee',
+      accent: '#ef5350',
+      background: '#ffffff',
+      text: '#212529'
+    },
+    {
+      id: 'purple',
+      name: 'Royal Purple',
+      primary: '#6a1b9a',
+      secondary: '#f3e5f5',
+      accent: '#ab47bc',
+      background: '#ffffff',
+      text: '#212529'
+    },
+    {
+      id: 'teal',
+      name: 'Teal Accent',
+      primary: '#00796b',
+      secondary: '#e0f2f1',
+      accent: '#26a69a',
+      background: '#ffffff',
+      text: '#212529'
+    },
+    {
+      id: 'orange',
+      name: 'Vibrant Orange',
+      primary: '#ef6c00',
+      secondary: '#fff3e0',
+      accent: '#ff9800',
+      background: '#ffffff',
+      text: '#212529'
+    },
+    {
+      id: 'grey',
+      name: 'Classic Grey',
+      primary: '#455a64',
+      secondary: '#eceff1',
+      accent: '#78909c',
+      background: '#ffffff',
+      text: '#212529'
+    },
+  ],
+  modern: [
+    {
+      id: 'monochrome',
+      name: 'Monochrome',
+      primary: '#212529',
+      secondary: '#f8f9fa',
+      accent: '#495057',
+      background: '#ffffff',
+      text: '#212529'
+    },
+    {
+      id: 'sepia',
+      name: 'Sepia',
+      primary: '#6d4c41',
+      secondary: '#efebe9',
+      accent: '#8d6e63',
+      background: '#fffcf7',
+      text: '#3e2723'
+    },
+  ]
+};
 
-/**
- * Retrieve a template by its ID
- * @param id The template ID to look up
- * @returns The template definition or undefined if not found
- */
-export function getTemplateById(id: string): TemplateDefinition | undefined {
-  return templateRegistry.find(template => template.id === id);
-}
+// Get template metadata
+const getTemplateMetadata = (templateId: string): Partial<TemplateWithMetadata> => {
+  // Default descriptions and metadata
+  const defaultMetadata: Record<string, Partial<TemplateWithMetadata>> = {
+    moonlightSonata: {
+      description: 'Elegant and modern design with subtle accents and clean layout.',
+      colorSchemes: colorSchemes.standard,
+      isPopular: true,
+    },
+    kaziFasta: {
+      description: 'Bold, attention-grabbing design that showcases your achievements.',
+      colorSchemes: colorSchemes.standard,
+      isNew: true,
+    },
+    jijengeClassic: {
+      description: 'Traditional CV layout with a professional appearance.',
+      colorSchemes: colorSchemes.standard,
+    },
+    kilimanjaro: {
+      description: 'Impressive and standout design inspired by Tanzania\'s highest peak.',
+      colorSchemes: colorSchemes.standard,
+      isPopular: true,
+    },
+    brightDiamond: {
+      description: 'Clean, sparkling design that makes your skills shine.',
+      colorSchemes: colorSchemes.standard,
+    },
+    mjenziWaTaifa: {
+      description: 'Strong, structured layout ideal for construction and engineering professionals.',
+      colorSchemes: colorSchemes.standard,
+    },
+    streetHustler: {
+      description: 'Urban, dynamic design for creative professionals.',
+      colorSchemes: colorSchemes.standard,
+      isNew: true,
+    },
+    safariOriginal: {
+      description: 'Adventure-inspired design that takes your career journey to new heights.',
+      colorSchemes: colorSchemes.standard,
+    },
+    bigBoss: {
+      description: 'Executive-level design that commands attention.',
+      colorSchemes: colorSchemes.standard,
+      isPro: true,
+    },
+    tanzanitePro: {
+      description: 'Rare and valuable like the gemstone, this design makes you stand out.',
+      colorSchemes: colorSchemes.standard,
+      isPro: true,
+    },
+    mwalimuOne: {
+      description: 'Scholarly design perfect for education professionals.',
+      colorSchemes: colorSchemes.standard,
+    },
+    serengetiFlow: {
+      description: 'Natural, flowing design inspired by Tanzania\'s famous plains.',
+      colorSchemes: colorSchemes.standard,
+    },
+    smartBongo: {
+      description: 'Intelligent design with a modern twist for tech professionals.',
+      colorSchemes: colorSchemes.standard,
+      isNew: true,
+    },
+    madiniMob: {
+      description: 'Resource-rich design showcasing your valuable skills and experience.',
+      colorSchemes: colorSchemes.standard,
+    },
+    mkaliModern: {
+      description: 'Sharp, contemporary design for the modern professional.',
+      colorSchemes: colorSchemes.standard,
+      isPopular: true,
+    }
+  };
+  
+  return defaultMetadata[templateId] || {};
+};
 
-/**
- * Get all available templates
- * @returns Array of all template definitions
- */
-export function getAllTemplates(): TemplateDefinition[] {
-  return templateRegistry;
-}
+// Get all templates with metadata
+export const getAllTemplatesWithMetadata = (): TemplateWithMetadata[] => {
+  const templates = getAllTemplates();
+  
+  return templates.map(template => {
+    const metadata = getTemplateMetadata(template.id);
+    return {
+      ...template,
+      description: metadata.description || 'Professional CV template with clean design.',
+      colorSchemes: metadata.colorSchemes || colorSchemes.standard,
+      isPopular: metadata.isPopular || false,
+      isNew: metadata.isNew || false,
+      isPro: metadata.isPro || false,
+    };
+  });
+};
 
-/**
- * Filter templates by category
- * @param category The category to filter by
- * @returns Array of template definitions in that category
- */
-export function getTemplatesByCategory(category: string): TemplateDefinition[] {
-  return templateRegistry.filter(template => template.category === category);
-}
+// Get template by ID with metadata
+export const getTemplateWithMetadata = (id: string): TemplateWithMetadata | undefined => {
+  const template = getTemplateByID(id);
+  if (!template) return undefined;
+  
+  const metadata = getTemplateMetadata(id);
+  return {
+    ...template,
+    description: metadata.description || 'Professional CV template with clean design.',
+    colorSchemes: metadata.colorSchemes || colorSchemes.standard,
+    isPopular: metadata.isPopular || false,
+    isNew: metadata.isNew || false,
+    isPro: metadata.isPro || false,
+  };
+};
+
+// Get popular templates
+export const getPopularTemplates = (): TemplateWithMetadata[] => {
+  return getAllTemplatesWithMetadata().filter(template => template.isPopular);
+};
+
+// Get new templates
+export const getNewTemplates = (): TemplateWithMetadata[] => {
+  return getAllTemplatesWithMetadata().filter(template => template.isNew);
+};
+
+// Get pro templates
+export const getProTemplates = (): TemplateWithMetadata[] => {
+  return getAllTemplatesWithMetadata().filter(template => template.isPro);
+};
+
+// Apply a color scheme to a template (for preview purposes)
+export const applyColorScheme = (templateId: string, colorSchemeId: string): TemplateWithMetadata | undefined => {
+  const template = getTemplateWithMetadata(templateId);
+  if (!template) return undefined;
+  
+  const colorScheme = template.colorSchemes.find(scheme => scheme.id === colorSchemeId);
+  if (!colorScheme) return template;
+  
+  // Here we could modify the template render function to apply the color scheme
+  // This is a placeholder for actual implementation
+  return template;
+};

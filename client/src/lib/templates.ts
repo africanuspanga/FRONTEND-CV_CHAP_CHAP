@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { getAllTemplates, getTemplateById, getTemplatesByCategory } from './templates-registry';
+import { getAllTemplates, getTemplateByID } from '@/templates/index';
+
+// Note: This file bridges between templates/index.ts and the application components
+// It will be eventually replaced by templates-registry.ts
 
 export interface Template {
   id: string;
@@ -14,11 +17,11 @@ export interface Template {
  */
 export const getTemplates = async (): Promise<Template[]> => {
   // Get templates from registry and map to Template interface
-  const templates = getAllTemplates().map(template => ({
+  const templates = getAllTemplates().map((template: any) => ({
     id: template.id,
     name: template.name,
-    description: template.description,
-    thumbnail: template.previewImage
+    description: 'Professional CV template with a clean and modern design.',
+    thumbnail: ''
   }));
   
   return Promise.resolve(templates);

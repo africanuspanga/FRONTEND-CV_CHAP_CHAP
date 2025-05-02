@@ -1,6 +1,7 @@
 import html2pdf from 'html2pdf.js';
 import { CVData } from '@shared/schema';
-import { getTemplateByID } from '@/templates';
+import { getTemplateByID } from '@/templates/index';
+import React from 'react';
 
 /**
  * Generate PDF directly from React components
@@ -28,8 +29,9 @@ export const generateClientSidePDF = async (cvData: CVData, templateId: string):
     
     // Wait for template to render
     await new Promise<void>(resolve => {
-      const Template = template.render;
-      root.render(<Template {...cvData} />);
+      const TemplateComponent = template.render;
+      // @ts-ignore - This is correct usage but TypeScript doesn't know about JSX here
+      root.render(React.createElement(TemplateComponent, cvData));
       
       // Give it a moment to render completely
       setTimeout(resolve, 500);
