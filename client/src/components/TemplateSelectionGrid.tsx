@@ -52,7 +52,7 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
             <div className="relative h-[300px] sm:h-[400px] md:h-[500px] bg-white overflow-hidden">
               <div className="absolute inset-0 bg-gray-100 animate-pulse" /> {/* Loading placeholder */}
               <img
-                src={template.previewImage}
+                src={template.previewImage || '/static/templates-preview.png'}
                 alt={`${template.name} template preview`}
                 className="w-full h-full object-contain object-top px-2 relative z-10"
                 style={{
@@ -71,7 +71,12 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
                 }}
                 onError={(e) => {
                   console.error(`Failed to load image: ${template.previewImage}`);
-                  e.currentTarget.style.display = 'none';
+                  // Attempt to load fallback image instead of hiding
+                  if (template.previewImage !== '/static/templates-preview.png') {
+                    e.currentTarget.src = '/static/templates-preview.png';
+                  } else {
+                    e.currentTarget.style.display = 'none';
+                  }
                 }}
               />
             </div>
