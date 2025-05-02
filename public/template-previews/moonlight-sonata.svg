@@ -1,0 +1,29 @@
+<svg width="300" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#f8f9fa"/>
+  
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="30%" height="100%" fill="#ff9966"/>
+  
+  <!-- Header section -->
+  <rect x="35%" y="5%" width="60%" height="15%" rx="4" fill="#e9ecef"/>
+  
+  <!-- Contact info -->
+  <rect x="5%" y="25%" width="20%" height="40%" rx="4" fill="#ffccb3"/>
+  
+  <!-- Skills section -->
+  <rect x="5%" y="70%" width="20%" height="25%" rx="4" fill="#ffccb3"/>
+  
+  <!-- Main content: Experience -->
+  <rect x="35%" y="25%" width="60%" height="30%" rx="4" fill="#e9ecef"/>
+  
+  <!-- Main content: Education -->
+  <rect x="35%" y="60%" width="60%" height="20%" rx="4" fill="#e9ecef"/>
+  
+  <!-- Main content: Additional section -->
+  <rect x="35%" y="85%" width="60%" height="10%" rx="4" fill="#e9ecef"/>
+  
+  <!-- Text -->
+  <text x="50%" y="50%" font-family="Arial" font-size="16" fill="#212529" text-anchor="middle" dominant-baseline="middle">Moonlight Sonata</text>
+  <text x="50%" y="56%" font-family="Arial" font-size="12" fill="#6c757d" text-anchor="middle" dominant-baseline="middle">Elegant modern template</text>
+</svg>

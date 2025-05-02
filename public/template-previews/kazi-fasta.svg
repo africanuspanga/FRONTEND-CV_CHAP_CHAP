@@ -1,0 +1,36 @@
+<svg width="300" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="100%" height="15%" fill="#2563eb"/>
+  <rect x="5%" y="5%" width="25%" height="7%" rx="4" fill="#60a5fa"/>
+  <rect x="70%" y="5%" width="25%" height="7%" rx="4" fill="#60a5fa"/>
+  
+  <!-- Two column layout -->
+  <rect x="5%" y="20%" width="40%" height="75%" fill="#f3f4f6"/>
+  <rect x="55%" y="20%" width="40%" height="75%" fill="#f3f4f6"/>
+  
+  <!-- Left column content -->
+  <rect x="10%" y="25%" width="30%" height="5%" rx="4" fill="#d1d5db"/>
+  <rect x="10%" y="32%" width="30%" height="20%" rx="4" fill="#d1d5db"/>
+  <rect x="10%" y="55%" width="30%" height="5%" rx="4" fill="#d1d5db"/>
+  
+  <!-- Right column content -->
+  <rect x="60%" y="25%" width="30%" height="5%" rx="4" fill="#d1d5db"/>
+  
+  <!-- Skill bars -->
+  <rect x="60%" y="35%" width="30%" height="2.5%" rx="4" fill="#2563eb"/>
+  <rect x="60%" y="40%" width="25%" height="2.5%" rx="4" fill="#2563eb"/>
+  <rect x="60%" y="45%" width="20%" height="2.5%" rx="4" fill="#2563eb"/>
+  <rect x="60%" y="50%" width="28%" height="2.5%" rx="4" fill="#2563eb"/>
+  <rect x="60%" y="55%" width="22%" height="2.5%" rx="4" fill="#2563eb"/>
+  
+  <!-- Additional sections -->
+  <rect x="60%" y="65%" width="30%" height="5%" rx="4" fill="#d1d5db"/>
+  <rect x="60%" y="75%" width="30%" height="15%" rx="4" fill="#d1d5db"/>
+  
+  <!-- Text -->
+  <text x="50%" y="50%" font-family="Arial" font-size="16" fill="#212529" text-anchor="middle" dominant-baseline="middle">Kazi Fasta</text>
+  <text x="50%" y="56%" font-family="Arial" font-size="12" fill="#6c757d" text-anchor="middle" dominant-baseline="middle">Clean two-column layout</text>
+</svg>
