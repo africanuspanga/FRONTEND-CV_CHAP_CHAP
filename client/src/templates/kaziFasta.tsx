@@ -1,7 +1,80 @@
 import React from 'react';
 import { CVData } from '@shared/schema';
 
-export function KaziFastaTemplate({ personalInfo, workExperience, education, skills, summary, languages, references }: CVData): JSX.Element {
+interface PersonalInfo {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  jobTitle?: string;
+  website?: string;
+}
+
+interface WorkExperience {
+  id?: string;
+  jobTitle: string;
+  company: string;
+  startDate: string;
+  endDate?: string;
+  location?: string;
+  description?: string;
+  achievements?: string[];
+}
+
+interface Education {
+  id?: string;
+  degree: string;
+  institution: string;
+  startDate: string;
+  endDate?: string;
+  fieldOfStudy?: string;
+  description?: string;
+  achievements?: string[];
+}
+
+interface Skill {
+  id?: string;
+  name: string;
+  level?: number;
+}
+
+interface Language {
+  id?: string;
+  name: string;
+  proficiency: string;
+}
+
+interface Reference {
+  id?: string;
+  name: string;
+  position?: string;
+  company?: string;
+  email?: string;
+  phone?: string;
+}
+
+interface CVDataTemplate {
+  personalInfo?: PersonalInfo;
+  workExperience?: WorkExperience[];
+  education?: Education[];
+  skills?: Skill[];
+  summary?: string;
+  languages?: Language[];
+  references?: Reference[];
+}
+
+export function KaziFastaTemplate(cvData: CVDataTemplate = {}): JSX.Element {
+  // Safely destructure with default empty values to prevent null errors
+  const {
+    personalInfo = {} as PersonalInfo,
+    workExperience = [] as WorkExperience[],
+    education = [] as Education[],
+    skills = [] as Skill[],
+    summary = '',
+    languages = [] as Language[],
+    references = [] as Reference[]
+  } = cvData || {};
   return (
     <div className="kazi-fasta-template" style={{ 
       fontFamily: 'Arial, sans-serif',
@@ -88,7 +161,7 @@ export function KaziFastaTemplate({ personalInfo, workExperience, education, ski
                     paddingBottom: '5px',
                     marginBottom: '15px'
                   }}>WORK EXPERIENCE</h2>
-                  {workExperience.map((job, index) => (
+                  {workExperience.map((job: WorkExperience, index: number) => (
                     <div key={`job-${index}-${job.id || ''}`} className="job" style={{ marginBottom: '20px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <h3 style={{ margin: '0 0 5px 0', fontSize: '1.1rem', fontWeight: 'bold' }}>
@@ -113,7 +186,7 @@ export function KaziFastaTemplate({ personalInfo, workExperience, education, ski
                           fontSize: '0.9rem',
                           lineHeight: '1.5'
                         }}>
-                          {job.achievements.map((achievement, achievementIndex) => (
+                          {job.achievements.map((achievement: string, achievementIndex: number) => (
                             <li key={achievementIndex}>{achievement}</li>
                           ))}
                         </ul>
@@ -132,7 +205,7 @@ export function KaziFastaTemplate({ personalInfo, workExperience, education, ski
                     paddingBottom: '5px',
                     marginBottom: '15px'
                   }}>EDUCATION</h2>
-                  {education.map((edu, index) => (
+                  {education.map((edu: Education, index: number) => (
                     <div key={`edu-${index}-${edu.id || ''}`} className="education-item" style={{ marginBottom: '20px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <h3 style={{ margin: '0 0 5px 0', fontSize: '1.1rem', fontWeight: 'bold' }}>
@@ -157,7 +230,7 @@ export function KaziFastaTemplate({ personalInfo, workExperience, education, ski
                           fontSize: '0.9rem',
                           lineHeight: '1.5'
                         }}>
-                          {edu.achievements.map((achievement, achievementIndex) => (
+                          {edu.achievements.map((achievement: string, achievementIndex: number) => (
                             <li key={achievementIndex}>{achievement}</li>
                           ))}
                         </ul>
@@ -173,7 +246,7 @@ export function KaziFastaTemplate({ personalInfo, workExperience, education, ski
                 <section className="skills" style={{ marginBottom: '25px' }}>
                   <h2 style={{ fontSize: '1.2rem', color: '#2c3e50', borderBottom: '2px solid #2c3e50', paddingBottom: '5px', marginBottom: '15px' }}>SKILLS</h2>
                   <div className="skills-container">
-                    {skills.map((skill, index) => (
+                    {skills.map((skill: Skill, index: number) => (
                       <div key={`skill-${index}-${skill.id || ''}`} className="skill-item" style={{ marginBottom: '12px' }}>
                         <div className="skill-name" style={{ fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '5px' }}>{skill.name}</div>
                         <div className="skill-bar-container" style={{ height: '8px', backgroundColor: '#ddd', borderRadius: '4px', overflow: 'hidden' }}>
@@ -197,7 +270,7 @@ export function KaziFastaTemplate({ personalInfo, workExperience, education, ski
                 <section className="languages" style={{ marginBottom: '25px' }}>
                   <h2 style={{ fontSize: '1.2rem', color: '#2c3e50', borderBottom: '2px solid #2c3e50', paddingBottom: '5px', marginBottom: '15px' }}>LANGUAGES</h2>
                   <div className="languages-container">
-                    {languages.map((language, index) => (
+                    {languages.map((language: Language, index: number) => (
                       <div key={`lang-${index}-${language.id || ''}`} className="language-item" style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
                         <span className="language-name" style={{ fontSize: '0.95rem', fontWeight: 'bold' }}>{language.name}</span>
                         <span className="language-level" style={{ fontSize: '0.9rem', color: '#555' }}>{language.proficiency}</span>
@@ -210,7 +283,7 @@ export function KaziFastaTemplate({ personalInfo, workExperience, education, ski
               {references && references.length > 0 && (
                 <section className="references" style={{ marginBottom: '25px' }}>
                   <h2 style={{ fontSize: '1.2rem', color: '#2c3e50', borderBottom: '2px solid #2c3e50', paddingBottom: '5px', marginBottom: '15px' }}>REFERENCES</h2>
-                  {references.map((reference, index) => (
+                  {references.map((reference: Reference, index: number) => (
                     <div key={`ref-${index}-${reference.id || ''}`} className="reference-item" style={{ marginBottom: '15px' }}>
                       <h3 style={{ fontSize: '1rem', fontWeight: 'bold', margin: '0 0 5px 0' }}>{reference.name}</h3>
                       {reference.position && <p style={{ fontSize: '0.9rem', margin: '0 0 2px 0', fontStyle: 'italic' }}>{reference.position}</p>}

@@ -149,7 +149,15 @@ export const ClientSideTemplateRenderer = ({
           marginRight: 'auto'
         }}
       >
-        <Template {...(cvData || {})} />
+        <Template {...(cvData || {
+          personalInfo: {},
+          workExperience: [],
+          education: [],
+          skills: [],
+          summary: '',
+          languages: [],
+          references: []
+        })} />
       </div>
     </div>
   );
