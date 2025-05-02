@@ -94,11 +94,11 @@ const WorkExperienceForm = () => {
         ]);
       } else {
         // Remove any preview items
-        const filteredExperiences = (formData.workExperience || []).filter(job => job.id !== 'preview-job');
-        updateFormField('workExperience', filteredExperiences);
+        const filteredExperiences = (formData.workExperiences || []).filter(job => job.id !== 'preview-job');
+        updateFormField('workExperiences', filteredExperiences);
       }
     }
-  }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob, aiRecommendations, showJobForm, editingJobIndex, formData.workExperience, updateFormField]);
+  }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob, aiRecommendations, showJobForm, editingJobIndex, formData.workExperiences, updateFormField]);
   
   // Add a new work experience to the form data
   const addWorkExperience = (achievements: string[] = []) => {
@@ -121,8 +121,8 @@ const WorkExperienceForm = () => {
       };
       
       // Update work experience array without the preview
-      const filteredExperiences = (formData.workExperience || []).filter(job => job.id !== 'preview-job');
-      updateFormField('workExperience', [...filteredExperiences, newWorkExperience]);
+      const filteredExperiences = (formData.workExperiences || []).filter(job => job.id !== 'preview-job');
+      updateFormField('workExperiences', [...filteredExperiences, newWorkExperience]);
       
       // Reset form for adding another job
       resetFormFields();
@@ -135,12 +135,12 @@ const WorkExperienceForm = () => {
   
   // Update an existing work experience
   const updateExistingWorkExperience = (achievements: string[] = []) => {
-    if (editingJobIndex !== null && formData.workExperience && formData.workExperience[editingJobIndex]) {
+    if (editingJobIndex !== null && formData.workExperiences && formData.workExperiences[editingJobIndex]) {
       const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
       const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
       
       // Get current work experiences
-      const currentExperiences = [...(formData.workExperience || [])];
+      const currentExperiences = [...(formData.workExperiences || [])];
       
       // Update the specific job
       currentExperiences[editingJobIndex] = {
@@ -155,7 +155,7 @@ const WorkExperienceForm = () => {
       };
       
       // Update in form context
-      updateFormField('workExperience', currentExperiences);
+      updateFormField('workExperiences', currentExperiences);
       
       // Reset form and editing state
       resetFormFields();
@@ -220,8 +220,8 @@ const WorkExperienceForm = () => {
   };
   
   const handleEditJob = (index: number) => {
-    if (formData.workExperience && formData.workExperience[index]) {
-      const job = formData.workExperience[index];
+    if (formData.workExperiences && formData.workExperiences[index]) {
+      const job = formData.workExperiences[index];
       
       // Fill the form with the job data
       setJobTitle(job.jobTitle || '');
@@ -261,7 +261,7 @@ const WorkExperienceForm = () => {
   
   const handleDeleteJob = (index: number) => {
     // Remove the job at the specified index
-    removeItemFromArray('workExperience', index);
+    removeItemFromArray('workExperiences', index);
   };
   
   const handleAddAnotherPosition = () => {
@@ -482,7 +482,7 @@ const WorkExperienceForm = () => {
         {showWorkHistory && (
           <>
             <WorkHistorySummary
-              workExperiences={(formData.workExperience || []).map(job => ({
+              workExperiences={(formData.workExperiences || []).map(job => ({
                 ...job,
                 id: job.id || Date.now().toString() // Ensure all jobs have an ID
               }))}
