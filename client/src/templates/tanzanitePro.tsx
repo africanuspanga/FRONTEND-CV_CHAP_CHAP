@@ -25,8 +25,12 @@ export function TanzaniteProTemplate(data: CVData) {
   const validLanguages = languages?.filter(lang => lang.name) || [];
   // Filter out empty references
   const validReferences = references?.filter(ref => ref.name) || [];
-  // Filter out empty hobbies
-  const validHobbies = hobbies?.filter(hobby => hobby) || [];
+  // Handle hobbies based on data type
+  const validHobbies = typeof hobbies === 'string' 
+    ? [hobbies] // If hobbies is a string, wrap it in an array
+    : Array.isArray(hobbies) 
+      ? hobbies.filter(hobby => hobby) // If it's an array, filter out empty values
+      : []; // Default to empty array
 
   // Get initials for the circle
   const getInitials = () => {
