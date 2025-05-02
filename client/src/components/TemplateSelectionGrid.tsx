@@ -5,7 +5,23 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import TemplatePreviewImage from './TemplatePreviewImage';
-import { MoonlightSonataTemplate, KaziFastaTemplate } from '@/assets/templates';
+import { 
+  MoonlightSonataTemplate, 
+  KaziFastaTemplate,
+  JijengeClassicTemplate,
+  KilimanjaroTemplate,
+  BrightDiamondTemplate,
+  MjenziWaTaifaTemplate,
+  StreetHustlerTemplate,
+  SafariOriginalTemplate,
+  BigBossTemplate,
+  TanzaniteProTemplate,
+  MwalimuOneTemplate,
+  SerengetiFlowTemplate,
+  SmartBongoTemplate,
+  MadiniMobTemplate,
+  MkaliModernTemplate
+} from '@/assets/templates';
 
 interface TemplateSelectionGridProps {
   onSelectTemplate: (templateId: string) => void;
