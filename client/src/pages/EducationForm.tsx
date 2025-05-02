@@ -10,7 +10,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { ChevronLeft, PlusCircle, Info, Lightbulb, LightbulbIcon } from 'lucide-react';
+import { ChevronLeft, PlusCircle, Info, Lightbulb, LightbulbIcon, X } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -26,13 +26,12 @@ const EducationForm = () => {
   // Generate degree options
   const degreeOptions = [
     'No Degree',
-    'High School Diploma',
-    'Associate Degree',
-    'Bachelor\'s Degree',
-    'Master\'s Degree',
-    'MBA',
-    'Ph.D.',
-    'Other'
+    'Diploma',
+    'Bachelor of Arts',
+    'Bachelor of Science',
+    'Master of Arts',
+    'Master of Science',
+    'PhD'
   ];
   
   // State for education entry
@@ -42,6 +41,12 @@ const EducationForm = () => {
   const [schoolLocation, setSchoolLocation] = useState('');
   const [gradMonth, setGradMonth] = useState('');
   const [gradYear, setGradYear] = useState('');
+  
+  // State for educational achievements
+  const [showGpaInput, setShowGpaInput] = useState(false);
+  const [gpaValue, setGpaValue] = useState('');
+  const [showHonorsInput, setShowHonorsInput] = useState(false);
+  const [honorsValue, setHonorsValue] = useState('');
   
   // UI states
   const [showEducationForm, setShowEducationForm] = useState(true);
@@ -62,6 +67,12 @@ const EducationForm = () => {
     setGradMonth('');
     setGradYear('');
     setEditingEducationIndex(null);
+    
+    // Reset achievement fields
+    setShowGpaInput(false);
+    setGpaValue('');
+    setShowHonorsInput(false);
+    setHonorsValue('');
   };
   
   // Effect to update the live preview as user types
@@ -258,7 +269,7 @@ const EducationForm = () => {
                 <UniversitySelect
                   value={institution}
                   onChange={setInstitution}
-                  placeholder="Search for your university or college"
+                  placeholder="University of Dar es Salaam"
                 />
               </div>
 
@@ -363,32 +374,86 @@ const EducationForm = () => {
                     <p className="text-gray-600 mb-4">Would you like to include any honors or achievements?</p>
                     
                     <div className="grid grid-cols-2 gap-4 mb-4">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="flex items-center justify-center py-6 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
-                        onClick={() => {}}
-                      >
-                        <PlusCircle className="h-4 w-4 mr-2" />
-                        GPA
-                      </Button>
+                      {!showGpaInput ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="flex items-center justify-center py-6 bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
+                          onClick={() => setShowGpaInput(true)}
+                        >
+                          <PlusCircle className="h-4 w-4 mr-2" />
+                          GPA
+                        </Button>
+                      ) : (
+                        <div className="border border-gray-200 rounded-md p-4 bg-white">
+                          <Label htmlFor="gpa" className="block mb-2 text-sm font-medium">GPA Value</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="gpa"
+                              value={gpaValue}
+                              onChange={(e) => setGpaValue(e.target.value)}
+                              placeholder="e.g. 3.8"
+                              className="flex-grow"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setShowGpaInput(false);
+                                setGpaValue('');
+                              }}
+                              className="h-9 w-9"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                       
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="flex items-center justify-center py-6 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
-                        onClick={() => {}}
-                      >
-                        <PlusCircle className="h-4 w-4 mr-2" />
-                        Honors
-                      </Button>
+                      {!showHonorsInput ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="flex items-center justify-center py-6 bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
+                          onClick={() => setShowHonorsInput(true)}
+                        >
+                          <PlusCircle className="h-4 w-4 mr-2" />
+                          Honors
+                        </Button>
+                      ) : (
+                        <div className="border border-gray-200 rounded-md p-4 bg-white">
+                          <Label htmlFor="honors" className="block mb-2 text-sm font-medium">Honors</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="honors"
+                              value={honorsValue}
+                              onChange={(e) => setHonorsValue(e.target.value)}
+                              placeholder="e.g. Cum Laude"
+                              className="flex-grow"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setShowHonorsInput(false);
+                                setHonorsValue('');
+                              }}
+                              className="h-9 w-9"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="mb-4">
                       <Button
                         type="button"
                         variant="outline"
-                        className="flex items-center justify-center py-6 w-full bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                        className="flex items-center justify-center py-6 w-full bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
                         onClick={() => {}}
                       >
                         <PlusCircle className="h-4 w-4 mr-2" />
@@ -400,7 +465,7 @@ const EducationForm = () => {
                       <Button
                         type="button"
                         variant="outline"
-                        className="flex items-center justify-center py-6 w-full bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                        className="flex items-center justify-center py-6 w-full bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
                         onClick={() => {}}
                       >
                         <PlusCircle className="h-4 w-4 mr-2" />
@@ -412,7 +477,7 @@ const EducationForm = () => {
                       <Button
                         type="button"
                         variant="outline"
-                        className="flex items-center justify-center py-6 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                        className="flex items-center justify-center py-6 bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
                         onClick={() => {}}
                       >
                         <PlusCircle className="h-4 w-4 mr-2" />
@@ -422,7 +487,7 @@ const EducationForm = () => {
                       <Button
                         type="button"
                         variant="outline"
-                        className="flex items-center justify-center py-6 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                        className="flex items-center justify-center py-6 bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
                         onClick={() => {}}
                       >
                         <PlusCircle className="h-4 w-4 mr-2" />
@@ -433,13 +498,8 @@ const EducationForm = () => {
                   
                   <div>
                     <h3 className="font-semibold text-lg mb-3">EDUCATION DESCRIPTION</h3>
-                    <div className="bg-blue-100 p-6 rounded-md min-h-[200px]">
-                      <ul className="text-blue-900 space-y-4">
-                        <li className="flex">
-                          <span className="mr-2">•</span>
-                          <span>Completed University-level Coursework: [Area of Study], [School Name]</span>
-                        </li>
-                      </ul>
+                    <div className="bg-white p-6 rounded-md min-h-[200px] border border-gray-200">
+                      {/* Empty education description field */}
                     </div>
                   </div>
                 </div>

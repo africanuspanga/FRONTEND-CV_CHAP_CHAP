@@ -51,7 +51,7 @@ interface UniversitySelectProps {
 const UniversitySelect: React.FC<UniversitySelectProps> = ({
   value,
   onChange,
-  placeholder = "Select your institution",
+  placeholder = "University of Dar es Salaam",
   disabled = false,
   className
 }) => {
