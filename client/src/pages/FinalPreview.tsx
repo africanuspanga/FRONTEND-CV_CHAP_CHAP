@@ -26,19 +26,7 @@ const FinalPreview = () => {
   const [currentTemplateId, setCurrentTemplateId] = useState(templateId || formData.templateId);
   // Track download in progress
   const [isDownloading, setIsDownloading] = useState(false);
-  // Template color options
-  const colors = [
-    '#E5E7EB', // gray
-    '#4B5563', // dark gray
-    '#1E40AF', // blue
-    '#3B82F6', // light blue
-    '#10B981', // green
-    '#059669', // dark green
-    '#B91C1C', // red
-    '#7C2D12', // brown
-    '#F59E0B', // yellow
-    '#D97706'  // orange
-  ];
+
   
   // Get current template name
   const currentTemplateName = getTemplateById(currentTemplateId)?.name || 'Template';
@@ -85,14 +73,7 @@ const FinalPreview = () => {
     });
   };
   
-  // Handle color change - shows toast for now
-  const handleColorChange = (color: string) => {
-    toast({
-      title: 'Color Selected',
-      description: `Theme color ${color} will be applied in the next update.`,
-      variant: 'default',
-    });
-  };
+
   
   // Check if we need to redirect
   useEffect(() => {
@@ -226,20 +207,7 @@ const FinalPreview = () => {
               </button>
             </div>
             
-            {/* Color Selection */}
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex flex-wrap gap-2 justify-center">
-                {colors.map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => handleColorChange(color)}
-                    className="w-6 h-6 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                    style={{ backgroundColor: color }}
-                    aria-label={`Color ${color}`}
-                  />
-                ))}
-              </div>
-            </div>
+
             
             {/* All Templates */}
             <div className="p-4 overflow-y-auto" style={isMobile ? {maxHeight: 'calc(100vh - 130px)'} : {}}>
