@@ -106,7 +106,7 @@ const SummaryStep: React.FC = () => {
     try {
       // Call the OpenAI service to enhance the summary
       const jobTitle = formData.personalInfo?.professionalTitle || '';
-      const yearsOfExperience = formData.workExperiences?.length > 0 
+      const yearsOfExperience = formData.workExperiences && formData.workExperiences.length > 0 
         ? calculateTotalYearsExperience(formData.workExperiences) 
         : undefined;
       
