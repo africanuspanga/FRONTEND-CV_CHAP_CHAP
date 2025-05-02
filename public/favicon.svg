@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Blue background -->
+  <rect x="56" y="56" width="400" height="400" rx="80" ry="80" fill="#4285F4" />
+  <!-- White CV document -->
+  <rect x="120" y="120" width="280" height="320" rx="20" ry="20" fill="white" />
+  <!-- Document corner fold -->
+  <path d="M400 140 L380 120 L380 140 Z" fill="#e8eaf6" />
+  <path d="M400 140 L380 120 L380 140 Z" fill="none" stroke="#c5cae9" stroke-width="2" />
+  <!-- CV text -->
+  <text x="130" y="300" font-family="Arial, sans-serif" font-size="150" font-weight="bold" fill="#0a2463">CV</text>
+  <!-- Underline -->
+  <rect x="150" y="350" width="220" height="10" rx="5" ry="5" fill="#e8eaf6" />
+  <!-- Stars -->
+  <path d="M390 220 L400 230 L390 240 L380 230 Z" fill="white" />
+  <path d="M420 250 L430 260 L420 270 L410 260 Z" fill="white" />
+</svg>
