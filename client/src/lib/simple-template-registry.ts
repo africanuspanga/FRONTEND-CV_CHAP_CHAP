@@ -3,8 +3,8 @@
  * This file provides a stable API for accessing templates
  */
 
-// Import from .js file (template dummy data)
-import { templates as templateRegistry, getAllTemplates as getAllTemplatesBase, getTemplateByID as getTemplateByIDBase } from '../templates/index.js';
+// Import from .js file (template data)
+import { templates, getAllTemplates as getAllTemplatesBase, getTemplateByID as getTemplateByIDBase } from '../templates/index.js';
 
 // Define the interface
 export interface CVTemplate {
@@ -35,6 +35,6 @@ export function getTemplateByID(id: string): CVTemplate | undefined {
 export function getTemplatesByCategory(category: string): CVTemplate[] {
   // Filter templates by category
   return getAllTemplatesBase().filter(template => 
-    template.category === category
+    (template as any).category === category
   );
 }
