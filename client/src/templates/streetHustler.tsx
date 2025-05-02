@@ -419,7 +419,7 @@ export function StreetHustlerTemplate({
         )}
 
         {/* Hobbies Section (Optional) */}
-        {hobbies && hobbies.length > 0 && (
+        {hobbies && (
           <section style={{ marginBottom: '0' }}>
             <h3 style={{
               fontSize: '1.1em',
@@ -433,7 +433,7 @@ export function StreetHustlerTemplate({
               HOBBIES & INTERESTS
             </h3>
             <p style={{ fontSize: '0.95em', color: '#444' }}>
-              {hobbies.join(', ')}
+              {typeof hobbies === 'string' ? hobbies : Array.isArray(hobbies) ? hobbies.join(', ') : ''}
             </p>
           </section>
         )}
