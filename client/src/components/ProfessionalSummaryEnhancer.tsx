@@ -6,7 +6,8 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { hasOpenAIApiKey, enhanceProfessionalSummary } from '@/lib/openai-service';
+import { enhanceProfessionalSummary } from '@/lib/openai-service';
+import { useAIStatus } from '@/hooks/use-ai-status';
 import { AlertCircle, Brain, CheckCircle2, Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
@@ -33,6 +34,7 @@ const ProfessionalSummaryEnhancer: React.FC<ProfessionalSummaryEnhancerProps> = 
   const [error, setError] = useState<string | null>(null);
   const [enhancedSummary, setEnhancedSummary] = useState<string>('');
   const { toast } = useToast();
+  const { hasOpenAI, isLoading: isCheckingAI } = useAIStatus();
 
   const handleEnhanceSummary = async () => {
     // Check if the summary is empty
@@ -46,7 +48,7 @@ const ProfessionalSummaryEnhancer: React.FC<ProfessionalSummaryEnhancerProps> = 
     }
 
     // Check if the OpenAI API key is available
-    if (!hasOpenAIApiKey()) {
+    if (!hasOpenAI) {
       setError('OpenAI API key not found. Please contact support to enable AI features.');
       return;
     }
@@ -139,8 +141,21 @@ const ProfessionalSummaryEnhancer: React.FC<ProfessionalSummaryEnhancerProps> = 
         <CardTitle className="flex items-center">
           <Brain className="mr-2 h-5 w-5" /> Enhance Your Summary
         </CardTitle>
-        <CardDescription>
-          Use AI to improve your professional summary for better impact.
+        <CardDescription className="flex items-center justify-between">
+          <span>Use AI to improve your professional summary for better impact.</span>
+          {isCheckingAI ? (
+            <span className="flex items-center text-xs text-muted-foreground">
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" /> Checking AI...
+            </span>
+          ) : hasOpenAI ? (
+            <span className="flex items-center text-xs text-green-500">
+              <CheckCircle2 className="mr-1 h-3 w-3" /> AI Ready
+            </span>
+          ) : (
+            <span className="flex items-center text-xs text-yellow-500">
+              <AlertCircle className="mr-1 h-3 w-3" /> AI Limited
+            </span>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -158,12 +173,17 @@ const ProfessionalSummaryEnhancer: React.FC<ProfessionalSummaryEnhancerProps> = 
         </Button>
         <Button 
           onClick={handleEnhanceSummary}
-          disabled={isLoading}
+          disabled={isLoading || isCheckingAI}
         >
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Enhancing...
+            </>
+          ) : isCheckingAI ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Checking AI Status...
             </>
           ) : (
             <>Enhance Summary</>

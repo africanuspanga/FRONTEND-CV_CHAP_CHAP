@@ -1,5 +1,5 @@
 /**
- * Skills AI Recommendations Component
+ * Skills Recommendations Component
  * This component provides AI-powered recommendations for skills
  */
 
@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { hasOpenAIApiKey, getSkillRecommendations } from '@/lib/openai-service';
+import { getSkillRecommendations } from '@/lib/openai-service';
+import { useAIStatus } from '@/hooks/use-ai-status';
 import { AlertCircle, Brain, CheckCircle2, Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -35,10 +36,11 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<Record<number, boolean>>({});
   const { toast } = useToast();
+  const { hasOpenAI, isLoading: isCheckingAI } = useAIStatus();
 
-  const handleGenerateRecommendations = async () => {
+  const handleGenerateSkills = async () => {
     // Check if the OpenAI API key is available
-    if (!hasOpenAIApiKey()) {
+    if (!hasOpenAI) {
       setError('OpenAI API key not found. Please contact support to enable AI features.');
       return;
     }
@@ -47,18 +49,18 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
     setError(null);
 
     try {
-      // Generate skill recommendations
+      // Generate skills
       const skills = await getSkillRecommendations(jobTitle, yearsOfExperience, industry);
       setRecommendations(skills);
       
-      // Select all recommendations by default
+      // Select all skills by default
       const initialSelected: Record<number, boolean> = {};
       skills.forEach((_, index) => {
         initialSelected[index] = true;
       });
       setSelectedSkills(initialSelected);
     } catch (err) {
-      console.error('Error generating skill recommendations:', err);
+      console.error('Error generating skills:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate skill recommendations';
       setError(errorMessage);
       toast({
@@ -91,11 +93,11 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
             <CheckCircle2 className="mr-2 h-5 w-5" /> AI Skill Recommendations
           </CardTitle>
           <CardDescription>
-            Select the skills you'd like to add to your CV.
+            Select the skills you'd like to include in your CV.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {recommendations.map((skill, index) => (
               <div key={index} className="flex items-start space-x-2">
                 <Checkbox
@@ -118,7 +120,7 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
             Skip
           </Button>
           <Button onClick={handleAddSelected}>
-            Add Selected
+            Add Selected Skills
           </Button>
         </CardFooter>
       </Card>
@@ -140,7 +142,7 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
           <Button variant="outline" onClick={onSkip}>
             Skip AI Features
           </Button>
-          <Button variant="default" onClick={handleGenerateRecommendations}>
+          <Button variant="default" onClick={handleGenerateSkills}>
             Try Again
           </Button>
         </CardFooter>
@@ -154,14 +156,28 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
         <CardTitle className="flex items-center">
           <Brain className="mr-2 h-5 w-5" /> AI Skill Recommendations
         </CardTitle>
-        <CardDescription>
-          Get AI-powered skill suggestions for your position as {jobTitle}.
+        <CardDescription className="flex items-center justify-between">
+          <span>Get AI-powered skill suggestions for your CV.</span>
+          {isCheckingAI ? (
+            <span className="flex items-center text-xs text-muted-foreground">
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" /> Checking AI...
+            </span>
+          ) : hasOpenAI ? (
+            <span className="flex items-center text-xs text-green-500">
+              <CheckCircle2 className="mr-1 h-3 w-3" /> AI Ready
+            </span>
+          ) : (
+            <span className="flex items-center text-xs text-yellow-500">
+              <AlertCircle className="mr-1 h-3 w-3" /> AI Limited
+            </span>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-sm">
-          Our AI can suggest relevant technical and soft skills for your profile.
-          Click the button below to generate skill suggestions.
+          Our AI can suggest relevant skills for a {jobTitle}{industry ? ` in the ${industry} industry` : ''}
+          {yearsOfExperience ? ` with ${yearsOfExperience} years of experience` : ''}.
+          Click the button below to generate recommendations.
         </p>
       </CardContent>
       <CardFooter className="flex justify-between">
@@ -169,16 +185,21 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
           Skip
         </Button>
         <Button 
-          onClick={handleGenerateRecommendations}
-          disabled={isLoading}
+          onClick={handleGenerateSkills}
+          disabled={isLoading || isCheckingAI}
         >
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Generating...
             </>
+          ) : isCheckingAI ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Checking AI Status...
+            </>
           ) : (
-            <>Generate Suggestions</>
+            <>Generate Skills</>
           )}
         </Button>
       </CardFooter>
