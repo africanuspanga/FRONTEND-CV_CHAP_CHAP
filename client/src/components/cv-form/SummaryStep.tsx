@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { enhanceProfessionalSummary } from '@/lib/openai-service';
+import { enhanceProfessionalSummary, ToneType } from '@/lib/openai-service';
 import { useAIStatus } from '@/hooks/use-ai-status';
 import { debounce } from '@/lib/utils';
 
@@ -109,6 +109,16 @@ const SummaryStep: React.FC = () => {
       const yearsOfExperience = formData.workExperiences && formData.workExperiences.length > 0 
         ? calculateTotalYearsExperience(formData.workExperiences) 
         : undefined;
+      
+      // Log what data we're sending to OpenAI for debugging
+      console.log('Summary Enhancement Data:', {
+        currentSummary,
+        jobTitle,
+        yearsOfExperience,
+        workExperiences: formData.workExperiences,
+        education: formData.education,
+        skills: formData.skills
+      });
       
       // Pass comprehensive CV data to get a personalized summary
       const enhanced = await enhanceProfessionalSummary(

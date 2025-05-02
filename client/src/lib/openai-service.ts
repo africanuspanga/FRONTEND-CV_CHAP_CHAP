@@ -247,7 +247,10 @@ ${workExperienceContext}
 ${educationContext}
 ${skillsContext}
 
-Please provide an enhanced, personalized professional summary for this person based on all the information above. Focus on their actual experiences, skills, and education to create a tailored summary.`;
+Please provide an enhanced, personalized professional summary for this person based on all the information above. Focus on their actual experiences, skills, and education to create a tailored summary. Make sure to be specific about their actual skills and experiences mentioned above.`;
+  
+  // For debugging
+  console.log('OpenAI Prompt for Summary:', prompt);
 
   return await makeOpenAIRequest({
     prompt,
