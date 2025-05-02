@@ -175,14 +175,14 @@ const SummaryStep: React.FC = () => {
                 type="button" 
                 variant="secondary" 
                 size="sm"
-                disabled
+                onClick={() => {
+                  // Open AI enhancement dialog or panel here
+                  // This will be implemented after this fix
+                }}
                 className="text-xs"
               >
                 <Wand2 className="mr-1 h-3 w-3" />
                 AI Enhancement
-                <span className="ml-1 px-1.5 py-0.5 rounded-sm text-xs bg-gray-100 text-gray-500">
-                  Coming Soon
-                </span>
               </Button>
             </div>
           </CardContent>
