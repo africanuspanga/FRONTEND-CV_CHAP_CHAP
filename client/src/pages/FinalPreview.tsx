@@ -3,7 +3,7 @@ import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useCVForm } from '@/contexts/cv-form-context';
-import { ClientSideTemplateRenderer } from '@/components/ClientSideTemplateRenderer';
+import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
 import { getAllTemplates, getTemplateById } from '@/lib/templates-registry';
 import { X, Download, Printer, Mail, CheckCircle, ArrowLeft, Edit, RefreshCw, ChevronRight } from 'lucide-react';
 import { generatePDF } from '@/lib/pdf-generator';
@@ -284,10 +284,10 @@ const FinalPreview = () => {
         {/* CV Preview Area */}
         <div className={`flex-grow overflow-auto flex justify-center items-start ${isMobile ? 'p-2' : 'p-4'} bg-gray-100`}>
           <div className="bg-white shadow-md overflow-hidden max-w-screen-md w-full aspect-[210/297] print:shadow-none">
-            <ClientSideTemplateRenderer
+            <DirectTemplateRenderer
               templateId={currentTemplateId}
               cvData={formData}
-              className="w-full h-full"
+              height={800}
             />
           </div>
         </div>

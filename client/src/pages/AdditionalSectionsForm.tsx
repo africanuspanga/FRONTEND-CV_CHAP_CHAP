@@ -85,101 +85,78 @@ const AdditionalSectionsForm = () => {
         />
       </Helmet>
 
-      <div className="flex flex-col md:flex-row h-full">
-        {/* Main Form Section */}
-        <div className="flex-1 overflow-auto px-4 py-6 md:py-12">
-          <div className="max-w-2xl mx-auto">
-            <Link href={`/cv/${templateId}/references`} className="flex items-center text-indigo-600 mb-6">
-              <ChevronLeft className="w-4 h-4 mr-1" />
-              <span>Go Back</span>
-            </Link>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <Link href={`/cv/${templateId}/references`} className="flex items-center text-indigo-600 mb-6">
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          <span>Go Back</span>
+        </Link>
 
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Additional Sections</h1>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                className="md:hidden"
-                onClick={() => setShowPreview(!showPreview)}
-              >
-                {showPreview ? (
-                  <>
-                    <EyeOff className="w-4 h-4 mr-2" /> Hide Preview
-                  </>
-                ) : (
-                  <>
-                    <Eye className="w-4 h-4 mr-2" /> Show Preview
-                  </>
-                )}
-              </Button>
-            </div>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Additional Sections</h1>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowPreview(!showPreview)}
+            className="flex items-center"
+          >
+            {showPreview ? (
+              <>
+                <EyeOff className="w-4 h-4 mr-2" /> Hide Preview
+              </>
+            ) : (
+              <>
+                <Eye className="w-4 h-4 mr-2" /> Show Preview
+              </>
+            )}
+          </Button>
+        </div>
 
-            <p className="text-gray-600 mb-8">
-              Add more sections to make your CV stand out. These are optional but can greatly enhance your profile.
-            </p>
+        <p className="text-gray-600 mb-8">
+          Add more sections to make your CV stand out. These are optional but can greatly enhance your profile.
+        </p>
 
-            <div className="space-y-4 mb-8">
-              {sectionOptions.map((section) => (
-                <SectionCard key={section.id} section={section} />
-              ))}
-            </div>
+        <div className="space-y-4 mb-8">
+          {sectionOptions.map((section) => (
+            <SectionCard key={section.id} section={section} />
+          ))}
+        </div>
 
-            <div className="flex justify-between mt-12">
-              <Button 
-                variant="outline"
-                onClick={handlePrevious}
-                className="flex items-center"
-              >
-                <ChevronLeft className="w-4 h-4 mr-1" />
-                Previous
-              </Button>
-              
-              <Button 
-                onClick={handleNext}
-                className="bg-teal-600 hover:bg-teal-700"
-              >
-                Next: Preview
-              </Button>
-            </div>
-          </div>
+        <div className="flex justify-between mt-8 mb-8">
+          <Button 
+            variant="outline"
+            onClick={handlePrevious}
+            className="flex items-center"
+          >
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            Previous
+          </Button>
+          
+          <Button 
+            onClick={handleNext}
+            className="bg-teal-600 hover:bg-teal-700"
+          >
+            Next: Preview
+          </Button>
         </div>
         
-        {/* Preview Section */}
-        {((showPreview && isMobile) || (!isMobile)) && (
-          <div className="hidden md:block md:w-1/2 lg:w-2/5 border-l border-gray-200 bg-gray-50 relative">
-            <div className="sticky top-0 w-full h-full overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Live Preview</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowPreview(!showPreview)}
-                  className="hidden md:flex items-center"
-                >
-                  {showPreview ? (
-                    <>
-                      <EyeOff className="w-4 h-4 mr-2" /> Hide Preview
-                    </>
-                  ) : (
-                    <>
-                      <Eye className="w-4 h-4 mr-2" /> Show Preview
-                    </>
-                  )}
-                </Button>
-              </div>
-              <div className="flex-1 overflow-auto p-4">
-                <ClientSideTemplateRenderer
-                  templateId={templateId}
-                  cvData={formData}
-                  height={800}
-                />
-              </div>
+        {/* Preview Section - Below the form content */}
+        {showPreview && (
+          <div className="mt-8 border border-gray-200 rounded-md bg-gray-50">
+            <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 rounded-t-md">
+              <h3 className="text-lg font-medium text-gray-900">Live Preview</h3>
+            </div>
+            <div className="p-4">
+              <ClientSideTemplateRenderer
+                templateId={templateId}
+                cvData={formData}
+                height={700}
+              />
             </div>
           </div>
         )}
         
-        {/* Mobile Preview (Conditional) */}
+        {/* Mobile Preview (Conditional - Full Screen) */}
         {showPreview && isMobile && (
           <div className="fixed inset-0 bg-white z-50 overflow-auto">
             <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-2 flex justify-between items-center">
