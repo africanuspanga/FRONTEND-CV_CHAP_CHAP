@@ -159,12 +159,18 @@ export const ClientSideTemplateRenderer = ({
               // Prepare default safe data with fallbacks for each property
               const safeData = {
                 personalInfo: cvData?.personalInfo || {},
-                workExperience: cvData?.workExperience || [],
+                workExperience: cvData?.workExperiences || [], // Use workExperiences from cvData
+                workExperiences: cvData?.workExperiences || [], // Support for both naming conventions
                 education: cvData?.education || [],
                 skills: cvData?.skills || [],
-                summary: cvData?.summary || '',
+                summary: cvData?.personalInfo?.summary || '', // Summary might be part of personalInfo
                 languages: cvData?.languages || [],
-                references: cvData?.references || []
+                references: cvData?.references || [],
+                // Add other possible properties
+                hobbies: cvData?.hobbies || [],
+                certifications: cvData?.certifications || [],
+                projects: cvData?.projects || [],
+                websites: cvData?.websites || []
               };
               // Call the template function with safe data
               return template(safeData);
