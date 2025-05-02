@@ -63,7 +63,7 @@ const WorkExperienceForm = () => {
   // Effect to update the live preview as user types (only when adding a new job)
   useEffect(() => {
     // Check if the preview already exists
-    const hasPreview = formData.workExperience?.some(job => job.id === 'preview-job');
+    const hasPreview = formData.workExperiences?.some(job => job.id === 'preview-job');
     // Check if we should display a preview
     const shouldShowPreview = jobTitle && employer && editingJobIndex === null && showJobForm;
     
@@ -75,10 +75,10 @@ const WorkExperienceForm = () => {
         const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
         
         // Filter out any existing preview
-        const filteredExperiences = (formData.workExperience || []).filter(job => job.id !== 'preview-job');
+        const filteredExperiences = (formData.workExperiences || []).filter(job => job.id !== 'preview-job');
         
         // Add the new preview
-        updateFormField('workExperience', [
+        updateFormField('workExperiences', [
           {
             id: 'preview-job' as string,
             jobTitle,
