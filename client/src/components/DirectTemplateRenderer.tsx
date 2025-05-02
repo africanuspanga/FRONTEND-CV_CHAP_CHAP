@@ -1,6 +1,7 @@
 import React from 'react';
 import { CVData } from '@shared/schema';
 import { getTemplateByID } from '@/lib/simple-template-registry';
+import withSafeTemplateData from '@/lib/withSafeTemplateData';
 
 interface DirectTemplateRendererProps {
   cvData: CVData;
@@ -16,7 +17,7 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
   // Log the data for debugging
   console.log('Direct renderer data:', {
     personalInfo: cvData?.personalInfo || {},
-    workExp: cvData?.workExperiences || cvData?.workExperience || [],
+    workExp: cvData?.workExperiences || [],
     templateId
   });
 
@@ -33,10 +34,27 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
   const template = getTemplateByID(templateId);
 
   if (template && template.render) {
-    // Render the template using the template registry's render function
+    // Convert and massage data if needed
+    // Make sure workExperiences is used correctly
+    const processedData = {
+      ...cvData,
+      // Ensure workExperience is available (some templates use this name)
+      workExperience: cvData?.workExperiences || [],
+      // Format the hobbies field correctly
+      hobbies: Array.isArray(cvData?.hobbies) ? 
+        // If it's an array of hobby objects, join the names
+        cvData.hobbies.map(h => h.name || h).join(', ') :
+        // Otherwise use as is or empty string
+        cvData?.hobbies || '',
+    };
+    
+    // Add more debugging info
+    console.log('Processed template data for final preview:', processedData);
+    
+    // Render the template using the template registry's render function with safe data
     return (
       <div className="template-container" style={containerStyle}>
-        {template.render(cvData || {})}
+        {template.render(processedData)}
       </div>
     );
   }
@@ -50,13 +68,13 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
             {cvData?.personalInfo?.firstName || ''} {cvData?.personalInfo?.lastName || ''}
           </h1>
           <h2 className="text-lg text-gray-600 mb-4">
-            {cvData?.personalInfo?.professionalTitle || cvData?.personalInfo?.jobTitle || ''}
+            {cvData?.personalInfo?.professionalTitle || ''}
           </h2>
           
           <div className="flex justify-center space-x-4 text-sm text-gray-500">
             <div>{cvData?.personalInfo?.email}</div>
             <div>{cvData?.personalInfo?.phone}</div>
-            <div>{cvData?.personalInfo?.address || cvData?.personalInfo?.location}</div>
+            <div>{cvData?.personalInfo?.address || ''}</div>
           </div>
         </div>
         
