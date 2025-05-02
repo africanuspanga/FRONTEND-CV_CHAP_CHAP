@@ -1,0 +1,14 @@
+{
+  "name": "CV Chap Chap",
+  "short_name": "CV Chap Chap",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#034694",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}
