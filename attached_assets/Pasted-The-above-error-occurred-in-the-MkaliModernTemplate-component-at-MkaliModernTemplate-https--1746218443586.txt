@@ -1,0 +1,24 @@
+The above error occurred in the <MkaliModernTemplate> component:
+
+    at MkaliModernTemplate (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/templates/mkaliModern.tsx:19:5)
+    at div
+    at DirectTemplateRenderer (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/components/DirectTemplateRenderer.tsx?t=1746218390010:19:3)
+    at div
+    at div
+    at div
+    at div
+    at FinalPreview (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/pages/FinalPreview.tsx?t=1746218390010:31:26)
+    at Route (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=38113d6b:323:16)
+    at Switch (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=38113d6b:379:17)
+    at div
+    at Router
+    at CVFormProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/contexts/cv-form-context.tsx:58:34)
+    at AdminAuthProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/contexts/admin-auth-context.tsx:31:37)
+    at AuthProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/contexts/auth-context.tsx:20:32)
+    at Provider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-NNZVJN4K.js?v=38113d6b:38:15)
+    at TooltipProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=38113d6b:62:5)
+    at QueryClientProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=38113d6b:2805:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
