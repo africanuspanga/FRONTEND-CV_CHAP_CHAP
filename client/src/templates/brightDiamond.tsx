@@ -57,7 +57,7 @@ export function BrightDiamondTemplate({
             letterSpacing: '1.5px',
             marginBottom: '0'
           }}>
-            {personalInfo.jobTitle}
+            {personalInfo.professionalTitle || personalInfo.jobTitle}
           </h2>
         </header>
 
@@ -75,7 +75,7 @@ export function BrightDiamondTemplate({
         }}>
           <span>Phone: {personalInfo.phone}</span>
           <span style={{ color: '#ccc' }}>|</span>
-          <span>Address: {personalInfo.location}</span>
+          <span>Address: {personalInfo.address || personalInfo.location}</span>
           <span style={{ color: '#ccc' }}>|</span>
           <span>Email: {personalInfo.email}</span>
           {personalInfo.linkedin && (
