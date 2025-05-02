@@ -2,7 +2,17 @@ import React from 'react';
 import { CVData } from '@shared/schema';
 import { formatDate } from '@/lib/utils';
 
-export function MoonlightSonataTemplate({ personalInfo, workExperience, education, skills, summary, languages, references }: CVData): JSX.Element {
+export function MoonlightSonataTemplate(props: CVData = {}): JSX.Element {
+  // Safely destructure with default empty values to prevent null errors
+  const {
+    personalInfo = {},
+    workExperience = [],
+    education = [],
+    skills = [], 
+    summary = '',
+    languages = [],
+    references = []
+  } = props || {};
   const fullName = `${personalInfo?.firstName || ''} ${personalInfo?.lastName || ''}`.trim();
   const jobTitle = personalInfo?.jobTitle || 'PROFESSIONAL';
 

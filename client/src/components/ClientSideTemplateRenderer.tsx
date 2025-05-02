@@ -148,21 +148,44 @@ export const ClientSideTemplateRenderer = ({
           marginRight: 'auto'
         }}
       >
-        {template && React.isValidElement(template) ? (
-          template
-        ) : typeof template === 'function' ? (
-          template(cvData || {
-            personalInfo: {},
-            workExperience: [],
-            education: [],
-            skills: [],
-            summary: '',
-            languages: [],
-            references: []
-          })
-        ) : (
-          <div className="text-red-500 p-4">Invalid template format</div>
-        )}
+        {(() => {
+          try {
+            // Handle JSX elements
+            if (template && React.isValidElement(template)) {
+              return template;
+            }
+            // Handle function components
+            else if (typeof template === 'function') {
+              // Prepare default safe data with fallbacks for each property
+              const safeData = {
+                personalInfo: cvData?.personalInfo || {},
+                workExperience: cvData?.workExperience || [],
+                education: cvData?.education || [],
+                skills: cvData?.skills || [],
+                summary: cvData?.summary || '',
+                languages: cvData?.languages || [],
+                references: cvData?.references || []
+              };
+              // Call the template function with safe data
+              return template(safeData);
+            }
+            // Handle invalid template case
+            return <div className="text-red-500 p-4">Invalid template format</div>;
+          } catch (error) {
+            console.error('Template rendering error:', error);
+            return (
+              <div className="text-red-500 p-4 flex flex-col items-center justify-center h-full text-center">
+                <h3 className="text-lg font-medium text-red-800 mb-2">Template Error</h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  There was an error rendering this template.
+                </p>
+                <p className="text-xs text-gray-500">
+                  {error instanceof Error ? error.message : 'Unknown error'}
+                </p>
+              </div>
+            );
+          }
+        })()}
       </div>
     </div>
   );
