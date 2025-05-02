@@ -1,6 +1,6 @@
 /**
- * Work Experience AI Recommendations Component
- * This component provides AI-powered recommendations for work experience bullet points
+ * Skills AI Recommendations Component
+ * This component provides AI-powered recommendations for skills
  */
 
 import { Button } from '@/components/ui/button';
@@ -8,39 +8,37 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { getWorkExperienceRecommendations } from '@/lib/openai-service';
-import { useAIStatus } from '@/hooks/use-ai-status';
+import { hasOpenAIApiKey, getSkillRecommendations } from '@/lib/openai-service';
 import { AlertCircle, Brain, CheckCircle2, Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
 
-interface WorkExperienceAIRecommendationsProps {
+interface SkillRecommendationsProps {
   jobTitle: string;
-  company: string;
+  yearsOfExperience?: number;
   industry?: string;
-  onAddRecommendations: (recommendations: string[]) => void;
+  onAddSkills: (skills: string[]) => void;
   onSkip: () => void;
 }
 
 /**
- * Component for getting AI recommendations for work experience
+ * Component for getting AI recommendations for skills
  */
-const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsProps> = ({
+const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
   jobTitle,
-  company,
+  yearsOfExperience,
   industry,
-  onAddRecommendations,
+  onAddSkills,
   onSkip,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recommendations, setRecommendations] = useState<string[]>([]);
-  const [selectedRecommendations, setSelectedRecommendations] = useState<Record<number, boolean>>({});
+  const [selectedSkills, setSelectedSkills] = useState<Record<number, boolean>>({});
   const { toast } = useToast();
-  const { hasOpenAI, isLoading: isCheckingAI } = useAIStatus();
 
   const handleGenerateRecommendations = async () => {
     // Check if the OpenAI API key is available
-    if (!hasOpenAI) {
+    if (!hasOpenAIApiKey()) {
       setError('OpenAI API key not found. Please contact support to enable AI features.');
       return;
     }
@@ -49,19 +47,19 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
     setError(null);
 
     try {
-      // Generate job description bullet points
-      const bulletPoints = await getWorkExperienceRecommendations(jobTitle, company, industry);
-      setRecommendations(bulletPoints);
+      // Generate skill recommendations
+      const skills = await getSkillRecommendations(jobTitle, yearsOfExperience, industry);
+      setRecommendations(skills);
       
       // Select all recommendations by default
       const initialSelected: Record<number, boolean> = {};
-      bulletPoints.forEach((_, index) => {
+      skills.forEach((_, index) => {
         initialSelected[index] = true;
       });
-      setSelectedRecommendations(initialSelected);
+      setSelectedSkills(initialSelected);
     } catch (err) {
-      console.error('Error generating recommendations:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate recommendations';
+      console.error('Error generating skill recommendations:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate skill recommendations';
       setError(errorMessage);
       toast({
         title: 'AI Enhancement Error',
@@ -73,16 +71,16 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
     }
   };
 
-  const handleToggleRecommendation = (index: number) => {
-    setSelectedRecommendations(prev => ({
+  const handleToggleSkill = (index: number) => {
+    setSelectedSkills(prev => ({
       ...prev,
       [index]: !prev[index],
     }));
   };
 
   const handleAddSelected = () => {
-    const selected = recommendations.filter((_, index) => selectedRecommendations[index]);
-    onAddRecommendations(selected);
+    const selected = recommendations.filter((_, index) => selectedSkills[index]);
+    onAddSkills(selected);
   };
 
   if (recommendations.length > 0) {
@@ -90,26 +88,26 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <CheckCircle2 className="mr-2 h-5 w-5" /> AI Recommendations
+            <CheckCircle2 className="mr-2 h-5 w-5" /> AI Skill Recommendations
           </CardTitle>
           <CardDescription>
-            Select the bullet points you'd like to include in your work experience.
+            Select the skills you'd like to add to your CV.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {recommendations.map((recommendation, index) => (
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {recommendations.map((skill, index) => (
               <div key={index} className="flex items-start space-x-2">
                 <Checkbox
-                  id={`recommendation-${index}`}
-                  checked={selectedRecommendations[index] || false}
-                  onCheckedChange={() => handleToggleRecommendation(index)}
+                  id={`skill-${index}`}
+                  checked={selectedSkills[index] || false}
+                  onCheckedChange={() => handleToggleSkill(index)}
                 />
                 <Label
-                  htmlFor={`recommendation-${index}`}
+                  htmlFor={`skill-${index}`}
                   className="text-sm leading-tight cursor-pointer"
                 >
-                  {recommendation}
+                  {skill}
                 </Label>
               </div>
             ))}
@@ -154,29 +152,16 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Brain className="mr-2 h-5 w-5" /> AI Work Experience Recommendations
+          <Brain className="mr-2 h-5 w-5" /> AI Skill Recommendations
         </CardTitle>
-        <CardDescription className="flex items-center justify-between">
-          <span>Get AI-powered suggestions for your work experience as {jobTitle} at {company}.</span>
-          {isCheckingAI ? (
-            <span className="flex items-center text-xs text-muted-foreground">
-              <Loader2 className="mr-1 h-3 w-3 animate-spin" /> Checking AI...
-            </span>
-          ) : hasOpenAI ? (
-            <span className="flex items-center text-xs text-green-500">
-              <CheckCircle2 className="mr-1 h-3 w-3" /> AI Ready
-            </span>
-          ) : (
-            <span className="flex items-center text-xs text-yellow-500">
-              <AlertCircle className="mr-1 h-3 w-3" /> AI Limited
-            </span>
-          )}
+        <CardDescription>
+          Get AI-powered skill suggestions for your position as {jobTitle}.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-sm">
-          Our AI can help you create powerful bullet points that highlight your achievements
-          and skills. Click the button below to generate suggestions.
+          Our AI can suggest relevant technical and soft skills for your profile.
+          Click the button below to generate skill suggestions.
         </p>
       </CardContent>
       <CardFooter className="flex justify-between">
@@ -185,17 +170,12 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
         </Button>
         <Button 
           onClick={handleGenerateRecommendations}
-          disabled={isLoading || isCheckingAI}
+          disabled={isLoading}
         >
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Generating...
-            </>
-          ) : isCheckingAI ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Checking AI Status...
             </>
           ) : (
             <>Generate Suggestions</>
@@ -206,4 +186,4 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
   );
 };
 
-export default WorkExperienceAIRecommendations;
+export default SkillRecommendations;

@@ -7,7 +7,9 @@
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 /**
- * Check if an OpenAI API key exists in environment variables
+ * Check if an OpenAI API key exists on the server
+ * This function should be replaced with the useAIStatus hook in React components
+ * Only use this directly in non-React contexts
  */
 export function hasOpenAIApiKey(): boolean {
   return !!getOpenAIApiKey();
@@ -15,9 +17,11 @@ export function hasOpenAIApiKey(): boolean {
 
 /**
  * Get the OpenAI API key
+ * Note: This will always return the environment variable, not the actual key
  */
 export function getOpenAIApiKey(): string | null {
-  // First check environment variable, then fall back to localStorage for backward compatibility
+  // In production, we should rely on the server having the API key
+  // The client code should never have direct access to the actual key
   if (OPENAI_API_KEY) {
     return OPENAI_API_KEY;
   }
