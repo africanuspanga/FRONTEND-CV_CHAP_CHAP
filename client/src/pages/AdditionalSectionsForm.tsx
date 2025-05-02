@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation } from 'wouter';
-import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
+import { ChevronLeft, Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Helmet } from 'react-helmet';
@@ -91,25 +91,8 @@ const AdditionalSectionsForm = () => {
           <span>Go Back</span>
         </Link>
 
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Additional Sections</h1>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowPreview(!showPreview)}
-            className="flex items-center"
-          >
-            {showPreview ? (
-              <>
-                <EyeOff className="w-4 h-4 mr-2" /> Hide Preview
-              </>
-            ) : (
-              <>
-                <Eye className="w-4 h-4 mr-2" /> Show Preview
-              </>
-            )}
-          </Button>
+        <div className="mb-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Additional Sections</h1>  
         </div>
 
         <p className="text-gray-600 mb-8">
@@ -139,14 +122,31 @@ const AdditionalSectionsForm = () => {
             Next: Preview
           </Button>
         </div>
+
+        {/* Toggle Preview Button */}
+        <button
+          onClick={() => setShowPreview(!showPreview)}
+          className={`w-full rounded-md border border-gray-300 flex items-center justify-center gap-2 py-3 px-4 mb-8 ${showPreview ? 'bg-white text-gray-700' : 'bg-indigo-600 text-white'}`}
+        >
+          {showPreview ? (
+            <>
+              <EyeOff className="w-5 h-5" /> Hide Preview <ChevronUp className="w-4 h-4 ml-1" />
+            </>
+          ) : (
+            <>
+              <Eye className="w-5 h-5" /> Show Preview <ChevronDown className="w-4 h-4 ml-1" />
+            </>
+          )}
+        </button>
         
         {/* Preview Section - Below the form content */}
         {showPreview && (
-          <div className="mt-8 border border-gray-200 rounded-md bg-gray-50">
-            <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 rounded-t-md">
-              <h3 className="text-lg font-medium text-gray-900">Live Preview</h3>
+          <div className="mt-4">
+            <div className="mb-4">
+              <h3 className="text-xl font-medium text-gray-900">Live Preview</h3>
+              <p className="text-gray-500 text-sm">This preview updates in real-time as you fill in your information.</p>
             </div>
-            <div className="p-4">
+            <div className="border border-gray-200 rounded-md bg-white p-4">
               <ClientSideTemplateRenderer
                 templateId={templateId}
                 cvData={formData}
