@@ -9,6 +9,8 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import WorkExperienceBulletGenerator from '@/components/WorkExperienceBulletGenerator';
+import WorkExperienceRecommendationsDialog from '@/components/WorkExperienceRecommendationsDialog';
+import GeneratingRecommendations from '@/components/GeneratingRecommendations';
 import WorkExperienceEditor from '@/components/WorkExperienceEditor';
 import WorkHistorySummary from '@/components/WorkHistorySummary';
 import { WorkExperience } from '@shared/schema';
@@ -32,7 +34,8 @@ const WorkExperienceForm = () => {
   const [showWorkHistory, setShowWorkHistory] = useState(false);
   
   // AI recommendation flow states
-  const [showAIRecommendations, setShowAIRecommendations] = useState(false);
+  const [isGeneratingRecommendations, setIsGeneratingRecommendations] = useState(false);
+  const [showRecommendationsDialog, setShowRecommendationsDialog] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
   const [aiRecommendations, setAIRecommendations] = useState<string[]>([]);
   
@@ -161,24 +164,37 @@ const WorkExperienceForm = () => {
     }
   };
 
+  // Function to handle successful generation of recommendations
   const handleAddRecommendations = (recommendations: string[]) => {
     // Ensure we have an array of strings
     const recommendationsArray = Array.isArray(recommendations) ? recommendations : [recommendations];
-    setAIRecommendations(recommendationsArray);
-    setShowAIRecommendations(false);
-    setShowEditor(true);
+    
+    // Only keep the top 3 recommendations for cleaner UI
+    const topRecommendations = recommendationsArray.slice(0, 3);
+    
+    setAIRecommendations(topRecommendations);
+    setIsGeneratingRecommendations(false);
+    setShowRecommendationsDialog(true);
   };
 
+  // Function to handle error or skip recommendations
   const handleSkipRecommendations = () => {
-    if (editingJobIndex !== null) {
-      updateExistingWorkExperience();
-      setEditingJobIndex(null);
-    } else {
-      addWorkExperience();
-    }
-    setShowAIRecommendations(false);
-    setShowWorkHistory(true);
-    setShowJobForm(false);
+    setIsGeneratingRecommendations(false);
+    // Go directly to editor with empty achievements
+    setShowEditor(true);
+  };
+  
+  // Function to handle user accepting the recommendations
+  const handleAcceptRecommendations = () => {
+    setShowRecommendationsDialog(false);
+    setShowEditor(true);
+  };
+  
+  // Function to handle user declining the recommendations
+  const handleRejectRecommendations = () => {
+    setShowRecommendationsDialog(false);
+    setShowEditor(true);
+    // Keep the recommendations in state in case they want to use them later
   };
 
   const handleSaveAchievements = (achievements: string[]) => {
@@ -256,8 +272,8 @@ const WorkExperienceForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Show AI recommendations instead of directly navigating
-    setShowAIRecommendations(true);
+    // Start generating recommendations
+    setIsGeneratingRecommendations(true);
   };
 
   // Generate month options
@@ -479,12 +495,30 @@ const WorkExperienceForm = () => {
       </div>
       
       {/* AI Recommendation Modal */}
-      {showAIRecommendations && (
-        <WorkExperienceBulletGenerator
+      {isGeneratingRecommendations && (
+        <>
+          {/* Show loading indicator */}
+          <GeneratingRecommendations />
+          
+          {/* Hidden generator component that does the actual API call */}
+          <div className="hidden">
+            <WorkExperienceBulletGenerator
+              jobTitle={jobTitle}
+              company={employer}
+              onBulletPointsGenerated={handleAddRecommendations}
+              onError={handleSkipRecommendations}
+            />
+          </div>
+        </>
+      )}
+      
+      {showRecommendationsDialog && (
+        <WorkExperienceRecommendationsDialog
           jobTitle={jobTitle}
           company={employer}
-          onBulletPointsGenerated={handleAddRecommendations}
-          onError={handleSkipRecommendations}
+          recommendations={aiRecommendations}
+          onAccept={handleAcceptRecommendations}
+          onReject={handleRejectRecommendations}
         />
       )}
     </div>
