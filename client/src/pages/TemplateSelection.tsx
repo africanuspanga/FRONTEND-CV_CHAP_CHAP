@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCVData } from '@/hooks/useCVData';
 import TemplateSelectionGrid from '@/components/TemplateSelectionGrid';
 import { getAllTemplates } from '@/lib/templates-registry';
@@ -11,17 +9,10 @@ const TemplateSelection = () => {
   const [, navigate] = useLocation();
   const { cvData, setTemplate } = useCVData();
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   
   // Get templates directly from registry
   const templates = getAllTemplates();
-
-  // Filter templates by category if one is selected
-  const filteredTemplates = selectedCategory 
-    ? templates.filter(template => template.category === selectedCategory)
-    : templates;
 
   // Select template and immediately proceed to Personal Information form
   const handleSelectTemplate = (templateId: string) => {
@@ -45,9 +36,6 @@ const TemplateSelection = () => {
     }
   }, [cvData.templateId]);
 
-  // Get unique categories from templates
-  const categories = Array.from(new Set(templates.map(template => template.category)));
-
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-5xl mx-auto">
@@ -56,39 +44,16 @@ const TemplateSelection = () => {
           Select a professional template that best represents your career goals and personal style.
         </p>
         
-        <Tabs defaultValue="all" className="mb-8">
-          <TabsList>
-            <TabsTrigger value="all" onClick={() => setSelectedCategory(null)}>
-              All Templates
-            </TabsTrigger>
-            {categories.map(category => (
-              <TabsTrigger 
-                key={category} 
-                value={category}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        <div className="mb-8">
+          <div className="inline-flex items-center rounded-md border px-2.5 py-1.5 mb-6 border-input bg-background text-sm font-medium">
+            All Templates
+          </div>
           
-          <TabsContent value="all" className="mt-6">
-            <TemplateSelectionGrid 
-              onSelectTemplate={handleSelectTemplate}
-              selectedTemplateId={selectedTemplateId || undefined}
-            />
-          </TabsContent>
-          
-          {categories.map(category => (
-            <TabsContent key={category} value={category} className="mt-6">
-              <TemplateSelectionGrid 
-                onSelectTemplate={handleSelectTemplate}
-                selectedTemplateId={selectedTemplateId || undefined}
-                filterCategory={category}
-              />
-            </TabsContent>
-          ))}
-        </Tabs>
+          <TemplateSelectionGrid 
+            onSelectTemplate={handleSelectTemplate}
+            selectedTemplateId={selectedTemplateId || undefined}
+          />
+        </div>
         
         <div className="flex justify-end mt-8">
           <Button 
