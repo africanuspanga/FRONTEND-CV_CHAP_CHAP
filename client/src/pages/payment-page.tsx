@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PhoneIcon, MessageSquareText } from 'lucide-react';
+import { PhoneIcon, MessageSquareText, CreditCard, Smartphone, ArrowLeft, Download } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useCVForm } from '@/contexts/cv-form-context';
+import { generatePDF } from '@/lib/pdf-generator';
 
 const PaymentPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [, setLocation] = useLocation();
-  const { id } = useParams();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isPaymentComplete, setIsPaymentComplete] = useState(false);
+  const [, navigate] = useLocation();
+  const { formData } = useCVForm();
+  const { toast } = useToast();
+  const templateId = formData.templateId;
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Allow only numbers and limit to 12 digits
