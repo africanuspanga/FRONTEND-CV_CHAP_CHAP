@@ -72,13 +72,26 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
               
               {/* Directly use imported template components */}
               <div className="relative w-full h-full z-10">
-                {template.id === 'moonlightSonata' ? (
-                  <MoonlightSonataTemplate />
-                ) : template.id === 'kaziFasta' ? (
-                  <KaziFastaTemplate />
-                ) : (
-                  <TemplatePreviewImage templateId={template.id} templateName={template.name} />
-                )}
+                {(() => {
+                  switch(template.id) {
+                    case 'moonlightSonata': return <MoonlightSonataTemplate />;
+                    case 'kaziFasta': return <KaziFastaTemplate />;
+                    case 'jijengeClassic': return <JijengeClassicTemplate />;
+                    case 'kilimanjaro': return <KilimanjaroTemplate />;
+                    case 'brightDiamond': return <BrightDiamondTemplate />;
+                    case 'mjenziWaTaifa': return <MjenziWaTaifaTemplate />;
+                    case 'streetHustler': return <StreetHustlerTemplate />;
+                    case 'safariOriginal': return <SafariOriginalTemplate />;
+                    case 'bigBoss': return <BigBossTemplate />;
+                    case 'tanzanitePro': return <TanzaniteProTemplate />;
+                    case 'mwalimuOne': return <MwalimuOneTemplate />;
+                    case 'serengetiFlow': return <SerengetiFlowTemplate />;
+                    case 'smartBongo': return <SmartBongoTemplate />;
+                    case 'madiniMob': return <MadiniMobTemplate />;
+                    case 'mkaliModern': return <MkaliModernTemplate />;
+                    default: return <TemplatePreviewImage templateId={template.id} templateName={template.name} />;
+                  }
+                })()}
               </div>
             </div>
             <CardContent className="p-3 sm:p-4 flex flex-col justify-between flex-grow border-t">
