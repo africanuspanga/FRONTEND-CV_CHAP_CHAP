@@ -33,46 +33,30 @@ export function setOpenAIApiKey(apiKey: string): void {}
 export function clearOpenAIApiKey(): void {}
 
 /**
- * Make a request to the OpenAI API
+ * Make a request to the OpenAI API via our server-side proxy
  */
 async function makeOpenAIRequest(prompt: string, maxTokens: number = 500): Promise<string> {
-  const apiKey = getOpenAIApiKey();
-  if (!apiKey) {
-    throw new Error('No OpenAI API key found');
-  }
-
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('/api/openai/proxy', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a professional CV writing assistant. Provide clear, concise, and professional content.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: maxTokens,
-        temperature: 0.7,
+        prompt,
+        maxTokens,
       }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'Failed to get response from OpenAI');
+      throw new Error(errorData.error || 'Failed to get response from OpenAI');
     }
 
     const data = await response.json();
-    return data.choices[0].message.content.trim();
+    return data.content.trim();
   } catch (error) {
+    console.error('Error in OpenAI request:', error);
     if (error instanceof Error) {
       throw error;
     }

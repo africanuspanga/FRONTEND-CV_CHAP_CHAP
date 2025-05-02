@@ -8,6 +8,7 @@ import { storage } from "./storage";
 import { cvDataSchema } from "@shared/schema";
 import { z } from "zod";
 import { apiKeysHandler } from "./api-keys";
+import { openaiProxyHandler } from "./openai-proxy";
 
 // Type declarations for Express Request (isAuthenticated & user) are in server/types/express.d.ts
 
@@ -46,6 +47,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // API Keys status endpoint
   app.get("/api/keys/status", apiKeysHandler);
+
+  // OpenAI proxy endpoint
+  app.post("/api/openai/proxy", openaiProxyHandler);
 
   const httpServer = createServer(app);
   return httpServer;
