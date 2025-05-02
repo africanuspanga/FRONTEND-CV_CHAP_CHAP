@@ -5,23 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import TemplatePreviewImage from './TemplatePreviewImage';
-import { 
-  MoonlightSonataTemplate, 
-  KaziFastaTemplate,
-  JijengeClassicTemplate,
-  KilimanjaroTemplate,
-  BrightDiamondTemplate,
-  MjenziWaTaifaTemplate,
-  StreetHustlerTemplate,
-  SafariOriginalTemplate,
-  BigBossTemplate,
-  TanzaniteProTemplate,
-  MwalimuOneTemplate,
-  SerengetiFlowTemplate,
-  SmartBongoTemplate,
-  MadiniMobTemplate,
-  MkaliModernTemplate
-} from '@/assets/templates';
 
 interface TemplateSelectionGridProps {
   onSelectTemplate: (templateId: string) => void;
@@ -74,26 +57,15 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
               
               {/* Template Preview */}
               <div className="absolute inset-0 z-10">
-                {(() => {
-                  switch(template.id) {
-                    case 'moonlightSonata': return <MoonlightSonataTemplate />;
-                    case 'kaziFasta': return <KaziFastaTemplate />;
-                    case 'jijengeClassic': return <JijengeClassicTemplate />;
-                    case 'kilimanjaro': return <KilimanjaroTemplate />;
-                    case 'brightDiamond': return <BrightDiamondTemplate />;
-                    case 'mjenziWaTaifa': return <MjenziWaTaifaTemplate />;
-                    case 'streetHustler': return <StreetHustlerTemplate />;
-                    case 'safariOriginal': return <SafariOriginalTemplate />;
-                    case 'bigBoss': return <BigBossTemplate />;
-                    case 'tanzanitePro': return <TanzaniteProTemplate />;
-                    case 'mwalimuOne': return <MwalimuOneTemplate />;
-                    case 'serengetiFlow': return <SerengetiFlowTemplate />;
-                    case 'smartBongo': return <SmartBongoTemplate />;
-                    case 'madiniMob': return <MadiniMobTemplate />;
-                    case 'mkaliModern': return <MkaliModernTemplate />;
-                    default: return <TemplatePreviewImage templateId={template.id} templateName={template.name} />;
-                  }
-                })()}
+                {template.previewImage ? (
+                  <img 
+                    src={template.previewImage} 
+                    alt={`${template.name} Template Preview`} 
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <TemplatePreviewImage templateId={template.id} templateName={template.name} />
+                )}
               </div>
               
               {/* Hover Overlay with Select Button */}

@@ -39,105 +39,105 @@ export const templates = {
   moonlightSonata: {
     id: 'moonlightSonata',
     name: 'Moonlight Sonata',
-    previewImage: '@assets/images/templates/moonlightSonata.png',
+    previewImage: moonlightSonataImg,
     category: 'Professional',
     render: MoonlightSonataTemplate
   },
   kaziFasta: {
     id: 'kaziFasta',
     name: 'Kazi Fasta',
-    previewImage: '@assets/images/templates/kaziFasta.png',
+    previewImage: kaziFastaImg,
     category: 'Modern',
     render: KaziFastaTemplate
   },
   jijengeClassic: {
     id: 'jijengeClassic',
     name: 'Jijenge Classic',
-    previewImage: '@assets/images/templates/jijengeClassic.png',
+    previewImage: jijengeClassicImg,
     category: 'Classic',
     render: JijengeClassicTemplate
   },
   kilimanjaro: {
     id: 'kilimanjaro',
     name: 'Kilimanjaro',
-    previewImage: '@assets/images/templates/kilimanjaro.png',
+    previewImage: kilimanjaroImg,
     category: 'Professional',
     render: KilimanjaroTemplate
   },
   brightDiamond: {
     id: 'brightDiamond',
     name: 'Bright Diamond',
-    previewImage: '@assets/images/templates/brightDiamond.png',
+    previewImage: brightDiamondImg,
     category: 'Elegant',
     render: BrightDiamondTemplate
   },
   mjenziWaTaifa: {
     id: 'mjenziWaTaifa',
     name: 'Mjenzi wa Taifa',
-    previewImage: '@assets/images/templates/mjenziWaTaifa.png',
+    previewImage: mjenziWaTaifaImg,
     category: 'Technical',
     render: MjenziWaTaifaTemplate
   },
   streetHustler: {
     id: 'streetHustler',
     name: 'Street Hustler',
-    previewImage: '@assets/images/templates/streetHustler.png',
+    previewImage: streetHustlerImg,
     category: 'Creative',
     render: StreetHustlerTemplate
   },
   safariOriginal: {
     id: 'safariOriginal',
     name: 'Safari Original',
-    previewImage: '@assets/images/templates/safariOriginal.png',
+    previewImage: safariOriginalImg,
     category: 'Modern',
     render: SafariOriginalTemplate
   },
   bigBoss: {
     id: 'bigBoss',
     name: 'Big Boss',
-    previewImage: '@assets/images/templates/bigBoss.png',
+    previewImage: bigBossImg,
     category: 'Executive',
     render: BigBossTemplate
   },
   tanzanitePro: {
     id: 'tanzanitePro',
     name: 'Tanzanite Pro',
-    previewImage: '@assets/images/templates/tanzanitePro.png',
+    previewImage: tanzaniteProImg,
     category: 'Premium',
     render: TanzaniteProTemplate
   },
   mwalimuOne: {
     id: 'mwalimuOne',
     name: 'Mwalimu One',
-    previewImage: '@assets/images/templates/mwalimuOne.png',
+    previewImage: mwalimuOneImg,
     category: 'Education',
     render: MwalimuOneTemplate
   },
   serengetiFlow: {
     id: 'serengetiFlow',
     name: 'Serengeti Flow',
-    previewImage: '@assets/images/templates/serengetiFlow.png',
+    previewImage: serengetiFlowImg,
     category: 'Modern',
     render: SerengetiFlowTemplate
   },
   smartBongo: {
     id: 'smartBongo',
     name: 'Smart Bongo',
-    previewImage: '@assets/images/templates/smartBongo.png',
+    previewImage: smartBongoImg,
     category: 'Technology',
     render: SmartBongoTemplate
   },
   madiniMob: {
     id: 'madiniMob',
     name: 'Madini Mob',
-    previewImage: '@assets/images/templates/madiniMob.png',
+    previewImage: madiniMobImg,
     category: 'Industry',
     render: MadiniMobTemplate
   },
   mkaliModern: {
     id: 'mkaliModern',
     name: 'Mkali Modern',
-    previewImage: '@assets/images/templates/mkaliModern.png',
+    previewImage: mkaliModernImg,
     category: 'Creative',
     render: MkaliModernTemplate
   }
