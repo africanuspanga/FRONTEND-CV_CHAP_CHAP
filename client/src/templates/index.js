@@ -5,14 +5,14 @@ export const templates = {
   moonlightSonata: {
     id: 'moonlightSonata',
     name: 'Moonlight Sonata',
-    previewImage: '/static/templates-preview.png',
+    previewImage: '/images/templates/moonlightSonata.png',
     category: 'Professional',
     render: () => null // Placeholder
   },
   kaziFasta: {
     id: 'kaziFasta',
     name: 'Kazi Fasta',
-    previewImage: '/static/templates-preview.png',
+    previewImage: '/images/templates/kaziFasta.png',
     category: 'Modern',
     render: () => null // Placeholder
   },
