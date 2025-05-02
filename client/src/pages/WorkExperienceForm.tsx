@@ -14,6 +14,7 @@ import GeneratingRecommendations from '@/components/GeneratingRecommendations';
 import WorkExperienceEditor from '@/components/WorkExperienceEditor';
 import WorkHistorySummary from '@/components/WorkHistorySummary';
 import { WorkExperience } from '@shared/schema';
+import { getWorkExperienceRecommendations } from '@/lib/openai-service';
 
 const WorkExperienceForm = () => {
   const [, navigate] = useLocation();
@@ -279,22 +280,30 @@ const WorkExperienceForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Start generating recommendations - but we'll only show very briefly for visual feedback
+    // Start generating recommendations
     setIsGeneratingRecommendations(true);
     
-    // ULTRA-FAST: Immediately generate mock data for UI testing while real data loads in background
-    setTimeout(() => {
-      const mockRecommendations = [
-        `Spearheaded the development of innovative ${jobTitle} strategies at ${employer}, resulting in a 30% increase in overall efficiency.`,
-        `Collaborated with cross-functional teams to implement new systems, leading to reduced costs and improved customer satisfaction.`,
-        `Managed key projects and initiatives, consistently exceeding targets and delivering results ahead of schedule.`
-      ];
-      
-      // Always show the recommendations dialog extremely quickly
-      setAIRecommendations(mockRecommendations);
-      setIsGeneratingRecommendations(false);
-      setShowRecommendationsDialog(true);
-    }, 150); // Ultra-fast 150ms delay - just enough to see something happened
+    // Use the WorkExperienceBulletGenerator component indirectly by
+    // calling the OpenAI API directly here
+    getWorkExperienceRecommendations(jobTitle, employer)
+      .then(recommendations => {
+        console.log('Received AI recommendations:', recommendations);
+        setAIRecommendations(recommendations);
+        setIsGeneratingRecommendations(false);
+        setShowRecommendationsDialog(true);
+      })
+      .catch(error => {
+        console.error('Error getting AI recommendations:', error);
+        setIsGeneratingRecommendations(false);
+        // Fallback to a minimal set of professional bullet points if AI fails
+        const fallbackRecommendations = [
+          `Led important initiatives as ${jobTitle} at ${employer}.`,
+          `Worked with teams to achieve company objectives.`,
+          `Managed various projects and responsibilities.`
+        ];
+        setAIRecommendations(fallbackRecommendations);
+        setShowRecommendationsDialog(true);
+      });
   };
 
   // Generate month options

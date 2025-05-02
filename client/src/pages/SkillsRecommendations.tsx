@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, AlertCircle } from 'lucide-react';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import { useCVForm } from '@/contexts/cv-form-context';
+import { getSkillRecommendations } from '@/lib/openai-service';
+import { useToast } from '@/hooks/use-toast';
+import { useAIStatus } from '@/hooks/use-ai-status';
 
 interface SkillWithLevel {
   id: string;
@@ -43,14 +46,53 @@ const SkillsRecommendations = () => {
     navigate(`/cv/${templateId}/skills-editor`);
   };
 
-  // Generate skills from the work experience
+  // Generate skills from the work experience using OpenAI
+  const { toast } = useToast();
+  const { hasOpenAI } = useAIStatus();
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    // In a real app, this would make an API call to generate skills
+    // Check if we have work experience data
+    if (!formData.workExperiences || formData.workExperiences.length === 0) {
+      toast({
+        title: "Missing work experience",
+        description: "We need work experience details to recommend skills.",
+        variant: "destructive"
+      });
+      navigate(`/cv/${templateId}/work-experience`);
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+    setError(null);
+    
+    // Convert work experience to a format suitable for AI analysis
+    const workExperienceText = formData.workExperiences.map(job => 
+      `${job.jobTitle} at ${job.company}${job.achievements?.length ? `: ${job.achievements.join('. ')}` : ''}`
+    ).join('\n\n');
+    
+    // Extract job title for better recommendations
+    const jobTitle = formData.workExperiences?.[0]?.jobTitle || 'Professional';
+    
+    // Get AI-based skill recommendations
+    getSkillRecommendations(jobTitle)
+      .then(skills => {
+        console.log('Received skills from API:', skills);
+        // Transform the received skills into the required format with IDs and levels
+        const formattedSkills = skills.map((skill, index) => ({
+          id: (index + 1).toString(),
+          name: skill,
+          level: Math.min(Math.max(Math.round(Math.random() * 2) + 3), 5) // Default to level 3-5
+        }));
+        setRecommendedSkills(formattedSkills);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Error getting skill recommendations:', err);
+        setError(err instanceof Error ? err.message : 'Failed to generate skills recommendations');
+        setIsLoading(false);
+      });
+  }, [formData.workExperiences, templateId, navigate, toast]);
 
   const handlePrevious = () => {
     navigate(`/cv/${templateId}/skills`);
@@ -91,6 +133,18 @@ const SkillsRecommendations = () => {
           <div className="py-12 text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
             <p className="text-xl font-medium text-gray-700">Generating skills based on your work experience...</p>
+          </div>
+        ) : error ? (
+          <div className="py-12 text-center">
+            <AlertCircle className="h-12 w-12 mx-auto text-red-500 mb-4" />
+            <p className="text-xl font-medium text-red-500 mb-2">Error generating skills</p>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <Button
+              onClick={() => navigate(`/cv/${templateId}/skills-editor`)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Continue with manual skills
+            </Button>
           </div>
         ) : (
           <div>
