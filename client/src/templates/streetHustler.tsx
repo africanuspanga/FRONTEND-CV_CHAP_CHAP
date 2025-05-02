@@ -1,18 +1,22 @@
 import React from 'react';
 import { CVData } from '@shared/schema';
 
-export function StreetHustlerTemplate({
-  personalInfo,
-  workExperience = [],
-  education = [],
-  skills = [],
-  summary = "",
-  languages = [],
-  references = [],
-  certifications = [],
-  projects = [],
-  hobbies
-}: CVData): JSX.Element {
+export function StreetHustlerTemplate(cvData: CVData): JSX.Element {
+  const {
+    personalInfo,
+    workExperiences = [],
+    education = [],
+    skills = [],
+    languages = [],
+    references = [],
+    certifications = [],
+    projects = [],
+    hobbies
+  } = cvData;
+  
+  // Get the summary from personalInfo
+  const summary = personalInfo?.summary || "";
+
   return (
     <div style={{ 
       fontFamily: "'Lato', sans-serif",
@@ -121,8 +125,8 @@ export function StreetHustlerTemplate({
             PROFESSIONAL EXPERIENCE
           </h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {workExperience.map((exp, index) => (
-              <li key={index} style={{ marginBottom: index < workExperience.length - 1 ? '25px' : '0' }}>
+            {workExperiences.map((exp, index: number) => (
+              <li key={index} style={{ marginBottom: index < workExperiences.length - 1 ? '25px' : '0' }}>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -177,7 +181,7 @@ export function StreetHustlerTemplate({
                   paddingLeft: 0, 
                   marginTop: '5px' 
                 }}>
-                  {exp.achievements?.map((item, idx) => (
+                  {exp.achievements?.map((item: string, idx: number) => (
                     <li key={idx} style={{
                       fontSize: '0.95em',
                       color: '#444',

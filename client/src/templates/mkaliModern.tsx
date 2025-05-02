@@ -4,14 +4,17 @@ import { CVData } from '@shared/schema';
 export function MkaliModernTemplate(data: CVData) {
   const {
     personalInfo,
-    summary,
-    workExperience,
-    education,
-    skills,
-    languages,
-    references,
-    hobbies,
+    workExperiences = [],
+    education = [],
+    skills = [],
+    languages = [],
+    references = [],
+    hobbies
   } = data;
+  
+  // Get the summary from personalInfo
+  const summary = personalInfo?.summary || "";
+
 
   // Filter out empty work experiences
   const validWorkExperience = workExperience?.filter(exp => exp.jobTitle && exp.company) || [];
