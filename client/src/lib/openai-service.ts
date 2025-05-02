@@ -139,14 +139,15 @@ export async function getSkillRecommendations(
  */
 export async function enhanceProfessionalSummary(
   currentSummary: string,
-  jobTitle: string,
+  jobTitle?: string,
   yearsOfExperience?: number,
 ): Promise<string> {
+  const jobContext = jobTitle ? `for a ${jobTitle}` : 'for a professional';
   const experienceContext = yearsOfExperience 
     ? `with ${yearsOfExperience} years of experience` 
     : 'with relevant experience';
 
-  const prompt = `Enhance the following professional summary for a ${jobTitle} ${experienceContext}:
+  const prompt = `Enhance the following professional summary ${jobContext} ${experienceContext}:
 
 "${currentSummary}"
 

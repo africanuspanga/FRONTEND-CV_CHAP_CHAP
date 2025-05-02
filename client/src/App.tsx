@@ -49,6 +49,9 @@ import AdminUSSDVerificationPage from "@/pages/admin-ussd-verification";
 import AdminAnalyticsPage from "@/pages/admin-analytics";
 import AdminSettingsPage from "@/pages/admin-settings";
 
+// Test Pages
+import OpenAITestPage from "@/pages/OpenAITestPage";
+
 function Router() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -98,6 +101,7 @@ function Router() {
                 <Route path="/about" component={About} />
                 <Route path="/login" component={Login} />
                 <Route path="/register" component={Register} />
+                <Route path="/openai-test" component={OpenAITestPage} />
                 <Route component={NotFound} />
               </Switch>
             </div>
