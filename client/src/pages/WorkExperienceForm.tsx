@@ -166,6 +166,7 @@ const WorkExperienceForm = () => {
 
   // Function to handle successful generation of recommendations
   const handleAddRecommendations = (recommendations: string[]) => {
+    console.log('Received recommendations:', recommendations);
     // Ensure we have an array of strings
     const recommendationsArray = Array.isArray(recommendations) ? recommendations : [recommendations];
     
@@ -506,8 +507,8 @@ const WorkExperienceForm = () => {
           {/* Show loading indicator */}
           <GeneratingRecommendations />
           
-          {/* Hidden generator component that does the actual API call */}
-          <div className="hidden">
+          {/* Generator component that does the actual API call - render in visible DOM for proper functionality */}
+          <div style={{ position: 'absolute', left: '-9999px' }}>
             <WorkExperienceBulletGenerator
               jobTitle={jobTitle}
               company={employer}
