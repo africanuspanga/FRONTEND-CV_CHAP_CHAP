@@ -180,20 +180,26 @@ const WorkExperienceForm = () => {
   // Function to handle error or skip recommendations
   const handleSkipRecommendations = () => {
     setIsGeneratingRecommendations(false);
+    setShowRecommendationsDialog(false);
     // Go directly to editor with empty achievements
     setShowEditor(true);
+    console.log('Proceeding to editor after skipping recommendations');
   };
   
   // Function to handle user accepting the recommendations
   const handleAcceptRecommendations = () => {
     setShowRecommendationsDialog(false);
+    setIsGeneratingRecommendations(false);
     setShowEditor(true);
+    console.log('Proceeding to editor with accepted recommendations');
   };
   
   // Function to handle user declining the recommendations
   const handleRejectRecommendations = () => {
     setShowRecommendationsDialog(false);
+    setIsGeneratingRecommendations(false);
     setShowEditor(true);
+    console.log('Proceeding to editor after declining recommendations');
     // Keep the recommendations in state in case they want to use them later
   };
 

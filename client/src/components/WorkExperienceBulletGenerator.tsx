@@ -79,15 +79,15 @@ const WorkExperienceBulletGenerator: React.FC<WorkExperienceBulletGeneratorProps
     }
   };
 
-  // Generate bullet points on component mount only
+  // Generate bullet points immediately when component mounts
   useEffect(() => {
-    // Only generate on mount, not on every render
     let isMounted = true;
     
     const generate = async () => {
       // Only run if component is still mounted and API is available
       if (isMounted && hasOpenAI !== undefined && !isCheckingAI && !isLoading) {
         try {
+          console.log('Generating bullet points for', jobTitle, 'at', company);
           await generateBulletPoints();
         } catch (error) {
           console.error('Failed to generate bullet points:', error);
@@ -95,6 +95,7 @@ const WorkExperienceBulletGenerator: React.FC<WorkExperienceBulletGeneratorProps
       }
     };
     
+    // Generate immediately without delay
     generate();
     
     // Cleanup function to prevent updates after unmount
