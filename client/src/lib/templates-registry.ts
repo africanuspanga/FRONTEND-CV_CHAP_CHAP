@@ -30,6 +30,8 @@ export interface TemplateWithMetadata {
   isPopular?: boolean;
   isNew?: boolean;
   isPro?: boolean;
+  category?: string;
+  popularity?: number;
 }
 
 // Re-export the base functions
