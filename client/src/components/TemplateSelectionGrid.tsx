@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { getAllTemplatesWithMetadata as getAllTemplates, TemplateWithMetadata } from '@/lib/templates-registry';
 import { getTemplatesByCategory } from '@/lib/simple-template-registry';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import TemplateFallbackImage from './TemplateFallbackImage';
 
 interface TemplateSelectionGridProps {
   onSelectTemplate: (templateId: string) => void;
@@ -16,6 +17,9 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
   selectedTemplateId,
   filterCategory
 }) => {
+  // Track which templates failed to load their preview images
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+  
   // Get templates from either filtered category or all templates
   const templates = filterCategory 
     ? getTemplatesByCategory(filterCategory).map(template => ({
@@ -51,34 +55,40 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
           <Card key={template.id} className="overflow-hidden flex flex-col h-full border shadow-sm hover:shadow-md transition-shadow">
             <div className="relative h-[300px] sm:h-[400px] md:h-[500px] bg-white overflow-hidden">
               <div className="absolute inset-0 bg-gray-100 animate-pulse" /> {/* Loading placeholder */}
-              <img
-                src={template.previewImage || '/static/templates-preview.png'}
-                alt={`${template.name} template preview`}
-                className="w-full h-full object-contain object-top px-2 relative z-10"
-                style={{
-                  maxWidth: '100%',
-                  display: 'block',
-                  margin: '0 auto'
-                }}
-                loading="lazy" /* For better mobile performance */
-                onLoad={(e) => {
-                  // Remove loading animation when image loads
-                  const target = e.target as HTMLImageElement;
-                  if (target.parentElement) {
-                    const placeholder = target.parentElement.querySelector('.animate-pulse');
-                    if (placeholder) placeholder.classList.add('hidden');
-                  }
-                }}
-                onError={(e) => {
-                  console.error(`Failed to load image: ${template.previewImage}`);
-                  // Attempt to load fallback image instead of hiding
-                  if (template.previewImage !== '/static/templates-preview.png') {
-                    e.currentTarget.src = '/static/templates-preview.png';
-                  } else {
+              
+              {failedImages[template.id] ? (
+                <div className="relative w-full h-full z-10">
+                  <TemplateFallbackImage templateName={template.name} />
+                </div>
+              ) : (
+                <img
+                  src={template.previewImage || '/static/templates-preview.png'}
+                  alt={`${template.name} template preview`}
+                  className="w-full h-full object-contain object-top px-2 relative z-10"
+                  style={{
+                    maxWidth: '100%',
+                    display: 'block',
+                    margin: '0 auto'
+                  }}
+                  loading="lazy" /* For better mobile performance */
+                  onLoad={(e) => {
+                    // Remove loading animation when image loads
+                    const target = e.target as HTMLImageElement;
+                    if (target.parentElement) {
+                      const placeholder = target.parentElement.querySelector('.animate-pulse');
+                      if (placeholder) placeholder.classList.add('hidden');
+                    }
+                  }}
+                  onError={(e) => {
+                    console.error(`Failed to load image: ${template.previewImage}`);
+                    // Mark this template's image as failed
+                    setFailedImages(prev => ({ ...prev, [template.id]: true }));
+                    
+                    // Hide the image since we'll show the fallback component
                     e.currentTarget.style.display = 'none';
-                  }
-                }}
-              />
+                  }}
+                />
+              )}
             </div>
             <CardContent className="p-3 sm:p-4 flex flex-col justify-between flex-grow border-t">
               <div>
