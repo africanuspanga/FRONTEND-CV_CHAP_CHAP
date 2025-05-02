@@ -1,25 +1,5 @@
-/**
- * OpenAI Proxy Service
- * Securely handles OpenAI API requests from the client without exposing API keys
- */
-
-import { Request, Response } from 'express';
-
-// Use the OpenAI API key from environment variables
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
-export interface OpenAIProxyRequest {
-  prompt: string;
-  maxTokens?: number;
-  type?: 'summary' | 'skills' | 'jobDescription';
-  tone?: 'professional' | 'confident' | 'friendly';
-}
-
-/**
- * Get the system prompt for a professional summary
- */
-function getSummarySystemPrompt(tone: string = 'professional') {
-  const toneInstructions: Record<string, string> = {
+function getSummarySystemPrompt(tone) {
+  const toneInstructions = {
     professional: "Use formal language and focus on achievements and expertise.",
     confident: "Use strong, assertive language that highlights expertise and value.",
     friendly: "Use warm, approachable language while maintaining professionalism."
@@ -32,7 +12,7 @@ function getSummarySystemPrompt(tone: string = 'professional') {
     
     REQUIREMENTS:
     - Length: 250-400 characters (approximately 3-4 sentences)
-    - ${toneInstructions[tone] || toneInstructions.professional}
+    - ${toneInstructions[tone]}
     - Focus on career achievements, expertise, and unique value proposition
     - Include years of experience if mentioned
     - Avoid clichés, generalities, and first-person pronouns
@@ -54,11 +34,8 @@ function getSummarySystemPrompt(tone: string = 'professional') {
   `;
 }
 
-/**
- * Get the system prompt for a job description
- */
-function getJobDescriptionSystemPrompt(tone: string = 'professional') {
-  const toneInstructions: Record<string, string> = {
+function getJobDescriptionSystemPrompt(tone) {
+  const toneInstructions = {
     professional: "Use formal, industry-standard language.",
     confident: "Use achievement-oriented language with strong action verbs.",
     friendly: "Balance professionalism with approachable language."
@@ -71,7 +48,7 @@ function getJobDescriptionSystemPrompt(tone: string = 'professional') {
     
     REQUIREMENTS:
     - Create exactly 3 bullet points
-    - ${toneInstructions[tone] || toneInstructions.professional}
+    - ${toneInstructions[tone]}
     - Start each bullet with a strong action verb (Developed, Managed, Implemented, etc.)
     - Focus on achievements and results, not just responsibilities
     - Include metrics and quantifiable results when possible (percentages, amounts, time frames)
@@ -94,11 +71,8 @@ function getJobDescriptionSystemPrompt(tone: string = 'professional') {
   `;
 }
 
-/**
- * Get the system prompt for skills recommendations
- */
-function getSkillsSystemPrompt(tone: string = 'professional') {
-  const toneInstructions: Record<string, string> = {
+function getSkillsSystemPrompt(tone) {
+  const toneInstructions = {
     professional: "Focus on industry-standard and technically accurate skills.",
     confident: "Emphasize mastery and expertise in key areas.",
     friendly: "Balance technical skills with transferable skills that show teamwork."
@@ -111,7 +85,7 @@ function getSkillsSystemPrompt(tone: string = 'professional') {
     
     REQUIREMENTS:
     - Extract 4-5 most relevant skills based on the provided information
-    - ${toneInstructions[tone] || toneInstructions.professional}
+    - ${toneInstructions[tone]}
     - Prioritize specific technical and industry-specific skills over general ones
     - Be precise with skill names (e.g., "Adobe Photoshop" instead of just "Design Software")
     - Ensure skills align with the person's industry and experience level
@@ -130,86 +104,4 @@ function getSkillsSystemPrompt(tone: string = 'professional') {
     
     Respond with ONLY the list of skills, no explanations or other text.
   `;
-}
-
-/**
- * Get the appropriate system prompt based on request type
- */
-function getSystemPrompt(type: string = 'default', tone: string = 'professional') {
-  switch (type) {
-    case 'summary':
-      return getSummarySystemPrompt(tone);
-    case 'jobDescription':
-      return getJobDescriptionSystemPrompt(tone);
-    case 'skills':
-      return getSkillsSystemPrompt(tone);
-    default:
-      return 'You are a professional CV writing assistant. Provide clear, concise, and professional content.';
-  }
-}
-
-/**
- * Handler for proxying OpenAI API requests
- * Uses the server's API key instead of requiring the client to have one
- */
-export async function openaiProxyHandler(req: Request, res: Response) {
-  // Check if OpenAI API key exists
-  if (!OPENAI_API_KEY) {
-    return res.status(500).json({ error: 'OpenAI API key not configured on server' });
-  }
-
-  try {
-    // Get prompt and optional parameters from request body
-    const { prompt, maxTokens = 500, type = 'default', tone = 'professional' } = req.body as OpenAIProxyRequest;
-
-    // Validate prompt
-    if (!prompt || typeof prompt !== 'string') {
-      return res.status(400).json({ error: 'Missing or invalid prompt' });
-    }
-
-    // Get the appropriate system prompt based on type
-    const systemPrompt = getSystemPrompt(type, tone);
-
-    // Make API call to OpenAI
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: maxTokens,
-        temperature: 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenAI API error:', errorData);
-      return res.status(response.status).json({
-        error: errorData.error?.message || 'Failed to get response from OpenAI'
-      });
-    }
-
-    const data = await response.json();
-    return res.json({
-      content: data.choices[0].message.content.trim()
-    });
-  } catch (error) {
-    console.error('OpenAI proxy error:', error);
-    return res.status(500).json({
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
-    });
-  }
 }

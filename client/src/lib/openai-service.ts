@@ -33,9 +33,33 @@ export function setOpenAIApiKey(apiKey: string): void {}
 export function clearOpenAIApiKey(): void {}
 
 /**
+ * Types for the prompting options
+ */
+export type PromptType = 'default' | 'summary' | 'skills' | 'jobDescription';
+export type ToneType = 'professional' | 'confident' | 'friendly';
+
+/**
+ * Options for making OpenAI requests
+ */
+interface OpenAIRequestOptions {
+  prompt: string;
+  maxTokens?: number;
+  type?: PromptType;
+  tone?: ToneType;
+}
+
+/**
  * Make a request to the OpenAI API via our server-side proxy
  */
-async function makeOpenAIRequest(prompt: string, maxTokens: number = 500): Promise<string> {
+async function makeOpenAIRequest(
+  options: OpenAIRequestOptions | string,
+  maxTokens: number = 500
+): Promise<string> {
+  // Allow simple string prompt for backward compatibility
+  const requestOptions: OpenAIRequestOptions = typeof options === 'string' 
+    ? { prompt: options, maxTokens } 
+    : options;
+  
   try {
     const response = await fetch('/api/openai/proxy', {
       method: 'POST',
@@ -43,8 +67,10 @@ async function makeOpenAIRequest(prompt: string, maxTokens: number = 500): Promi
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        prompt,
-        maxTokens,
+        prompt: requestOptions.prompt,
+        maxTokens: requestOptions.maxTokens || maxTokens,
+        type: requestOptions.type || 'default',
+        tone: requestOptions.tone || 'professional',
       }),
     });
 
@@ -70,15 +96,21 @@ async function makeOpenAIRequest(prompt: string, maxTokens: number = 500): Promi
 export async function getWorkExperienceRecommendations(
   jobTitle: string,
   company: string,
-  industry?: string
+  industry?: string,
+  tone: ToneType = 'professional'
 ): Promise<string[]> {
   const industryContext = industry ? ` in the ${industry} industry` : '';
-  const prompt = `Generate 5 professional bullet points for a ${jobTitle} position at ${company}${industryContext}. 
-  Focus on achievements and responsibilities. Make each point start with a strong action verb. 
-  Format the response as a plain list with one bullet point per line, without numbering. 
-  Each bullet point should be concise (15-20 words), impactful, and highlight transferable skills.`;
+  const prompt = `Job Title: ${jobTitle}
+Company: ${company}${industryContext}
 
-  const result = await makeOpenAIRequest(prompt, 600);
+Please provide professional bullet points for this position that highlight achievements and responsibilities.`;
+
+  const result = await makeOpenAIRequest({
+    prompt,
+    maxTokens: 600,
+    type: 'jobDescription',
+    tone
+  });
   
   // Split the result into individual bullet points
   return result
@@ -93,7 +125,8 @@ export async function getWorkExperienceRecommendations(
 export async function getSkillRecommendations(
   jobTitle: string,
   yearsOfExperience?: number,
-  industry?: string
+  industry?: string,
+  tone: ToneType = 'professional'
 ): Promise<string[]> {
   const experienceLevel = yearsOfExperience 
     ? yearsOfExperience < 2 
@@ -104,18 +137,23 @@ export async function getSkillRecommendations(
     : 'various experience levels';
 
   const industryContext = industry ? ` in the ${industry} industry` : '';
-  const prompt = `Generate 10 relevant skills for a ${experienceLevel} ${jobTitle}${industryContext}.
-  Include both technical and soft skills.
-  Format the response as a plain list with one skill per line, without numbering.
-  Each skill should be concise (1-3 words when possible).`;
+  const prompt = `Job Title: ${jobTitle}
+Experience Level: ${experienceLevel}${industryContext}
 
-  const result = await makeOpenAIRequest(prompt, 400);
+Please provide a list of professional skills relevant for this position.`;
+
+  const result = await makeOpenAIRequest({
+    prompt,
+    maxTokens: 400,
+    type: 'skills',
+    tone
+  });
   
   // Split the result into individual skills
   return result
-    .split('\n')
-    .map(line => line.replace(/^[\s•\-*]+/, '').trim())
-    .filter(line => line.length > 0);
+    .split(',')
+    .map(skill => skill.trim())
+    .filter(skill => skill.length > 0);
 }
 
 /**
@@ -125,21 +163,25 @@ export async function enhanceProfessionalSummary(
   currentSummary: string,
   jobTitle?: string,
   yearsOfExperience?: number,
+  tone: ToneType = 'professional'
 ): Promise<string> {
   const jobContext = jobTitle ? `for a ${jobTitle}` : 'for a professional';
   const experienceContext = yearsOfExperience 
     ? `with ${yearsOfExperience} years of experience` 
     : 'with relevant experience';
 
-  const prompt = `Enhance the following professional summary ${jobContext} ${experienceContext}:
+  const prompt = `Professional Summary: ${currentSummary}
+Job Title: ${jobTitle || 'Not specified'}
+Experience: ${yearsOfExperience ? `${yearsOfExperience} years` : 'Not specified'}
 
-"${currentSummary}"
+Please provide an enhanced professional summary for this person.`;
 
-Make it more impactful, professional, and concise (100-150 words). Highlight strengths and career achievements.
-Focus on value proposition. Use active voice and first-person perspective.
-Avoid clichés and generic statements. Keep the tone professional but personable.`;
-
-  return await makeOpenAIRequest(prompt, 300);
+  return await makeOpenAIRequest({
+    prompt,
+    maxTokens: 300,
+    type: 'summary',
+    tone
+  });
 }
 
 /**
@@ -152,6 +194,7 @@ export async function enhanceWorkExperience({
   startDate,
   endDate,
   yearsOfExperience,
+  tone = 'professional'
 }: {
   jobTitle: string;
   company: string;
@@ -159,6 +202,7 @@ export async function enhanceWorkExperience({
   startDate?: string;
   endDate?: string;
   yearsOfExperience?: number;
+  tone?: ToneType;
 }): Promise<string> {
   const dateContext = startDate && endDate 
     ? `from ${startDate} to ${endDate}` 
@@ -170,13 +214,18 @@ export async function enhanceWorkExperience({
     ? `with approximately ${yearsOfExperience} years of experience` 
     : '';
 
-  const prompt = `Enhance the following job description for a ${jobTitle} position at ${company} ${dateContext} ${experienceContext}:
+  const prompt = `Job Title: ${jobTitle}
+Company: ${company}
+Time Period: ${dateContext || 'Not specified'}
+Experience Level: ${yearsOfExperience ? `${yearsOfExperience} years` : 'Not specified'}
+Current Description: ${description}
 
-"${description}"
+Please provide an enhanced professional description for this work experience.`;
 
-Rewrite it to be more professional, achievement-oriented, and impactful. Focus on quantifiable achievements and specific contributions.
-Use strong action verbs and professional language. Maintain first-person perspective if present in the original text.
-Keep the tone professional, concise, and highlight transferable skills. Format as a cohesive paragraph, not bullet points.`;
-
-  return await makeOpenAIRequest(prompt, 400);
+  return await makeOpenAIRequest({
+    prompt, 
+    maxTokens: 400,
+    type: 'jobDescription',
+    tone
+  });
 }
