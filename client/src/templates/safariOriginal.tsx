@@ -27,8 +27,12 @@ export function SafariOriginalTemplate(data: CVData) {
   const validReferences = references?.filter(ref => ref.name) || [];
   // Filter out empty certifications
   const validCertifications = certifications?.filter(cert => cert.name) || [];
-  // Filter out empty hobbies
-  const validHobbies = hobbies?.filter(hobby => hobby) || [];
+  // Handle hobbies based on data type
+  const validHobbies = typeof hobbies === 'string' 
+    ? [hobbies] // If hobbies is a string, wrap it in an array
+    : Array.isArray(hobbies) 
+      ? hobbies.filter(hobby => hobby) // If it's an array, filter out empty values
+      : []; // Default to empty array
 
   // Determine if we have additional skills (use certifications as additional skills)
   const hasAdditionalSkills = validCertifications.length > 0;
