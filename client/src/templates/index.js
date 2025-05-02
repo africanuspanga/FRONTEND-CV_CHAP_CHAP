@@ -75,35 +75,35 @@ export const templates = {
   mwalimuOne: {
     id: 'mwalimuOne',
     name: 'Mwalimu One',
-    previewImage: '/template-previews/template-placeholder.svg',
+    previewImage: '/template-previews/templates-preview.png',
     category: 'Education',
     render: () => null // Placeholder
   },
   serengetiFlow: {
     id: 'serengetiFlow',
     name: 'Serengeti Flow',
-    previewImage: '/template-previews/template-placeholder.svg',
+    previewImage: '/template-previews/templates-preview.png',
     category: 'Modern',
     render: () => null // Placeholder
   },
   smartBongo: {
     id: 'smartBongo',
     name: 'Smart Bongo',
-    previewImage: '/template-previews/template-placeholder.svg',
+    previewImage: '/template-previews/templates-preview.png',
     category: 'Technology',
     render: () => null // Placeholder
   },
   madiniMob: {
     id: 'madiniMob',
     name: 'Madini Mob',
-    previewImage: '/template-previews/template-placeholder.svg',
+    previewImage: '/template-previews/templates-preview.png',
     category: 'Industry',
     render: () => null // Placeholder
   },
   mkaliModern: {
     id: 'mkaliModern',
     name: 'Mkali Modern',
-    previewImage: '/template-previews/template-placeholder.svg',
+    previewImage: '/template-previews/templates-preview.png',
     category: 'Creative',
     render: () => null // Placeholder
   }
