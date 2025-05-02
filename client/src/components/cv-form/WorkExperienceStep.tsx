@@ -44,8 +44,8 @@ const WorkExperienceStep: React.FC = () => {
   
   // Get default values from context or use an empty array with one item
   const defaultValues: FormValues = {
-    workExperience: formData.workExperience && formData.workExperience.length > 0
-      ? formData.workExperience
+    workExperience: formData.workExperiences && formData.workExperiences.length > 0
+      ? formData.workExperiences
       : [emptyWorkExperience],
   };
 
@@ -64,7 +64,7 @@ const WorkExperienceStep: React.FC = () => {
 
   // Handle form submission
   const onSubmit = (data: FormValues) => {
-    updateFormField('workExperience', data.workExperience);
+    updateFormField('workExperiences', data.workExperience);
   };
 
   // Add a new work experience entry
@@ -79,8 +79,8 @@ const WorkExperienceStep: React.FC = () => {
     form.setValue('workExperience', [...form.getValues('workExperience')]);
     
     // Update the preview with the new empty field
-    const updatedExperience = [...formData.workExperience || [], emptyWorkExperience];
-    updateFormField('workExperience', updatedExperience);
+    const updatedExperience = [...formData.workExperiences || [], emptyWorkExperience];
+    updateFormField('workExperiences', updatedExperience);
   };
 
   // Remove a work experience entry
@@ -89,15 +89,15 @@ const WorkExperienceStep: React.FC = () => {
     setShowMaxWarning(false);
     
     // Update the preview immediately
-    const updatedExperience = [...(formData.workExperience || [])];
+    const updatedExperience = [...(formData.workExperiences || [])];
     updatedExperience.splice(index, 1);
-    updateFormField('workExperience', updatedExperience);
+    updateFormField('workExperiences', updatedExperience);
   };
 
   // Update form data on change to provide real-time preview
   const handleFieldChange = (index: number, field: string, value: any) => {
     // Clone the current work experience array
-    const updatedExperiences = [...(formData.workExperience || [])];
+    const updatedExperiences = [...(formData.workExperiences || [])];
     
     // Ensure the index exists
     if (!updatedExperiences[index]) {
@@ -111,7 +111,7 @@ const WorkExperienceStep: React.FC = () => {
     };
     
     // Update the global state for preview
-    updateFormField('workExperience', updatedExperiences);
+    updateFormField('workExperiences', updatedExperiences);
   };
 
   return (
