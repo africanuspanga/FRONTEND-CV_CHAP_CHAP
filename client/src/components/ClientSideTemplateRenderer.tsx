@@ -175,8 +175,25 @@ export const ClientSideTemplateRenderer = ({
               
               // Debug template data to see what's being passed to each template
               console.log('Template Renderer processed data:', { templateId, rawData: cvData, processedData: safeData });
-              // Call the template function with safe data
-              return template(safeData);
+              console.log('Template function type:', typeof template);
+              
+              // Call the template function with safe data within a try/catch
+              try {
+                const result = template(safeData);
+                console.log('Template render result type:', typeof result);
+                return result;
+              } catch (error) {
+                console.error('Error rendering template:', error);
+                return (
+                  <div className="text-red-500 p-4">
+                    <h3>Error rendering template</h3>
+                    <p>{error instanceof Error ? error.message : 'Unknown error'}</p>
+                    <pre className="text-xs bg-gray-100 p-2 mt-2 overflow-auto max-h-32">
+                      {JSON.stringify(safeData, null, 2)}
+                    </pre>
+                  </div>
+                );
+              }
             }
             // Handle invalid template case
             return <div className="text-red-500 p-4">Invalid template format</div>;
