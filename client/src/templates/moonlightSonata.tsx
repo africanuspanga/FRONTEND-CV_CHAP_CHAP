@@ -14,7 +14,7 @@ export function MoonlightSonataTemplate(props: CVData = {}): JSX.Element {
     references = []
   } = props || {};
   const fullName = `${personalInfo?.firstName || ''} ${personalInfo?.lastName || ''}`.trim();
-  const jobTitle = personalInfo?.jobTitle || 'PROFESSIONAL';
+  const jobTitle = personalInfo?.jobTitle || personalInfo?.professionalTitle || 'PROFESSIONAL';
 
   return (
     <div className="cv-container" style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', minHeight: '100vh', backgroundColor: '#ffffff', boxShadow: '0 1px 5px rgba(0, 0, 0, 0.15)' }}>
