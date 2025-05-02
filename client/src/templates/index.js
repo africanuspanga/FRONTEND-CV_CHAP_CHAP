@@ -16,6 +16,8 @@ import { SerengetiFlowTemplate } from './serengetiFlow';
 import { SmartBongoTemplate } from './smartBongo';
 import { MadiniMobTemplate } from './madiniMob';
 import { MkaliModernTemplate } from './mkaliModern';
+// Import the HOC to wrap templates with safe data handling
+import withSafeTemplateData from '../lib/withSafeTemplateData';
 
 // Import template preview images
 import moonlightSonataImg from '../assets/images/templates/moonlightSonata.png';
@@ -41,105 +43,105 @@ export const templates = {
     name: 'Moonlight Sonata',
     previewImage: moonlightSonataImg,
     category: 'Professional',
-    render: MoonlightSonataTemplate
+    render: withSafeTemplateData(MoonlightSonataTemplate)
   },
   kaziFasta: {
     id: 'kaziFasta',
     name: 'Kazi Fasta',
     previewImage: kaziFastaImg,
     category: 'Modern',
-    render: KaziFastaTemplate
+    render: withSafeTemplateData(KaziFastaTemplate)
   },
   jijengeClassic: {
     id: 'jijengeClassic',
     name: 'Jijenge Classic',
     previewImage: jijengeClassicImg,
     category: 'Classic',
-    render: JijengeClassicTemplate
+    render: withSafeTemplateData(JijengeClassicTemplate)
   },
   kilimanjaro: {
     id: 'kilimanjaro',
     name: 'Kilimanjaro',
     previewImage: kilimanjaroImg,
     category: 'Professional',
-    render: KilimanjaroTemplate
+    render: withSafeTemplateData(KilimanjaroTemplate)
   },
   brightDiamond: {
     id: 'brightDiamond',
     name: 'Bright Diamond',
     previewImage: brightDiamondImg,
     category: 'Elegant',
-    render: BrightDiamondTemplate
+    render: withSafeTemplateData(BrightDiamondTemplate)
   },
   mjenziWaTaifa: {
     id: 'mjenziWaTaifa',
     name: 'Mjenzi wa Taifa',
     previewImage: mjenziWaTaifaImg,
     category: 'Technical',
-    render: MjenziWaTaifaTemplate
+    render: withSafeTemplateData(MjenziWaTaifaTemplate)
   },
   streetHustler: {
     id: 'streetHustler',
     name: 'Street Hustler',
     previewImage: streetHustlerImg,
     category: 'Creative',
-    render: StreetHustlerTemplate
+    render: withSafeTemplateData(StreetHustlerTemplate)
   },
   safariOriginal: {
     id: 'safariOriginal',
     name: 'Safari Original',
     previewImage: safariOriginalImg,
     category: 'Modern',
-    render: SafariOriginalTemplate
+    render: withSafeTemplateData(SafariOriginalTemplate)
   },
   bigBoss: {
     id: 'bigBoss',
     name: 'Big Boss',
     previewImage: bigBossImg,
     category: 'Executive',
-    render: BigBossTemplate
+    render: withSafeTemplateData(BigBossTemplate)
   },
   tanzanitePro: {
     id: 'tanzanitePro',
     name: 'Tanzanite Pro',
     previewImage: tanzaniteProImg,
     category: 'Premium',
-    render: TanzaniteProTemplate
+    render: withSafeTemplateData(TanzaniteProTemplate)
   },
   mwalimuOne: {
     id: 'mwalimuOne',
     name: 'Mwalimu One',
     previewImage: mwalimuOneImg,
     category: 'Education',
-    render: MwalimuOneTemplate
+    render: withSafeTemplateData(MwalimuOneTemplate)
   },
   serengetiFlow: {
     id: 'serengetiFlow',
     name: 'Serengeti Flow',
     previewImage: serengetiFlowImg,
     category: 'Modern',
-    render: SerengetiFlowTemplate
+    render: withSafeTemplateData(SerengetiFlowTemplate)
   },
   smartBongo: {
     id: 'smartBongo',
     name: 'Smart Bongo',
     previewImage: smartBongoImg,
     category: 'Technology',
-    render: SmartBongoTemplate
+    render: withSafeTemplateData(SmartBongoTemplate)
   },
   madiniMob: {
     id: 'madiniMob',
     name: 'Madini Mob',
     previewImage: madiniMobImg,
     category: 'Industry',
-    render: MadiniMobTemplate
+    render: withSafeTemplateData(MadiniMobTemplate)
   },
   mkaliModern: {
     id: 'mkaliModern',
     name: 'Mkali Modern',
     previewImage: mkaliModernImg,
     category: 'Creative',
-    render: MkaliModernTemplate
+    render: withSafeTemplateData(MkaliModernTemplate)
   }
 };
 
