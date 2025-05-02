@@ -48,9 +48,10 @@ const Combobox = ({
   // Use provided filter function or default
   const filterFunc = filterFunction || defaultFilterFunction;
 
-  // Filter options based on search query
+  // Filter options based on search query - only show options if search query is at least 2 characters
   const filteredOptions = React.useMemo(() => {
-    if (!searchQuery) return options;
+    // Don't show any options unless there are at least 2 characters in the search query
+    if (!searchQuery || searchQuery.length < 2) return [];
     return options.filter(option => filterFunc(searchQuery, option));
   }, [options, searchQuery, filterFunc]);
 
@@ -77,7 +78,15 @@ const Combobox = ({
             onValueChange={setSearchQuery}
             className="h-9"
           />
-          <CommandEmpty>{emptyMessage}</CommandEmpty>
+          <CommandEmpty>
+            {searchQuery && searchQuery.length < 2 
+              ? <div className="flex flex-col items-center justify-center py-3 text-center">
+                  <p className="text-amber-600 font-medium mb-1">Type at least 2 characters</p>
+                  <p className="text-muted-foreground text-sm">Suggestions will appear after 2 letters</p>
+                </div> 
+              : emptyMessage
+            }
+          </CommandEmpty>
           <CommandGroup className="max-h-64 overflow-auto">
             {filteredOptions.map((option) => (
               <CommandItem
