@@ -112,11 +112,23 @@ Please provide professional bullet points for this position that highlight achie
     tone
   });
   
-  // Split the result into individual bullet points
-  return result
+  // Process into individual bullet points and ensure we get exactly 3
+  let bulletPoints = result
     .split('\n')
     .map(line => line.replace(/^[\s•\-*]+/, '').trim())
     .filter(line => line.length > 0);
+  
+  // Make sure we have exactly 3 bullet points
+  if (bulletPoints.length > 3) {
+    bulletPoints = bulletPoints.slice(0, 3);
+  } else if (bulletPoints.length < 3) {
+    // If we somehow got fewer than 3 bullet points, pad the array
+    while (bulletPoints.length < 3) {
+      bulletPoints.push(`Additional ${jobTitle} responsibilities at ${company}`);
+    }
+  }
+  
+  return bulletPoints;
 }
 
 /**
@@ -149,11 +161,20 @@ Please provide a list of professional skills relevant for this position.`;
     tone
   });
   
-  // Split the result into individual skills
-  return result
-    .split(',')
-    .map(skill => skill.trim())
-    .filter(skill => skill.length > 0);
+  // Process the result based on the format (handles both comma-separated and line-separated formats)
+  if (result.includes(',')) {
+    // Process comma-separated list
+    return result
+      .split(',')
+      .map(skill => skill.trim())
+      .filter(skill => skill.length > 0);
+  } else {
+    // Fallback for line-separated list
+    return result
+      .split('\n')
+      .map(line => line.replace(/^[\s•\-*]+/, '').trim())
+      .filter(line => line.length > 0);
+  }
 }
 
 /**

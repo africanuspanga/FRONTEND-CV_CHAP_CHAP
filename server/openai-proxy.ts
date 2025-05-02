@@ -46,11 +46,20 @@ function getSummarySystemPrompt(tone: string = 'professional') {
     - No bullet points
     - Do not repeat the same information
     - No title or header
+    - No introductory phrases like "Professional Summary:" or "Here is"
+    - No conversational phrases like "Certainly!" or "I'd be happy to"
     
-    EXAMPLE:
+    EXAMPLES OF CORRECT RESPONSES:
     "Results-driven Software Engineer with 8+ years specializing in full-stack development. Expert in React.js, Node.js, and cloud infrastructure with a track record of delivering robust applications that improved client satisfaction by 35%. Passionate about clean code and mentoring junior developers to build scalable solutions."
     
-    Respond with ONLY the enhanced professional summary, no explanations or other text.
+    EXAMPLES OF INCORRECT RESPONSES:
+    "Professional Summary: Results-driven Software Engineer with 8+ years..."
+    
+    "Here's an enhanced professional summary for you: Results-driven Software Engineer with 8+ years..."
+    
+    "I'd be happy to enhance your professional summary: Results-driven Software Engineer with 8+ years..."
+    
+    IMPORTANT: Respond with ONLY the enhanced professional summary paragraph, no explanations or other text.
   `;
 }
 
@@ -70,7 +79,7 @@ function getJobDescriptionSystemPrompt(tone: string = 'professional') {
     TASK: Transform the provided job information into powerful, achievement-oriented bullet points.
     
     REQUIREMENTS:
-    - Create exactly 3 bullet points
+    - Create EXACTLY 3 bullet points and no more
     - ${toneInstructions[tone] || toneInstructions.professional}
     - Start each bullet with a strong action verb (Developed, Managed, Implemented, etc.)
     - Focus on achievements and results, not just responsibilities
@@ -80,17 +89,29 @@ function getJobDescriptionSystemPrompt(tone: string = 'professional') {
     - Avoid industry jargon unless it's standard for the field
     
     FORMAT:
-    - Provide exactly 3 bullet points
-    - Start each with a strong action verb in past tense for previous jobs, present tense for current positions
-    - No introductory text or explanations
+    - Provide EXACTLY 3 bullet points, with each point preceded by a bullet character
+    - Each bullet point must start with a strong action verb in past tense for previous jobs, present tense for current positions
+    - No introductory text, no explanatory notes, no additional text of any kind
     - No periods at the end of bullet points
+    - No numbering, only bullet points
+    - No "Certainly!" or other conversational phrases
     
-    EXAMPLES:
+    EXAMPLES OF CORRECT RESPONSES:
     • Increased customer satisfaction by 27% through implementation of streamlined service protocols and staff training
     • Managed team of 12 developers across 3 time zones, delivering 15 product features ahead of schedule
     • Reduced operational costs by $150K annually by optimizing supply chain processes and negotiating vendor contracts
     
-    Respond with ONLY the 3 enhanced bullet points, no explanations or other text.
+    EXAMPLES OF INCORRECT RESPONSES:
+    "Here are some bullet points for your job description:
+    • Increased customer satisfaction by 27% through implementation of streamlined service protocols and staff training
+    • Managed team of 12 developers across 3 time zones, delivering 15 product features ahead of schedule
+    • Reduced operational costs by $150K annually by optimizing supply chain processes and negotiating vendor contracts"
+    
+    "1. Increased customer satisfaction by 27% through implementation of streamlined service protocols and staff training
+    2. Managed team of 12 developers across 3 time zones, delivering 15 product features ahead of schedule
+    3. Reduced operational costs by $150K annually by optimizing supply chain processes and negotiating vendor contracts"
+    
+    IMPORTANT: Respond with ONLY the 3 enhanced bullet points, no explanations or other text.
   `;
 }
 
@@ -110,7 +131,7 @@ function getSkillsSystemPrompt(tone: string = 'professional') {
     TASK: Transform the provided information into a concise, relevant list of professional skills.
     
     REQUIREMENTS:
-    - Extract 4-5 most relevant skills based on the provided information
+    - Extract 5-8 most relevant skills based on the provided information
     - ${toneInstructions[tone] || toneInstructions.professional}
     - Prioritize specific technical and industry-specific skills over general ones
     - Be precise with skill names (e.g., "Adobe Photoshop" instead of just "Design Software")
@@ -119,16 +140,22 @@ function getSkillsSystemPrompt(tone: string = 'professional') {
     - For technical fields, include specific tools, languages, or methodologies
     
     FORMAT:
-    - Provide a simple comma-separated list of skills
-    - No bullet points, no formatting
+    - Provide a simple comma-separated list of skills, without any other text
+    - No bullet points, no numbering, no asterisks, no formatting
     - No explanations or descriptions for each skill
-    - No title or header
+    - No introductory phrases like "Here is" or "Certainly!"
+    - No titles, headers, or section markers
     
-    EXAMPLE:
+    EXAMPLES OF CORRECT RESPONSES:
     "Python, JavaScript, Docker, AWS, Database Design"
     "Project Management, Agile Methodologies, Stakeholder Communication, Risk Assessment, Microsoft Project"
     
-    Respond with ONLY the list of skills, no explanations or other text.
+    EXAMPLES OF INCORRECT RESPONSES:
+    "Here are the skills: Python, JavaScript, Docker, AWS, Database Design"
+    "1. Python, 2. JavaScript, 3. Docker, 4. AWS, 5. Database Design"
+    "Certainly! The skills are: Python, JavaScript, Docker, AWS, Database Design"
+    
+    IMPORTANT: Respond with ONLY the comma-separated list of skills, nothing else.
   `;
 }
 
