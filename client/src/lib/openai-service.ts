@@ -161,20 +161,26 @@ Please provide a list of professional skills relevant for this position.`;
     tone
   });
   
-  // Process the result based on the format (handles both comma-separated and line-separated formats)
+  // Parse skills from the result
+  let skills: string[] = [];
+  
+  // Process the result based on the format
   if (result.includes(',')) {
     // Process comma-separated list
-    return result
+    skills = result
       .split(',')
       .map(skill => skill.trim())
       .filter(skill => skill.length > 0);
   } else {
     // Fallback for line-separated list
-    return result
+    skills = result
       .split('\n')
       .map(line => line.replace(/^[\s•\-*]+/, '').trim())
       .filter(line => line.length > 0);
   }
+  
+  // Ensure we return exactly 5 skills (or fewer if not enough were provided)
+  return skills.slice(0, 5);
 }
 
 /**

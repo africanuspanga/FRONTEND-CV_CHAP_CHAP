@@ -131,16 +131,18 @@ function getSkillsSystemPrompt(tone: string = 'professional') {
     TASK: Transform the provided information into a concise, relevant list of professional skills.
     
     REQUIREMENTS:
-    - Extract 5-8 most relevant skills based on the provided information
+    - Extract EXACTLY 5 most relevant skills based on the provided information (no more, no less)
     - ${toneInstructions[tone] || toneInstructions.professional}
     - Prioritize specific technical and industry-specific skills over general ones
     - Be precise with skill names (e.g., "Adobe Photoshop" instead of just "Design Software")
     - Ensure skills align with the person's industry and experience level
     - Include a mix of technical (hard) skills and soft skills if appropriate
     - For technical fields, include specific tools, languages, or methodologies
+    - Each skill should be 1-3 words maximum
     
     FORMAT:
-    - Provide a simple comma-separated list of skills, without any other text
+    - Provide a simple comma-separated list of EXACTLY 5 skills, without any other text
+    - The list should contain EXACTLY 5 skills and not one more or less
     - No bullet points, no numbering, no asterisks, no formatting
     - No explanations or descriptions for each skill
     - No introductory phrases like "Here is" or "Certainly!"
@@ -154,8 +156,10 @@ function getSkillsSystemPrompt(tone: string = 'professional') {
     "Here are the skills: Python, JavaScript, Docker, AWS, Database Design"
     "1. Python, 2. JavaScript, 3. Docker, 4. AWS, 5. Database Design"
     "Certainly! The skills are: Python, JavaScript, Docker, AWS, Database Design"
+    "Python, JavaScript, Docker, AWS, Database Design, Git, CI/CD" (too many skills)
+    "Python, JavaScript, Docker, AWS" (too few skills)
     
-    IMPORTANT: Respond with ONLY the comma-separated list of skills, nothing else.
+    IMPORTANT: Respond with EXACTLY 5 skills in a comma-separated list, nothing else.
   `;
 }
 
