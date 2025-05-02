@@ -1,0 +1,31 @@
+<svg width="300" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Academic/education themed background -->
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  
+  <!-- University/education style header -->
+  <rect x="0" y="0" width="100%" height="15%" fill="#065f46"/>
+  <path d="M0,60 L300,60 L300,70 L150,85 L0,70 Z" fill="#10b981"/>
+  
+  <!-- Book/scholar cap icon suggestion -->
+  <rect x="135" y="15" width="30" height="20" fill="#d1fae5" rx="2"/>
+  <path d="M135,35 L165,35 L170,40 L130,40 Z" fill="#a7f3d0"/>
+  
+  <!-- Content sections -->
+  <rect x="5%" y="25%" width="90%" height="10%" rx="0" fill="#ecfdf5"/>
+  <rect x="7%" y="27%" width="86%" height="6%" rx="0" fill="#d1fae5"/>
+  
+  <!-- Education history section -->
+  <rect x="5%" y="38%" width="90%" height="7%" rx="0" fill="#065f46"/>
+  <rect x="5%" y="45%" width="90%" height="20%" rx="0" fill="#ecfdf5"/>
+  
+  <!-- Teaching experience section -->
+  <rect x="5%" y="68%" width="90%" height="7%" rx="0" fill="#065f46"/>
+  <rect x="5%" y="75%" width="90%" height="15%" rx="0" fill="#ecfdf5"/>
+  
+  <!-- Publications and skills -->
+  <rect x="5%" y="93%" width="90%" height="5%" rx="0" fill="#10b981"/>
+  
+  <!-- Text -->
+  <text x="50%" y="50%" font-family="Arial" font-size="16" fill="#065f46" text-anchor="middle" dominant-baseline="middle">Mwalimu One</text>
+  <text x="50%" y="56%" font-family="Arial" font-size="12" fill="#047857" text-anchor="middle" dominant-baseline="middle">Scholarly education design</text>
+</svg>

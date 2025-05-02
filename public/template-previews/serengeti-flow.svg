@@ -1,0 +1,29 @@
+<svg width="300" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Savanna-inspired background gradient -->
+  <rect width="100%" height="100%" fill="#fef9c3"/>
+  <rect x="0" y="0" width="100%" height="30%" fill="#facc15" opacity="0.3"/>
+  
+  <!-- Flowing grass-like patterns -->
+  <path d="M0,120 Q75,90 150,120 T300,120" stroke="#ca8a04" fill="none" stroke-width="2"/>
+  <path d="M0,130 Q75,100 150,130 T300,130" stroke="#ca8a04" fill="none" stroke-width="2"/>
+  <path d="M0,140 Q75,110 150,140 T300,140" stroke="#ca8a04" fill="none" stroke-width="2"/>
+  
+  <!-- Header with flowing design -->
+  <path d="M0,0 Q150,50 300,0 V60 H0 Z" fill="#eab308" opacity="0.5"/>
+  <rect x="10%" y="10%" width="80%" height="10%" rx="10" fill="#fef9c3"/>
+  
+  <!-- Content sections with natural flow -->
+  <rect x="5%" y="32%" width="90%" height="7%" rx="20" fill="#ca8a04"/>
+  <rect x="5%" y="40%" width="90%" height="15%" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="1"/>
+  
+  <rect x="5%" y="58%" width="90%" height="7%" rx="20" fill="#ca8a04"/>
+  <rect x="5%" y="66%" width="90%" height="15%" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="1"/>
+  
+  <!-- Wildlife-inspired skill indicators -->
+  <rect x="5%" y="84%" width="90%" height="7%" rx="20" fill="#ca8a04"/>
+  <rect x="5%" y="92%" width="90%" height="6%" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="1"/>
+  
+  <!-- Text -->
+  <text x="50%" y="50%" font-family="Arial" font-size="16" fill="#854d0e" text-anchor="middle" dominant-baseline="middle">Serengeti Flow</text>
+  <text x="50%" y="56%" font-family="Arial" font-size="12" fill="#a16207" text-anchor="middle" dominant-baseline="middle">Natural flowing design</text>
+</svg>
