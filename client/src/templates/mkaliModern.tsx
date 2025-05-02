@@ -17,7 +17,7 @@ export function MkaliModernTemplate(data: CVData) {
 
 
   // Filter out empty work experiences
-  const validWorkExperience = workExperience?.filter(exp => exp.jobTitle && exp.company) || [];
+  const validWorkExperience = workExperiences?.filter((exp) => exp.jobTitle && exp.company) || [];
   // Filter out empty education entries
   const validEducation = education?.filter(edu => edu.institution && edu.degree) || [];
   // Filter out empty skills
