@@ -7,6 +7,7 @@ import * as anonymousCvAPI from "./api/anonymous-cv";
 import { storage } from "./storage";
 import { cvDataSchema } from "@shared/schema";
 import { z } from "zod";
+import { apiKeysHandler } from "./api-keys";
 
 // Type declarations for Express Request (isAuthenticated & user) are in server/types/express.d.ts
 
@@ -42,6 +43,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   app.get("/api/templates", templateAPI.getAllTemplates);
+
+  // API Keys status endpoint
+  app.get("/api/keys/status", apiKeysHandler);
 
   const httpServer = createServer(app);
   return httpServer;

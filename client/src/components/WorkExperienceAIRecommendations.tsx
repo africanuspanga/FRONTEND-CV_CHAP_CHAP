@@ -37,8 +37,9 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
   const { toast } = useToast();
 
   const handleGenerateRecommendations = async () => {
+    // Check if the OpenAI API key is available
     if (!hasOpenAIApiKey()) {
-      setError('OpenAI API key not found. Please add your API key to use AI features.');
+      setError('OpenAI API key not found. Please contact support to enable AI features.');
       return;
     }
 
@@ -46,6 +47,7 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
     setError(null);
 
     try {
+      // Generate job description bullet points
       const bulletPoints = await getWorkExperienceRecommendations(jobTitle, company, industry);
       setRecommendations(bulletPoints);
       
@@ -56,10 +58,11 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
       });
       setSelectedRecommendations(initialSelected);
     } catch (err) {
+      console.error('Error generating recommendations:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate recommendations';
       setError(errorMessage);
       toast({
-        title: 'Error',
+        title: 'AI Enhancement Error',
         description: errorMessage,
         variant: 'destructive',
       });

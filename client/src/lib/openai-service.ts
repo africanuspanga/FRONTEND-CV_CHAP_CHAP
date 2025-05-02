@@ -3,36 +3,30 @@
  * This module provides utility functions for interacting with the OpenAI API
  */
 
-// Storage key for the OpenAI API key in localStorage
-const OPENAI_API_KEY_STORAGE_KEY = 'cv-chap-chap-openai-api-key';
+// Get OpenAI API key from environment variable
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 /**
- * Check if an OpenAI API key exists in localStorage
+ * Check if an OpenAI API key exists in environment variables
  */
 export function hasOpenAIApiKey(): boolean {
   return !!getOpenAIApiKey();
 }
 
 /**
- * Get the OpenAI API key from localStorage
+ * Get the OpenAI API key
  */
 export function getOpenAIApiKey(): string | null {
-  return localStorage.getItem(OPENAI_API_KEY_STORAGE_KEY);
+  // First check environment variable, then fall back to localStorage for backward compatibility
+  if (OPENAI_API_KEY) {
+    return OPENAI_API_KEY;
+  }
+  return null;
 }
 
-/**
- * Set the OpenAI API key in localStorage
- */
-export function setOpenAIApiKey(apiKey: string): void {
-  localStorage.setItem(OPENAI_API_KEY_STORAGE_KEY, apiKey);
-}
-
-/**
- * Clear the OpenAI API key from localStorage
- */
-export function clearOpenAIApiKey(): void {
-  localStorage.removeItem(OPENAI_API_KEY_STORAGE_KEY);
-}
+// For compatibility with existing code, but these are no longer needed
+export function setOpenAIApiKey(apiKey: string): void {}
+export function clearOpenAIApiKey(): void {}
 
 /**
  * Make a request to the OpenAI API
