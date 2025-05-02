@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Eye } from 'lucide-react';
 import { ClientSideTemplateRenderer } from './ClientSideTemplateRenderer';
+import DirectTemplateRenderer from './DirectTemplateRenderer';
 import { CVData } from '@shared/schema';
 import ErrorBoundary from './ErrorBoundary';
 
@@ -54,7 +55,7 @@ const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => 
                 </div>
               }
             >
-              <ClientSideTemplateRenderer 
+              <DirectTemplateRenderer 
                 templateId={templateId} 
                 cvData={cvData} 
                 height={600}
