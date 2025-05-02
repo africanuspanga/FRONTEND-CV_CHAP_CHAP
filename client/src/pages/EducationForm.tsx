@@ -15,7 +15,7 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import EducationSummary from '@/components/EducationSummary';
-import UniversitySelect from '@/components/UniversitySelect';
+// UniversitySelect import removed
 import { Education } from '@shared/schema';
 
 const EducationForm = () => {
@@ -266,9 +266,10 @@ const EducationForm = () => {
                 <Label htmlFor="institution" className="font-semibold">
                   INSTITUTION <span className="text-red-500">*</span>
                 </Label>
-                <UniversitySelect
+                <Input
+                  id="institution"
                   value={institution}
-                  onChange={setInstitution}
+                  onChange={(e) => setInstitution(e.target.value)}
                   placeholder="University of Dar es Salaam"
                 />
               </div>
