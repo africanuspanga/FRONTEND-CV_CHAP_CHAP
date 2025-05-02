@@ -162,7 +162,9 @@ const WorkExperienceForm = () => {
   };
 
   const handleAddRecommendations = (recommendations: string[]) => {
-    setAIRecommendations(recommendations);
+    // Ensure we have an array of strings
+    const recommendationsArray = Array.isArray(recommendations) ? recommendations : [recommendations];
+    setAIRecommendations(recommendationsArray);
     setShowAIRecommendations(false);
     setShowEditor(true);
   };
@@ -481,7 +483,10 @@ const WorkExperienceForm = () => {
         <WorkExperienceAIRecommendations
           jobTitle={jobTitle}
           company={employer}
-          onAddRecommendations={handleAddRecommendations}
+          currentDescription="" 
+          onEnhanceDescription={enhancedDescription => {
+            handleAddRecommendations([enhancedDescription])
+          }}
           onSkip={handleSkipRecommendations}
         />
       )}
