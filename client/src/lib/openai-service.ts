@@ -55,7 +55,7 @@ const getOpenAIClient = () => {
     throw new Error('OpenAI API key not set');
   }
   
-  return new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+  return new OpenAI({ apiKey: apiKey, dangerouslyAllowBrowser: true });
 };
 
 /**
@@ -92,7 +92,8 @@ export const generateWorkExperienceBullets = async (
       response_format: { type: "json_object" }
     });
     
-    const result = JSON.parse(response.choices[0].message.content);
+    const content = response.choices[0].message.content || '{"bullets":[]}';
+    const result = JSON.parse(content);
     return result.bullets || [];
     
   } catch (error) {
@@ -150,7 +151,8 @@ export const generateSkillsRecommendations = async (
       response_format: { type: "json_object" }
     });
     
-    const result = JSON.parse(response.choices[0].message.content);
+    const content = response.choices[0].message.content || '{"skills":[]}';
+    const result = JSON.parse(content);
     return result.skills || [];
     
   } catch (error) {
@@ -218,6 +220,10 @@ export const enhanceProfessionalSummary = async (
         content: prompt
       }]
     });
+    
+    if (!response.choices?.[0]?.message?.content) {
+      return currentSummary || 'Experienced professional with strong skills in communication and problem-solving.';
+    }
     
     return response.choices[0].message.content.trim();
     

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { InfoCircle, Key } from 'lucide-react';
+import { InfoIcon, Key } from 'lucide-react';
 import { getOpenAIApiKey, setOpenAIApiKey, clearOpenAIApiKey } from '@/lib/openai-service';
 import { useToast } from '@/hooks/use-toast';
 
@@ -75,7 +75,7 @@ const AIKeyInput: React.FC<AIKeyInputProps> = ({ onApiKeySet }) => {
           <DialogDescription>
             <div className="mt-2 space-y-2 text-sm text-muted-foreground">
               <p className="flex items-start gap-1.5">
-                <InfoCircle className="h-4 w-4 mt-0.5 text-blue-500 flex-shrink-0" />
+                <InfoIcon className="h-4 w-4 mt-0.5 text-blue-500 flex-shrink-0" />
                 <span>
                   To enable AI enhancement features, please enter your OpenAI API key.
                   Your key will be stored in your browser for this session only and will
@@ -83,7 +83,7 @@ const AIKeyInput: React.FC<AIKeyInputProps> = ({ onApiKeySet }) => {
                 </span>
               </p>
               <p className="flex items-start gap-1.5">
-                <InfoCircle className="h-4 w-4 mt-0.5 text-blue-500 flex-shrink-0" />
+                <InfoIcon className="h-4 w-4 mt-0.5 text-blue-500 flex-shrink-0" />
                 <span>
                   You can get an API key from{' '}
                   <a
@@ -99,7 +99,7 @@ const AIKeyInput: React.FC<AIKeyInputProps> = ({ onApiKeySet }) => {
               </p>
               {hasKey && (
                 <p className="flex items-start gap-1.5 text-green-600">
-                  <InfoCircle className="h-4 w-4 mt-0.5 text-green-500 flex-shrink-0" />
+                  <InfoIcon className="h-4 w-4 mt-0.5 text-green-500 flex-shrink-0" />
                   <span>You already have an API key set for this session.</span>
                 </p>
               )}

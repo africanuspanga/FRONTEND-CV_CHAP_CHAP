@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { generateWorkExperienceBullets, hasOpenAIApiKey } from '@/lib/openai-service';
+import AIKeyInput from '@/components/AIKeyInput';
 
 interface WorkExperienceAIRecommendationsProps {
   jobTitle: string;
@@ -9,11 +11,8 @@ interface WorkExperienceAIRecommendationsProps {
   onSkip: () => void;
 }
 
-// Placeholder recommendations based on job title
-const getRecommendations = (jobTitle: string): string[] => {
-  // For now, these are hardcoded recommendations
-  // Later, this will be replaced with actual API calls to an AI service
-  
+// Fallback recommendations based on job title (used if no API key is provided)
+const getFallbackRecommendations = (jobTitle: string): string[] => {
   if (jobTitle.toLowerCase().includes('software') || jobTitle.toLowerCase().includes('developer') || jobTitle.toLowerCase().includes('engineer')) {
     return [
       "Spearheaded the development of a new software feature that increased user engagement by 30%, enhancing overall product functionality and customer satisfaction.",
@@ -49,18 +48,34 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
 }) => {
   const [isGenerating, setIsGenerating] = useState(true);
   const [recommendations, setRecommendations] = useState<string[]>([]);
+  const [apiKeySet, setApiKeySet] = useState(hasOpenAIApiKey());
   
-  // Simulate AI generation with a timer
-  React.useEffect(() => {
-    // Wait 2 seconds to simulate AI generation
-    const timer = setTimeout(() => {
-      const generatedRecommendations = getRecommendations(jobTitle);
-      setRecommendations(generatedRecommendations);
+  const generateRecommendations = async () => {
+    setIsGenerating(true);
+    try {
+      // If we have an API key, use the OpenAI service
+      if (apiKeySet) {
+        const aiRecommendations = await generateWorkExperienceBullets(jobTitle, company);
+        setRecommendations(aiRecommendations);
+      } else {
+        // Otherwise use our fallback function
+        const fallbackRecommendations = getFallbackRecommendations(jobTitle);
+        setRecommendations(fallbackRecommendations);
+      }
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      // Fallback to local recommendations if AI generation fails
+      const fallbackRecommendations = getFallbackRecommendations(jobTitle);
+      setRecommendations(fallbackRecommendations);
+    } finally {
       setIsGenerating(false);
-    }, 2000);
-    
-    return () => clearTimeout(timer);
-  }, [jobTitle]);
+    }
+  };
+  
+  // Generate recommendations when component mounts or when API key status changes
+  useEffect(() => {
+    generateRecommendations();
+  }, [jobTitle, company, apiKeySet]);
   
   if (isGenerating) {
     return (
@@ -76,8 +91,28 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-90 z-50">
       <div className="bg-white rounded-lg border p-6 shadow-lg max-w-md w-full">
-        <h2 className="text-xl font-bold mb-2">Expert recommendations for {jobTitle}</h2>
-        <p className="text-gray-600 mb-4 text-sm">You can edit these in the next step.</p>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Expert recommendations for {jobTitle}</h2>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="p-1" 
+            onClick={generateRecommendations}
+            disabled={isGenerating}
+          >
+            <RefreshCw className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
+        
+        <div className="flex justify-end mb-3">
+          <AIKeyInput onApiKeySet={setApiKeySet} />
+        </div>
+        
+        <p className="text-gray-600 mb-4 text-sm">
+          {apiKeySet 
+            ? 'Using OpenAI to generate personalized recommendations.'
+            : 'Add your OpenAI API key for personalized AI recommendations.'}
+        </p>
         
         <ul className="space-y-3 mb-6">
           {recommendations.map((recommendation, index) => (
