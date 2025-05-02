@@ -1,6 +1,6 @@
 /**
- * Professional Summary AI Enhancer Component
- * This component provides AI-powered enhancement for CV professional summaries
+ * Professional Summary Enhancer Component
+ * This component provides AI-powered enhancement for professional summaries
  */
 
 import { Button } from '@/components/ui/button';
@@ -41,7 +41,7 @@ const ProfessionalSummaryEnhancer: React.FC<ProfessionalSummaryEnhancerProps> = 
     if (!currentSummary.trim()) {
       toast({
         title: 'Empty Summary',
-        description: 'Please enter a professional summary to enhance.',
+        description: 'Please enter a summary to enhance.',
         variant: 'destructive',
       });
       return;
@@ -58,11 +58,15 @@ const ProfessionalSummaryEnhancer: React.FC<ProfessionalSummaryEnhancerProps> = 
 
     try {
       // Generate enhanced summary
-      const summary = await enhanceProfessionalSummary(currentSummary, jobTitle, yearsOfExperience);
-      setEnhancedSummary(summary);
+      const enhanced = await enhanceProfessionalSummary(
+        currentSummary,
+        jobTitle,
+        yearsOfExperience
+      );
+      setEnhancedSummary(enhanced);
     } catch (err) {
       console.error('Error enhancing summary:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to enhance professional summary';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to enhance summary';
       setError(errorMessage);
       toast({
         title: 'AI Enhancement Error',
@@ -83,10 +87,10 @@ const ProfessionalSummaryEnhancer: React.FC<ProfessionalSummaryEnhancerProps> = 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <CheckCircle2 className="mr-2 h-5 w-5" /> Enhanced Summary
+            <CheckCircle2 className="mr-2 h-5 w-5" /> Enhanced Professional Summary
           </CardTitle>
           <CardDescription>
-            Review the AI-enhanced professional summary below.
+            Review your AI-enhanced professional summary below.
           </CardDescription>
         </CardHeader>
         <CardContent>

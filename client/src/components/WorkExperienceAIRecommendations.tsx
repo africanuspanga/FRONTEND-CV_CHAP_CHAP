@@ -1,44 +1,58 @@
 /**
  * Work Experience AI Recommendations Component
- * This component provides AI-powered recommendations for work experience bullet points
+ * This component provides AI-powered enhancements for work experience descriptions
  */
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { getWorkExperienceRecommendations } from '@/lib/openai-service';
+import { enhanceWorkExperience } from '@/lib/openai-service';
 import { useAIStatus } from '@/hooks/use-ai-status';
 import { AlertCircle, Brain, CheckCircle2, Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
+import { Textarea } from '@/components/ui/textarea';
 
 interface WorkExperienceAIRecommendationsProps {
   jobTitle: string;
   company: string;
-  industry?: string;
-  onAddRecommendations: (recommendations: string[]) => void;
+  currentDescription: string;
+  startDate?: string;
+  endDate?: string;
+  yearsOfExperience?: number;
+  onEnhanceDescription: (enhancedDescription: string) => void;
   onSkip: () => void;
 }
 
 /**
- * Component for getting AI recommendations for work experience
+ * Component for getting AI-powered enhancements for work experience descriptions
  */
 const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsProps> = ({
   jobTitle,
   company,
-  industry,
-  onAddRecommendations,
+  currentDescription,
+  startDate,
+  endDate,
+  yearsOfExperience,
+  onEnhanceDescription,
   onSkip,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [recommendations, setRecommendations] = useState<string[]>([]);
-  const [selectedRecommendations, setSelectedRecommendations] = useState<Record<number, boolean>>({});
+  const [enhancedDescription, setEnhancedDescription] = useState<string>('');
   const { toast } = useToast();
   const { hasOpenAI, isLoading: isCheckingAI } = useAIStatus();
 
-  const handleGenerateRecommendations = async () => {
+  const handleEnhanceDescription = async () => {
+    // Check if the description is empty
+    if (!currentDescription.trim()) {
+      toast({
+        title: 'Empty Description',
+        description: 'Please enter a job description to enhance.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     // Check if the OpenAI API key is available
     if (!hasOpenAI) {
       setError('OpenAI API key not found. Please contact support to enable AI features.');
@@ -49,19 +63,19 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
     setError(null);
 
     try {
-      // Generate job description bullet points
-      const bulletPoints = await getWorkExperienceRecommendations(jobTitle, company, industry);
-      setRecommendations(bulletPoints);
-      
-      // Select all recommendations by default
-      const initialSelected: Record<number, boolean> = {};
-      bulletPoints.forEach((_, index) => {
-        initialSelected[index] = true;
+      // Generate enhanced description
+      const enhancedText = await enhanceWorkExperience({
+        jobTitle,
+        company,
+        description: currentDescription,
+        startDate,
+        endDate,
+        yearsOfExperience,
       });
-      setSelectedRecommendations(initialSelected);
+      setEnhancedDescription(enhancedText);
     } catch (err) {
-      console.error('Error generating recommendations:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate recommendations';
+      console.error('Error enhancing job description:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to enhance job description';
       setError(errorMessage);
       toast({
         title: 'AI Enhancement Error',
@@ -73,54 +87,38 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
     }
   };
 
-  const handleToggleRecommendation = (index: number) => {
-    setSelectedRecommendations(prev => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
+  const handleUseEnhanced = () => {
+    onEnhanceDescription(enhancedDescription);
   };
 
-  const handleAddSelected = () => {
-    const selected = recommendations.filter((_, index) => selectedRecommendations[index]);
-    onAddRecommendations(selected);
-  };
-
-  if (recommendations.length > 0) {
+  if (enhancedDescription) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <CheckCircle2 className="mr-2 h-5 w-5" /> AI Recommendations
+            <CheckCircle2 className="mr-2 h-5 w-5" /> Enhanced Job Description
           </CardTitle>
           <CardDescription>
-            Select the bullet points you'd like to include in your work experience.
+            Review the AI-enhanced job description below.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {recommendations.map((recommendation, index) => (
-              <div key={index} className="flex items-start space-x-2">
-                <Checkbox
-                  id={`recommendation-${index}`}
-                  checked={selectedRecommendations[index] || false}
-                  onCheckedChange={() => handleToggleRecommendation(index)}
-                />
-                <Label
-                  htmlFor={`recommendation-${index}`}
-                  className="text-sm leading-tight cursor-pointer"
-                >
-                  {recommendation}
-                </Label>
-              </div>
-            ))}
-          </div>
+          <Textarea 
+            value={enhancedDescription}
+            onChange={(e) => setEnhancedDescription(e.target.value)}
+            className="h-40 resize-none"
+            readOnly={false}
+          />
+          <p className="mt-2 text-xs text-muted-foreground">
+            You can edit the enhanced description before using it.
+          </p>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={onSkip}>
-            Skip
+            Use Original
           </Button>
-          <Button onClick={handleAddSelected}>
-            Add Selected
+          <Button onClick={handleUseEnhanced}>
+            Use Enhanced Description
           </Button>
         </CardFooter>
       </Card>
@@ -142,7 +140,7 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
           <Button variant="outline" onClick={onSkip}>
             Skip AI Features
           </Button>
-          <Button variant="default" onClick={handleGenerateRecommendations}>
+          <Button variant="default" onClick={handleEnhanceDescription}>
             Try Again
           </Button>
         </CardFooter>
@@ -154,10 +152,10 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Brain className="mr-2 h-5 w-5" /> AI Work Experience Recommendations
+          <Brain className="mr-2 h-5 w-5" /> Enhance Job Description
         </CardTitle>
         <CardDescription className="flex items-center justify-between">
-          <span>Get AI-powered suggestions for your work experience as {jobTitle} at {company}.</span>
+          <span>Use AI to improve your job description with professional language.</span>
           {isCheckingAI ? (
             <span className="flex items-center text-xs text-muted-foreground">
               <Loader2 className="mr-1 h-3 w-3 animate-spin" /> Checking AI...
@@ -174,9 +172,12 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 p-3 bg-muted rounded-md">
+          <p className="text-sm italic">Current description: "{currentDescription}"</p>
+        </div>
         <p className="text-sm">
-          Our AI can help you create powerful bullet points that highlight your achievements
-          and skills. Click the button below to generate suggestions.
+          Our AI can enhance your description for {jobTitle} at {company} with more impactful, achievement-oriented language.
+          Click the button below to generate an improved version.
         </p>
       </CardContent>
       <CardFooter className="flex justify-between">
@@ -184,13 +185,13 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
           Skip
         </Button>
         <Button 
-          onClick={handleGenerateRecommendations}
+          onClick={handleEnhanceDescription}
           disabled={isLoading || isCheckingAI}
         >
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Generating...
+              Enhancing...
             </>
           ) : isCheckingAI ? (
             <>
@@ -198,7 +199,7 @@ const WorkExperienceAIRecommendations: React.FC<WorkExperienceAIRecommendationsP
               Checking AI Status...
             </>
           ) : (
-            <>Generate Suggestions</>
+            <>Enhance Description</>
           )}
         </Button>
       </CardFooter>

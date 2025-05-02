@@ -1,16 +1,14 @@
 /**
- * Skills Recommendations Component
- * This component provides AI-powered recommendations for skills
+ * Skills AI Recommendations Component
+ * This component provides AI-powered recommendations for skills based on job title
  */
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { getSkillRecommendations } from '@/lib/openai-service';
 import { useAIStatus } from '@/hooks/use-ai-status';
-import { AlertCircle, Brain, CheckCircle2, Loader2 } from 'lucide-react';
+import { AlertCircle, Brain, CheckCircle2, Loader2, Plus } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface SkillRecommendationsProps {
@@ -22,7 +20,7 @@ interface SkillRecommendationsProps {
 }
 
 /**
- * Component for getting AI recommendations for skills
+ * Component for getting AI-generated skill recommendations
  */
 const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
   jobTitle,
@@ -33,12 +31,22 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [recommendations, setRecommendations] = useState<string[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<Record<number, boolean>>({});
+  const [recommendedSkills, setRecommendedSkills] = useState<string[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const { toast } = useToast();
   const { hasOpenAI, isLoading: isCheckingAI } = useAIStatus();
 
-  const handleGenerateSkills = async () => {
+  const handleGetRecommendations = async () => {
+    // Check if the job title is empty
+    if (!jobTitle.trim()) {
+      toast({
+        title: 'Empty Job Title',
+        description: 'Please enter a job title to get skill recommendations.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     // Check if the OpenAI API key is available
     if (!hasOpenAI) {
       setError('OpenAI API key not found. Please contact support to enable AI features.');
@@ -49,22 +57,19 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
     setError(null);
 
     try {
-      // Generate skills
-      const skills = await getSkillRecommendations(jobTitle, yearsOfExperience, industry);
-      setRecommendations(skills);
-      
-      // Select all skills by default
-      const initialSelected: Record<number, boolean> = {};
-      skills.forEach((_, index) => {
-        initialSelected[index] = true;
-      });
-      setSelectedSkills(initialSelected);
+      // Generate skill recommendations
+      const skills = await getSkillRecommendations(
+        jobTitle,
+        yearsOfExperience,
+        industry
+      );
+      setRecommendedSkills(skills);
     } catch (err) {
-      console.error('Error generating skills:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate skill recommendations';
+      console.error('Error getting skill recommendations:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to get skill recommendations';
       setError(errorMessage);
       toast({
-        title: 'AI Enhancement Error',
+        title: 'AI Recommendations Error',
         description: errorMessage,
         variant: 'destructive',
       });
@@ -73,59 +78,17 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
     }
   };
 
-  const handleToggleSkill = (index: number) => {
-    setSelectedSkills(prev => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
+  const toggleSkill = (skill: string) => {
+    if (selectedSkills.includes(skill)) {
+      setSelectedSkills(selectedSkills.filter((s) => s !== skill));
+    } else {
+      setSelectedSkills([...selectedSkills, skill]);
+    }
   };
 
-  const handleAddSelected = () => {
-    const selected = recommendations.filter((_, index) => selectedSkills[index]);
-    onAddSkills(selected);
+  const handleAddSelectedSkills = () => {
+    onAddSkills(selectedSkills);
   };
-
-  if (recommendations.length > 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <CheckCircle2 className="mr-2 h-5 w-5" /> AI Skill Recommendations
-          </CardTitle>
-          <CardDescription>
-            Select the skills you'd like to include in your CV.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {recommendations.map((skill, index) => (
-              <div key={index} className="flex items-start space-x-2">
-                <Checkbox
-                  id={`skill-${index}`}
-                  checked={selectedSkills[index] || false}
-                  onCheckedChange={() => handleToggleSkill(index)}
-                />
-                <Label
-                  htmlFor={`skill-${index}`}
-                  className="text-sm leading-tight cursor-pointer"
-                >
-                  {skill}
-                </Label>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={onSkip}>
-            Skip
-          </Button>
-          <Button onClick={handleAddSelected}>
-            Add Selected Skills
-          </Button>
-        </CardFooter>
-      </Card>
-    );
-  }
 
   if (error) {
     return (
@@ -142,8 +105,54 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
           <Button variant="outline" onClick={onSkip}>
             Skip AI Features
           </Button>
-          <Button variant="default" onClick={handleGenerateSkills}>
+          <Button variant="default" onClick={handleGetRecommendations}>
             Try Again
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  if (recommendedSkills.length > 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <CheckCircle2 className="mr-2 h-5 w-5" /> Recommended Skills
+          </CardTitle>
+          <CardDescription>
+            Select the skills you want to add to your CV.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {recommendedSkills.map((skill, index) => (
+              <Button
+                key={`skill-${index}`}
+                variant={selectedSkills.includes(skill) ? "default" : "outline"}
+                size="sm"
+                className="rounded-full"
+                onClick={() => toggleSkill(skill)}
+              >
+                {skill}
+                {selectedSkills.includes(skill) ? (
+                  <CheckCircle2 className="ml-1 h-3 w-3" />
+                ) : (
+                  <Plus className="ml-1 h-3 w-3" />
+                )}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline" onClick={onSkip}>
+            Skip
+          </Button>
+          <Button 
+            onClick={handleAddSelectedSkills}
+            disabled={selectedSkills.length === 0}
+          >
+            Add Selected Skills ({selectedSkills.length})
           </Button>
         </CardFooter>
       </Card>
@@ -154,10 +163,10 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Brain className="mr-2 h-5 w-5" /> AI Skill Recommendations
+          <Brain className="mr-2 h-5 w-5" /> Recommend Skills
         </CardTitle>
         <CardDescription className="flex items-center justify-between">
-          <span>Get AI-powered skill suggestions for your CV.</span>
+          <span>Use AI to recommend relevant skills for your profession.</span>
           {isCheckingAI ? (
             <span className="flex items-center text-xs text-muted-foreground">
               <Loader2 className="mr-1 h-3 w-3 animate-spin" /> Checking AI...
@@ -175,9 +184,10 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
       </CardHeader>
       <CardContent>
         <p className="text-sm">
-          Our AI can suggest relevant skills for a {jobTitle}{industry ? ` in the ${industry} industry` : ''}
-          {yearsOfExperience ? ` with ${yearsOfExperience} years of experience` : ''}.
-          Click the button below to generate recommendations.
+          Our AI can suggest appropriate skills for a {jobTitle} position
+          {yearsOfExperience ? ` with ${yearsOfExperience} years of experience` : ''}
+          {industry ? ` in the ${industry} industry` : ''}.
+          Click the button below to generate skill recommendations.
         </p>
       </CardContent>
       <CardFooter className="flex justify-between">
@@ -185,13 +195,13 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
           Skip
         </Button>
         <Button 
-          onClick={handleGenerateSkills}
+          onClick={handleGetRecommendations}
           disabled={isLoading || isCheckingAI}
         >
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Generating...
+              Getting Recommendations...
             </>
           ) : isCheckingAI ? (
             <>
@@ -199,7 +209,7 @@ const SkillRecommendations: React.FC<SkillRecommendationsProps> = ({
               Checking AI Status...
             </>
           ) : (
-            <>Generate Skills</>
+            <>Get Skill Recommendations</>
           )}
         </Button>
       </CardFooter>

@@ -1,27 +1,18 @@
-import React from 'react';
 import { Loader2 } from 'lucide-react';
+import React from 'react';
 
 interface AILoadingProps {
   message?: string;
-  size?: 'small' | 'medium' | 'large';
 }
 
-const AILoading: React.FC<AILoadingProps> = ({ 
-  message = 'AI is thinking...', 
-  size = 'medium' 
-}) => {
-  const sizeClass = {
-    small: 'w-4 h-4',
-    medium: 'w-6 h-6',
-    large: 'w-8 h-8'
-  }[size];
-
+/**
+ * Loading indicator for AI operations
+ */
+export function AILoading({ message = 'Processing your request...' }: AILoadingProps) {
   return (
-    <div className="flex flex-col items-center justify-center p-4 gap-2">
-      <Loader2 className={`${sizeClass} animate-spin text-primary`} />
+    <div className="flex flex-col items-center justify-center p-8 text-center">
+      <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
       <p className="text-sm text-muted-foreground">{message}</p>
     </div>
   );
-};
-
-export default AILoading;
+}

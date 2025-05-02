@@ -156,3 +156,42 @@ Avoid clichés and generic statements. Keep the tone professional but personable
 
   return await makeOpenAIRequest(prompt, 300);
 }
+
+/**
+ * Enhance a work experience description with AI
+ */
+export async function enhanceWorkExperience({
+  jobTitle,
+  company,
+  description,
+  startDate,
+  endDate,
+  yearsOfExperience,
+}: {
+  jobTitle: string;
+  company: string;
+  description: string;
+  startDate?: string;
+  endDate?: string;
+  yearsOfExperience?: number;
+}): Promise<string> {
+  const dateContext = startDate && endDate 
+    ? `from ${startDate} to ${endDate}` 
+    : startDate 
+    ? `starting from ${startDate}` 
+    : '';
+
+  const experienceContext = yearsOfExperience 
+    ? `with approximately ${yearsOfExperience} years of experience` 
+    : '';
+
+  const prompt = `Enhance the following job description for a ${jobTitle} position at ${company} ${dateContext} ${experienceContext}:
+
+"${description}"
+
+Rewrite it to be more professional, achievement-oriented, and impactful. Focus on quantifiable achievements and specific contributions.
+Use strong action verbs and professional language. Maintain first-person perspective if present in the original text.
+Keep the tone professional, concise, and highlight transferable skills. Format as a cohesive paragraph, not bullet points.`;
+
+  return await makeOpenAIRequest(prompt, 400);
+}
