@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { getWorkExperienceRecommendations } from '@/lib/openai-service';
 import { useAIStatus } from '@/hooks/use-ai-status';
-import { AlertCircle, Brain, CheckCircle2, Loader2 } from 'lucide-react';
+import { AlertCircle, Brain, Loader2 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 interface WorkExperienceBulletGeneratorProps {
@@ -32,11 +32,7 @@ const WorkExperienceBulletGenerator: React.FC<WorkExperienceBulletGeneratorProps
   const { toast } = useToast();
   const { hasOpenAI, isLoading: isCheckingAI } = useAIStatus();
 
-  // Automatically generate bullet points when the component mounts
-  useEffect(() => {
-    generateBulletPoints();
-  }, []);
-
+  // Function to generate bullet points
   const generateBulletPoints = async () => {
     // Check if we have the required data
     if (!jobTitle.trim() || !company.trim()) {
@@ -82,6 +78,31 @@ const WorkExperienceBulletGenerator: React.FC<WorkExperienceBulletGeneratorProps
       setIsLoading(false);
     }
   };
+
+  // Generate bullet points on component mount only
+  useEffect(() => {
+    // Only generate on mount, not on every render
+    let isMounted = true;
+    
+    const generate = async () => {
+      // Only run if component is still mounted and API is available
+      if (isMounted && hasOpenAI !== undefined && !isCheckingAI && !isLoading) {
+        try {
+          await generateBulletPoints();
+        } catch (error) {
+          console.error('Failed to generate bullet points:', error);
+        }
+      }
+    };
+    
+    generate();
+    
+    // Cleanup function to prevent updates after unmount
+    return () => {
+      isMounted = false;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Card className="max-w-4xl mx-auto">
