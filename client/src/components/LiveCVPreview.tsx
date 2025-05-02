@@ -13,6 +13,11 @@ interface LiveCVPreviewProps {
 const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   
+  // Debug form data to see what's being passed to the template
+  React.useEffect(() => {
+    console.log('LiveCVPreview received data:', cvData);
+  }, [cvData]);
+  
   const togglePreview = () => {
     setIsPreviewOpen(!isPreviewOpen);
   };

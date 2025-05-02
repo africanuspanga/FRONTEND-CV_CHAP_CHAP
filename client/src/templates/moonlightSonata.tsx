@@ -14,7 +14,8 @@ export function MoonlightSonataTemplate(props: CVData = {}): JSX.Element {
     references = []
   } = props || {};
   const fullName = `${personalInfo?.firstName || ''} ${personalInfo?.lastName || ''}`.trim();
-  const jobTitle = personalInfo?.jobTitle || personalInfo?.professionalTitle || 'PROFESSIONAL';
+  // Use either jobTitle or professionalTitle as available
+  const jobTitle = personalInfo?.professionalTitle || personalInfo?.jobTitle || 'PROFESSIONAL';
 
   return (
     <div className="cv-container" style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', minHeight: '100vh', backgroundColor: '#ffffff', boxShadow: '0 1px 5px rgba(0, 0, 0, 0.15)' }}>
@@ -48,10 +49,10 @@ export function MoonlightSonataTemplate(props: CVData = {}): JSX.Element {
             </p>
           )}
           
-          {personalInfo?.location && (
+          {personalInfo?.address && (
             <p style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '10px', fontSize: '0.95em', lineHeight: '1.5', fontFamily: '"Open Sans", sans-serif' }}>
               <span style={{ width: '20px', marginRight: '10px', textAlign: 'center', color: '#f0f0f0', flexShrink: 0, paddingTop: '2px' }}>[A]</span>
-              <span>{personalInfo.location}</span>
+              <span>{personalInfo.address}</span>
             </p>
           )}
           
@@ -132,7 +133,7 @@ export function MoonlightSonataTemplate(props: CVData = {}): JSX.Element {
                       {job.jobTitle}
                     </strong>
                     <span style={{ display: 'block', fontSize: '1em', color: '#555', fontFamily: '"Open Sans", sans-serif' }}>
-                      {job.company}{job.location ? `, ${job.location}` : ''}
+                      {job.company}{job.address ? `, ${job.address}` : ''}
                     </span>
                   </div>
                   

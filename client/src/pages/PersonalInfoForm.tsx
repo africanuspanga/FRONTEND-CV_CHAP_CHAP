@@ -112,25 +112,25 @@ const PersonalInfoForm = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="address">Location</Label>
               <Input
-                id="location"
-                value={formData.personalInfo.location || ''}
+                id="address"
+                value={formData.personalInfo.address || ''}
                 onChange={(e) => updateFormField('personalInfo', {
                   ...formData.personalInfo,
-                  location: e.target.value
+                  address: e.target.value
                 })}
                 placeholder="Dar es Salaam, Tanzania"
               />
             </div>
             <div>
-              <Label htmlFor="jobTitle">Professional Title</Label>
+              <Label htmlFor="professionalTitle">Professional Title</Label>
               <Input
-                id="jobTitle"
-                value={formData.personalInfo.jobTitle || ''}
+                id="professionalTitle"
+                value={formData.personalInfo.professionalTitle || ''}
                 onChange={(e) => updateFormField('personalInfo', {
                   ...formData.personalInfo,
-                  jobTitle: e.target.value
+                  professionalTitle: e.target.value
                 })}
                 placeholder="Software Engineer"
               />

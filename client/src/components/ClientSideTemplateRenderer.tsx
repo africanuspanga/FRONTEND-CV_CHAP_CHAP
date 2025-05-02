@@ -172,6 +172,9 @@ export const ClientSideTemplateRenderer = ({
                 projects: cvData?.projects || [],
                 websites: cvData?.websites || []
               };
+              
+              // Debug template data to see what's being passed to each template
+              console.log('Template Renderer processed data:', { templateId, rawData: cvData, processedData: safeData });
               // Call the template function with safe data
               return template(safeData);
             }
