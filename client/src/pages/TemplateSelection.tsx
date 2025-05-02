@@ -37,15 +37,15 @@ const TemplateSelection = () => {
   }, [cvData.templateId]);
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Choose a Template</h1>
-        <p className="text-muted-foreground mb-8">
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6">Choose a Template</h1>
+        <p className="text-muted-foreground mb-6 md:mb-8 text-lg">
           Select a professional template that best represents your career goals and personal style.
         </p>
         
         <div className="mb-8">
-          <div className="inline-flex items-center rounded-md border px-2.5 py-1.5 mb-6 border-input bg-background text-sm font-medium">
+          <div className="inline-flex items-center rounded-md border px-3 py-2 mb-8 border-input bg-background text-sm font-medium">
             All Templates
           </div>
           
@@ -55,11 +55,12 @@ const TemplateSelection = () => {
           />
         </div>
         
-        <div className="flex justify-end mt-8">
+        <div className="flex justify-end mt-10 md:mt-12">
           <Button 
             size="lg" 
             onClick={handleProceed}
             disabled={!selectedTemplateId}
+            className="px-6 py-6 text-base"
           >
             Continue with Selected Template
           </Button>
