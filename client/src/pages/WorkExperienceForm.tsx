@@ -8,7 +8,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LiveCVPreview from '@/components/LiveCVPreview';
-import WorkExperienceAIRecommendations from '@/components/WorkExperienceAIRecommendations';
+import WorkExperienceBulletGenerator from '@/components/WorkExperienceBulletGenerator';
 import WorkExperienceEditor from '@/components/WorkExperienceEditor';
 import WorkHistorySummary from '@/components/WorkHistorySummary';
 import { WorkExperience } from '@shared/schema';
@@ -480,14 +480,11 @@ const WorkExperienceForm = () => {
       
       {/* AI Recommendation Modal */}
       {showAIRecommendations && (
-        <WorkExperienceAIRecommendations
+        <WorkExperienceBulletGenerator
           jobTitle={jobTitle}
           company={employer}
-          currentDescription="" 
-          onEnhanceDescription={enhancedDescription => {
-            handleAddRecommendations([enhancedDescription])
-          }}
-          onSkip={handleSkipRecommendations}
+          onBulletPointsGenerated={handleAddRecommendations}
+          onError={handleSkipRecommendations}
         />
       )}
     </div>
