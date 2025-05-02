@@ -64,14 +64,16 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4 sm:mb-6 px-2 sm:px-0">New Templates</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-2 sm:px-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 px-2 sm:px-0">
         {templates.map((template) => (
-          <Card key={template.id} className="overflow-hidden flex flex-col h-full border shadow-sm hover:shadow-md transition-shadow">
-            <div className="relative h-[300px] sm:h-[400px] md:h-[500px] bg-white overflow-hidden">
-              <div className="absolute inset-0 bg-gray-100 animate-pulse" /> {/* Loading placeholder */}
+          <div key={template.id} className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+            {/* Template Preview Container */}
+            <div className="relative aspect-[3/4] w-full overflow-hidden">
+              {/* Loading placeholder */}
+              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
-              {/* Directly use imported template components */}
-              <div className="relative w-full h-full z-10">
+              {/* Template Preview */}
+              <div className="absolute inset-0 z-10">
                 {(() => {
                   switch(template.id) {
                     case 'moonlightSonata': return <MoonlightSonataTemplate />;
@@ -93,30 +95,25 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
                   }
                 })()}
               </div>
-            </div>
-            <CardContent className="p-3 sm:p-4 flex flex-col justify-between flex-grow border-t">
-              <div>
-                <h3 className="text-lg sm:text-xl font-bold">{template.name}</h3>
-                <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">{template.description}</p>
-              </div>
-              <div className="mt-3 sm:mt-4 flex flex-wrap sm:flex-nowrap justify-between items-center">
-                <div className="flex flex-wrap items-center space-x-1 sm:space-x-2 mb-2 sm:mb-0">
-                  <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200 text-xs sm:text-sm">
-                    {template.category}
-                  </Badge>
-                  <div className="ml-1 sm:ml-2">{renderStarRating(template.popularity)}</div>
-                </div>
+              
+              {/* Hover Overlay with Select Button */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center z-20">
                 <Button 
-                  variant={selectedTemplateId === template.id ? "default" : "outline"}
+                  variant={selectedTemplateId === template.id ? "default" : "secondary"}
                   onClick={() => onSelectTemplate(template.id)}
-                  className={`ml-auto text-sm sm:text-base ${selectedTemplateId === template.id ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'border-gray-300 hover:bg-gray-50'}`}
-                  size="sm"
+                  className={`text-base font-medium ${selectedTemplateId === template.id ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-white hover:bg-gray-100 text-gray-900'}`}
+                  size="lg"
                 >
-                  {selectedTemplateId === template.id ? "Selected" : "Select"}
+                  {selectedTemplateId === template.id ? "Selected" : "Select Template"}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            
+            {/* Template Name with Clean Border */}
+            <div className="p-3 text-center border-t">
+              <h3 className="font-semibold text-lg text-gray-900">{template.name}</h3>
+            </div>
+          </div>
         ))}
       </div>
     </div>
