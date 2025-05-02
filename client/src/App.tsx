@@ -30,6 +30,7 @@ import SummaryEditor from "@/pages/SummaryEditor";
 import ReferencesForm from "@/pages/ReferencesForm";
 import AdditionalSectionsForm from "@/pages/AdditionalSectionsForm";
 import FinalPreview from "@/pages/FinalPreview";
+import PaymentPage from "@/pages/payment-page";
 import About from "@/pages/About";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
@@ -67,9 +68,12 @@ function Router() {
         <ProtectedAdminRoute path="/admin-analytics" component={AdminAnalyticsPage} />
         <ProtectedAdminRoute path="/admin-settings" component={AdminSettingsPage} />
         
-        {/* Final Preview route without navbar or footer */}
+        {/* Final Preview and Payment routes without navbar or footer */}
         <Route path="/cv/:templateId/final-preview">
           <FinalPreview />
+        </Route>
+        <Route path="/payment">
+          <PaymentPage />
         </Route>
         
         {/* All other routes with navbar and footer */}

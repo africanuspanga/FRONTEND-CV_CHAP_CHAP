@@ -24,7 +24,7 @@ const FinalPreview = () => {
   const allTemplates = getAllTemplates();
   // Currently selected template for preview
   const [currentTemplateId, setCurrentTemplateId] = useState(templateId || formData.templateId);
-  // Track download in progress
+  // Track payment/download in progress
   const [isDownloading, setIsDownloading] = useState(false);
 
   
@@ -36,41 +36,24 @@ const FinalPreview = () => {
     setCurrentTemplateId(id);
   };
   
-  // Handle PDF download
-  const handleDownload = async () => {
+  // Handle CV download (redirect to payment page)
+  const handleDownload = () => {
+    // Set downloading state to true to disable the button
     setIsDownloading(true);
-    try {
-      await generatePDF(formData, currentTemplateId);
-      toast({
-        title: 'Success!',
-        description: 'Your CV has been downloaded successfully.',
-        variant: 'default',
-      });
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast({
-        title: 'Download failed',
-        description: 'There was an error downloading your CV. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsDownloading(false);
-    }
+    // Redirect to payment page instead of directly downloading
+    navigate('/payment');
   };
   
-  // Handle print
+  // Handle print - disabled as requested
   const handlePrint = () => {
-    // This will open the print dialog
-    window.print();
+    // Do nothing - print functionality is disabled
+    return;
   };
   
-  // Handle email
+  // Handle email - disabled as requested
   const handleEmail = () => {
-    toast({
-      title: 'Coming Soon',
-      description: 'Email functionality will be available soon!',
-      variant: 'default',
-    });
+    // Do nothing - email functionality is disabled
+    return;
   };
   
 
