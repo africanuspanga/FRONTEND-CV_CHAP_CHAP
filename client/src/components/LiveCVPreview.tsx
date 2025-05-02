@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Eye } from 'lucide-react';
 import { ClientSideTemplateRenderer } from './ClientSideTemplateRenderer';
 import { CVData } from '@shared/schema';
+import ErrorBoundary from './ErrorBoundary';
 
 interface LiveCVPreviewProps {
   cvData: CVData;
@@ -35,11 +36,25 @@ const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => 
           <p className="text-sm text-gray-500 mb-4">This preview updates in real-time as you fill in your information.</p>
           
           <div className="bg-white border rounded-md overflow-hidden" style={{ height: '600px' }}>
-            <ClientSideTemplateRenderer 
-              templateId={templateId} 
-              cvData={cvData} 
-              height={600}
-            />
+            <ErrorBoundary
+              fallback={
+                <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+                  <h3 className="text-lg font-medium text-red-800 mb-2">Template Preview Error</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    There was an error displaying the template preview. Please continue filling your information.
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    The final CV will still be generated correctly once all information is complete.
+                  </p>
+                </div>
+              }
+            >
+              <ClientSideTemplateRenderer 
+                templateId={templateId} 
+                cvData={cvData} 
+                height={600}
+              />
+            </ErrorBoundary>
           </div>
         </div>
       )}
