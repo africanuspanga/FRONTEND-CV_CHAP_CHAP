@@ -1,0 +1,25 @@
+Warning: React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s%s <div />  Did you accidentally export a JSX literal instead of a component? 
+    at ClientSideTemplateRenderer (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/components/ClientSideTemplateRenderer.tsx:22:3)
+    at ErrorBoundary (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/components/ErrorBoundary.tsx:7:5)
+    at div
+    at div
+    at div
+    at LiveCVPreview (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/components/LiveCVPreview.tsx?t=1746183812811:23:26)
+    at div
+    at div
+    at WorkExperienceForm (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/pages/WorkExperienceForm.tsx?t=1746183812811:33:24)
+    at Route (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=b3c5efd9:323:16)
+    at Switch (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=b3c5efd9:379:17)
+    at div
+    at div
+    at Route (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=b3c5efd9:323:16)
+    at Switch (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=b3c5efd9:379:17)
+    at div
+    at Router
+    at CVFormProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/contexts/cv-form-context.tsx:58:34)
+    at AdminAuthProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/contexts/admin-auth-context.tsx:31:37)
+    at AuthProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/contexts/auth-context.tsx:20:32)
+    at Provider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-NNZVJN4K.js?v=b3c5efd9:38:15)
+    at TooltipProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=b3c5efd9:63:5)
+    at QueryClientProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=b3c5efd9:2805:3)
+    at App

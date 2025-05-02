@@ -132,7 +132,6 @@ export const ClientSideTemplateRenderer = ({
   }
 
   // Render template
-  const Template = template;
   return (
     <div 
       ref={containerRef}
@@ -149,15 +148,21 @@ export const ClientSideTemplateRenderer = ({
           marginRight: 'auto'
         }}
       >
-        <Template {...(cvData || {
-          personalInfo: {},
-          workExperience: [],
-          education: [],
-          skills: [],
-          summary: '',
-          languages: [],
-          references: []
-        })} />
+        {template && React.isValidElement(template) ? (
+          template
+        ) : typeof template === 'function' ? (
+          template(cvData || {
+            personalInfo: {},
+            workExperience: [],
+            education: [],
+            skills: [],
+            summary: '',
+            languages: [],
+            references: []
+          })
+        ) : (
+          <div className="text-red-500 p-4">Invalid template format</div>
+        )}
       </div>
     </div>
   );
