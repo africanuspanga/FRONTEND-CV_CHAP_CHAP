@@ -5,7 +5,7 @@ import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Helmet } from 'react-helmet';
 import { useCVForm } from '@/contexts/cv-form-context';
-import { ClientSideTemplateRenderer } from '@/components/ClientSideTemplateRenderer';
+import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SectionOption {
@@ -147,7 +147,7 @@ const AdditionalSectionsForm = () => {
               <p className="text-gray-500 text-sm">This preview updates in real-time as you fill in your information.</p>
             </div>
             <div className="border border-gray-200 rounded-md bg-white p-4">
-              <ClientSideTemplateRenderer
+              <DirectTemplateRenderer
                 templateId={templateId}
                 cvData={formData}
                 height={700}
@@ -171,7 +171,7 @@ const AdditionalSectionsForm = () => {
               </Button>
             </div>
             <div className="p-4">
-              <ClientSideTemplateRenderer
+              <DirectTemplateRenderer
                 templateId={templateId}
                 cvData={formData}
                 height={800}
