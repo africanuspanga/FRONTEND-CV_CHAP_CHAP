@@ -5,21 +5,21 @@ export const templates = {
   moonlightSonata: {
     id: 'moonlightSonata',
     name: 'Moonlight Sonata',
-    previewImage: '/template-previews/template-placeholder.svg',
+    previewImage: '/template-previews/moonlight-sonata.svg',
     category: 'Professional',
     render: () => null // Placeholder
   },
   kaziFasta: {
     id: 'kaziFasta',
     name: 'Kazi Fasta',
-    previewImage: '/template-previews/template-placeholder.svg',
+    previewImage: '/template-previews/kazi-fasta.svg',
     category: 'Modern',
     render: () => null // Placeholder
   },
   jijengeClassic: {
     id: 'jijengeClassic',
     name: 'Jijenge Classic',
-    previewImage: '/template-previews/template-placeholder.svg',
+    previewImage: '/template-previews/jijenge-classic.svg',
     category: 'Classic',
     render: () => null // Placeholder
   },

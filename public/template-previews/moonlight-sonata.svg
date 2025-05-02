@@ -1,29 +1,28 @@
 <svg width="300" height="400" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect width="100%" height="100%" fill="#f8f9fa"/>
+  <!-- Elegant professional background -->
+  <rect width="100%" height="100%" fill="#f8fafc"/>
   
-  <!-- Sidebar -->
-  <rect x="0" y="0" width="30%" height="100%" fill="#ff9966"/>
+  <!-- Moonlight-inspired header gradient -->
+  <rect x="0" y="0" width="100%" height="25%" fill="#1e293b"/>
+  <rect x="0" y="25%" width="100%" height="5%" fill="#334155"/>
   
-  <!-- Header section -->
-  <rect x="35%" y="5%" width="60%" height="15%" rx="4" fill="#e9ecef"/>
+  <!-- Moonlight glow effect in header -->
+  <circle cx="250" cy="50" r="30" fill="#94a3b8" opacity="0.3"/>
   
-  <!-- Contact info -->
-  <rect x="5%" y="25%" width="20%" height="40%" rx="4" fill="#ffccb3"/>
+  <!-- Personal details area -->
+  <rect x="5%" y="35%" width="90%" height="15%" rx="0" fill="#f1f5f9"/>
+  <rect x="7%" y="37%" width="50%" height="5%" rx="0" fill="#64748b"/>
+  <rect x="7%" y="44%" width="40%" height="3%" rx="0" fill="#94a3b8"/>
+  
+  <!-- Experience section -->
+  <rect x="5%" y="55%" width="90%" height="7%" rx="0" fill="#1e293b"/>
+  <rect x="5%" y="62%" width="90%" height="15%" rx="0" fill="#f1f5f9"/>
   
   <!-- Skills section -->
-  <rect x="5%" y="70%" width="20%" height="25%" rx="4" fill="#ffccb3"/>
-  
-  <!-- Main content: Experience -->
-  <rect x="35%" y="25%" width="60%" height="30%" rx="4" fill="#e9ecef"/>
-  
-  <!-- Main content: Education -->
-  <rect x="35%" y="60%" width="60%" height="20%" rx="4" fill="#e9ecef"/>
-  
-  <!-- Main content: Additional section -->
-  <rect x="35%" y="85%" width="60%" height="10%" rx="4" fill="#e9ecef"/>
+  <rect x="5%" y="82%" width="90%" height="7%" rx="0" fill="#1e293b"/>
+  <rect x="5%" y="89%" width="90%" height="8%" rx="0" fill="#f1f5f9"/>
   
   <!-- Text -->
-  <text x="50%" y="50%" font-family="Arial" font-size="16" fill="#212529" text-anchor="middle" dominant-baseline="middle">Moonlight Sonata</text>
-  <text x="50%" y="56%" font-family="Arial" font-size="12" fill="#6c757d" text-anchor="middle" dominant-baseline="middle">Elegant modern template</text>
+  <text x="50%" y="50%" font-family="Arial" font-size="16" fill="#334155" text-anchor="middle" dominant-baseline="middle">Moonlight Sonata</text>
+  <text x="50%" y="56%" font-family="Arial" font-size="12" fill="#64748b" text-anchor="middle" dominant-baseline="middle">Elegant professional design</text>
 </svg>
