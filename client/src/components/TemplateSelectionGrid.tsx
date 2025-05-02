@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import TemplatePreviewImage from './TemplatePreviewImage';
+import { MoonlightSonataTemplate, KaziFastaTemplate } from '@/assets/templates';
 
 interface TemplateSelectionGridProps {
   onSelectTemplate: (templateId: string) => void;
@@ -53,36 +54,16 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
             <div className="relative h-[300px] sm:h-[400px] md:h-[500px] bg-white overflow-hidden">
               <div className="absolute inset-0 bg-gray-100 animate-pulse" /> {/* Loading placeholder */}
               
-              {/* Try to load the actual PNG image first, fall back to SVG */}
-              {['moonlightSonata', 'kaziFasta'].includes(template.id) ? (
-                <img
-                  src={template.previewImage}
-                  alt={`${template.name} template preview`}
-                  className="w-full h-full object-contain object-top px-2 relative z-10"
-                  style={{
-                    maxWidth: '100%',
-                    display: 'block',
-                    margin: '0 auto'
-                  }}
-                  loading="lazy" /* For better mobile performance */
-                  onLoad={(e) => {
-                    // Remove loading animation when image loads
-                    const target = e.target as HTMLImageElement;
-                    if (target.parentElement) {
-                      const placeholder = target.parentElement.querySelector('.animate-pulse');
-                      if (placeholder) placeholder.classList.add('hidden');
-                    }
-                  }}
-                  onError={(e) => {
-                    console.error(`Failed to load image: ${template.previewImage}`);
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              ) : (
-                <div className="relative w-full h-full z-10">
+              {/* Directly use imported template components */}
+              <div className="relative w-full h-full z-10">
+                {template.id === 'moonlightSonata' ? (
+                  <MoonlightSonataTemplate />
+                ) : template.id === 'kaziFasta' ? (
+                  <KaziFastaTemplate />
+                ) : (
                   <TemplatePreviewImage templateId={template.id} templateName={template.name} />
-                </div>
-              )}
+                )}
+              </div>
             </div>
             <CardContent className="p-3 sm:p-4 flex flex-col justify-between flex-grow border-t">
               <div>
