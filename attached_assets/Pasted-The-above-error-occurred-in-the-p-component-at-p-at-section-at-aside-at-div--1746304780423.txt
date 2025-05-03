@@ -1,0 +1,27 @@
+The above error occurred in the <p> component:
+
+    at p
+    at section
+    at aside
+    at div
+    at div
+    at KilimanjaroTemplate (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/templates/kilimanjaro.tsx:18:3)
+    at SafeTemplateWrapper
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+Objects are not valid as a React child (found: object with keys {name, id}). If you meant to render a collection of children, use an array instead.
+Template may have rendered empty content: 
+Generating PDF from rendered template...
+#2 0ms Starting document clone with size 773x628 scrolled to 0,-76
+Cannot read properties of undefined (reading 'frame')
+at new ErrorOverlay (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@vite/client:425:26)
+at DocumentCloner2.createElementClone (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14570:30)
+at DocumentCloner2.cloneNode (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14701:32)
+at DocumentCloner2.appendChildNode (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14673:40)
+at DocumentCloner2.cloneChildNodes (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14688:22)
+at DocumentCloner2.cloneNode (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14718:22)
+at DocumentCloner2.appendChildNode (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14673:40)
+at DocumentCloner2.cloneChildNodes (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14688:22)
+at DocumentCloner2.cloneNode (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14718:22)
+at new DocumentCloner2 (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev
