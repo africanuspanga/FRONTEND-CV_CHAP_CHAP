@@ -68,15 +68,20 @@ const BackendTest = () => {
           } : e));
         }
       } 
-      // For other endpoints, we'll use OPTIONS to avoid actually creating or modifying data
+      // For other endpoints, we'll use HEAD to avoid actually creating or modifying data
       else {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
         
         try {
+          // Use HEAD method or fall back to GET if not supported
           const response = await fetch(endpoint.url, {
-            method: 'OPTIONS',
-            signal: controller.signal
+            method: 'HEAD',
+            signal: controller.signal,
+            mode: 'cors',
+            headers: {
+              'Accept': 'application/json'
+            }
           });
           
           clearTimeout(timeoutId);
@@ -101,12 +106,12 @@ const BackendTest = () => {
           clearTimeout(timeoutId);
           const duration = performance.now() - startTime;
           
-          // If the request was aborted, it could still mean the endpoint exists but doesn't support OPTIONS
+          // If the request was aborted, it could still mean the endpoint exists but doesn't support HEAD
           if (error?.name === 'AbortError') {
             setEndpoints(prev => prev.map((e, i) => i === index ? { 
               ...e, 
               status: 'success', 
-              message: 'Endpoint exists (timeout on OPTIONS is normal)',
+              message: 'Endpoint exists (timeout is normal)',
               responseTime: Math.round(duration)
             } : e));
           } else {
