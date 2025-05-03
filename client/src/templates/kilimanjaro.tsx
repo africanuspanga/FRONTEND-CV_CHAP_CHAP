@@ -274,10 +274,10 @@ export function KilimanjaroTemplate({
                     </div>
                     <div style={{ flexShrink: 0, textAlign: 'right', fontSize: '0.9em', color: '#666', paddingLeft: '15px' }}>
                       <span style={{ display: 'block', lineHeight: 1.4 }}>
-                        {job.startDate} - {job.endDate || 'Present'}
+                        {safeRender(job.startDate)} - {job.endDate ? safeRender(job.endDate) : 'Present'}
                       </span>
                       <span style={{ display: 'block', lineHeight: 1.4 }}>
-                        {job.location || ''}
+                        {job.location ? safeRender(job.location) : ''}
                       </span>
                     </div>
                   </div>
@@ -291,7 +291,7 @@ export function KilimanjaroTemplate({
                         position: 'relative'
                       }}>
                         <span style={{ position: 'absolute', left: 0, top: '0.1em', fontSize: '1em', color: '#555' }}>•</span>
-                        {bullet.trim()}
+                        {typeof bullet === 'string' ? bullet.trim() : safeRender(bullet)}
                       </li>
                     ))}
                     {job.achievements && job.achievements.map((achievement, achieveIndex) => (
@@ -303,7 +303,7 @@ export function KilimanjaroTemplate({
                         position: 'relative'
                       }}>
                         <span style={{ position: 'absolute', left: 0, top: '0.1em', fontSize: '1em', color: '#555' }}>•</span>
-                        {achievement}
+                        {safeRender(achievement)}
                       </li>
                     ))}
                   </ul>
@@ -346,7 +346,7 @@ export function KilimanjaroTemplate({
                     </div>
                     <div style={{ flexShrink: 0, textAlign: 'right', fontSize: '0.9em', color: '#666', paddingLeft: '15px' }}>
                       <span style={{ display: 'block', lineHeight: 1.4 }}>
-                        {edu.endDate}
+                        {safeRender(edu.endDate)}
                       </span>
                     </div>
                   </div>
@@ -369,7 +369,7 @@ export function KilimanjaroTemplate({
                                 position: 'relative'
                               }}>
                                 <span style={{ position: 'absolute', left: 0, top: '0.1em', fontSize: '0.9em', color: '#777' }}>◦</span>
-                                {course.trim()}
+                                {typeof course === 'string' ? course.trim() : safeRender(course)}
                               </li>
                             ))}
                           </ul>
@@ -391,7 +391,7 @@ export function KilimanjaroTemplate({
                                 position: 'relative'
                               }}>
                                 <span style={{ position: 'absolute', left: 0, top: '0.1em', fontSize: '0.9em', color: '#777' }}>◦</span>
-                                {award}
+                                {safeRender(award)}
                               </li>
                             ))}
                           </ul>
