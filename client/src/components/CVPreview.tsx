@@ -6,6 +6,7 @@ import { generateAndDownloadPDF } from '@/lib/screenshot-pdf-generator';
 import { getAllTemplates } from '@/lib/templates-registry';
 import ClientSideTemplateRenderer from './ClientSideTemplateRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';
+import PDFTestButton from './PDFTestButton';
 
 interface CVPreviewProps {
   cvData: CVData;
@@ -54,15 +55,20 @@ const CVPreview: React.FC<CVPreviewProps> = ({
           </Select>
         </div>
         
-        <Button 
-          onClick={handleExportPDF}
-          disabled={!isFormComplete}
-          variant="secondary"
-          size="sm"
-          className="w-full sm:w-auto text-xs sm:text-sm mt-2 sm:mt-0"
-        >
-          Export PDF
-        </Button>
+        <div className="flex space-x-2">
+          <PDFTestButton 
+            className="mt-2 sm:mt-0"
+          />
+          <Button 
+            onClick={handleExportPDF}
+            disabled={!isFormComplete}
+            variant="secondary"
+            size="sm"
+            className="w-full sm:w-auto text-xs sm:text-sm mt-2 sm:mt-0"
+          >
+            Export PDF
+          </Button>
+        </div>
       </div>
       
       {/* Mobile note - helpful for small screens */}

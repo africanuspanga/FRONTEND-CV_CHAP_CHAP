@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { generateAndDownloadPDF } from '@/lib/screenshot-pdf-generator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ClientSideTemplateRenderer from '@/components/ClientSideTemplateRenderer';
+import PDFTestButton from '@/components/PDFTestButton';
 
 // Section completion helper
 type SectionStatus = 'complete' | 'partial' | 'empty';
