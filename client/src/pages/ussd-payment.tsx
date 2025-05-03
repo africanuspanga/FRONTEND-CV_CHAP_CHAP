@@ -44,43 +44,87 @@ const USSDPaymentPage: React.FC = () => {
     setVerificationError('');
     
     // Validate the payment message
-    if (!paymentMessage || paymentMessage.trim().length < 20) {
+    if (!paymentMessage || paymentMessage.trim().length < 40) {
       setVerificationError('Please paste the complete payment confirmation message');
       setIsVerifying(false);
       return;
     }
     
-    // Check for key components in the message
+    // Normalize the message (remove extra spaces, make case insensitive comparison)
+    const normalizedMessage = paymentMessage.trim().toLowerCase();
+    
+    // Check for key components in the message - these are essential parts of a Selcom message
     const requiredTerms = [
-      'Selcom Pay',
-      'DRIFTMARK',
-      'Merchant# 61115073',
-      'TZS',
-      'TransID',
-      'Channel',
-      'From'
+      'selcom pay',
+      'driftmark',
+      'merchant',
+      '61115073', // Your specific merchant ID
+      'tzs',
+      'transid',
+      'channel'
     ];
     
     const missingTerms = requiredTerms.filter(term => 
-      !paymentMessage.includes(term)
+      !normalizedMessage.includes(term.toLowerCase())
     );
     
     if (missingTerms.length > 0) {
-      setVerificationError('Invalid payment message. Please check and try again.');
+      setVerificationError('Invalid payment message. The message is missing required information.');
       setIsVerifying(false);
       return;
     }
     
-    // Simple amount validation (should contain "10,000" or similar)
-    if (!paymentMessage.match(/TZS\s*(\d{1,3}(,\d{3})*(\.\d{1,2})?)/) && 
-        !paymentMessage.match(/[0-9]{1,3}(,[0-9]{3})*\.[0-9]{2}/)) {
-      setVerificationError('Payment amount not recognized. Please check the message.');
+    // Price validation - should be 10,000 TZS
+    // Match different formats: "TZS 10,000.00" or "10,000" or "10000"
+    const priceRegex = /(tzs\s*10[\s,.]*000|10[\s,.]*000)/i;
+    if (!priceRegex.test(normalizedMessage)) {
+      setVerificationError('The payment amount does not match the required amount of 10,000 TZS.');
+      setIsVerifying(false);
+      return;
+    }
+    
+    // TransID validation - should be alphanumeric
+    const transIdRegex = /transid\s*([a-z0-9]+)/i;
+    const transIdMatch = normalizedMessage.match(transIdRegex);
+    if (!transIdMatch || !transIdMatch[1] || transIdMatch[1].length < 4) {
+      setVerificationError('Transaction ID appears to be invalid or missing.');
+      setIsVerifying(false);
+      return;
+    }
+    
+    // Date validation - check if the message contains a recent date
+    // This is a simple check to ensure the date string exists
+    const dateRegex = /\d{1,2}\/\d{1,2}\/\d{4}/;
+    const timeRegex = /\d{1,2}:\d{1,2}:\d{1,2}|\d{1,2}:\d{1,2}/;
+    if (!dateRegex.test(normalizedMessage) && !timeRegex.test(normalizedMessage)) {
+      setVerificationError('Payment date information seems to be missing or invalid.');
+      setIsVerifying(false);
+      return;
+    }
+    
+    // Additional validation for expected payment channels
+    const validChannels = ['vodacom', 'm-pesa', 'airtel', 'money', 'tigo', 'mixx', 'yas'];
+    const hasValidChannel = validChannels.some(channel => 
+      normalizedMessage.includes(channel.toLowerCase())
+    );
+    
+    if (!hasValidChannel) {
+      setVerificationError('Payment channel not recognized. Please check the message.');
       setIsVerifying(false);
       return;
     }
 
-    // Simulate verification delay
+    // For demo purposes, simulate server verification with a delay
     setTimeout(() => {
+      // In production, this would be a call to your backend API to verify the transaction
+      // const response = await fetch('/api/verify-transaction', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ transactionMessage: paymentMessage })
+      // });
+      // const data = await response.json();
+      // if (data.verified) { ... }
+      
       setIsVerifying(false);
       setIsPaymentVerified(true);
       toast({
