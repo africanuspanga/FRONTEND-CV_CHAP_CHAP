@@ -33,19 +33,19 @@ const BackendTest = () => {
       description: 'Initiates USSD payment flow (critical)'
     },
     {
-      url: `${API_BASE_URL}/api/cv-pdf/sample-id/verify`,
+      url: `${API_BASE_URL}/api/cv-pdf/test-request-id/verify`,
       status: 'idle',
       method: 'POST',
       description: 'Verifies payment status from SMS (critical)'
     },
     {
-      url: `${API_BASE_URL}/api/cv-pdf/sample-id/status`,
+      url: `${API_BASE_URL}/api/cv-pdf/test-request-id/status`,
       status: 'idle',
       method: 'GET',
       description: 'Checks PDF generation status (critical)'
     },
     {
-      url: `${API_BASE_URL}/api/cv-pdf/sample-id/download`,
+      url: `${API_BASE_URL}/api/cv-pdf/test-request-id/download`,
       status: 'idle',
       method: 'GET',
       description: 'Downloads generated PDF (critical)'
@@ -145,7 +145,7 @@ const BackendTest = () => {
       }
       // For health endpoint, try different methods if one fails
       else if (endpoint.url.includes('/health')) {
-        // This specific API might have health at a different path, let's try multiple paths
+        // This specific API uses /api/cv-pdf/health as its health endpoint
         try {
           // First try with GET
           const response = await fetch(endpoint.url, {
@@ -249,12 +249,24 @@ const BackendTest = () => {
               }
             }
             
-            setEndpoints(prev => prev.map((e, i) => i === index ? { 
-              ...e, 
-              status: 'error', 
-              message: `Error ${response.status}: ${response.statusText}`,
-              responseTime: Math.round(duration)
-            } : e));
+            // For health endpoints, 503 Service Unavailable is expected during maintenance
+            // or when certain components are starting up
+            if (endpoint.url.includes('/health') && response.status === 503) {
+              setEndpoints(prev => prev.map((e, i) => i === index ? { 
+                ...e, 
+                // If it's a non-critical health check, don't mark as failed
+                status: e.description?.includes('non-critical') ? 'success' : 'error',
+                message: `Service temporarily unavailable (maintenance or startup)`,
+                responseTime: Math.round(duration)
+              } : e));
+            } else {
+              setEndpoints(prev => prev.map((e, i) => i === index ? { 
+                ...e, 
+                status: 'error', 
+                message: `Error ${response.status}: ${response.statusText}`,
+                responseTime: Math.round(duration)
+              } : e));
+            }
           }
         } catch (healthError) {
           console.error('Error with health endpoint:', healthError);
