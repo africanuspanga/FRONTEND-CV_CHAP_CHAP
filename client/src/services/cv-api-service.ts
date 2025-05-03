@@ -1,7 +1,7 @@
 import { CVData } from '@shared/schema';
 
 // Backend API URL
-const API_BASE_URL = 'https://cv-screener-africanuspanga.replit.app';
+export const API_BASE_URL = 'https://cv-screener-africanuspanga.replit.app';
 
 export interface CVRequestStatus {
   status: 'pending_payment' | 'verifying_payment' | 'generating_pdf' | 'completed' | 'failed';

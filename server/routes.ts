@@ -21,6 +21,15 @@ const cvRequests: Record<string, CVRequest> = {};
 const upload = multer();
 
 export function registerRoutes(app: Express): Server {
+  // Health check endpoint
+  app.get("/api/cv-pdf/health", (req, res) => {
+    res.status(200).json({
+      status: "ok",
+      message: "CV Chap Chap API is online",
+      version: "1.0.0",
+      timestamp: new Date().toISOString()
+    });
+  });
   // API route for initiating USSD payment
   app.post("/api/cv-pdf/anonymous/initiate-ussd", async (req, res) => {
     try {
