@@ -18,7 +18,7 @@ const FinalPreview = () => {
   const { toast } = useToast();
   const { formData } = useCVForm();
   const { isAuthenticated } = useAuth();
-  const { resetRequest, paymentStatus } = useCVRequest();
+  const { initiatePayment, resetRequest, paymentStatus } = useCVRequest();
   
   // State for template sidebar
   const [templateSidebarOpen, setTemplateSidebarOpen] = useState(!isMobile);
@@ -38,12 +38,39 @@ const FinalPreview = () => {
     setCurrentTemplateId(id);
   };
   
-  // Handle CV download (redirect to payment page)
-  const handleDownload = () => {
+  // Handle CV download (initiate payment and redirect to payment page)
+  const handleDownload = async () => {
     // Set downloading state to true to disable the button
     setIsDownloading(true);
-    // Redirect to USSD payment page for manual payment verification
-    navigate('/ussd-payment');
+    
+    // Reset any existing request
+    resetRequest();
+    
+    try {
+      console.log("Initiating payment with template ID:", currentTemplateId);
+      // Initiate payment with backend API
+      const paymentInitiated = await initiatePayment(currentTemplateId, formData);
+      
+      if (paymentInitiated) {
+        toast({
+          title: "Payment Initiated",
+          description: "Redirecting to payment verification page",
+        });
+        // Redirect to USSD payment page for manual payment verification
+        navigate('/ussd-payment');
+      } else {
+        // Error message is handled in the initiatePayment function
+        setIsDownloading(false);
+      }
+    } catch (error) {
+      console.error("Error initiating payment:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to initiate payment",
+        variant: "destructive"
+      });
+      setIsDownloading(false);
+    }
   };
   
   // Handle print - disabled as requested

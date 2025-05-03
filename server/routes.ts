@@ -1,56 +1,203 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import * as templateAPI from "./api/templates";
-import * as cvAPI from "./api/cv";
-import * as simpleCvAPI from "./api/simple-cv";
-import * as anonymousCvAPI from "./api/anonymous-cv";
-import { storage } from "./storage";
-import { cvDataSchema } from "@shared/schema";
-import { z } from "zod";
-import { apiKeysHandler } from "./api-keys";
-import { openaiProxyHandler } from "./openai-proxy";
+import { v4 as uuidv4 } from 'uuid';
+import multer from 'multer';
+import crypto from 'crypto';
 
-// Type declarations for Express Request (isAuthenticated & user) are in server/types/express.d.ts
+// In-memory storage for CV requests
+interface CVRequest {
+  id: string;
+  templateId: string;
+  cvData: any;
+  status: 'pending_payment' | 'verifying_payment' | 'generating_pdf' | 'completed' | 'failed';
+  createdAt: Date;
+  completedAt?: Date;
+  error?: string;
+}
 
-export async function registerRoutes(app: Express): Promise<Server> {
+const cvRequests: Record<string, CVRequest> = {};
 
-  // Template routes
-  app.get("/api/cv/templates", templateAPI.getAllTemplates);
-  app.get("/api/cv/templates/:id", templateAPI.getTemplateById);
-  
-  // Admin template management routes
-  app.post("/api/admin/templates", templateAPI.createTemplate);
-  app.put("/api/admin/templates/:id", templateAPI.updateTemplate);
-  app.delete("/api/admin/templates/:id", templateAPI.deleteTemplate);
-  
-  // CV routes
-  app.get("/api/cv/:id", simpleCvAPI.getCV);
-  app.post("/api/cv", anonymousCvAPI.createAnonymousCV); // Use anonymous CV creation
-  app.get("/api/cv", simpleCvAPI.getAllCVs);
-  
-  // CV preview routes
-  app.get("/api/cv/:id/preview", simpleCvAPI.getCVPreview);
-  app.get("/api/cv/:id/html-preview", cvAPI.getHTMLPreview);
-  
-  // Payment and download routes
-  app.get("/api/cv/:id/payment-status", cvAPI.checkPaymentStatus);
-  app.post("/api/cv/:id/generate-pdf", cvAPI.generatePDF);
-  app.get("/api/cv/:id/document-status/:taskId", cvAPI.checkDocumentStatus);
-  
-  // Legacy routes for compatibility (can be removed later)
-  app.get("/api/cv", async (req, res) => {
-    const cvs = await storage.getAllCVs();
-    res.json(cvs);
+// Configure multer for form-data parsing
+const upload = multer();
+
+export function registerRoutes(app: Express): Server {
+  // API route for initiating USSD payment
+  app.post("/api/cv-pdf/anonymous/initiate-ussd", async (req, res) => {
+    try {
+      const { template_id, cv_data } = req.body;
+      
+      if (!template_id || !cv_data) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Missing required parameters: template_id or cv_data' 
+        });
+      }
+      
+      // Generate unique request ID
+      const requestId = uuidv4();
+      
+      // Store CV request
+      cvRequests[requestId] = {
+        id: requestId,
+        templateId: template_id,
+        cvData: cv_data,
+        status: 'pending_payment',
+        createdAt: new Date()
+      };
+      
+      // Return success response
+      res.status(200).json({
+        success: true,
+        request_id: requestId
+      });
+    } catch (error: any) {
+      console.error('Error initiating payment:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error'
+      });
+    }
   });
-  
-  app.get("/api/templates", templateAPI.getAllTemplates);
 
-  // API Keys status endpoint
-  app.get("/api/keys/status", apiKeysHandler);
+  // API route for verifying payment
+  app.post("/api/cv-pdf/:requestId/verify", upload.none(), async (req, res) => {
+    try {
+      const { requestId } = req.params;
+      const { payment_message } = req.body;
+      
+      // Check if request exists
+      const request = cvRequests[requestId];
+      if (!request) {
+        return res.status(404).json({
+          success: false,
+          error: 'Request not found'
+        });
+      }
+      
+      // Check if payment message is provided
+      if (!payment_message) {
+        return res.status(400).json({
+          success: false,
+          error: 'Payment message is required'
+        });
+      }
+      
+      // Verify payment message (simplified for mock server)
+      if (!payment_message.includes('DRIFTMARK TECHNOLOGI') || 
+          !payment_message.includes('61115073') ||
+          !payment_message.includes('Selcom Pay')) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid payment message'
+        });
+      }
+      
+      // Update request status
+      request.status = 'verifying_payment';
+      
+      // Simulate processing (in a real implementation, this would be a background job)
+      setTimeout(() => {
+        // Update to generating PDF after verification
+        if (request && request.status === 'verifying_payment') {
+          request.status = 'generating_pdf';
+          
+          // Simulate PDF generation
+          setTimeout(() => {
+            if (request) {
+              request.status = 'completed';
+              request.completedAt = new Date();
+            }
+          }, 5000); // 5 seconds to generate PDF
+        }
+      }, 3000); // 3 seconds to verify payment
+      
+      // Return success response
+      res.status(200).json({
+        success: true
+      });
+    } catch (error: any) {
+      console.error('Error verifying payment:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error'
+      });
+    }
+  });
 
-  // OpenAI proxy endpoint
-  app.post("/api/openai/proxy", openaiProxyHandler);
+  // API route for checking payment status
+  app.get("/api/cv-pdf/:requestId/status", (req, res) => {
+    try {
+      const { requestId } = req.params;
+      
+      // Check if request exists
+      const request = cvRequests[requestId];
+      if (!request) {
+        return res.status(404).json({
+          success: false,
+          error: 'Request not found'
+        });
+      }
+      
+      // Return status
+      res.status(200).json({
+        status: request.status,
+        request_id: request.id,
+        created_at: request.createdAt.toISOString(),
+        completed_at: request.completedAt?.toISOString(),
+        error: request.error
+      });
+    } catch (error: any) {
+      console.error('Error checking status:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error'
+      });
+    }
+  });
 
+  // API route for downloading PDF
+  app.get("/api/cv-pdf/:requestId/download", (req, res) => {
+    try {
+      const { requestId } = req.params;
+      
+      // Check if request exists
+      const request = cvRequests[requestId];
+      if (!request) {
+        return res.status(404).json({
+          success: false,
+          error: 'Request not found'
+        });
+      }
+      
+      // Check if PDF is ready for download
+      if (request.status !== 'completed') {
+        return res.status(400).json({
+          success: false,
+          error: `PDF is not ready for download. Current status: ${request.status}`
+        });
+      }
+      
+      // Generate a sample PDF (just a text file with PDF extension for the mock)
+      const samplePDF = Buffer.from('This is a sample PDF file generated by the mock server.');
+      
+      // Set response headers
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="cv_${requestId}.pdf"`);
+      res.setHeader('Content-Length', samplePDF.length);
+      
+      // Send the sample PDF
+      res.status(200).send(samplePDF);
+    } catch (error: any) {
+      console.error('Error downloading PDF:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error'
+      });
+    }
+  });
+
+  // Create HTTP server
   const httpServer = createServer(app);
+  
   return httpServer;
 }

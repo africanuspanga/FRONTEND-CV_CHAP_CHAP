@@ -1,7 +1,8 @@
 import { CVData } from '@shared/schema';
 
-// Backend API URL
-const API_BASE_URL = 'https://cv-screener-africanuspanga.replit.app';
+// Backend API URL - using local server for development
+// In a production environment, this would point to the actual API
+const API_BASE_URL = '';  // Empty string will default to current host
 
 export interface CVRequestStatus {
   status: 'pending_payment' | 'verifying_payment' | 'generating_pdf' | 'completed' | 'failed';
