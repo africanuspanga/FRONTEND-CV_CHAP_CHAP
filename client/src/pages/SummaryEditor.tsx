@@ -6,12 +6,16 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { useAIStatus } from '@/hooks/use-ai-status';
 
 const SummaryEditor = () => {
   const [, navigate] = useLocation();
   const params = useParams<{ templateId: string }>();
   const { formData, updateFormField } = useCVForm();
   const templateId = params.templateId;
+  const { toast } = useToast();
+  const { hasOpenAI } = useAIStatus();
 
   // Sample summary
   const defaultSummary = 
@@ -22,17 +26,22 @@ const SummaryEditor = () => {
     "deliver impactful solutions and continuous improvement to forward-thinking " +
     "organizations.";
 
-  // State
-  const [summary, setSummary] = useState(formData.summary || defaultSummary);
+  // State - use the summary from personalInfo object
+  const [summary, setSummary] = useState(formData.personalInfo?.summary || defaultSummary);
   const [jobSearchTerm, setJobSearchTerm] = useState('');
   const [isSearchingExamples, setIsSearchingExamples] = useState(false);
+  const [isEnhancing, setIsEnhancing] = useState(false);
 
-  // Update the summary in the form data
+  // Update the summary in the form data (in personalInfo object)
   useEffect(() => {
-    if (summary !== formData.summary) {
-      updateFormField('summary', summary);
+    if (summary !== formData.personalInfo?.summary) {
+      const updatedPersonalInfo = {
+        ...formData.personalInfo,
+        summary: summary
+      };
+      updateFormField('personalInfo', updatedPersonalInfo);
     }
-  }, [summary, formData.summary, updateFormField]);
+  }, [summary, formData.personalInfo, updateFormField]);
 
   // Navigate to previous step
   const handlePrevious = () => {
@@ -50,15 +59,59 @@ const SummaryEditor = () => {
   };
 
   // Handle AI enhance click
-  const handleEnhanceWithAI = () => {
-    // This would normally call the backend for AI processing
-    // For now, we'll just update with a slightly modified version
-    setSummary(
-      "Enhanced: " + summary.replace(
-        "Emerging professional",
-        "Dynamic emerging professional"
-      )
-    );
+  const handleEnhanceWithAI = async () => {
+    if (!hasOpenAI) {
+      toast({
+        title: "AI Enhancement Unavailable",
+        description: "OpenAI service is not available. Please check your API key settings.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsEnhancing(true);
+    try {
+      // Call OpenAI API to enhance the summary
+      const response = await fetch('/api/openai/proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Please enhance this professional summary, maintaining its core message but improving its clarity, impact, and professionalism (250-400 characters only):\n\n${summary}`,
+          maxTokens: 350,
+          type: 'summary',
+          tone: 'professional',
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to enhance summary');
+      }
+      
+      const data = await response.json();
+      setSummary(data.content.trim());
+      
+      toast({
+        title: "Summary Enhanced",
+        description: "Your professional summary has been enhanced.",
+      });
+    } catch (error) {
+      console.error('Error enhancing summary:', error);
+      toast({
+        title: "Enhancement Failed",
+        description: error instanceof Error ? error.message : "Failed to enhance summary",
+        variant: "destructive"
+      });
+      
+      // Fallback enhancement if API fails
+      setSummary(summary.replace(
+        /professional|individual/i,
+        'seasoned professional'
+      ));
+    } finally {
+      setIsEnhancing(false);
+    }
   };
 
   // Handle search for examples
@@ -184,9 +237,17 @@ const SummaryEditor = () => {
             <div className="flex justify-end mb-8">
               <Button
                 onClick={handleEnhanceWithAI}
+                disabled={isEnhancing || !hasOpenAI}
                 className="bg-blue-100 text-blue-700 hover:bg-blue-200"
               >
-                Enhance with AI
+                {isEnhancing ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Enhancing...
+                  </>
+                ) : (
+                  "Enhance with AI"
+                )}
               </Button>
             </div>
           </div>
