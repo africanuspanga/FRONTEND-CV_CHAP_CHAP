@@ -12,7 +12,7 @@ import StructuredData from "@/components/StructuredData";
 
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-import AdminLoginLink from "@/components/AdminLoginLink";
+// Admin button removed - access via /admin-dashboard directly
 import Home from "@/pages/Home";
 import CreateCV from "@/pages/CreateCV";
 import TemplateSelection from "@/pages/TemplateSelection";
@@ -56,7 +56,6 @@ import OpenAITestPage from "@/pages/OpenAITestPage";
 function Router() {
   return (
     <div className="flex flex-col min-h-screen">
-      <AdminLoginLink />
       <Switch>
         {/* Admin Dashboard Routes */}
         <Route path="/admin-login" component={AdminLoginPage} />
