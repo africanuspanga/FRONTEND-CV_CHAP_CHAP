@@ -24,19 +24,31 @@ const USSDPaymentPage: React.FC = () => {
   const handleDownload = async () => {
     try {
       // Pass required data to PDF generator with explicit type conversions
-      const cvData: any = {
-        personalInfo: formData.personalInfo || {},
-        // The professional summary is stored in personalInfo.summary
-        workExperiences: formData.workExperiences || [],
-        education: formData.education || [],
-        skills: formData.skills || [],
-        certifications: formData.certifications || [],
-        languages: formData.languages || [],
-        accomplishments: formData.accomplishments || [],
-        projects: formData.projects || [],
-        hobbies: Array.isArray(formData.hobbies) ? formData.hobbies : [],
-        references: formData.references || []
-      };
+      // Important: We need to pass the complete formData to maintain template ID and other params
+      // Just ensure all required properties are present and non-null
+      
+      // Clone the formData to avoid modifying the original
+      const cvData = JSON.parse(JSON.stringify(formData));
+      
+      // Ensure all required properties exist
+      cvData.personalInfo = cvData.personalInfo || {};
+      cvData.workExperiences = cvData.workExperiences || [];
+      cvData.education = cvData.education || [];
+      cvData.skills = cvData.skills || [];
+      cvData.certifications = cvData.certifications || [];
+      cvData.languages = cvData.languages || [];
+      cvData.accomplishments = cvData.accomplishments || [];
+      cvData.projects = cvData.projects || [];
+      cvData.hobbies = Array.isArray(cvData.hobbies) ? cvData.hobbies : [];
+      cvData.references = cvData.references || [];
+      
+      // Make sure templateId is included
+      if (!cvData.templateId) {
+        cvData.templateId = formData.templateId;
+      }
+      
+      console.log('Generating PDF with template ID:', formData.templateId);
+      console.log('CV Data structure:', Object.keys(cvData));
 
       // Use the client-side PDF generator with explicit filename
       await generateAndDownloadPDF(

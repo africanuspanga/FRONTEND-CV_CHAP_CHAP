@@ -10,7 +10,9 @@ import { CVData } from '@shared/schema';
 import React from 'react';
 
 // Configuration options for PDF generation
-const pdfOptions = {
+// These are the default options, but we'll create a fresh options object
+// in the generatePDF function to avoid any shared reference issues
+const defaultPdfOptions = {
   margin: 0,
   filename: 'cv-chap-chap.pdf',
   image: { type: 'jpeg', quality: 0.98 },
@@ -24,16 +26,15 @@ const pdfOptions = {
   jsPDF: { 
     unit: 'mm', 
     format: 'a4', 
-    orientation: 'portrait' as 'portrait',
-    compress: true,
-    hotfixes: ['px_scaling']
+    orientation: 'portrait',
+    compress: true
   }
 };
 
 /**
  * Generate a PDF from a template and CV data
  */
-export async function generatePDF(templateId: string, cvData: CVData): Promise<Blob> {
+export async function generatePDF(templateId: string, cvData: any): Promise<Blob> {
   // Create a container for rendering the template
   const container = document.createElement('div');
   // Set to A4 dimensions with proper scaling
@@ -50,6 +51,7 @@ export async function generatePDF(templateId: string, cvData: CVData): Promise<B
 
   try {
     console.log('Starting PDF generation for template:', templateId);
+    console.log('CV Data keys:', Object.keys(cvData));
     
     // Get the template component
     const template = getTemplateByID(templateId);
@@ -59,6 +61,30 @@ export async function generatePDF(templateId: string, cvData: CVData): Promise<B
     }
     console.log('Template found:', template.name);
 
+    // Important: Create a safer version of the CV data
+    // that includes all necessary fields with defaults
+    const safeData = {
+      templateId,
+      personalInfo: cvData.personalInfo || {},
+      workExperience: cvData.workExperience || cvData.workExperiences || [],
+      workExperiences: cvData.workExperiences || cvData.workExperience || [],
+      education: cvData.education || [],
+      skills: cvData.skills || [],
+      summary: cvData.summary || cvData.personalInfo?.summary || '',
+      languages: cvData.languages || [],
+      references: cvData.references || [],
+      hobbies: cvData.hobbies || [],
+      projects: cvData.projects || [],
+      certifications: cvData.certifications || [],
+      websites: cvData.websites || [],
+      accomplishments: cvData.accomplishments || []
+    };
+    
+    // Ensure personalInfo has a summary
+    if (!safeData.personalInfo.summary && safeData.summary) {
+      safeData.personalInfo.summary = safeData.summary;
+    }
+    
     // Create a React root and render the template
     const { createRoot } = await import('react-dom/client');
     const root = createRoot(container);
@@ -71,11 +97,11 @@ export async function generatePDF(templateId: string, cvData: CVData): Promise<B
     const TemplateComponent = template.render;
     console.log('Rendering template component with data');
     
-    root.render(React.createElement(TemplateComponent, cvData));
+    root.render(React.createElement(TemplateComponent, safeData));
     
     // Allow time for the template to fully render and styles to apply
     console.log('Waiting for template to render...');
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Increased timeout for better rendering
     
     // Check if anything was actually rendered
     if (container.innerHTML.trim().length < 50) {
@@ -86,11 +112,33 @@ export async function generatePDF(templateId: string, cvData: CVData): Promise<B
 
     // Generate the PDF with additional debugging
     console.log('Generating PDF from rendered template...');
+    const pdfOptions = {
+      margin: 0,
+      filename: 'cv-chap-chap.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: true
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait',
+        compress: true
+      }
+    };
+    
     const pdfGenerator = html2pdf().from(container).set(pdfOptions);
     const pdf = await pdfGenerator.outputPdf('blob');
     console.log('PDF generated successfully with size:', pdf.size, 'bytes');
 
     return pdf;
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw error;
   } finally {
     // Clean up the container
     if (container.parentNode) {
