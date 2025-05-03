@@ -267,7 +267,7 @@ const SummaryEditor = () => {
             onClick={handlePreview}
             className="bg-teal-600 hover:bg-teal-700 text-white"
           >
-            Next: Preview
+            Next
           </Button>
         </div>
 
