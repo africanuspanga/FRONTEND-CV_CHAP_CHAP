@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { CVFormProvider } from "@/contexts/cv-form-context";
 import { AuthProvider } from "@/contexts/auth-context";
 import { AdminAuthProvider } from "@/contexts/admin-auth-context";
+import { CVRequestProvider } from "@/contexts/cv-request-context";
 import { ProtectedAdminRoute } from "@/components/admin/ProtectedAdminRoute";
 import SEO from "@/components/SEO";
 import StructuredData from "@/components/StructuredData";
@@ -127,14 +128,16 @@ function App() {
         <AuthProvider>
           <AdminAuthProvider>
             <CVFormProvider>
-              {/* SEO Components */}
-              <SEO />
-              <StructuredData type="website" />
-              <StructuredData type="organization" />
-              <StructuredData type="webApplication" />
-              
-              <Router />
-              <Toaster />
+              <CVRequestProvider>
+                {/* SEO Components */}
+                <SEO />
+                <StructuredData type="website" />
+                <StructuredData type="organization" />
+                <StructuredData type="webApplication" />
+                
+                <Router />
+                <Toaster />
+              </CVRequestProvider>
             </CVFormProvider>
           </AdminAuthProvider>
         </AuthProvider>

@@ -1,0 +1,322 @@
+Frontend Integration Guide: CV Chap Chap USSD Payment Flow
+Overview
+This guide explains how to integrate with CV Chap Chap's USSD payment verification flow, allowing users to select templates, make payments via USSD, verify payments by pasting confirmation messages, and download their generated CVs once verification is complete.
+
+Complete Flow
+User creates/edits CV content
+User selects a template
+User initiates payment via USSD
+User makes the payment using their mobile money
+User pastes the payment confirmation SMS on the verification page
+System processes the payment and generates the PDF
+User downloads the completed PDF
+API Endpoints
+1. Initiate USSD Payment
+Endpoint: /api/cv-pdf/{cv_id}/initiate-ussd
+Method: POST
+Authentication: Optional (works for both logged-in and anonymous users)
+Request Body:
+
+{
+  "template_id": "modern", 
+  "cv_data": {
+    "name": "John Doe",
+    "title": "Software Engineer",
+    "email": "john@example.com",
+    "phone": "+255 123 456 789",
+    "summary": "Experienced software engineer...",
+    "experience": [
+      {
+        "position": "Senior Developer",
+        "company": "Tech Solutions Ltd",
+        "duration": "2020-2023",
+        "description": "Led development team..."
+      }
+    ],
+    "education": [
+      {
+        "degree": "BSc Computer Science",
+        "school": "University of Dar es Salaam",
+        "duration": "2015-2019",
+        "description": "Graduated with honors..."
+      }
+    ],
+    "skills": ["JavaScript", "Python", "React"],
+    "languages": ["English", "Swahili"]
+  }
+}
+Response:
+
+{
+  "success": true,
+  "request_id": "7f4c2b3a-1d5e-4f9a-8c3d-6b7a9c8d0e1f",
+  "payment_page_url": "/api/cv-pdf/7f4c2b3a-1d5e-4f9a-8c3d-6b7a9c8d0e1f/payment-page"
+}
+2. USSD Payment Page
+This is an HTML page shown to the user with instructions for USSD payment.
+
+Endpoint: /api/cv-pdf/{request_id}/payment-page
+Method: GET
+Authentication: None
+Implementation Notes:
+
+This page displays the USSD code to dial (*150*00#)
+Shows the menu options the user needs to follow
+Shows the amount to pay (1000 TZS)
+Shows the Vendor ID (CVCHAPCHAP)
+Includes a button/link to the verification page
+3. Payment Verification Page
+After making payment, users paste their confirmation message on this page.
+
+Endpoint: /api/cv-pdf/{request_id}/verify
+Method: GET (for form) / POST (for submission)
+Authentication: None
+POST Request Body:
+
+payment_message: "Payment of TZS 1000 to CVCHAPCHAP confirmed. Transaction ID: ABC123XYZ. Thank you."
+Response: Redirects to status page
+
+4. Payment Status Page
+This page shows the current status of the payment and PDF generation.
+
+Endpoint: /api/cv-pdf/{request_id}/status-page
+Method: GET
+Authentication: None
+Implementation Notes:
+
+Shows current status (pending_payment, verifying_payment, generating_pdf, completed, failed)
+Displays error message if applicable
+Shows download button when completed
+Provides option to retry if failed
+5. Check Status API (For Polling)
+For frontend applications that want to poll status programmatically:
+
+Endpoint: /api/cv-pdf/{request_id}/status
+Method: GET
+Content-Type: application/json
+Authentication: Optional JWT
+Response:
+
+{
+  "status": "completed", 
+  "request_id": "7f4c2b3a-1d5e-4f9a-8c3d-6b7a9c8d0e1f",
+  "created_at": "2025-05-03T10:15:30Z",
+  "completed_at": "2025-05-03T10:18:45Z",
+  "download_url": "/api/cv-pdf/7f4c2b3a-1d5e-4f9a-8c3d-6b7a9c8d0e1f/download"
+}
+Possible Status Values:
+
+pending_payment: Waiting for user to complete payment
+verifying_payment: Verifying the payment confirmation
+generating_pdf: Payment confirmed, generating PDF
+completed: PDF generation complete
+failed: Error occurred during processing
+6. Download PDF
+Once the PDF is ready, this endpoint allows download:
+
+Endpoint: /api/cv-pdf/{request_id}/download
+Method: GET
+Authentication: Optional JWT
+Content-Type: application/pdf
+Implementation Notes:
+
+Returns the PDF directly as a downloadable file
+Includes proper Cache-Control headers for repeated downloads
+Requires matching user_id if the request was made by a logged-in user
+Code Path Explanation
+1. Payment Initiation Flow
+When a user initiates payment:
+
+Frontend calls /api/cv-pdf/{cv_id}/initiate-ussd with CV data and template ID
+Backend creates a CVRequest record with status pending_payment
+Backend returns a request ID and payment page URL
+Frontend redirects to payment page
+Key Code Path:
+
+# routes/cv_pdf.py
+@cv_pdf_bp.route('/<cv_id>/initiate-ussd', methods=['POST'])
+@optional_jwt_required
+def initiate_ussd_payment(cv_id, user_id=None):
+    """
+    Initiate USSD payment flow for a CV download
+    - Creates a CV request and redirects to payment page
+    - Supports both authenticated and anonymous users
+    """
+    try:
+        # Get CV data from request
+        data = request.json
+        template_id = data.get('template_id')
+        cv_data = data.get('cv_data')
+        
+        # Create CV request
+        cv_request = CVRequest(
+            cv_id=cv_id if cv_id != 'anonymous' else None,
+            user_id=user_id,
+            template_id=template_id,
+            cv_data=cv_data,
+            status='pending_payment'
+        )
+        db.session.add(cv_request)
+        db.session.commit()
+        
+        # Return request ID and payment page URL
+        return jsonify({
+            'success': True,
+            'request_id': str(cv_request.id),
+            'payment_page_url': url_for('cv_pdf.show_payment_page', request_id=cv_request.id, _external=True)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+2. Payment Verification Flow
+After making payment via USSD:
+
+User pastes confirmation SMS on verification page
+Backend extracts payment reference using regex patterns
+Backend updates CVRequest status to verifying_payment
+Backend initiates async task to verify payment and generate PDF
+User is redirected to status page
+Key Code Path:
+
+# routes/cv_pdf.py
+@cv_pdf_bp.route('/<request_id>/verify', methods=['GET', 'POST'])
+def verify_payment_page(request_id):
+    """
+    Page for verifying payment by pasting the confirmation message
+    """
+    try:
+        # Get the CV request
+        cv_request = CVRequest.query.get(request_id)
+        if not cv_request:
+            return jsonify({'error': 'Request not found'}), 404
+        
+        # If this is a form submission
+        if request.method == 'POST':
+            # Get the payment message
+            payment_message = request.form.get('payment_message')
+            
+            # Parse the payment message to extract the reference
+            payment_reference = parse_ussd_message(payment_message)
+            
+            # Update the request with the payment reference
+            cv_request.payment_reference = payment_reference
+            cv_request.status = 'verifying_payment'
+            db.session.commit()
+            
+            # Start Celery task to verify payment and generate PDF
+            from services.tasks import process_cv_request_task
+            task = process_cv_request_task.delay(str(request_id))
+            
+            # Redirect to the status page
+            return redirect(url_for('cv_pdf.check_status_page', request_id=request_id))
+3. PDF Generation Process
+After payment is verified:
+
+Backend attempts to verify payment with Selcom API
+If payment is valid, status changes to generating_pdf
+System generates PDF using template and CV data (with fallback mechanisms)
+PDF is stored in file system (and database for backward compatibility)
+Status is updated to completed with PDF download URL
+Key Code Path:
+
+# services/tasks.py
+@celery_app.task(bind=True, max_retries=3, retry_backoff=True)
+def process_cv_request_task(self, request_id):
+    """
+    Process a CV request - generate PDF and update status
+    """
+    from app import db
+    from models import CVRequest
+    from services.pdf import generate_pdf
+    from services.selcom_client import check_selcom_payment_status_with_client
+    
+    try:
+        # Get CV request
+        cv_request = CVRequest.query.get(request_id)
+        
+        # Verify payment reference
+        payment_result = check_selcom_payment_status_with_client(cv_request.payment_reference)
+        
+        if payment_result['success']:
+            # Update status to generating_pdf
+            cv_request.status = 'generating_pdf'
+            db.session.commit()
+            
+            # Generate PDF
+            pdf_data = generate_pdf(cv_request.cv_data, cv_request.template_id)
+            
+            # Store PDF in file storage system
+            filename = f"cv_request_{request_id}.pdf"
+            storage_result = pdf_storage.save_pdf(pdf_data, filename)
+            
+            # Update CV request with storage info
+            cv_request.pdf_storage_key = storage_result['storage_key']
+            cv_request.pdf_data = pdf_data  # For backward compatibility
+            
+            # Mark as completed
+            cv_request.status = 'completed'
+            cv_request.completed_at = datetime.utcnow()
+            db.session.commit()
+            
+            return {'status': 'completed'}
+        else:
+            # Payment verification failed
+            cv_request.status = 'failed'
+            cv_request.error = f"Payment verification failed: {payment_result['message']}"
+            db.session.commit()
+            return {'status': 'failed', 'error': payment_result['message']}
+Webhook Integration (Optional)
+For automatic payment notifications:
+
+Endpoint: /api/cv-pdf/ussd-callback
+Method: POST
+Authentication: Selcom signature verification
+This endpoint allows Selcom to notify the system when a payment has been completed, eliminating the need for manual verification by pasting SMS messages.
+
+Frontend Integration Example
+Here's how to integrate with the payment flow in a frontend application:
+
+// Step 1: Initiate USSD payment
+async function initiatePayment(cvId, templateId, cvData) {
+  const response = await fetch(`/api/cv-pdf/${cvId}/initiate-ussd`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ template_id: templateId, cv_data: cvData })
+  });
+  
+  const data = await response.json();
+  if (data.success) {
+    // Option 1: Redirect to payment page
+    window.location.href = data.payment_page_url;
+    
+    // Option 2: Open in modal/iframe
+    // showPaymentModal(data.payment_page_url);
+  }
+}
+// Step 2: Poll for status (if using programmatic approach)
+async function checkStatus(requestId) {
+  const response = await fetch(`/api/cv-pdf/${requestId}/status`);
+  const data = await response.json();
+  
+  if (data.status === 'completed') {
+    // Show download button
+    showDownloadButton(data.download_url);
+  } else if (data.status === 'failed') {
+    // Show error message
+    showError(data.error);
+  } else {
+    // Still processing, poll again after delay
+    setTimeout(() => checkStatus(requestId), 3000);
+  }
+}
+Implementation Tips
+Error Handling: Always handle network errors and timeout gracefully
+Loading States: Show appropriate loading indicators during each step
+Cache Management: Utilize the Cache-Control headers when downloading PDFs
+Responsive Design: Ensure payment and verification pages work well on mobile
+Authentication: Support both anonymous and authenticated user flows
+Security Considerations
+USSD Messages: Be careful handling user-pasted confirmation messages as they might contain sensitive information
+Request Validation: Validate the request_id parameter to prevent access to other users' PDFs
+Rate Limiting: Implement rate limiting on verification attempts to prevent abuse
+Idempotency: Ensure multiple verification attempts for the same payment don't create duplicate PDFs
+This integration guide should provide all the information needed to connect your frontend to the CV Chap Chap USSD payment flow.
