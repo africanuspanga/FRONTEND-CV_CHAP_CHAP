@@ -30,27 +30,6 @@ interface PDFOptions {
   };
 }
 
-// These are the default options, but we'll create a fresh options object
-// in the generatePDF function to avoid any shared reference issues
-const defaultPdfOptions: PDFOptions = {
-  margin: 0,
-  filename: 'cv-chap-chap.pdf',
-  image: { type: 'jpeg', quality: 0.98 },
-  html2canvas: { 
-    scale: 2, 
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: '#ffffff',
-    logging: true
-  },
-  jsPDF: { 
-    unit: 'mm', 
-    format: 'a4', 
-    orientation: 'portrait',
-    compress: true
-  }
-};
-
 /**
  * Generate a PDF from a template and CV data
  */
@@ -69,6 +48,15 @@ export async function generatePDF(templateId: string, cvData: any): Promise<Blob
   container.style.margin = '0';
   document.body.appendChild(container);
 
+  // Create an iframe to isolate content from Vite's error overlay
+  const iframe = document.createElement('iframe');
+  iframe.style.visibility = 'hidden';
+  iframe.style.position = 'absolute';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.top = '-9999px';
+  iframe.style.left = '-9999px';
+  
   try {
     console.log('Starting PDF generation for template:', templateId);
     console.log('CV Data keys:', Object.keys(cvData));
@@ -151,18 +139,63 @@ export async function generatePDF(templateId: string, cvData: any): Promise<Blob
       }
     };
     
-    const pdfGenerator = html2pdf().from(container).set(pdfOptions);
-    const pdf = await pdfGenerator.outputPdf('blob');
-    console.log('PDF generated successfully with size:', pdf.size, 'bytes');
-
-    return pdf;
+    // Get the HTML content as a string
+    const htmlContent = container.outerHTML;
+    
+    // Append the iframe to the document
+    document.body.appendChild(iframe);
+    
+    // Write the template content to the iframe
+    const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!iframeDocument) {
+      throw new Error('Could not access iframe document');
+    }
+    
+    iframeDocument.open();
+    iframeDocument.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>CV PDF Preview</title>
+          <style>
+            body {
+              margin: 0;
+              padding: 0;
+              width: 210mm;
+              height: 297mm;
+              background-color: white;
+            }
+          </style>
+        </head>
+        <body>
+          ${htmlContent}
+        </body>
+      </html>
+    `);
+    iframeDocument.close();
+    
+    // Wait for content to render
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Generate PDF from the iframe's body element
+    const pdfGenerator = html2pdf()
+      .from(iframeDocument.body)
+      .set(pdfOptions);
+    
+    const pdfBlob = await pdfGenerator.outputPdf('blob');
+    console.log('PDF generated successfully with size:', pdfBlob.size, 'bytes');
+    
+    return pdfBlob;
   } catch (error) {
     console.error('Error generating PDF:', error);
     throw error;
   } finally {
-    // Clean up the container
+    // Clean up the container and iframe
     if (container.parentNode) {
       document.body.removeChild(container);
+    }
+    if (iframe.parentNode) {
+      document.body.removeChild(iframe);
     }
   }
 }

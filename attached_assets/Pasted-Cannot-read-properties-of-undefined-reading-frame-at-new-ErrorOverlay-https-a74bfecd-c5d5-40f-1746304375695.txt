@@ -1,0 +1,20 @@
+Cannot read properties of undefined (reading 'frame')
+at new ErrorOverlay (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@vite/client:425:26)
+at DocumentCloner2.createElementClone (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14570:30)
+at DocumentCloner2.cloneNode (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14701:32)
+at DocumentCloner2.appendChildNode (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14673:40)
+at DocumentCloner2.cloneChildNodes (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14688:22)
+at DocumentCloner2.cloneNode (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14718:22)
+at DocumentCloner2.appendChildNode (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14673:40)
+at DocumentCloner2.cloneChildNodes (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14688:22)
+at DocumentCloner2.cloneNode (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14718:22)
+at new DocumentCloner2 (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/html2pdf__js.js?v=38113d6b:14491:41)
+#1 145ms Document cloned, element located at 0,76 with size 793.703125x0 using computed rendering
+#1 145ms Starting DOM parsing
+#1 146ms Starting renderer for element at 0,76 with size 794x0
+#1 146ms Canvas renderer initialized (794x0) with scale 2
+#1 148ms Finished rendering
+PDF generated successfully with size: 3077 bytes
+Creating download link for PDF
+Initiating PDF download as: AFRICANUS_PANGA.pdf
+PDF download process completed
