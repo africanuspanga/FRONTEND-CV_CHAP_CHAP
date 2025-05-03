@@ -195,59 +195,70 @@ export async function enhanceProfessionalSummary(
   skills?: any[] | null,
   tone: ToneType = 'professional'
 ): Promise<string> {
-  // Build a comprehensive context from CV data
-  const jobContext = jobTitle ? `for a ${jobTitle}` : 'for a professional';
-  const experienceContext = yearsOfExperience 
-    ? `with ${yearsOfExperience} years of experience` 
-    : 'with relevant experience';
-
-  // Process work experiences into a useful string
+  // Process work experiences into a detailed string with achievements
   let workExperienceContext = '';
   if (workExperiences && workExperiences.length > 0) {
     workExperienceContext = 'Work Experience:\n';
-    workExperiences.slice(0, 3).forEach((job, index) => {
-      workExperienceContext += `- ${job.jobTitle || 'Position'} at ${job.company || 'Company'}`;
-      if (job.achievements && job.achievements.length > 0) {
-        // Include 1-2 achievements for context
-        const achievements = job.achievements.slice(0, 2);
-        workExperienceContext += `: ${achievements.join(', ')}`;
+    workExperiences.forEach((job, index) => {
+      workExperienceContext += `${job.jobTitle || 'Position'} at ${job.company || 'Company'}`;
+      if (job.startDate || job.endDate) {
+        workExperienceContext += ` (${job.startDate || ''} - ${job.current ? 'Present' : job.endDate || ''})`;
       }
       workExperienceContext += '\n';
+      
+      // Include all available achievements for better context
+      if (job.achievements && job.achievements.length > 0) {
+        workExperienceContext += 'Key achievements:\n';
+        job.achievements.forEach((achievement: string) => {
+          workExperienceContext += `- ${achievement}\n`;
+        });
+      }
+      
+      // Add a separator between jobs
+      if (index < workExperiences.length - 1) {
+        workExperienceContext += '\n';
+      }
     });
   }
 
-  // Process education into a useful string
+  // Process education into a detailed string
   let educationContext = '';
   if (education && education.length > 0) {
     educationContext = 'Education:\n';
-    education.slice(0, 2).forEach((edu, index) => {
+    education.forEach((edu, index) => {
       educationContext += `- ${edu.degree || 'Degree'} from ${edu.institution || 'Institution'}`;
       if (edu.fieldOfStudy) {
         educationContext += ` in ${edu.fieldOfStudy}`;
+      }
+      if (edu.startDate || edu.endDate) {
+        educationContext += ` (${edu.startDate || ''} - ${edu.endDate || ''})`;
       }
       educationContext += '\n';
     });
   }
 
-  // Process skills into a useful string
+  // Process skills into a comprehensive list
   let skillsContext = '';
   if (skills && skills.length > 0) {
-    const skillNames = skills.map(skill => skill.name).filter(Boolean).slice(0, 10);
+    const skillNames = skills.map(skill => skill.name).filter(Boolean);
     if (skillNames.length > 0) {
       skillsContext = `Key Skills: ${skillNames.join(', ')}`;
     }
   }
 
-  // Build a comprehensive prompt with all the context
-  const prompt = `Professional Summary: ${currentSummary}
-Job Title: ${jobTitle || 'Not specified'}
-Experience: ${yearsOfExperience ? `${yearsOfExperience} years` : 'Not specified'}
+  // Build a comprehensive prompt with detailed instructions
+  const prompt = `Professional Title: ${jobTitle || 'Not specified'}
+Experience Level: ${yearsOfExperience ? `${yearsOfExperience} years` : 'Not specified'}
 
 ${workExperienceContext}
 ${educationContext}
 ${skillsContext}
 
-Please provide an enhanced, personalized professional summary for this person based on all the information above. Focus on their actual experiences, skills, and education to create a tailored summary. Make sure to be specific about their actual skills and experiences mentioned above.`;
+Current Summary: ${currentSummary}
+
+Please create a highly personalized professional summary that specifically references the companies, job titles, achievements, and skills mentioned above. The summary must directly mention the person's actual work experience and reflect their specific background. Make it relevant to their exact career path.
+
+Avoid generic descriptions that could apply to anyone in the field. Focus on what makes this person unique based on their specific experience at ${workExperiences && workExperiences.length > 0 ? workExperiences[0].company : 'their company'} and their specific skills like ${skills && skills.length > 0 ? skills[0].name : 'their key skills'}.`;
   
   // For debugging
   console.log('OpenAI Prompt for Summary:', prompt);

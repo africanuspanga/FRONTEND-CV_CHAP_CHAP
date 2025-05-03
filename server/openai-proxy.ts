@@ -41,6 +41,8 @@ function getSummarySystemPrompt(tone: string = 'professional') {
     - Be specific and quantify accomplishments when possible
     - DIRECTLY REFERENCE the actual companies, job titles, skills and education provided in the prompt
     - NEVER use generic descriptions - each summary must reflect the person's unique background
+    - MUST INCLUDE AT LEAST ONE SPECIFIC COMPANY NAME from their work experience
+    - MUST INCLUDE AT LEAST ONE SPECIFIC ACHIEVEMENT OR SKILL from their background
     
     FORMAT:
     - Create a single paragraph
@@ -54,8 +56,12 @@ function getSummarySystemPrompt(tone: string = 'professional') {
     EXAMPLES OF CORRECT RESPONSES (note the specific references to actual companies and skills):
     "React.js Developer with 3 years of experience at TechCorp and InnoSystems. Delivered 5+ web applications using React, Redux, and Node.js, reducing page load times by 40%. Skilled in agile methodologies with a computer science degree from University of Technology, specializing in modern JavaScript tooling and responsive design."
     
+    "Marketing Manager with 2 years at Parimatch Tanzania, driving digital campaigns that boosted online engagement by 40%. Proven expertise in cross-platform advertising, increasing lead generation by 25% and revenue by 15%. Skilled in SEO implementation, which improved website ranking and organic traffic by 35% in a single quarter."
+    
     EXAMPLES OF INCORRECT RESPONSES (generic, not personalized):
     "Dedicated software engineer with several years of experience developing scalable web applications. Proven track record of delivering high-quality code on time and mentoring junior developers. Passionate about creating intuitive user experiences and optimizing application performance."
+    
+    "Marketing professional with experience in digital strategies and campaign management. Adept at leveraging analytical skills to optimize processes and contribute to team efficiency. Eager to bring fresh perspective and commitment to excellence in forward-thinking organizations."
     
     IMPORTANT: The summary MUST be highly specific to the individual based on the information provided. Generic summaries are unacceptable.
     Respond with ONLY the enhanced professional summary paragraph, no explanations or other text.
