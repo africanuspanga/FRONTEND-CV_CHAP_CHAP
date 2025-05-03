@@ -332,6 +332,17 @@ const BackendTest = () => {
             <div>
               <h3 className="text-lg font-medium">Status: {getOverallStatus()}</h3>
               <p className="text-sm text-gray-500">Backend URL: <code className="bg-gray-100 px-1 py-0.5 rounded">{API_BASE_URL}</code></p>
+              <div className="mt-2 text-sm">
+                <span className="font-medium">Critical endpoints: </span>
+                {endpoints.filter(e => e.description?.includes('(critical)')).map((endpoint, i) => (
+                  <span key={endpoint.url} className={`inline-flex items-center mr-2 ${endpoint.status === 'success' ? 'text-green-600' : endpoint.status === 'error' ? 'text-red-600' : 'text-gray-500'}`}>
+                    {endpoint.url.split('/').slice(-1)[0]}
+                    {endpoint.status === 'success' && <Check className="ml-1 h-3 w-3" />}
+                    {endpoint.status === 'error' && <X className="ml-1 h-3 w-3" />}
+                    {i < endpoints.filter(e => e.description?.includes('(critical)')).length - 1 && ', '}
+                  </span>
+                ))}
+              </div>
             </div>
             <div className="space-x-2">
               <Button
@@ -375,9 +386,16 @@ const BackendTest = () => {
                   {getStatusBadge(endpoint.status)}
                 </div>
                 
-                <p className="text-sm text-gray-500 mb-3">
-                  <code className="bg-gray-100 px-1 py-0.5 rounded break-all">{endpoint.url}</code>
-                </p>
+                <div className="space-y-1 mb-3">
+                  <p className="text-sm text-gray-500">
+                    <code className="bg-gray-100 px-1 py-0.5 rounded break-all">{endpoint.url}</code>
+                  </p>
+                  {endpoint.description && (
+                    <p className="text-xs text-gray-600">
+                      {endpoint.description}
+                    </p>
+                  )}
+                </div>
                 
                 {endpoint.message && (
                   <Alert className={endpoint.status === 'error' ? 'bg-red-50 text-red-800 border-red-200' : 'bg-green-50 text-green-800 border-green-200'}>
