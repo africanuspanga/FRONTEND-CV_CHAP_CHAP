@@ -1,8 +1,34 @@
 import React from 'react';
 import type { CVData } from '@shared/schema';
 
+// Helper function to safely render any potentially complex object
+const safeRender = (value: any): string => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  
+  if (typeof value === 'object') {
+    // If value is an object, we should not render it directly
+    // Instead, convert it to a string representation if we can
+    if ('toString' in value && typeof value.toString === 'function' && value.toString() !== '[object Object]') {
+      return value.toString();
+    }
+    
+    // Handle common fields that might be accessed
+    if ('name' in value) return value.name;
+    if ('text' in value) return value.text;
+    if ('value' in value) return value.value;
+    
+    // Return an empty string instead of trying to render an object
+    return '';
+  }
+  
+  // If it's already a primitive value, return as string
+  return String(value);
+};
+
 export function KilimanjaroTemplate({ 
-  personalInfo, 
+  personalInfo = {}, 
   workExperience = [], 
   education = [], 
   skills = [], 
@@ -107,7 +133,7 @@ export function KilimanjaroTemplate({
                   fontSize: '0.9em',
                   lineHeight: 1.4
                 }}>
-                  {skill.name}
+                  {safeRender(skill.name)}
                 </span>
               ))}
             </div>
@@ -132,7 +158,7 @@ export function KilimanjaroTemplate({
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {languages.map((language, index) => (
                   <li key={index} style={{ fontSize: '0.95em', color: '#444', marginBottom: '6px' }}>
-                    {language.name} | {language.proficiency}
+                    {safeRender(language.name)} | {safeRender(language.proficiency)}
                   </li>
                 ))}
               </ul>
@@ -158,7 +184,7 @@ export function KilimanjaroTemplate({
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {certifications.map((cert, index) => (
                   <li key={index} style={{ fontSize: '0.95em', color: '#444', marginBottom: '6px' }}>
-                    {cert.name}
+                    {safeRender(cert.name)}
                   </li>
                 ))}
               </ul>
@@ -182,7 +208,7 @@ export function KilimanjaroTemplate({
                 HOBBIES & INTERESTS
               </h3>
               <p style={{ fontSize: '0.95em', color: '#444' }}>
-                {hobbies}
+                {typeof hobbies === 'string' ? hobbies : safeRender(hobbies)}
               </p>
             </section>
           )}
@@ -240,10 +266,10 @@ export function KilimanjaroTemplate({
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', flexWrap: 'wrap' }}>
                     <div style={{ flexGrow: 1 }}>
                       <strong style={{ display: 'block', fontSize: '1.1em', color: '#222', marginBottom: '2px', fontWeight: 700 }}>
-                        {job.jobTitle}
+                        {safeRender(job.jobTitle)}
                       </strong>
                       <span style={{ display: 'block', fontSize: '0.95em', color: '#555' }}>
-                        {job.company}
+                        {safeRender(job.company)}
                       </span>
                     </div>
                     <div style={{ flexShrink: 0, textAlign: 'right', fontSize: '0.9em', color: '#666', paddingLeft: '15px' }}>
@@ -307,10 +333,10 @@ export function KilimanjaroTemplate({
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', flexWrap: 'wrap' }}>
                     <div style={{ flexGrow: 1 }}>
                       <strong style={{ display: 'block', fontSize: '1.1em', color: '#222', marginBottom: '2px', fontWeight: 700 }}>
-                        {edu.degree} {edu.fieldOfStudy ? `In ${edu.fieldOfStudy}` : ''}
+                        {safeRender(edu.degree)} {edu.fieldOfStudy ? `In ${safeRender(edu.fieldOfStudy)}` : ''}
                       </strong>
                       <span style={{ display: 'block', fontSize: '0.95em', color: '#555' }}>
-                        {edu.institution}
+                        {safeRender(edu.institution)}
                       </span>
                       {edu.gpa && (
                         <span style={{ display: 'block', fontSize: '0.95em', color: '#555' }}>
@@ -398,19 +424,19 @@ export function KilimanjaroTemplate({
                 {references.map((reference, index) => (
                   <li key={index} style={{ marginBottom: '15px' }}>
                     <strong style={{ display: 'block', fontWeight: 700, fontSize: '1em', color: '#333' }}>
-                      {reference.name}
+                      {safeRender(reference.name)}
                     </strong>
                     <span style={{ display: 'block', fontSize: '0.95em', color: '#555' }}>
-                      {reference.position}
+                      {safeRender(reference.position)}
                     </span>
                     <span style={{ display: 'block', fontSize: '0.95em', color: '#555' }}>
-                      {reference.company}
+                      {safeRender(reference.company)}
                     </span>
                     <span style={{ display: 'block', fontSize: '0.95em', color: '#555' }}>
-                      {reference.email}
+                      {safeRender(reference.email)}
                     </span>
                     <span style={{ display: 'block', fontSize: '0.95em', color: '#555' }}>
-                      {reference.phone}
+                      {safeRender(reference.phone)}
                     </span>
                   </li>
                 ))}
