@@ -101,7 +101,7 @@ const USSDPaymentPage: React.FC = () => {
     
     // 2. Exact String Matching - Check for DRIFTMARK TECHNOLOGI (exact spelling)
     if (!trimmedMessage.includes('DRIFTMARK TECHNOLOGI')) {
-      setVerificationError('Invalid payment recipient. Please ensure this payment was made to DRIFTMARK TECHNOLOGI.');
+      setVerificationError('Invalid payment recipient. Please ensure this payment was made correctly.');
       setIsVerifying(false);
       return;
     }
@@ -122,7 +122,7 @@ const USSDPaymentPage: React.FC = () => {
     const missingTerms = requiredTerms.filter(term => !trimmedMessage.includes(term));
     
     if (missingTerms.length > 0) {
-      setVerificationError('Invalid payment message format. The message is missing required information.');
+      setVerificationError('This doesn\'t appear to be a valid payment message. Please check and try again.');
       setIsVerifying(false);
       return;
     }
@@ -131,7 +131,7 @@ const USSDPaymentPage: React.FC = () => {
     // Check for exact merchant ID
     const merchantIdRegex = /Merchant#\s*61115073/;
     if (!merchantIdRegex.test(trimmedMessage)) {
-      setVerificationError('Invalid merchant ID. Please check the payment message.');
+      setVerificationError('Invalid payment details. Please check your message and try again.');
       setIsVerifying(false);
       return;
     }
@@ -140,7 +140,7 @@ const USSDPaymentPage: React.FC = () => {
     // Match TZS 10,000.00 or TZS 10,000
     const priceRegex = /TZS\s*(10,000\.00|10,000)/;
     if (!priceRegex.test(trimmedMessage)) {
-      setVerificationError('The payment amount does not match the required amount of 10,000 TZS.');
+      setVerificationError('The payment amount appears to be incorrect. Please check and try again.');
       setIsVerifying(false);
       return;
     }
@@ -149,7 +149,7 @@ const USSDPaymentPage: React.FC = () => {
     const transIdRegex = /TransID\s+([A-Z0-9]+)/;
     const transIdMatch = trimmedMessage.match(transIdRegex);
     if (!transIdMatch || !transIdMatch[1] || transIdMatch[1].length < 8) {
-      setVerificationError('Transaction ID appears to be invalid or missing.');
+      setVerificationError('Payment verification failed. Please ensure you\'ve pasted the complete message.');
       setIsVerifying(false);
       return;
     }
@@ -162,7 +162,7 @@ const USSDPaymentPage: React.FC = () => {
     if (!mPesaRegex.test(trimmedMessage) && 
         !airtelRegex.test(trimmedMessage) && 
         !tigoRegex.test(trimmedMessage)) {
-      setVerificationError('Payment channel not recognized. Please check the message.');
+      setVerificationError('Payment method not recognized. Please check your message.');
       setIsVerifying(false);
       return;
     }
@@ -172,7 +172,7 @@ const USSDPaymentPage: React.FC = () => {
     const dateRegex = /(\d{1,2}\/\d{1,2}\/\d{4})/;
     const dateMatch = trimmedMessage.match(dateRegex);
     if (!dateMatch) {
-      setVerificationError('Payment date information seems to be missing or invalid.');
+      setVerificationError('Payment verification failed. The message appears to be incomplete.');
       setIsVerifying(false);
       return;
     }
@@ -181,7 +181,7 @@ const USSDPaymentPage: React.FC = () => {
     const timeRegex = /(\d{1,2}:\d{2}(?::\d{2})?(?: [AP]M)?)/;
     const timeMatch = trimmedMessage.match(timeRegex);
     if (!timeMatch) {
-      setVerificationError('Payment time information seems to be missing or invalid.');
+      setVerificationError('Payment verification failed. The message appears to be incomplete.');
       setIsVerifying(false);
       return; 
     }
@@ -190,7 +190,7 @@ const USSDPaymentPage: React.FC = () => {
     const phoneRegex = /From\s+(255\d{9})/;
     const phoneMatch = trimmedMessage.match(phoneRegex);
     if (!phoneMatch || !phoneMatch[1]) {
-      setVerificationError('Phone number appears to be invalid or missing.');
+      setVerificationError('Payment verification failed. Required information is missing.');
       setIsVerifying(false);
       return;
     }
@@ -199,7 +199,7 @@ const USSDPaymentPage: React.FC = () => {
     const refRegex = /Ref\s+(\d+)/;
     const refMatch = trimmedMessage.match(refRegex);
     if (!refMatch || !refMatch[1]) {
-      setVerificationError('Reference number appears to be invalid or missing.');
+      setVerificationError('Payment verification failed. Required information is missing.');
       setIsVerifying(false);
       return;
     }
@@ -250,7 +250,7 @@ const USSDPaymentPage: React.FC = () => {
     if (!fullMpesaPattern.test(formattedMsg) && 
         !fullAirtelPattern.test(formattedMsg) && 
         !fullTigoPattern.test(formattedMsg)) {
-      setVerificationError('The payment message format does not match the expected Selcom format.');
+      setVerificationError('We could not verify your payment. Please ensure you\'ve pasted the correct message.');
       setIsVerifying(false);
       return;
     }
