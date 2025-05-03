@@ -90,7 +90,7 @@ const USSDPaymentPage: React.FC = () => {
       return;
     }
     
-    if (trimmedMessage.length > 160) {
+    if (trimmedMessage.length > 180) {
       setVerificationError('The message is too long. Please paste only the Selcom payment message.');
       setIsVerifying(false);
       return;
@@ -322,11 +322,14 @@ const USSDPaymentPage: React.FC = () => {
                 value={paymentMessage}
                 onChange={(e) => setPaymentMessage(e.target.value)}
                 className="h-32 mb-2"
-                maxLength={160}
+                maxLength={200}
               />
-              <p className="text-xs text-gray-500 text-right">
-                {paymentMessage.length}/160 characters
-              </p>
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>Expected characters: 150-160</span>
+                <span className={paymentMessage.length < 150 ? "text-amber-500" : paymentMessage.length > 180 ? "text-red-500" : "text-green-500"}>
+                  {paymentMessage.length}/200 characters
+                </span>
+              </div>
             </div>
             
             {verificationError && (
