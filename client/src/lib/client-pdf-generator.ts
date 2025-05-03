@@ -10,9 +10,29 @@ import { CVData } from '@shared/schema';
 import React from 'react';
 
 // Configuration options for PDF generation
+// Define types for our PDF options to avoid TypeScript errors
+interface PDFOptions {
+  margin: number;
+  filename: string;
+  image: { type: string; quality: number };
+  html2canvas: { 
+    scale: number; 
+    useCORS: boolean;
+    allowTaint: boolean;
+    backgroundColor: string;
+    logging: boolean;
+  };
+  jsPDF: { 
+    unit: string; 
+    format: string; 
+    orientation: 'portrait' | 'landscape';
+    compress: boolean;
+  };
+}
+
 // These are the default options, but we'll create a fresh options object
 // in the generatePDF function to avoid any shared reference issues
-const defaultPdfOptions = {
+const defaultPdfOptions: PDFOptions = {
   margin: 0,
   filename: 'cv-chap-chap.pdf',
   image: { type: 'jpeg', quality: 0.98 },
@@ -112,7 +132,7 @@ export async function generatePDF(templateId: string, cvData: any): Promise<Blob
 
     // Generate the PDF with additional debugging
     console.log('Generating PDF from rendered template...');
-    const pdfOptions = {
+    const pdfOptions: PDFOptions = {
       margin: 0,
       filename: 'cv-chap-chap.pdf',
       image: { type: 'jpeg', quality: 0.98 },
