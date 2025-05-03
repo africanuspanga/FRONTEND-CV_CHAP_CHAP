@@ -280,7 +280,7 @@ const USSDPaymentPage: React.FC = () => {
       </div>
       
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold mb-4 text-center">PAY TO: DRIFTMARK TECHNOLOGIES LIMITED</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center text-primary">PAY TO: DRIFTMARK TECHNOLOGIES LIMITED</h2>
         
         <p className="text-center mb-6 text-lg">
           Please complete payment to Download your CV
@@ -288,9 +288,9 @@ const USSDPaymentPage: React.FC = () => {
         
         <div className="p-4 mb-6 mx-auto max-w-md">
           <ol className="list-decimal space-y-4 text-lg font-medium pl-8">
-            <li>DIAL *150*50*1#</li>
-            <li>ENTER 61115073</li>
-            <li>PAY TZS 10,000</li>
+            <li>DIAL <span className="font-bold">*150*50*1#</span></li>
+            <li>ENTER <span className="font-bold">61115073</span></li>
+            <li>PAY TZS <span className="font-bold">10,000</span></li>
           </ol>
         </div>
         
@@ -314,7 +314,7 @@ const USSDPaymentPage: React.FC = () => {
             <div className="mb-4">
               <p className="mb-2 font-medium">Paste your payment confirmation message below:</p>
               <p className="text-sm text-gray-500 mb-4">
-                After payment, you'll receive an SMS confirmation. Copy and paste the entire message here.
+                After payment, you'll receive an SMS confirmation from <span className="font-bold text-primary">Selcom</span>. Copy and paste the entire message here.
               </p>
               
               <Textarea 

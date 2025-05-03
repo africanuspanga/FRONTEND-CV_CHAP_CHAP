@@ -1,0 +1,76 @@
+Technical Implementation of CV Download Flow - Technical Overview
+Architecture and Data Flow
+I've implemented a comprehensive payment-to-download flow using a stateful approach centered around the CVRequest model. Here's the technical breakdown:
+
+Core Model Structure
+CVRequest: Serves as the state container through the entire payment verification flow:
+Contains the status field that transitions through states: pending_payment → verifying_payment → generating_pdf → completed
+Stores payment_reference extracted from USSD messages
+Contains a binary pdf_data field to store the generated document
+Links to both User (if authenticated) and CV models
+Tracks errors and timestamps for all stages
+Implementation Details
+State Management Pipeline
+When a user initiates payment, we:
+
+Create a CVRequest record in pending_payment state
+Generate a unique request ID (UUID) for tracking
+Associate with the CV and user (if authenticated) or store anonymous_id
+Redirect to the USSD payment instructions with proper merchant details
+After user completes payment on phone:
+
+They paste the confirmation SMS into the verification form
+Our regex-based parser (parse_ussd_message()) extracts payment reference numbers
+The CVRequest transitions to verifying_payment state
+We launch an asynchronous Celery task (process_cv_request_task) to handle verification
+The verification and PDF generation process:
+
+The Celery task takes the request_id and processes it asynchronously
+It uses the reference number to verify payment (stub implementation for now)
+On successful verification:
+It calls generate_pdf() to create the PDF with appropriate template
+Stores binary PDF data directly in the CVRequest.pdf_data field
+Marks the CV.is_paid field as true
+Sets status to completed and records timestamp
+CV Download Mechanism:
+
+The download_pdf endpoint serves the binary data from CVRequest.pdf_data
+This uses Flask's send_file() with an in-memory BytesIO buffer
+The PDF is served with proper MIME type and downloadable filename
+Increments the CV.download_count for analytics
+Key Technical Components
+Stateful Polling/Status Tracking:
+
+Client-side polling via status page auto-refresh (5-second intervals)
+Status tracking via check_status endpoints (both HTML and JSON)
+Clean status transitions with appropriate error handling
+Asynchronous Processing:
+
+Celery-based task queue to handle payment verification and PDF generation
+Task retries with exponential backoff (3 retries max)
+Status tracking and error logging throughout the process
+Payment Reference Extraction:
+
+Multi-pattern regex matching to handle different mobile money providers (Vodacom, Tigo, Airtel)
+Fallback extraction logic for non-standard confirmation formats
+Pattern matching for common references like "Transaction ID:", "Reference:", etc.
+Security Implementation:
+
+Optional JWT authentication allowing both logged-in and anonymous users
+Custom optional_jwt_required decorator for hybrid authorization
+Proper access control on CVRequest objects
+Error Handling:
+
+Explicit error tracking in CVRequest.error field
+Client-facing error messages on verification and status pages
+Comprehensive server-side logging with proper levels
+Alignment Questions
+Is the stateful approach with the CVRequest model aligned with your architecture vision?
+
+Does the direct storage of binary PDF data in the database work for your use case, or would you prefer file system storage?
+
+The implementation supports both authenticated and anonymous users - is that consistent with your requirements?
+
+Current implementation focuses on manual USSD verification - do you also need direct Selcom API callbacks for verification?
+
+We've implemented a simple regex-based parser for USSD messages - do you need more sophisticated extraction for specific mobile providers?
