@@ -2,7 +2,7 @@ import React from 'react';
 import { CVData } from '@shared/schema';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { generateAndDownloadPDF } from '@/lib/client-pdf-generator';
+import { generateAndDownloadPDF } from '@/lib/html2pdf-generator';
 import { getAllTemplates } from '@/lib/templates-registry';
 import ClientSideTemplateRenderer from './ClientSideTemplateRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';

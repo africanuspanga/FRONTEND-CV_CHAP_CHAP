@@ -177,12 +177,47 @@ export async function generatePDF(templateId: string, cvData: any): Promise<Blob
     // Wait for content to render
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Generate PDF from the iframe's body element
-    const pdfGenerator = html2pdf()
-      .from(iframeDocument.body)
-      .set(pdfOptions);
+    // Generate PDF from the iframe's body element directly with promise pattern
+    console.log('Using direct PDF generation with promise');
     
-    const pdfBlob = await pdfGenerator.outputPdf('blob');
+    // Use a more direct approach with promise
+    const pdfBlob = await new Promise<Blob>((resolve, reject) => {
+      try {
+        // Initialize options again to ensure it's clean
+        const worker = html2pdf()
+          .from(iframeDocument.body)
+          .set({
+            margin: 0,
+            filename: 'cv-chap-chap.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+              scale: 2, 
+              useCORS: true,
+              allowTaint: true,
+              backgroundColor: '#ffffff',
+              logging: true
+            },
+            jsPDF: { 
+              unit: 'mm', 
+              format: 'a4', 
+              orientation: 'portrait',
+              compress: true
+            }
+          });
+
+        // Output as blob
+        worker.output('blob').then((blob: Blob) => {
+          console.log('Worker generated PDF with size:', blob.size);
+          resolve(blob);
+        }).catch((err: any) => {
+          console.error('Worker error:', err);
+          reject(err);
+        });
+      } catch (err) {
+        console.error('Setup error:', err);
+        reject(err);
+      }
+    });
     console.log('PDF generated successfully with size:', pdfBlob.size, 'bytes');
     
     return pdfBlob;
