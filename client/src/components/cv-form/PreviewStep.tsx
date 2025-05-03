@@ -171,15 +171,21 @@ const PreviewStep: React.FC = () => {
               </Button>
             </div>
             
-            {/* Download Button */}
-            <Button 
-              onClick={handleDownloadPDF}
-              disabled={isGeneratingPDF}
-              className="w-full py-6 text-lg"
-            >
-              <Download className="mr-2 h-5 w-5" />
-              {isGeneratingPDF ? "Generating PDF..." : "Download as PDF"}
-            </Button>
+            {/* Download Buttons */}
+            <div className="space-y-3">
+              <Button 
+                onClick={handleDownloadPDF}
+                disabled={isGeneratingPDF}
+                className="w-full py-6 text-lg"
+              >
+                <Download className="mr-2 h-5 w-5" />
+                {isGeneratingPDF ? "Generating PDF..." : "Download as PDF"}
+              </Button>
+              
+              <div className="flex justify-center">
+                <PDFTestButton className="text-xs" />
+              </div>
+            </div>
             
             {/* CV Preview Card (only shown on mobile in this tab) */}
             <div className="block md:hidden">
