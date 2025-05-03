@@ -26,7 +26,7 @@ const USSDPaymentPage: React.FC = () => {
       // Pass required data to PDF generator with explicit type conversions
       const cvData: any = {
         personalInfo: formData.personalInfo || {},
-        professionalSummary: formData.professionalSummary || "",
+        // The professional summary is stored in personalInfo.summary
         workExperiences: formData.workExperiences || [],
         education: formData.education || [],
         skills: formData.skills || [],
