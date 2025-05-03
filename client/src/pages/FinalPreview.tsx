@@ -61,13 +61,37 @@ const FinalPreview = () => {
       } else {
         // Error message is handled in the initiatePayment function
         setIsDownloading(false);
+        
+        // Fallback option if API connection fails
+        toast({
+          title: "Connection Issue",
+          description: "Would you like to proceed with manual payment verification anyway?",
+          action: (
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/ussd-payment')}
+              className="bg-primary text-white hover:bg-primary/90"
+            >
+              Proceed
+            </Button>
+          ),
+        });
       }
     } catch (error) {
       console.error("Error initiating payment:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to initiate payment",
-        variant: "destructive"
+        variant: "destructive",
+        action: (
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/ussd-payment')}
+            className="bg-primary text-white hover:bg-primary/90"
+          >
+            Try Anyway
+          </Button>
+        ),
       });
       setIsDownloading(false);
     }
