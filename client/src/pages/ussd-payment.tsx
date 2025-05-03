@@ -43,88 +43,187 @@ const USSDPaymentPage: React.FC = () => {
     setIsVerifying(true);
     setVerificationError('');
     
-    // Validate the payment message
-    if (!paymentMessage || paymentMessage.trim().length < 40) {
-      setVerificationError('Please paste the complete payment confirmation message');
+    // 1. Character Length Validation
+    const trimmedMessage = paymentMessage.trim();
+    if (!trimmedMessage) {
+      setVerificationError('Please paste the payment confirmation message');
       setIsVerifying(false);
       return;
     }
     
-    // Normalize the message (remove extra spaces, make case insensitive comparison)
-    const normalizedMessage = paymentMessage.trim().toLowerCase();
+    if (trimmedMessage.length < 150) {
+      setVerificationError('The payment message is too short. Please paste the complete Selcom message.');
+      setIsVerifying(false);
+      return;
+    }
     
+    if (trimmedMessage.length > 160) {
+      setVerificationError('The message is too long. Please paste only the Selcom payment message.');
+      setIsVerifying(false);
+      return;
+    }
+    
+    // Make a normalized version for case-insensitive checks
+    const normalizedMessage = trimmedMessage.toLowerCase();
+    
+    // 2. Exact String Matching - Check for DRIFTMARK TECHNOLOGI (exact spelling)
+    if (!trimmedMessage.includes('DRIFTMARK TECHNOLOGI')) {
+      setVerificationError('Invalid payment recipient. Please ensure this payment was made to DRIFTMARK TECHNOLOGI.');
+      setIsVerifying(false);
+      return;
+    }
+    
+    // 3. Format Structure Verification
     // Check for key components in the message - these are essential parts of a Selcom message
     const requiredTerms = [
-      'selcom pay',
-      'driftmark',
-      'merchant',
-      '61115073', // Your specific merchant ID
-      'tzs',
-      'transid',
-      'channel'
+      'Selcom Pay',
+      'Merchant#',
+      '61115073',
+      'TZS',
+      'TransID',
+      'Ref',
+      'Channel',
+      'From'
     ];
     
-    const missingTerms = requiredTerms.filter(term => 
-      !normalizedMessage.includes(term.toLowerCase())
-    );
+    const missingTerms = requiredTerms.filter(term => !trimmedMessage.includes(term));
     
     if (missingTerms.length > 0) {
-      setVerificationError('Invalid payment message. The message is missing required information.');
+      setVerificationError('Invalid payment message format. The message is missing required information.');
       setIsVerifying(false);
       return;
     }
     
-    // Price validation - should be 10,000 TZS
-    // Match different formats: "TZS 10,000.00" or "10,000" or "10000"
-    const priceRegex = /(tzs\s*10[\s,.]*000|10[\s,.]*000)/i;
-    if (!priceRegex.test(normalizedMessage)) {
+    // 4. Strict Numeric Format Validation
+    // Check for exact merchant ID
+    const merchantIdRegex = /Merchant#\s*61115073/;
+    if (!merchantIdRegex.test(trimmedMessage)) {
+      setVerificationError('Invalid merchant ID. Please check the payment message.');
+      setIsVerifying(false);
+      return;
+    }
+    
+    // Price validation - exact format for 10,000 TZS
+    // Match TZS 10,000.00 or TZS 10,000
+    const priceRegex = /TZS\s*(10,000\.00|10,000)/;
+    if (!priceRegex.test(trimmedMessage)) {
       setVerificationError('The payment amount does not match the required amount of 10,000 TZS.');
       setIsVerifying(false);
       return;
     }
     
-    // TransID validation - should be alphanumeric
-    const transIdRegex = /transid\s*([a-z0-9]+)/i;
-    const transIdMatch = normalizedMessage.match(transIdRegex);
-    if (!transIdMatch || !transIdMatch[1] || transIdMatch[1].length < 4) {
+    // 5. Transaction ID Format Check
+    const transIdRegex = /TransID\s+([A-Z0-9]+)/;
+    const transIdMatch = trimmedMessage.match(transIdRegex);
+    if (!transIdMatch || !transIdMatch[1] || transIdMatch[1].length < 8) {
       setVerificationError('Transaction ID appears to be invalid or missing.');
       setIsVerifying(false);
       return;
     }
     
-    // Date validation - check if the message contains a recent date
-    // This is a simple check to ensure the date string exists
-    const dateRegex = /\d{1,2}\/\d{1,2}\/\d{4}/;
-    const timeRegex = /\d{1,2}:\d{1,2}:\d{1,2}|\d{1,2}:\d{1,2}/;
-    if (!dateRegex.test(normalizedMessage) && !timeRegex.test(normalizedMessage)) {
+    // 6. Channel Verification - Check for specific payment channels
+    const mPesaRegex = /Channel\s+Vodacom\s+M-pesa/i;
+    const airtelRegex = /Channel\s+Airtel\s+Money/i;
+    const tigoRegex = /Channel\s+(Tigo\s+Pesa|Mixx|Yas)/i;
+    
+    if (!mPesaRegex.test(trimmedMessage) && 
+        !airtelRegex.test(trimmedMessage) && 
+        !tigoRegex.test(trimmedMessage)) {
+      setVerificationError('Payment channel not recognized. Please check the message.');
+      setIsVerifying(false);
+      return;
+    }
+    
+    // 7. Timestamp Validation - Date format and recency
+    // Match date format DD/MM/YYYY
+    const dateRegex = /(\d{1,2}\/\d{1,2}\/\d{4})/;
+    const dateMatch = trimmedMessage.match(dateRegex);
+    if (!dateMatch) {
       setVerificationError('Payment date information seems to be missing or invalid.');
       setIsVerifying(false);
       return;
     }
     
-    // Additional validation for expected payment channels
-    const validChannels = ['vodacom', 'm-pesa', 'airtel', 'money', 'tigo', 'mixx', 'yas'];
-    const hasValidChannel = validChannels.some(channel => 
-      normalizedMessage.includes(channel.toLowerCase())
-    );
+    // Check for time format HH:MM:SS or HH:MM (AM/PM optional)
+    const timeRegex = /(\d{1,2}:\d{2}(?::\d{2})?(?: [AP]M)?)/;
+    const timeMatch = trimmedMessage.match(timeRegex);
+    if (!timeMatch) {
+      setVerificationError('Payment time information seems to be missing or invalid.');
+      setIsVerifying(false);
+      return; 
+    }
     
-    if (!hasValidChannel) {
-      setVerificationError('Payment channel not recognized. Please check the message.');
+    // 9. Phone Number Validation
+    const phoneRegex = /From\s+(255\d{9})/;
+    const phoneMatch = trimmedMessage.match(phoneRegex);
+    if (!phoneMatch || !phoneMatch[1]) {
+      setVerificationError('Phone number appears to be invalid or missing.');
       setIsVerifying(false);
       return;
     }
-
-    // For demo purposes, simulate server verification with a delay
-    setTimeout(() => {
-      // In production, this would be a call to your backend API to verify the transaction
-      // const response = await fetch('/api/verify-transaction', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ transactionMessage: paymentMessage })
-      // });
-      // const data = await response.json();
-      // if (data.verified) { ... }
-      
+    
+    // 10. Reference Number Validation
+    const refRegex = /Ref\s+(\d+)/;
+    const refMatch = trimmedMessage.match(refRegex);
+    if (!refMatch || !refMatch[1]) {
+      setVerificationError('Reference number appears to be invalid or missing.');
+      setIsVerifying(false);
+      return;
+    }
+    
+    // 8. Full Regex Pattern Matching - Create a more comprehensive check
+    // This combines all the checks above in one regex pattern
+    // The pattern varies slightly between different mobile money providers
+    const fullMpesaPattern = new RegExp(
+      'Selcom Pay\\s*[\\r\\n]+' +
+      'DRIFTMARK TECHNOLOGI\\s*[\\r\\n]+' +
+      'Merchant#\\s*61115073\\s*[\\r\\n]+' +
+      'TZS\\s*(10,000\\.00|10,000)\\s*[\\r\\n]+' +
+      'TransID\\s+[A-Z0-9]+\\s*[\\r\\n]+' +
+      'Ref\\s+\\d+\\s*[\\r\\n]+' +
+      'Channel\\s+Vodacom\\s+M-pesa\\s*[\\r\\n]+' +
+      'From\\s+255\\d{9}\\s*[\\r\\n]+' +
+      '\\d{1,2}/\\d{1,2}/\\d{4}\\s+\\d{1,2}:\\d{2}(?::\\d{2})?(?:\\s+[AP]M)?'
+    );
+    
+    const fullAirtelPattern = new RegExp(
+      'Selcom Pay\\s*[\\r\\n]+' +
+      'DRIFTMARK TECHNOLOGI\\s*[\\r\\n]+' +
+      'Merchant#\\s*61115073\\s*[\\r\\n]+' +
+      'TZS\\s*(10,000\\.00|10,000)\\s*[\\r\\n]+' +
+      'TransID\\s+\\d+\\s*[\\r\\n]+' +
+      'Ref\\s+\\d+\\s*[\\r\\n]+' +
+      'Channel\\s+Airtel\\s+Money\\s*[\\r\\n]+' +
+      'From\\s+255\\d{9}\\s*[\\r\\n]+' +
+      '\\d{1,2}/\\d{1,2}/\\d{4}\\s+\\d{1,2}:\\d{2}(?::\\d{2})?(?:\\s+[AP]M)?'
+    );
+    
+    const fullTigoPattern = new RegExp(
+      'Selcom Pay\\s*[\\r\\n]+' +
+      'DRIFTMARK TECHNOLOGI\\s*[\\r\\n]+' +
+      'Merchant#\\s*61115073\\s*[\\r\\n]+' +
+      'TZS\\s*(10,000\\.00|10,000)\\s*[\\r\\n]+' +
+      'TransID\\s+[A-Z0-9]+\\s*[\\r\\n]+' +
+      'Ref\\s+\\d+\\s*[\\r\\n]+' +
+      'Channel\\s+(Tigo\\s+Pesa|Mixx|Yas)\\s*[\\r\\n]+' +
+      'From\\s+255\\d{9}\\s*[\\r\\n]+' +
+      '\\d{1,2}/\\d{1,2}/\\d{4}\\s+\\d{1,2}:\\d{2}(?::\\d{2})?(?:\\s+[AP]M)?'
+    );
+    
+    // For testing/development, replace line breaks with newline char for regex testing
+    const formattedMsg = trimmedMessage.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    
+    // Check against full patterns - at least one must match
+    if (!fullMpesaPattern.test(formattedMsg) && 
+        !fullAirtelPattern.test(formattedMsg) && 
+        !fullTigoPattern.test(formattedMsg)) {
+      setVerificationError('The payment message format does not match the expected Selcom format.');
+      setIsVerifying(false);
+      return;
+    }
+    
+    // All validations passed, simulate verification
+    setTimeout(() => {      
       setIsVerifying(false);
       setIsPaymentVerified(true);
       toast({
