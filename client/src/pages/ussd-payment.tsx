@@ -1,68 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'wouter';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Download, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, Download, CheckCircle2, XCircle, Loader2, RefreshCw } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
+import { useCVRequest } from '@/contexts/cv-request-context';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { generateAndDownloadPDF } from '@/lib/client-pdf-generator';
 
 const USSDPaymentPage: React.FC = () => {
   const [paymentMessage, setPaymentMessage] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
-  const [isPaymentVerified, setIsPaymentVerified] = useState(false);
   const [verificationError, setVerificationError] = useState('');
   const [, navigate] = useLocation();
   const { formData } = useCVForm();
   const { toast } = useToast();
   
+  // CV Request context for handling backend API interactions
+  const { 
+    initiatePayment, 
+    verifyPayment: verifyPaymentAPI, 
+    downloadPDF,
+    isLoading, 
+    paymentStatus, 
+    requestId,
+    error: requestError
+  } = useCVRequest();
+  
+  // Check if payment is verified based on payment status
+  const isPaymentVerified = paymentStatus?.status === 'completed';
+  const isPending = paymentStatus?.status === 'verifying_payment' || paymentStatus?.status === 'generating_pdf';
+  
+  // Initialize payment request if not already done
+  useEffect(() => {
+    const initializePayment = async () => {
+      if (!requestId && formData.templateId) {
+        // Clone the formData to avoid modifying the original and ensure all required properties exist
+        const cvData = JSON.parse(JSON.stringify(formData));
+        
+        cvData.personalInfo = cvData.personalInfo || {};
+        cvData.workExperiences = cvData.workExperiences || [];
+        cvData.education = cvData.education || [];
+        cvData.skills = cvData.skills || [];
+        cvData.certifications = cvData.certifications || [];
+        cvData.languages = cvData.languages || [];
+        cvData.accomplishments = cvData.accomplishments || [];
+        cvData.projects = cvData.projects || [];
+        cvData.hobbies = Array.isArray(cvData.hobbies) ? cvData.hobbies : [];
+        cvData.references = cvData.references || [];
+        
+        // Make sure templateId is included
+        if (!cvData.templateId) {
+          cvData.templateId = formData.templateId;
+        }
+        
+        console.log('Initiating payment with template ID:', formData.templateId);
+        await initiatePayment(formData.templateId, cvData);
+      }
+    };
+    
+    initializePayment();
+  }, [requestId, formData, initiatePayment]);
+  
+  // Handle navigation back to preview
   const handleGoBack = () => {
     navigate('/cv/' + formData.templateId + '/final-preview');
   };
 
+  // Handle CV download
   const handleDownload = async () => {
     try {
-      // Pass required data to PDF generator with explicit type conversions
-      // Important: We need to pass the complete formData to maintain template ID and other params
-      // Just ensure all required properties are present and non-null
+      const pdfBlob = await downloadPDF();
       
-      // Clone the formData to avoid modifying the original
-      const cvData = JSON.parse(JSON.stringify(formData));
-      
-      // Ensure all required properties exist
-      cvData.personalInfo = cvData.personalInfo || {};
-      cvData.workExperiences = cvData.workExperiences || [];
-      cvData.education = cvData.education || [];
-      cvData.skills = cvData.skills || [];
-      cvData.certifications = cvData.certifications || [];
-      cvData.languages = cvData.languages || [];
-      cvData.accomplishments = cvData.accomplishments || [];
-      cvData.projects = cvData.projects || [];
-      cvData.hobbies = Array.isArray(cvData.hobbies) ? cvData.hobbies : [];
-      cvData.references = cvData.references || [];
-      
-      // Make sure templateId is included
-      if (!cvData.templateId) {
-        cvData.templateId = formData.templateId;
+      if (pdfBlob) {
+        // Create a download link and trigger download
+        const url = URL.createObjectURL(pdfBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${formData.personalInfo?.firstName || 'CV'}_${formData.personalInfo?.lastName || 'ChapChap'}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        toast({
+          title: "Success!",
+          description: "Your CV has been downloaded successfully.",
+        });
+      } else {
+        throw new Error('Failed to download PDF');
       }
-      
-      console.log('Generating PDF with template ID:', formData.templateId);
-      console.log('CV Data structure:', Object.keys(cvData));
-
-      // Use the client-side PDF generator with explicit filename
-      await generateAndDownloadPDF(
-        formData.templateId, 
-        cvData, 
-        `${formData.personalInfo?.firstName || 'CV'}_${formData.personalInfo?.lastName || 'ChapChap'}.pdf`
-      );
-      
-      toast({
-        title: "Success!",
-        description: "Your CV has been downloaded successfully.",
-      });
     } catch (error) {
-      console.error('PDF export error:', error);
+      console.error('PDF download error:', error);
       toast({
         title: "Error",
         description: "There was a problem downloading your CV. Please try again.",
@@ -71,12 +100,13 @@ const USSDPaymentPage: React.FC = () => {
     }
   };
 
-  const verifyPayment = () => {
+  // Handle payment verification with backend API
+  const handleVerifyPayment = async () => {
     // Reset states
     setIsVerifying(true);
     setVerificationError('');
     
-    // 1. Character Length Validation
+    // Check if there is a payment message
     const trimmedMessage = paymentMessage.trim();
     if (!trimmedMessage) {
       setVerificationError('Please paste the payment confirmation message');
@@ -84,6 +114,7 @@ const USSDPaymentPage: React.FC = () => {
       return;
     }
     
+    // Basic validation for message length
     if (trimmedMessage.length < 150) {
       setVerificationError('The payment message is too short. Please paste the complete Selcom message.');
       setIsVerifying(false);
@@ -96,18 +127,20 @@ const USSDPaymentPage: React.FC = () => {
       return;
     }
     
+    // Perform frontend validation first as a security measure
+    // The backend will do its own validation as well
+    
     // Make a normalized version for case-insensitive checks
     const normalizedMessage = trimmedMessage.toLowerCase();
     
-    // 2. Exact String Matching - Check for DRIFTMARK TECHNOLOGI (exact spelling)
+    // 1. Exact String Matching - Check for DRIFTMARK TECHNOLOGI (exact spelling)
     if (!trimmedMessage.includes('DRIFTMARK TECHNOLOGI')) {
       setVerificationError('Invalid payment recipient. Please ensure this payment was made correctly.');
       setIsVerifying(false);
       return;
     }
     
-    // 3. Format Structure Verification
-    // Check for key components in the message - these are essential parts of a Selcom message
+    // 2. Format Structure Verification
     const requiredTerms = [
       'Selcom Pay',
       'Merchant#',
@@ -127,143 +160,19 @@ const USSDPaymentPage: React.FC = () => {
       return;
     }
     
-    // 4. Strict Numeric Format Validation
-    // Check for exact merchant ID
-    const merchantIdRegex = /Merchant#\s*61115073/;
-    if (!merchantIdRegex.test(trimmedMessage)) {
-      setVerificationError('Invalid payment details. Please check your message and try again.');
+    // All validations passed, send to API for verification
+    try {
+      const success = await verifyPaymentAPI(trimmedMessage);
+      
+      if (!success) {
+        setVerificationError(requestError || 'Payment verification failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      setVerificationError('An error occurred during verification. Please try again.');
+    } finally {
       setIsVerifying(false);
-      return;
     }
-    
-    // Price validation - exact format for 10,000 TZS
-    // Match TZS 10,000.00 or TZS 10,000
-    const priceRegex = /TZS\s*(10,000\.00|10,000)/;
-    if (!priceRegex.test(trimmedMessage)) {
-      setVerificationError('The payment amount appears to be incorrect. Please check and try again.');
-      setIsVerifying(false);
-      return;
-    }
-    
-    // 5. Transaction ID Format Check
-    const transIdRegex = /TransID\s+([A-Z0-9]+)/;
-    const transIdMatch = trimmedMessage.match(transIdRegex);
-    if (!transIdMatch || !transIdMatch[1] || transIdMatch[1].length < 8) {
-      setVerificationError('Payment verification failed. Please ensure you\'ve pasted the complete message.');
-      setIsVerifying(false);
-      return;
-    }
-    
-    // 6. Channel Verification - Check for specific payment channels
-    const mPesaRegex = /Channel\s+Vodacom\s+M-pesa/i;
-    const airtelRegex = /Channel\s+Airtel\s+Money/i;
-    const tigoRegex = /Channel\s+(Tigo\s+Pesa|Mixx|Yas)/i;
-    
-    if (!mPesaRegex.test(trimmedMessage) && 
-        !airtelRegex.test(trimmedMessage) && 
-        !tigoRegex.test(trimmedMessage)) {
-      setVerificationError('Payment method not recognized. Please check your message.');
-      setIsVerifying(false);
-      return;
-    }
-    
-    // 7. Timestamp Validation - Date format and recency
-    // Match date format DD/MM/YYYY
-    const dateRegex = /(\d{1,2}\/\d{1,2}\/\d{4})/;
-    const dateMatch = trimmedMessage.match(dateRegex);
-    if (!dateMatch) {
-      setVerificationError('Payment verification failed. The message appears to be incomplete.');
-      setIsVerifying(false);
-      return;
-    }
-    
-    // Check for time format HH:MM:SS or HH:MM (AM/PM optional)
-    const timeRegex = /(\d{1,2}:\d{2}(?::\d{2})?(?: [AP]M)?)/;
-    const timeMatch = trimmedMessage.match(timeRegex);
-    if (!timeMatch) {
-      setVerificationError('Payment verification failed. The message appears to be incomplete.');
-      setIsVerifying(false);
-      return; 
-    }
-    
-    // 9. Phone Number Validation
-    const phoneRegex = /From\s+(255\d{9})/;
-    const phoneMatch = trimmedMessage.match(phoneRegex);
-    if (!phoneMatch || !phoneMatch[1]) {
-      setVerificationError('Payment verification failed. Required information is missing.');
-      setIsVerifying(false);
-      return;
-    }
-    
-    // 10. Reference Number Validation
-    const refRegex = /Ref\s+(\d+)/;
-    const refMatch = trimmedMessage.match(refRegex);
-    if (!refMatch || !refMatch[1]) {
-      setVerificationError('Payment verification failed. Required information is missing.');
-      setIsVerifying(false);
-      return;
-    }
-    
-    // 8. Full Regex Pattern Matching - Create a more comprehensive check
-    // This combines all the checks above in one regex pattern
-    // The pattern varies slightly between different mobile money providers
-    const fullMpesaPattern = new RegExp(
-      'Selcom Pay\\s*[\\r\\n]+' +
-      'DRIFTMARK TECHNOLOGI\\s*[\\r\\n]+' +
-      'Merchant#\\s*61115073\\s*[\\r\\n]+' +
-      'TZS\\s*(10,000\\.00|10,000)\\s*[\\r\\n]+' +
-      'TransID\\s+[A-Z0-9]+\\s*[\\r\\n]+' +
-      'Ref\\s+\\d+\\s*[\\r\\n]+' +
-      'Channel\\s+Vodacom\\s+M-pesa\\s*[\\r\\n]+' +
-      'From\\s+255\\d{9}\\s*[\\r\\n]+' +
-      '\\d{1,2}/\\d{1,2}/\\d{4}\\s+\\d{1,2}:\\d{2}(?::\\d{2})?(?:\\s+[AP]M)?'
-    );
-    
-    const fullAirtelPattern = new RegExp(
-      'Selcom Pay\\s*[\\r\\n]+' +
-      'DRIFTMARK TECHNOLOGI\\s*[\\r\\n]+' +
-      'Merchant#\\s*61115073\\s*[\\r\\n]+' +
-      'TZS\\s*(10,000\\.00|10,000)\\s*[\\r\\n]+' +
-      'TransID\\s+\\d+\\s*[\\r\\n]+' +
-      'Ref\\s+\\d+\\s*[\\r\\n]+' +
-      'Channel\\s+Airtel\\s+Money\\s*[\\r\\n]+' +
-      'From\\s+255\\d{9}\\s*[\\r\\n]+' +
-      '\\d{1,2}/\\d{1,2}/\\d{4}\\s+\\d{1,2}:\\d{2}(?::\\d{2})?(?:\\s+[AP]M)?'
-    );
-    
-    const fullTigoPattern = new RegExp(
-      'Selcom Pay\\s*[\\r\\n]+' +
-      'DRIFTMARK TECHNOLOGI\\s*[\\r\\n]+' +
-      'Merchant#\\s*61115073\\s*[\\r\\n]+' +
-      'TZS\\s*(10,000\\.00|10,000)\\s*[\\r\\n]+' +
-      'TransID\\s+[A-Z0-9]+\\s*[\\r\\n]+' +
-      'Ref\\s+\\d+\\s*[\\r\\n]+' +
-      'Channel\\s+(Tigo\\s+Pesa|Mixx|Yas)\\s*[\\r\\n]+' +
-      'From\\s+255\\d{9}\\s*[\\r\\n]+' +
-      '\\d{1,2}/\\d{1,2}/\\d{4}\\s+\\d{1,2}:\\d{2}(?::\\d{2})?(?:\\s+[AP]M)?'
-    );
-    
-    // For testing/development, replace line breaks with newline char for regex testing
-    const formattedMsg = trimmedMessage.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    
-    // Check against full patterns - at least one must match
-    if (!fullMpesaPattern.test(formattedMsg) && 
-        !fullAirtelPattern.test(formattedMsg) && 
-        !fullTigoPattern.test(formattedMsg)) {
-      setVerificationError('We could not verify your payment. Please ensure you\'ve pasted the correct message.');
-      setIsVerifying(false);
-      return;
-    }
-    
-    // All validations passed, simulate verification
-    setTimeout(() => {      
-      setIsVerifying(false);
-      setIsPaymentVerified(true);
-      toast({
-        title: "Payment Verified",
-        description: "Your payment has been confirmed. You can now download your CV.",
-      });
-    }, 1500);
   };
 
   return (
@@ -294,6 +203,15 @@ const USSDPaymentPage: React.FC = () => {
           </ol>
         </div>
         
+        {/* Display API errors if they exist */}
+        {requestError && !isPaymentVerified && !isPending && !isVerifying && (
+          <Alert variant="destructive" className="mb-6">
+            <XCircle className="h-4 w-4 mr-2" />
+            <AlertDescription>{requestError}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Payment completed - show download button */}
         {isPaymentVerified ? (
           <div className="mb-6 text-center">
             <div className="flex items-center justify-center mb-4 text-green-600">
@@ -304,9 +222,39 @@ const USSDPaymentPage: React.FC = () => {
               onClick={handleDownload}
               className="bg-primary hover:bg-primary/90 mx-auto flex items-center gap-2"
               size="lg"
+              disabled={isLoading}
             >
-              <Download className="h-5 w-5" />
-              Download Your CV
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <Download className="h-5 w-5" />
+                  Download Your CV
+                </>
+              )}
+            </Button>
+          </div>
+        ) : isPending ? (
+          <div className="mb-6 text-center">
+            <div className="flex items-center justify-center mb-4 text-amber-600">
+              <Loader2 className="h-8 w-8 mr-2 animate-spin" />
+              <span className="font-medium text-lg">
+                {paymentStatus?.status === 'verifying_payment' 
+                  ? 'Verifying your payment...' 
+                  : 'Generating your CV...'}
+              </span>
+            </div>
+            <p className="text-gray-600 mb-4">This usually takes less than a minute. Please be patient.</p>
+            <Button
+              onClick={() => window.location.reload()}
+              variant="outline"
+              className="mx-auto"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh Status
             </Button>
           </div>
         ) : (
@@ -340,9 +288,9 @@ const USSDPaymentPage: React.FC = () => {
             )}
             
             <Button 
-              onClick={verifyPayment} 
+              onClick={handleVerifyPayment} 
               className="w-full bg-primary hover:bg-primary/90"
-              disabled={isVerifying || !paymentMessage.trim()}
+              disabled={isVerifying || !paymentMessage.trim() || isLoading || isPending}
             >
               {isVerifying ? (
                 <>

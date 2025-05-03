@@ -3,6 +3,7 @@ import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useCVForm } from '@/contexts/cv-form-context';
+import { useCVRequest } from '@/contexts/cv-request-context';
 import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
 import { getAllTemplates, getTemplateById } from '@/lib/templates-registry';
 import { X, Download, Printer, Mail, CheckCircle, ArrowLeft, Edit, RefreshCw, ChevronRight } from 'lucide-react';
@@ -17,6 +18,7 @@ const FinalPreview = () => {
   const { toast } = useToast();
   const { formData } = useCVForm();
   const { isAuthenticated } = useAuth();
+  const { resetRequest, paymentStatus } = useCVRequest();
   
   // State for template sidebar
   const [templateSidebarOpen, setTemplateSidebarOpen] = useState(!isMobile);
