@@ -40,8 +40,8 @@ const FinalPreview = () => {
   const handleDownload = () => {
     // Set downloading state to true to disable the button
     setIsDownloading(true);
-    // Redirect to payment page instead of directly downloading
-    navigate('/payment');
+    // Redirect to USSD payment page for manual payment verification
+    navigate('/ussd-payment');
   };
   
   // Handle print - disabled as requested
