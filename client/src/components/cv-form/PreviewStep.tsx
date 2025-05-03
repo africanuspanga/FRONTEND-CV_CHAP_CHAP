@@ -20,7 +20,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { getTemplateWithMetadata } from '@/lib/templates-registry';
 import { Badge } from '@/components/ui/badge';
-import { generateAndDownloadPDF } from '@/lib/html2pdf-generator';
+import { generateAndDownloadPDF } from '@/lib/direct-pdf-generator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ClientSideTemplateRenderer from '@/components/ClientSideTemplateRenderer';
 
