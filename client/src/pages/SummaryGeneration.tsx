@@ -93,17 +93,26 @@ const SummaryGeneration = () => {
         yearsOfExperience = Math.round(totalMonths / 6) / 2;
       }
       
-      // Build the user prompt
-      const prompt = `Professional Title: ${jobTitle || 'Not specified'}
+      // Build the user prompt based on exact specifications
+      const prompt = `Create a professional summary paragraph for a CV based on the following information:
+
+      Professional Title: ${jobTitle || 'Not specified'}
       Experience Level: ${yearsOfExperience ? `${yearsOfExperience} years` : 'Not specified'}
       
       ${workExperienceDetails}
       ${skillsContext}
       
-      Please create a highly personalized professional summary for my CV based on the information above. 
-      Make it specific to my experiences and skills, and avoid generic statements.
-      Directly reference my actual work experience at ${workExperiences.length > 0 ? workExperiences[0]?.company || 'my company' : 'my companies'} 
-      and my specific skills like ${skills.length > 0 ? skills[0]?.name || 'my key skills' : 'my relevant skills'}.`;
+      Requirements:
+      - One paragraph (250-400 characters)
+      - Use a professional, confident tone
+      - Focus on career achievements, skills, and value proposition
+      - Include the years of experience (${yearsOfExperience || 'not specified'})
+      - Avoid clichés, repetition, and first-person language
+      - Use present tense for current skills, past tense for past achievements
+      - Do not include a title or bullet points
+      - Directly reference experience at ${workExperiences.length > 0 ? workExperiences[0]?.company || 'most recent company' : 'previous companies'}
+      - Highlight specific skills like ${skills.length > 0 ? skills.map((s: any) => s.name).slice(0, 2).join(' and ') || 'relevant skills' : 'relevant skills'}
+      `;
       
       console.log('Generating summary with prompt:', prompt);
       
@@ -138,9 +147,14 @@ const SummaryGeneration = () => {
       const skill = formData.skills && formData.skills.length > 0 ? 
         (formData.skills[0]?.name || 'relevant areas') : 'relevant areas';
         
+      // Create a fallback summary that matches the requirements (250-400 characters, professional tone, etc.)
+      // Default professional experience
+      const yearsText = "3 years";
+        
       setGeneratedSummary(
-        `Professional ${jobTitle} with experience in ${company}. ` +
-        `Skilled in ${skill} with a focus on delivering impactful results.`
+        `${jobTitle} with ${yearsText} of experience in ${company}, demonstrating expertise in ${skill}. ` +
+        `Proven track record of delivering high-quality results through effective problem-solving and collaboration. ` +
+        `Combines technical knowledge with strategic thinking to drive operational excellence and meet business objectives.`
       );
       
       toast({
@@ -170,9 +184,11 @@ const SummaryGeneration = () => {
             formData.skills.map((s: any) => s.name).filter(Boolean) : [];
           const skillsText = skillList.length > 0 ? skillList.join(', ') : 'relevant areas';
             
+          // Create a better fallback when no OpenAI is available
           setGeneratedSummary(
-            `Professional ${jobTitle} with experience at ${company}. ` +
-            `Skilled in ${skillsText}.`
+            `${jobTitle} with extensive experience at ${company}, specializing in ${skillsText}. ` +
+            `Delivers consistent results through analytical problem-solving and attention to detail. ` +
+            `Combines industry knowledge with practical expertise to drive successful project outcomes and exceed expectations.`
           );
           setLoading(false);
         }, 1000);
