@@ -20,7 +20,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { getTemplateWithMetadata } from '@/lib/templates-registry';
 import { Badge } from '@/components/ui/badge';
-import { generatePDF } from '@/lib/pdf-generator';
+import { generateAndDownloadPDF } from '@/lib/client-pdf-generator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ClientSideTemplateRenderer from '@/components/ClientSideTemplateRenderer';
 
@@ -40,7 +40,7 @@ const PreviewStep: React.FC = () => {
   const handleDownloadPDF = async () => {
     try {
       setIsGeneratingPDF(true);
-      await generatePDF(formData, formData.templateId);
+      await generateAndDownloadPDF(formData.templateId, formData);
       toast({
         title: "PDF Generated Successfully",
         description: "Your CV has been downloaded as a PDF file."
