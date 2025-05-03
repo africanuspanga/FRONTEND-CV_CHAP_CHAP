@@ -46,31 +46,39 @@ function getSummarySystemPrompt(tone: 'professional' | 'confident' | 'friendly' 
   };
 
   return `
-    You are an expert CV writer specializing in creating impactful professional summaries.
+    You are an expert CV writer specializing in creating impactful, HIGHLY PERSONALIZED professional summaries based on provided work experiences, education history, and skills.
     
-    TASK: Transform the provided information into a polished professional summary for a CV.
+    TASK: Transform the provided information into a polished, PERSONALIZED professional summary for a CV.
     
     REQUIREMENTS:
     - Length: 250-400 characters (approximately 3-4 sentences)
     - ${toneInstructions[tone]}
-    - Focus on career achievements, expertise, and unique value proposition
+    - Focus on SPECIFIC career achievements, expertise, and unique value proposition from the person's actual work history and education
+    - Use SPECIFIC DETAILS from their work experiences, skills, and education
     - Include years of experience if mentioned
     - Avoid clichés, generalities, and first-person pronouns
     - Use present tense for current skills and past tense for achievements
     - Be specific and quantify accomplishments when possible
-    - Highlight most relevant skills for the person's industry
+    - DIRECTLY REFERENCE the actual companies, job titles, skills and education provided in the prompt
+    - NEVER use generic descriptions - each summary must reflect the person's unique background
     
     FORMAT:
     - Create a single paragraph
-    - Begin with a strong opening statement about professional identity
+    - Begin with a strong opening statement about professional identity that references their actual background
     - No bullet points
     - Do not repeat the same information
     - No title or header
+    - No introductory phrases like "Professional Summary:" or "Here is"
+    - No conversational phrases like "Certainly!" or "I'd be happy to"
     
-    EXAMPLE:
-    "Results-driven Software Engineer with 8+ years specializing in full-stack development. Expert in React.js, Node.js, and cloud infrastructure with a track record of delivering robust applications that improved client satisfaction by 35%. Passionate about clean code and mentoring junior developers to build scalable solutions."
+    EXAMPLES OF CORRECT RESPONSES (note the specific references to actual companies and skills):
+    "React.js Developer with 3 years of experience at TechCorp and InnoSystems. Delivered 5+ web applications using React, Redux, and Node.js, reducing page load times by 40%. Skilled in agile methodologies with a computer science degree from University of Technology, specializing in modern JavaScript tooling and responsive design."
     
-    Respond with ONLY the enhanced professional summary, no explanations or other text.
+    EXAMPLES OF INCORRECT RESPONSES (generic, not personalized):
+    "Dedicated software engineer with several years of experience developing scalable web applications. Proven track record of delivering high-quality code on time and mentoring junior developers. Passionate about creating intuitive user experiences and optimizing application performance."
+    
+    IMPORTANT: The summary MUST be highly specific to the individual based on the information provided. Generic summaries are unacceptable.
+    Respond with ONLY the enhanced professional summary paragraph, no explanations or other text.
   `;
 }
 
@@ -210,14 +218,49 @@ export async function generateProfessionalSummary(
     // Check rate limit
     checkRateLimit();
     
-    // Prepare context for the AI
+    // Prepare context for the AI with much more detailed information
     const professional = personalInfo.professionalTitle || '';
-    const workHistory = workExperiences.map((job: any) => 
-      `${job.jobTitle} at ${job.company}${job.startDate ? ` (${job.startDate} - ${job.current ? 'Present' : job.endDate || ''})` : ''}`
-    ).join(', ');
-    const skillsText = skills.map((skill: any) => skill.name).join(', ');
     
-    const userPrompt = `Professional title: ${professional}\n\nWork experience: ${workHistory}\n\nSkills: ${skillsText}\n\nCreate a professional summary for my CV that highlights my expertise and achievements.`;
+    // Process work experience with more detail including achievements
+    let workHistoryDetails = '';
+    if (workExperiences && workExperiences.length > 0) {
+      workHistoryDetails = workExperiences.map((job: any) => {
+        let jobDetail = `${job.jobTitle} at ${job.company}${job.startDate ? ` (${job.startDate} - ${job.current ? 'Present' : job.endDate || ''})` : ''}`;
+        
+        // Add achievements if available
+        if (job.achievements && job.achievements.length > 0) {
+          jobDetail += '\nKey achievements:';
+          job.achievements.forEach((achievement: string) => {
+            jobDetail += `\n- ${achievement}`;
+          });
+        }
+        
+        return jobDetail;
+      }).join('\n\n');
+    }
+    
+    // Process skills with categories if available
+    const skillsText = skills && skills.length > 0 ? skills.map((skill: any) => skill.name).join(', ') : '';
+    
+    // Include education if available in personalInfo
+    let educationText = '';
+    if (personalInfo.education && personalInfo.education.length > 0) {
+      educationText = personalInfo.education.map((edu: any) => 
+        `${edu.degree || 'Degree'} from ${edu.institution || 'Institution'}${edu.fieldOfStudy ? ` in ${edu.fieldOfStudy}` : ''}`
+      ).join(', ');
+    }
+    
+    // Build a comprehensive prompt with all available details
+    const userPrompt = `Professional title: ${professional}
+
+Detailed work experience:
+${workHistoryDetails}
+
+Skills: ${skillsText}
+
+Education: ${educationText}
+
+Create a professional summary for my CV that highlights my specific experiences, companies, and achievements. Make it personalized and avoid generic statements.`;
     
     // Call the OpenAI API
     const response = await openai.chat.completions.create({
