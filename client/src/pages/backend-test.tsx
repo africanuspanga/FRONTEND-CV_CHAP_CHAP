@@ -23,6 +23,18 @@ const BackendTest = () => {
     {
       url: `${API_BASE_URL}/api/cv-pdf/anonymous/initiate-ussd`,
       status: 'idle',
+    },
+    {
+      url: `${API_BASE_URL}/api/cv-pdf/sample-id/verify`,
+      status: 'idle',
+    },
+    {
+      url: `${API_BASE_URL}/api/cv-pdf/sample-id/status`,
+      status: 'idle',
+    },
+    {
+      url: `${API_BASE_URL}/api/cv-pdf/sample-id/download`,
+      status: 'idle',
     }
   ]);
 
@@ -56,8 +68,8 @@ const BackendTest = () => {
           } : e));
         }
       } 
-      // For the initiate-ussd endpoint, we'll use OPTIONS to avoid actually creating a request
-      else if (endpoint.url.includes('/initiate-ussd')) {
+      // For other endpoints, we'll use OPTIONS to avoid actually creating or modifying data
+      else {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
         
