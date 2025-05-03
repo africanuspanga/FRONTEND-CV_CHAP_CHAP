@@ -6,7 +6,7 @@ import { ArrowLeft, Download, CheckCircle2, XCircle } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { exportCvToPdf } from '@/lib/pdf-export';
+import { generateAndDownloadPDF } from '@/lib/client-pdf-generator';
 
 const USSDPaymentPage: React.FC = () => {
   const [paymentMessage, setPaymentMessage] = useState('');
@@ -23,7 +23,24 @@ const USSDPaymentPage: React.FC = () => {
 
   const handleDownload = async () => {
     try {
-      await exportCvToPdf(formData);
+      // Map formData to the expected CVData format
+      const cvData = {
+        personalInfo: formData.personalInfo,
+        professionalSummary: formData.professionalSummary,
+        workExperiences: formData.workExperiences || [],
+        education: formData.education || [],
+        skills: formData.skills || [],
+        certifications: formData.certifications || [],
+        languages: formData.languages || [],
+        achievements: formData.achievements || [],
+        projects: formData.projects || [],
+        hobbies: formData.hobbies,
+        references: formData.references || []
+      };
+
+      // Use the client-side PDF generator
+      await generateAndDownloadPDF(formData.templateId, cvData);
+      
       toast({
         title: "Success!",
         description: "Your CV has been downloaded successfully.",

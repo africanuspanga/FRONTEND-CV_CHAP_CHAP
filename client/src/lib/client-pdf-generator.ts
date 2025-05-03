@@ -11,11 +11,23 @@ import React from 'react';
 
 // Configuration options for PDF generation
 const pdfOptions = {
-  margin: 10,
+  margin: 0,
   filename: 'cv-chap-chap.pdf',
   image: { type: 'jpeg', quality: 0.98 },
-  html2canvas: { scale: 2, useCORS: true },
-  jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as 'portrait' }
+  html2canvas: { 
+    scale: 2, 
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#ffffff',
+    logging: true
+  },
+  jsPDF: { 
+    unit: 'mm', 
+    format: 'a4', 
+    orientation: 'portrait' as 'portrait',
+    compress: true,
+    hotfixes: ['px_scaling']
+  }
 };
 
 /**
@@ -24,11 +36,16 @@ const pdfOptions = {
 export async function generatePDF(templateId: string, cvData: CVData): Promise<Blob> {
   // Create a container for rendering the template
   const container = document.createElement('div');
+  // Set to A4 dimensions with proper scaling
   container.style.width = '210mm'; // A4 width
-  container.style.height = 'auto';
+  container.style.height = '297mm'; // A4 height
+  container.style.overflow = 'hidden';
   container.style.position = 'absolute';
   container.style.top = '-9999px';
   container.style.left = '-9999px';
+  container.style.backgroundColor = '#ffffff';
+  container.style.padding = '0';
+  container.style.margin = '0';
   document.body.appendChild(container);
 
   try {
