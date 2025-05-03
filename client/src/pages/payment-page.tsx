@@ -163,7 +163,7 @@ const PaymentPage: React.FC = () => {
               </div>
               
               <div className="border-t border-b border-gray-200 py-3 mb-6 text-center">
-                <p className="text-lg font-medium">Total: 5,000 TZS</p>
+                <p className="text-xl font-bold text-primary">Total: 5,000 TZS</p>
                 <p className="text-sm text-gray-500">One-time payment for CV download</p>
               </div>
 
