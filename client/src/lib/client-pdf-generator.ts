@@ -49,25 +49,46 @@ export async function generatePDF(templateId: string, cvData: CVData): Promise<B
   document.body.appendChild(container);
 
   try {
+    console.log('Starting PDF generation for template:', templateId);
+    
     // Get the template component
     const template = getTemplateByID(templateId);
     if (!template) {
+      console.error('Template not found:', templateId);
       throw new Error(`Template "${templateId}" not found`);
     }
+    console.log('Template found:', template.name);
 
     // Create a React root and render the template
     const { createRoot } = await import('react-dom/client');
     const root = createRoot(container);
     
+    // Add debugging classes to help identify the template in the DOM
+    container.className = 'pdf-container';
+    container.setAttribute('data-template-id', templateId);
+    
     // Render the template with CV data
     const TemplateComponent = template.render;
+    console.log('Rendering template component with data');
+    
     root.render(React.createElement(TemplateComponent, cvData));
+    
+    // Allow time for the template to fully render and styles to apply
+    console.log('Waiting for template to render...');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Check if anything was actually rendered
+    if (container.innerHTML.trim().length < 50) {
+      console.error('Template may have rendered empty content:', container.innerHTML);
+    } else {
+      console.log('Template rendered successfully with content length:', container.innerHTML.length);
+    }
 
-    // Wait for any images to load
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Generate the PDF
-    const pdf = await html2pdf().from(container).set(pdfOptions).outputPdf('blob');
+    // Generate the PDF with additional debugging
+    console.log('Generating PDF from rendered template...');
+    const pdfGenerator = html2pdf().from(container).set(pdfOptions);
+    const pdf = await pdfGenerator.outputPdf('blob');
+    console.log('PDF generated successfully with size:', pdf.size, 'bytes');
 
     return pdf;
   } finally {
@@ -81,26 +102,51 @@ export async function generatePDF(templateId: string, cvData: CVData): Promise<B
 /**
  * Generate and download a PDF from a template and CV data
  */
-export async function generateAndDownloadPDF(templateId: string, cvData: CVData, filename?: string): Promise<void> {
+export async function generateAndDownloadPDF(templateId: string, cvData: any, filename?: string): Promise<void> {
+  console.log('Starting PDF download process for template:', templateId);
+  console.log('PDF filename:', filename);
+  
   try {
+    // If template or data is invalid, provide a fallback
+    if (!templateId || !cvData) {
+      console.error('Invalid template ID or CV data provided');
+      throw new Error('Missing required information for PDF generation');
+    }
+
     // Generate the PDF
+    console.log('Generating PDF with template:', templateId);
     const pdf = await generatePDF(templateId, cvData);
+    
+    // Verify PDF was generated successfully
+    if (!pdf || pdf.size < 1000) {
+      console.warn('Generated PDF may be empty or too small:', pdf?.size || 0, 'bytes');
+    }
 
     // Create a download link
+    console.log('Creating download link for PDF');
     const url = URL.createObjectURL(pdf);
     const link = document.createElement('a');
     link.href = url;
-    link.download = filename || `${cvData.personalInfo?.firstName || 'cv'}-${cvData.personalInfo?.lastName || 'chap-chap'}.pdf`;
+    
+    // Set a default filename if needed
+    const defaultName = `${cvData.personalInfo?.firstName || 'cv'}-${cvData.personalInfo?.lastName || 'chap-chap'}.pdf`;
+    link.download = filename || defaultName;
     
     // Trigger the download
+    console.log('Initiating PDF download as:', link.download);
     document.body.appendChild(link);
     link.click();
     
     // Clean up
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    setTimeout(() => {
+      if (link.parentNode) {
+        document.body.removeChild(link);
+      }
+      URL.revokeObjectURL(url);
+      console.log('PDF download process completed');
+    }, 100);
   } catch (error) {
-    console.error('Error generating PDF:', error);
+    console.error('Error generating or downloading PDF:', error);
     throw error;
   }
 }

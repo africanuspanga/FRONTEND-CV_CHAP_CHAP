@@ -23,23 +23,27 @@ const USSDPaymentPage: React.FC = () => {
 
   const handleDownload = async () => {
     try {
-      // Map formData to the expected CVData format
-      const cvData = {
-        personalInfo: formData.personalInfo,
-        professionalSummary: formData.professionalSummary,
+      // Pass required data to PDF generator with explicit type conversions
+      const cvData: any = {
+        personalInfo: formData.personalInfo || {},
+        professionalSummary: formData.professionalSummary || "",
         workExperiences: formData.workExperiences || [],
         education: formData.education || [],
         skills: formData.skills || [],
         certifications: formData.certifications || [],
         languages: formData.languages || [],
-        achievements: formData.achievements || [],
+        accomplishments: formData.accomplishments || [],
         projects: formData.projects || [],
-        hobbies: formData.hobbies,
+        hobbies: Array.isArray(formData.hobbies) ? formData.hobbies : [],
         references: formData.references || []
       };
 
-      // Use the client-side PDF generator
-      await generateAndDownloadPDF(formData.templateId, cvData);
+      // Use the client-side PDF generator with explicit filename
+      await generateAndDownloadPDF(
+        formData.templateId, 
+        cvData, 
+        `${formData.personalInfo?.firstName || 'CV'}_${formData.personalInfo?.lastName || 'ChapChap'}.pdf`
+      );
       
       toast({
         title: "Success!",
