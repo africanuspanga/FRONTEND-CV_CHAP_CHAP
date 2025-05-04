@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { API_BASE_URL, transformCVDataForBackend } from '@/services/cv-api-service';
 
 interface EndpointStatus {
+  id: string;
   url: string;
   method: string;
   status: 'idle' | 'loading' | 'success' | 'error';
@@ -15,162 +16,154 @@ interface EndpointStatus {
   error?: string;
 }
 
+const sampleCVData = {
+  personalInfo: {
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john@example.com',
+    phone: '+255 123 456 789',
+    professionalTitle: 'Software Developer',
+    summary: 'Experienced software developer with 5 years of experience.'
+  },
+  workExperiences: [
+    {
+      id: '1',
+      jobTitle: 'Senior Developer',
+      company: 'Tech Solutions Ltd',
+      location: 'Dar es Salaam',
+      startDate: '2020-01',
+      endDate: '2023-01',
+      description: 'Led development team on multiple projects.'
+    }
+  ],
+  education: [
+    {
+      id: '1',
+      institution: 'University of Dar es Salaam',
+      degree: 'Bachelor of Science',
+      field: 'Computer Science',
+      startDate: '2014-09',
+      endDate: '2018-05'
+    }
+  ],
+  skills: [
+    { id: '1', name: 'JavaScript' },
+    { id: '2', name: 'React' },
+    { id: '3', name: 'Node.js' },
+    { id: '4', name: 'Python' }
+  ]
+};
+
 const APIStatusCheck: React.FC = () => {
   const [requestId, setRequestId] = useState('');
-  const [paymentReference, setPaymentReference] = useState('ABC123XYZ'); // Default test reference
-  const [templateId, setTemplateId] = useState('kaziFasta'); // Default template ID
-  const [dummyData, setDummyData] = useState({
-    personalInfo: {
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john@example.com',
-      phone: '+255 123 456 789',
-      professionalTitle: 'Software Developer',
-      summary: 'Experienced software developer with 5 years of experience.'
-    },
-    workExperiences: [
-      {
-        id: '1',
-        jobTitle: 'Senior Developer',
-        company: 'Tech Solutions Ltd',
-        location: 'Dar es Salaam',
-        startDate: '2020-01',
-        endDate: '2023-01',
-        description: 'Led development team on multiple projects.'
-      }
-    ],
-    education: [
-      {
-        id: '1',
-        institution: 'University of Dar es Salaam',
-        degree: 'Bachelor of Science',
-        field: 'Computer Science',
-        startDate: '2014-09',
-        endDate: '2018-05'
-      }
-    ],
-    skills: [
-      { id: '1', name: 'JavaScript' },
-      { id: '2', name: 'React' },
-      { id: '3', name: 'Node.js' },
-      { id: '4', name: 'Python' }
-    ]
-  });
+  const [paymentReference, setPaymentReference] = useState('ABC123XYZ');
+  const [templateId, setTemplateId] = useState('kaziFasta');
   
-  // Add template ID input field under paymentReference
-  const handleTemplateIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTemplateId(e.target.value);
-  };
-
-  // Define endpoints to test
   const [endpoints, setEndpoints] = useState<EndpointStatus[]>([
     {
+      id: 'initiate',
       url: `${API_BASE_URL}/api/cv-pdf/anonymous/initiate-ussd`,
       method: 'POST',
       status: 'idle'
     },
     {
-      url: `${API_BASE_URL}/api/cv-pdf/${requestId}/verify`,
+      id: 'verify',
+      url: `${API_BASE_URL}/api/cv-pdf/{requestId}/verify`,
       method: 'POST',
       status: 'idle'
     },
     {
-      url: `${API_BASE_URL}/api/cv-pdf/${requestId}/status`,
+      id: 'status',
+      url: `${API_BASE_URL}/api/cv-pdf/{requestId}/status`,
       method: 'GET',
       status: 'idle'
     },
     {
-      url: `${API_BASE_URL}/api/cv-pdf/${requestId}/download`,
+      id: 'download',
+      url: `${API_BASE_URL}/api/cv-pdf/{requestId}/download`,
       method: 'GET',
       status: 'idle'
     }
   ]);
 
-  // Test the initiate endpoint
+  // Update endpoints when requestId changes
+  useEffect(() => {
+    if (requestId) {
+      setEndpoints(prevEndpoints => 
+        prevEndpoints.map(endpoint => {
+          if (endpoint.id !== 'initiate') {
+            return {
+              ...endpoint,
+              url: endpoint.url.replace('{requestId}', requestId)
+            };
+          }
+          return endpoint;
+        })
+      );
+    }
+  }, [requestId]);
+
+  const updateEndpointStatus = (id: string, update: Partial<EndpointStatus>) => {
+    setEndpoints(prevEndpoints => 
+      prevEndpoints.map(endpoint => 
+        endpoint.id === id ? { ...endpoint, ...update } : endpoint
+      )
+    );
+  };
+
   const testInitiateEndpoint = async () => {
-    const index = 0;
-    const updatedEndpoints = [...endpoints];
-    updatedEndpoints[index] = {
-      ...updatedEndpoints[index],
-      status: 'loading'
-    };
-    setEndpoints(updatedEndpoints);
+    const endpoint = endpoints.find(e => e.id === 'initiate');
+    if (!endpoint) return;
+
+    // Set loading state
+    updateEndpointStatus('initiate', { status: 'loading' });
 
     try {
-      // Ensure the URL is valid
-      const url = updatedEndpoints[index].url;
-      
-      if (!url) {
-        throw new Error('URL is undefined or invalid');
-      }
-      
-      const response = await fetch(url, {
-        method: updatedEndpoints[index].method,
+      const response = await fetch(endpoint.url, {
+        method: endpoint.method,
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           template_id: templateId,
-          cv_data: transformCVDataForBackend(dummyData)
+          cv_data: transformCVDataForBackend(sampleCVData)
         })
       });
 
       const responseData = await response.json();
       
-      updatedEndpoints[index] = {
-        ...updatedEndpoints[index],
+      updateEndpointStatus('initiate', {
         status: response.ok ? 'success' : 'error',
         statusCode: response.status,
         response: responseData
-      };
+      });
 
       if (response.ok && responseData.request_id) {
         setRequestId(responseData.request_id);
-        // Update subsequent endpoint URLs with the new request ID
-        for (let i = 1; i < updatedEndpoints.length; i++) {
-          const newUrl = updatedEndpoints[i].url.replace("{requestId}", responseData.request_id);
-          updatedEndpoints[i] = {
-            ...updatedEndpoints[i],
-            url: newUrl
-          };
-        }
       }
     } catch (error) {
-      updatedEndpoints[index] = {
-        ...updatedEndpoints[index],
+      updateEndpointStatus('initiate', {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error'
-      };
+      });
     }
-
-    setEndpoints(updatedEndpoints);
   };
 
-  // Test verify endpoint
   const testVerifyEndpoint = async () => {
     if (!requestId) {
       alert('Please test the initiate endpoint first to get a request ID');
       return;
     }
 
-    const index = 1;
-    const updatedEndpoints = [...endpoints];
-    updatedEndpoints[index] = {
-      ...updatedEndpoints[index],
-      status: 'loading'
-    };
-    setEndpoints(updatedEndpoints);
+    const endpoint = endpoints.find(e => e.id === 'verify');
+    if (!endpoint) return;
+
+    // Set loading state
+    updateEndpointStatus('verify', { status: 'loading' });
 
     try {
-      // Ensure the URL is valid
-      const url = updatedEndpoints[index].url;
-      
-      if (!url) {
-        throw new Error('URL is undefined or invalid');
-      }
-      
-      const response = await fetch(url, {
-        method: updatedEndpoints[index].method,
+      const response = await fetch(endpoint.url, {
+        method: endpoint.method,
         headers: {
           'Content-Type': 'application/json'
         },
@@ -186,137 +179,107 @@ const APIStatusCheck: React.FC = () => {
         responseData = await response.text();
       }
 
-      updatedEndpoints[index] = {
-        ...updatedEndpoints[index],
+      updateEndpointStatus('verify', {
         status: response.ok ? 'success' : 'error',
         statusCode: response.status,
         response: responseData
-      };
+      });
     } catch (error) {
-      updatedEndpoints[index] = {
-        ...updatedEndpoints[index],
+      updateEndpointStatus('verify', {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error'
-      };
+      });
     }
-
-    setEndpoints(updatedEndpoints);
   };
 
-  // Test status endpoint
   const testStatusEndpoint = async () => {
     if (!requestId) {
       alert('Please test the initiate endpoint first to get a request ID');
       return;
     }
 
-    const index = 2;
-    const updatedEndpoints = [...endpoints];
-    updatedEndpoints[index] = {
-      ...updatedEndpoints[index],
-      status: 'loading'
-    };
-    setEndpoints(updatedEndpoints);
+    const endpoint = endpoints.find(e => e.id === 'status');
+    if (!endpoint) return;
+
+    // Set loading state
+    updateEndpointStatus('status', { status: 'loading' });
 
     try {
-      // Ensure the URL is valid
-      const url = updatedEndpoints[index].url;
-      
-      if (!url) {
-        throw new Error('URL is undefined or invalid');
-      }
-      
-      const response = await fetch(url);
+      const response = await fetch(endpoint.url);
       const responseData = await response.json();
 
-      updatedEndpoints[index] = {
-        ...updatedEndpoints[index],
+      updateEndpointStatus('status', {
         status: response.ok ? 'success' : 'error',
         statusCode: response.status,
         response: responseData
-      };
+      });
     } catch (error) {
-      updatedEndpoints[index] = {
-        ...updatedEndpoints[index],
+      updateEndpointStatus('status', {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error'
-      };
+      });
     }
-
-    setEndpoints(updatedEndpoints);
   };
 
-  // Test download endpoint
   const testDownloadEndpoint = async () => {
     if (!requestId) {
       alert('Please test the initiate endpoint first to get a request ID');
       return;
     }
 
-    const index = 3;
-    const updatedEndpoints = [...endpoints];
-    updatedEndpoints[index] = {
-      ...updatedEndpoints[index],
-      status: 'loading'
-    };
-    setEndpoints(updatedEndpoints);
+    const endpoint = endpoints.find(e => e.id === 'download');
+    if (!endpoint) return;
+
+    // Set loading state
+    updateEndpointStatus('download', { status: 'loading' });
 
     try {
-      // Ensure the URL is valid
-      const url = updatedEndpoints[index].url;
-      
-      if (!url) {
-        throw new Error('URL is undefined or invalid');
-      }
-      
-      const response = await fetch(url);
+      const response = await fetch(endpoint.url);
       const blob = await response.blob();
 
-      updatedEndpoints[index] = {
-        ...updatedEndpoints[index],
+      updateEndpointStatus('download', {
         status: response.ok ? 'success' : 'error',
         statusCode: response.status,
         response: {
           type: blob.type,
           size: blob.size,
-          // Create link to download the blob
           url: window.URL.createObjectURL(blob)
         }
-      };
+      });
     } catch (error) {
-      updatedEndpoints[index] = {
-        ...updatedEndpoints[index],
+      updateEndpointStatus('download', {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error'
-      };
+      });
     }
-
-    setEndpoints(updatedEndpoints);
   };
 
-  // Reset all tests
   const resetTests = () => {
     setRequestId('');
-    // Reset to defaults
     setPaymentReference('ABC123XYZ');
     setTemplateId('kaziFasta');
+    
     setEndpoints([
       {
+        id: 'initiate',
         url: `${API_BASE_URL}/api/cv-pdf/anonymous/initiate-ussd`,
         method: 'POST',
         status: 'idle'
       },
       {
+        id: 'verify',
         url: `${API_BASE_URL}/api/cv-pdf/{requestId}/verify`,
         method: 'POST',
         status: 'idle'
       },
       {
+        id: 'status',
         url: `${API_BASE_URL}/api/cv-pdf/{requestId}/status`,
         method: 'GET',
         status: 'idle'
       },
       {
+        id: 'download',
         url: `${API_BASE_URL}/api/cv-pdf/{requestId}/download`,
         method: 'GET',
         status: 'idle'
@@ -339,12 +302,30 @@ const APIStatusCheck: React.FC = () => {
     }
   };
 
+  const testAllEndpoints = async () => {
+    await testInitiateEndpoint();
+    
+    // Only continue if we have a request ID
+    setTimeout(async () => {
+      if (requestId) {
+        await testVerifyEndpoint();
+        
+        setTimeout(async () => {
+          await testStatusEndpoint();
+          
+          setTimeout(async () => {
+            await testDownloadEndpoint();
+          }, 1000);
+        }, 1000);
+      }
+    }, 1000);
+  };
+
   return (
     <div className="container mx-auto px-4 py-4 md:py-8">
       <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">API Endpoint Status Check</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-        {/* CV PDF Endpoints */}
         <Card>
           <CardHeader>
             <CardTitle>CV PDF Generation Endpoints</CardTitle>
@@ -368,7 +349,7 @@ const APIStatusCheck: React.FC = () => {
                 <Label className="md:w-1/3">Template ID:</Label>
                 <Input 
                   value={templateId} 
-                  onChange={handleTemplateIdChange} 
+                  onChange={(e) => setTemplateId(e.target.value)} 
                   className="w-full md:max-w-xs"
                   placeholder="e.g., kaziFasta"
                 />
@@ -386,8 +367,8 @@ const APIStatusCheck: React.FC = () => {
             </div>
             
             <div className="space-y-4 mt-4">
-              {endpoints.map((endpoint, index) => (
-                <div key={index} className="border rounded-md p-3 md:p-4">
+              {endpoints.map((endpoint) => (
+                <div key={endpoint.id} className="border rounded-md p-3 md:p-4">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
                     <div className="overflow-hidden">
                       <Badge variant="outline" className="mr-2">{endpoint.method}</Badge>
@@ -399,7 +380,7 @@ const APIStatusCheck: React.FC = () => {
                   {endpoint.status === 'success' && (
                     <div className="mt-2 p-2 bg-gray-50 rounded text-xs sm:text-sm">
                       <p className="font-medium">Status: {endpoint.statusCode}</p>
-                      {endpoint.method === 'GET' && index === 3 && endpoint.response ? (
+                      {endpoint.id === 'download' && endpoint.response ? (
                         <div>
                           <p>Type: {endpoint.response.type}</p>
                           <p>Size: {endpoint.response.size} bytes</p>
@@ -436,14 +417,14 @@ const APIStatusCheck: React.FC = () => {
                       size="sm"
                       className="w-full sm:w-auto text-xs sm:text-sm py-1 px-2 h-auto"
                       onClick={() => {
-                        switch (index) {
-                          case 0: return testInitiateEndpoint();
-                          case 1: return testVerifyEndpoint();
-                          case 2: return testStatusEndpoint();
-                          case 3: return testDownloadEndpoint();
+                        switch (endpoint.id) {
+                          case 'initiate': return testInitiateEndpoint();
+                          case 'verify': return testVerifyEndpoint();
+                          case 'status': return testStatusEndpoint();
+                          case 'download': return testDownloadEndpoint();
                         }
                       }}
-                      disabled={endpoint.status === 'loading' || (index > 0 && !requestId)}
+                      disabled={endpoint.status === 'loading' || (endpoint.id !== 'initiate' && !requestId)}
                     >
                       Test Endpoint
                     </Button>
@@ -462,26 +443,7 @@ const APIStatusCheck: React.FC = () => {
             </Button>
             <Button 
               className="w-full sm:w-auto" 
-              onClick={() => {
-                testInitiateEndpoint().then(() => {
-                  // Wait a bit for the request ID to be set
-                  setTimeout(() => {
-                    if (requestId) {
-                      testVerifyEndpoint().then(() => {
-                        // Wait a bit for verification
-                        setTimeout(() => {
-                          testStatusEndpoint().then(() => {
-                            // Wait a bit more before trying download
-                            setTimeout(() => {
-                              testDownloadEndpoint();
-                            }, 1000);
-                          });
-                        }, 1000);
-                      });
-                    }
-                  }, 1000);
-                });
-              }}
+              onClick={testAllEndpoints}
             >
               Test All Endpoints
             </Button>
