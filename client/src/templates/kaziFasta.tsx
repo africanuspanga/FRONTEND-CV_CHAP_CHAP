@@ -75,228 +75,414 @@ export function KaziFastaTemplate(cvData: CVDataTemplate = {}): JSX.Element {
     languages = [] as Language[],
     references = [] as Reference[]
   } = cvData || {};
+  
+  // Create additional skills array for the right column
+  const mainSkills = skills.slice(0, 6); // First 6 skills get skill bars
+  const additionalSkills = skills.slice(6); // Remaining skills go to additional skills section
+  
   return (
-    <div className="kazi-fasta-template" style={{ 
-      fontFamily: 'Arial, sans-serif',
-      color: '#333',
-      backgroundColor: '#fff',
+    <div className="cv-container" style={{ 
       maxWidth: '900px',
-      margin: '0 auto',
-      boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-      position: 'relative'
+      margin: '20px auto',
+      backgroundColor: '#ffffff',
+      boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+      padding: '40px',
+      boxSizing: 'border-box',
+      fontFamily: 'Lato, sans-serif',
+      color: '#444',
+      lineHeight: 1.6,
+      fontSize: '10pt',
+      WebkitFontSmoothing: 'antialiased',
+      MozOsxFontSmoothing: 'grayscale'
     }}>
-      <div className="document" style={{ position: 'relative' }}>
-        <header style={{ 
-          backgroundColor: '#2c3e50', 
-          color: 'white',
-          padding: '40px 30px',
-          position: 'relative'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <h1 style={{ 
-                margin: '0 0 5px 0',
-                fontSize: '2.4rem',
-                fontWeight: 'bold',
-                letterSpacing: '0.05em'
-              }}>
-                {personalInfo?.firstName || 'FIRST'} {personalInfo?.lastName || 'LAST'}
-              </h1>
-              <h2 style={{ 
-                margin: '0',
-                fontSize: '1.4rem',
-                fontWeight: 'normal',
-                letterSpacing: '0.05em'
-              }}>
-                {personalInfo?.jobTitle || 'Professional Title'}
-              </h2>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              {personalInfo?.email && (
-                <div style={{ margin: '5px 0', fontSize: '0.9rem' }}>
-                  {personalInfo.email}
-                </div>
-              )}
-              {personalInfo?.phone && (
-                <div style={{ margin: '5px 0', fontSize: '0.9rem' }}>
-                  {personalInfo.phone}
-                </div>
-              )}
-              {personalInfo?.location && (
-                <div style={{ margin: '5px 0', fontSize: '0.9rem' }}>
-                  {personalInfo.location}
-                </div>
-              )}
-              {personalInfo?.website && (
-                <div style={{ margin: '5px 0', fontSize: '0.9rem' }}>
-                  {personalInfo.website}
-                </div>
-              )}
-            </div>
-          </div>
-        </header>
 
-        <main style={{ padding: '30px' }}>
-          {summary && (
-            <section className="summary" style={{ marginBottom: '25px' }}>
-              <h2 style={{ 
-                fontSize: '1.2rem', 
-                color: '#2c3e50',
-                borderBottom: '2px solid #2c3e50',
+      <header className="cv-header" style={{ 
+        textAlign: 'left',
+        marginBottom: '30px',
+        paddingBottom: '15px',
+        borderBottom: '1px solid #eee'
+      }}>
+        <h1 style={{ 
+          fontSize: '2.8em',
+          color: '#222',
+          marginBottom: 0,
+          textTransform: 'uppercase',
+          letterSpacing: '1px',
+          lineHeight: 1.1,
+          fontWeight: 700
+        }}>
+          {personalInfo?.firstName || 'FIRST'} {personalInfo?.lastName || 'LAST'}
+        </h1>
+        <h2 style={{ 
+          fontSize: '1.4em',
+          color: '#666',
+          fontWeight: 400,
+          marginBottom: 0
+        }}>
+          {personalInfo?.jobTitle || 'Professional Title'}
+        </h2>
+      </header>
+
+      <div className="main-content-area" style={{ display: 'flex', gap: '30px' }}>
+        <div className="left-column" style={{ 
+          width: '60%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '25px'
+        }}>
+          <section className="profile">
+            <h3 style={{ 
+              fontSize: '1.1em',
+              color: '#444',
+              marginBottom: '15px',
+              paddingBottom: '5px',
+              borderBottom: '1px solid #eee',
+              textTransform: 'uppercase',
+              letterSpacing: '1.5px',
+              fontWeight: 700
+            }}>PROFILE</h3>
+            <p style={{ fontSize: '0.95em', color: '#555' }}>{summary || 'Professional summary will appear here...'}</p>
+          </section>
+
+          <section className="contact-info" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {personalInfo?.phone && (
+              <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.95em', color: '#555' }}>
+                <span style={{ 
+                  display: 'inline-block',
+                  width: '20px',
+                  textAlign: 'center',
+                  marginRight: '8px',
+                  color: '#888'
+                }}>[P]</span>
+                <span>{personalInfo.phone}</span>
+              </div>
+            )}
+            {personalInfo?.email && (
+              <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.95em', color: '#555' }}>
+                <span style={{ 
+                  display: 'inline-block',
+                  width: '20px',
+                  textAlign: 'center',
+                  marginRight: '8px',
+                  color: '#888'
+                }}>[E]</span>
+                <span>{personalInfo.email}</span>
+              </div>
+            )}
+            {personalInfo?.location && (
+              <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.95em', color: '#555' }}>
+                <span style={{ 
+                  display: 'inline-block',
+                  width: '20px',
+                  textAlign: 'center',
+                  marginRight: '8px',
+                  color: '#888'
+                }}>[A]</span>
+                <span>{personalInfo.location}</span>
+              </div>
+            )}
+            {personalInfo?.website && (
+              <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.95em', color: '#555' }}>
+                <span style={{ 
+                  display: 'inline-block',
+                  width: '20px',
+                  textAlign: 'center',
+                  marginRight: '8px',
+                  color: '#888'
+                }}>[W]</span>
+                <a href={personalInfo.website} style={{ color: '#555', textDecoration: 'none' }}>
+                  {personalInfo.website.replace('https://', '')}
+                </a>
+              </div>
+            )}
+          </section>
+
+          <section className="experience">
+            <h3 style={{ 
+              fontSize: '1.1em',
+              color: '#444',
+              marginBottom: '15px',
+              paddingBottom: '5px',
+              borderBottom: '1px solid #eee',
+              textTransform: 'uppercase',
+              letterSpacing: '1.5px',
+              fontWeight: 700
+            }}>PROFESSIONAL EXPERIENCE</h3>
+            <ul style={{ margin: 0, listStyle: 'none', padding: 0 }}>
+              {workExperience && workExperience.length > 0 ? (
+                workExperience.map((job, index) => (
+                  <li key={`job-${index}`} style={{ marginBottom: index < workExperience.length - 1 ? '20px' : 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '15px', alignItems: 'flex-start' }}>
+                      <div style={{ flexGrow: 1 }}>
+                        <strong style={{ display: 'block', fontSize: '1.05em', color: '#333', marginBottom: '2px' }}>
+                          {job.jobTitle}
+                        </strong>
+                        <span style={{ display: 'block', fontSize: '0.95em', color: '#666', marginBottom: '8px' }}>
+                          {job.company}
+                        </span>
+                        {job.achievements && job.achievements.length > 0 && (
+                          <ul style={{ listStyle: 'none', paddingLeft: 0, marginTop: '8px' }}>
+                            {job.achievements.map((achievement, i) => (
+                              <li key={`achievement-${i}`} style={{ 
+                                fontSize: '0.95em',
+                                color: '#555',
+                                marginBottom: '5px',
+                                paddingLeft: '15px',
+                                position: 'relative'
+                              }}>
+                                <span style={{ 
+                                  content: '•',
+                                  color: '#888',
+                                  position: 'absolute',
+                                  left: 0,
+                                  top: '0.15em',
+                                  fontSize: '0.9em'
+                                }}>•</span>
+                                {achievement}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      <div style={{ flexShrink: 0, textAlign: 'right', fontSize: '0.9em', color: '#777', whiteSpace: 'nowrap' }}>
+                        <span style={{ display: 'block', lineHeight: 1.4 }}>
+                          {job.startDate}{job.endDate ? ` - ${job.endDate}` : ' - Present'}
+                        </span>
+                        {job.location && <span style={{ display: 'block', lineHeight: 1.4 }}>{job.location}</span>}
+                      </div>
+                    </div>
+                  </li>
+                ))
+              ) : (
+                <li>No work experience to display</li>
+              )}
+            </ul>
+          </section>
+
+          <section className="education">
+            <h3 style={{ 
+              fontSize: '1.1em',
+              color: '#444',
+              marginBottom: '15px',
+              paddingBottom: '5px',
+              borderBottom: '1px solid #eee',
+              textTransform: 'uppercase',
+              letterSpacing: '1.5px',
+              fontWeight: 700
+            }}>EDUCATION</h3>
+            <ul style={{ margin: 0, listStyle: 'none', padding: 0 }}>
+              {education && education.length > 0 ? (
+                education.map((edu, index) => (
+                  <li key={`edu-${index}`} style={{ marginBottom: index < education.length - 1 ? '20px' : 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '15px', alignItems: 'flex-start' }}>
+                      <div style={{ flexGrow: 1 }}>
+                        <strong style={{ display: 'block', fontSize: '1.05em', color: '#333', marginBottom: '2px' }}>
+                          {edu.degree}{edu.fieldOfStudy ? ` In ${edu.fieldOfStudy}` : ''}
+                        </strong>
+                        <span style={{ display: 'block', fontSize: '0.95em', color: '#666', marginBottom: '8px' }}>
+                          {edu.institution}
+                        </span>
+                        {edu.description && (
+                          <p style={{ fontSize: '0.95em', color: '#666', marginBottom: '5px' }}>
+                            {edu.description}
+                          </p>
+                        )}
+                        {/* GPA field doesn't exist in Education interface, but added for compatibility with template */}
+                        {edu.gpa && (
+                          <span style={{ display: 'block', fontSize: '0.95em', color: '#666', marginBottom: '4px' }}>
+                            GPA: {edu.gpa} / 4.0
+                          </span>
+                        )}
+                        {edu.achievements && edu.achievements.length > 0 && (
+                          <>
+                            <p style={{ fontSize: '0.95em', color: '#666', marginTop: '10px', marginBottom: '5px', fontWeight: 700 }}>
+                              Relevant Coursework:
+                            </p>
+                            <ul style={{ listStyle: 'none', paddingLeft: 0, marginTop: '8px' }}>
+                              {edu.achievements.map((course, i) => (
+                                <li key={`course-${i}`} style={{ 
+                                  fontSize: '0.95em',
+                                  color: '#555',
+                                  marginBottom: '5px',
+                                  paddingLeft: '15px',
+                                  position: 'relative'
+                                }}>
+                                  <span style={{ 
+                                    content: '•',
+                                    color: '#888',
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: '0.15em',
+                                    fontSize: '0.9em'
+                                  }}>•</span>
+                                  {course}
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        )}
+                      </div>
+                      <div style={{ flexShrink: 0, textAlign: 'right', fontSize: '0.9em', color: '#777', whiteSpace: 'nowrap' }}>
+                        <span style={{ display: 'block', lineHeight: 1.4 }}>
+                          {edu.endDate || (edu.startDate ? edu.startDate : 'Present')}
+                        </span>
+                        {edu.location && <span style={{ display: 'block', lineHeight: 1.4 }}>{edu.location}</span>}
+                      </div>
+                    </div>
+                  </li>
+                ))
+              ) : (
+                <li>No education to display</li>
+              )}
+            </ul>
+          </section>
+        </div>
+
+        <div className="right-column" style={{ 
+          width: '40%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '25px',
+          backgroundColor: '#f4f4f4',
+          padding: '20px'
+        }}>
+          <section className="key-skills">
+            <h3 style={{ 
+              fontSize: '1.1em',
+              color: '#444',
+              marginBottom: '15px',
+              paddingBottom: '5px',
+              borderBottom: '1px solid #eee',
+              textTransform: 'uppercase',
+              letterSpacing: '1.5px',
+              fontWeight: 700
+            }}>KEY SKILLS</h3>
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+              {mainSkills.length > 0 ? mainSkills.map((skill, index) => (
+                <li key={`skill-${index}`} style={{ 
+                  marginBottom: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  fontSize: '0.95em'
+                }}>
+                  <span style={{ 
+                    width: '100px',
+                    flexShrink: 0,
+                    color: '#555',
+                    paddingRight: '10px'
+                  }}>{skill.name}</span>
+                  <div style={{ 
+                    flexGrow: 1,
+                    height: '8px',
+                    backgroundColor: '#e0e0e0',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    margin: '0 10px'
+                  }}>
+                    <div style={{ 
+                      height: '100%',
+                      width: `${skill.level ? skill.level : 90}%`,
+                      backgroundColor: '#555',
+                      borderRadius: '4px'
+                    }}></div>
+                  </div>
+                  <span style={{ 
+                    width: '35px',
+                    flexShrink: 0,
+                    textAlign: 'right',
+                    color: '#777',
+                    fontSize: '0.9em'
+                  }}>{skill.level ? skill.level : 90}%</span>
+                </li>
+              )) : (
+                <li>No skills to display</li>
+              )}
+            </ul>
+          </section>
+
+          {additionalSkills.length > 0 && (
+            <section className="additional-skills">
+              <h3 style={{ 
+                fontSize: '1.1em',
+                color: '#444',
+                marginBottom: '15px',
                 paddingBottom: '5px',
-                marginBottom: '15px'
-              }}>PROFESSIONAL SUMMARY</h2>
-              <p style={{ lineHeight: '1.5', fontSize: '0.95rem' }}>{summary}</p>
+                borderBottom: '1px solid #eee',
+                textTransform: 'uppercase',
+                letterSpacing: '1.5px',
+                fontWeight: 700
+              }}>ADDITIONAL SKILLS</h3>
+              <ul style={{ margin: 0, padding: 0 }}>
+                {additionalSkills.map((skill, index) => (
+                  <li key={`add-skill-${index}`} style={{ 
+                    marginBottom: '6px',
+                    fontSize: '0.95em',
+                    color: '#555',
+                    paddingLeft: '0.5em'
+                  }}>
+                    <span style={{ 
+                      color: '#888',
+                      display: 'inline-block',
+                      width: '1em',
+                      marginLeft: '-1em',
+                      paddingRight: '0.5em'
+                    }}>•</span>
+                    {skill.name}
+                  </li>
+                ))}
+              </ul>
             </section>
           )}
 
-          <div style={{ display: 'flex', gap: '30px' }}>
-            <div className="left-column" style={{ flex: '2', paddingRight: '15px' }}>
-              {workExperience && workExperience.length > 0 && (
-                <section className="work-experience" style={{ marginBottom: '25px' }}>
-                  <h2 style={{ 
-                    fontSize: '1.2rem', 
-                    color: '#2c3e50',
-                    borderBottom: '2px solid #2c3e50',
-                    paddingBottom: '5px',
-                    marginBottom: '15px'
-                  }}>WORK EXPERIENCE</h2>
-                  {workExperience.map((job: WorkExperience, index: number) => (
-                    <div key={`job-${index}-${job.id || ''}`} className="job" style={{ marginBottom: '20px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <h3 style={{ margin: '0 0 5px 0', fontSize: '1.1rem', fontWeight: 'bold' }}>
-                          {job.jobTitle}
-                        </h3>
-                        <div style={{ fontSize: '0.9rem', color: '#666' }}>
-                          {job.startDate}{job.endDate && ` - ${job.endDate}`}
-                        </div>
-                      </div>
-                      <div style={{ fontSize: '1rem', fontWeight: 'semibold', marginBottom: '5px', color: '#444' }}>
-                        {job.company} {job.location && `• ${job.location}`}
-                      </div>
-                      {job.description && (
-                        <p style={{ margin: '10px 0', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                          {job.description}
-                        </p>
-                      )}
-                      {job.achievements && job.achievements.length > 0 && (
-                        <ul style={{ 
-                          margin: '10px 0', 
-                          paddingLeft: '20px',
-                          fontSize: '0.9rem',
-                          lineHeight: '1.5'
-                        }}>
-                          {job.achievements.map((achievement: string, achievementIndex: number) => (
-                            <li key={achievementIndex}>{achievement}</li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ))}
-                </section>
-              )}
+          {languages && languages.length > 0 && (
+            <section className="languages">
+              <h3 style={{ 
+                fontSize: '1.1em',
+                color: '#444',
+                marginBottom: '15px',
+                paddingBottom: '5px',
+                borderBottom: '1px solid #eee',
+                textTransform: 'uppercase',
+                letterSpacing: '1.5px',
+                fontWeight: 700
+              }}>LANGUAGES</h3>
+              <ul style={{ margin: 0, padding: 0 }}>
+                {languages.map((language, index) => (
+                  <li key={`lang-${index}`} style={{ 
+                    marginBottom: '6px',
+                    fontSize: '0.95em',
+                    color: '#555' 
+                  }}>
+                    {language.name} | {language.proficiency}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-              {education && education.length > 0 && (
-                <section className="education" style={{ marginBottom: '25px' }}>
-                  <h2 style={{ 
-                    fontSize: '1.2rem', 
-                    color: '#2c3e50',
-                    borderBottom: '2px solid #2c3e50',
-                    paddingBottom: '5px',
-                    marginBottom: '15px'
-                  }}>EDUCATION</h2>
-                  {education.map((edu: Education, index: number) => (
-                    <div key={`edu-${index}-${edu.id || ''}`} className="education-item" style={{ marginBottom: '20px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <h3 style={{ margin: '0 0 5px 0', fontSize: '1.1rem', fontWeight: 'bold' }}>
-                          {edu.degree}
-                        </h3>
-                        <div style={{ fontSize: '0.9rem', color: '#666' }}>
-                          {edu.startDate}{edu.endDate && ` - ${edu.endDate}`}
-                        </div>
-                      </div>
-                      <div style={{ fontSize: '1rem', fontWeight: 'semibold', marginBottom: '5px', color: '#444' }}>
-                        {edu.institution} {edu.fieldOfStudy && `• ${edu.fieldOfStudy}`}
-                      </div>
-                      {edu.description && (
-                        <p style={{ margin: '10px 0', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                          {edu.description}
-                        </p>
-                      )}
-                      {edu.achievements && edu.achievements.length > 0 && (
-                        <ul style={{ 
-                          margin: '10px 0', 
-                          paddingLeft: '20px',
-                          fontSize: '0.9rem',
-                          lineHeight: '1.5'
-                        }}>
-                          {edu.achievements.map((achievement: string, achievementIndex: number) => (
-                            <li key={achievementIndex}>{achievement}</li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ))}
-                </section>
-              )}
-            </div>
-
-            <div className="right-column" style={{ flex: '1', padding: '20px', backgroundColor: '#f4f4f4' }}>
-              {skills && skills.length > 0 && (
-                <section className="skills" style={{ marginBottom: '25px' }}>
-                  <h2 style={{ fontSize: '1.2rem', color: '#2c3e50', borderBottom: '2px solid #2c3e50', paddingBottom: '5px', marginBottom: '15px' }}>SKILLS</h2>
-                  <div className="skills-container">
-                    {skills.map((skill: Skill, index: number) => (
-                      <div key={`skill-${index}-${skill.id || ''}`} className="skill-item" style={{ marginBottom: '12px' }}>
-                        <div className="skill-name" style={{ fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '5px' }}>{skill.name}</div>
-                        <div className="skill-bar-container" style={{ height: '8px', backgroundColor: '#ddd', borderRadius: '4px', overflow: 'hidden' }}>
-                          <div 
-                            className="skill-bar" 
-                            style={{ 
-                              width: `${(skill.level || 3) * 20}%`, 
-                              height: '100%', 
-                              backgroundColor: '#3498db', 
-                              borderRadius: '4px' 
-                            }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {languages && languages.length > 0 && (
-                <section className="languages" style={{ marginBottom: '25px' }}>
-                  <h2 style={{ fontSize: '1.2rem', color: '#2c3e50', borderBottom: '2px solid #2c3e50', paddingBottom: '5px', marginBottom: '15px' }}>LANGUAGES</h2>
-                  <div className="languages-container">
-                    {languages.map((language: Language, index: number) => (
-                      <div key={`lang-${index}-${language.id || ''}`} className="language-item" style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
-                        <span className="language-name" style={{ fontSize: '0.95rem', fontWeight: 'bold' }}>{language.name}</span>
-                        <span className="language-level" style={{ fontSize: '0.9rem', color: '#555' }}>{language.proficiency}</span>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {references && references.length > 0 && (
-                <section className="references" style={{ marginBottom: '25px' }}>
-                  <h2 style={{ fontSize: '1.2rem', color: '#2c3e50', borderBottom: '2px solid #2c3e50', paddingBottom: '5px', marginBottom: '15px' }}>REFERENCES</h2>
-                  {references.map((reference: Reference, index: number) => (
-                    <div key={`ref-${index}-${reference.id || ''}`} className="reference-item" style={{ marginBottom: '15px' }}>
-                      <h3 style={{ fontSize: '1rem', fontWeight: 'bold', margin: '0 0 5px 0' }}>{reference.name}</h3>
-                      {reference.position && <p style={{ fontSize: '0.9rem', margin: '0 0 2px 0', fontStyle: 'italic' }}>{reference.position}</p>}
-                      {reference.company && <p style={{ fontSize: '0.9rem', margin: '0 0 2px 0' }}>{reference.company}</p>}
-                      {reference.email && <p style={{ fontSize: '0.9rem', margin: '0 0 2px 0' }}>{reference.email}</p>}
-                      {reference.phone && <p style={{ fontSize: '0.9rem', margin: '0 0 2px 0' }}>{reference.phone}</p>}
-                    </div>
-                  ))}
-                </section>
-              )}
-            </div>
-          </div>
-        </main>
+          {references && references.length > 0 && (
+            <section id="referencesSection">
+              <h3 style={{ 
+                fontSize: '1.1em',
+                color: '#444',
+                marginBottom: '15px',
+                paddingBottom: '5px',
+                borderBottom: '1px solid #eee',
+                textTransform: 'uppercase',
+                letterSpacing: '1.5px',
+                fontWeight: 700
+              }}>References</h3>
+              <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                {references.map((reference, index) => (
+                  <li key={`ref-${index}`}>
+                    {reference.name} - {reference.position} at {reference.company}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
       </div>
     </div>
   );
