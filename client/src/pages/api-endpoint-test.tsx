@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, Check, Download, Wifi, WifiOff, AlertCircle, ExternalLink, FileJson, FileText } from 'lucide-react';
+import { Loader2, ArrowLeft, Check, Download, Wifi, WifiOff, AlertCircle, ExternalLink, FileJson, FileText, Database } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { downloadCVWithPreviewEndpoint, downloadTestPDF, testDataExchange, API_BASE_URL } from '@/services/cv-api-service';
+import { downloadCVWithPreviewEndpoint, downloadTestPDF, testDataExchange, downloadPDFAsBase64, API_BASE_URL } from '@/services/cv-api-service';
 import { Link } from 'wouter';
 import { Badge } from '@/components/ui/badge';
 
@@ -219,6 +219,25 @@ const ApiEndpointTest: React.FC = () => {
     }
   };
   
+  // Test PDF download using Base64 JSON approach (CORS-friendly)
+  const handleTestBase64Download = async () => {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(false);
+    
+    try {
+      console.log('Testing PDF download with Base64 approach');
+      const pdfBlob = await downloadPDFAsBase64('brightdiamond', sampleCVData);
+      downloadBlob(pdfBlob, 'JOHN_DOE-CV-base64.pdf');
+      setSuccess(true);
+    } catch (err) {
+      console.error('Base64 PDF download failed:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   // Test JSON data exchange with the server
   const handleTestDataExchange = async () => {
     setIsLoading(true);
@@ -333,7 +352,7 @@ const ApiEndpointTest: React.FC = () => {
         </CardContent>
         
         <CardFooter className="flex flex-col space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
             {/* Option 1: Test main PDF generation endpoint */}
             <Button 
               onClick={handleTestDownload} 
@@ -363,8 +382,25 @@ const ApiEndpointTest: React.FC = () => {
               )}
               <span>Get Pre-Generated PDF</span>
             </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+            {/* Option 3: PDF as Base64 in JSON response (CORS-friendly) */}
+            <Button 
+              onClick={handleTestBase64Download} 
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2"
+              variant="default"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Database className="h-4 w-4" />
+              )}
+              <span>PDF via Base64 (Recommended)</span>
+            </Button>
 
-            {/* Option 3: JSON Data Exchange Test */}
+            {/* Option 4: JSON Data Exchange Test */}
             <Button 
               onClick={handleTestDataExchange} 
               disabled={isLoading}

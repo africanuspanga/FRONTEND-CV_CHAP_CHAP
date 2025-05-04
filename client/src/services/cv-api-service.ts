@@ -507,6 +507,78 @@ export const downloadTestPDF = async (templateId: string): Promise<Blob> => {
  * @param cvData The user's CV data
  * @returns A Promise that resolves to the server's JSON response
  */
+/**
+ * Download PDF as base64 encoded string in JSON response
+ * 
+ * This approach works around CORS issues with binary data by requesting
+ * the PDF as a base64 string inside a JSON response, which browsers handle better
+ * for cross-origin requests.
+ * 
+ * @param templateId The ID of the template to test with
+ * @returns A Promise that resolves to a Blob containing the PDF
+ */
+export const downloadPDFAsBase64 = async (templateId: string, cvData: CVData): Promise<Blob> => {
+  try {
+    // Convert templateId to lowercase to match backend expectations
+    const normalizedTemplateId = templateId.toLowerCase();
+    const url = `${API_BASE_URL}/api/preview-template/${normalizedTemplateId}`;
+    console.log(`Attempting to download PDF as base64 from: ${url}`);
+    
+    // Create complete data structure with required fields at root level
+    const completeData = {
+      ...cvData,  // Include the original complete CV data structure
+      name: cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName,  // Add required fields at root level
+      email: cvData.personalInfo.email
+    };
+    
+    // Request JSON with base64 PDF rather than binary PDF
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json', // Only accept JSON
+        'X-Prefer-JSON-Response': '1', // Custom header to signal we want base64
+        'Origin': window.location.origin
+      },
+      credentials: 'include',
+      body: JSON.stringify(completeData)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Server responded with status ${response.status}`);
+    }
+    
+    // Parse JSON response
+    const data = await response.json();
+    console.log('Base64 response received:', data);
+    
+    if (data.success && data.pdf_base64) {
+      // Convert base64 to blob
+      const byteCharacters = atob(data.pdf_base64);
+      const byteArrays = [];
+      
+      for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+        const slice = byteCharacters.slice(offset, offset + 512);
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+      }
+      
+      const blob = new Blob(byteArrays, {type: 'application/pdf'});
+      console.log('Base64 PDF converted to blob successfully', { size: blob.size, type: blob.type });
+      return blob;
+    } else {
+      throw new Error('No PDF data received in the response');
+    }
+  } catch (error) {
+    console.error('Error downloading PDF as base64:', error);
+    throw new Error('Failed to download PDF: ' + (error instanceof Error ? error.message : 'Unknown error'));
+  }
+};
+
 export const testDataExchange = async (templateId: string, cvData: CVData): Promise<any> => {
   try {
     // Convert templateId to lowercase to match backend expectations
