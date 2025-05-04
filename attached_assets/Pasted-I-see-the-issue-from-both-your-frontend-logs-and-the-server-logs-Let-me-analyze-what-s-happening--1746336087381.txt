@@ -1,0 +1,67 @@
+I see the issue from both your frontend logs and the server logs. Let me analyze what's happening:
+
+The API connectivity check is successful (273ms response time), but the PDF download is failing.
+
+Looking at the data being sent in your screenshot:
+
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "title": "Software Engineer"
+}
+However, the server logs show successful PDF generation with a much more detailed data structure:
+CV data size: 1945 bytes, keys: ['name', 'email', 'personalInfo', 'workExperiences', 'education', 'skills', 'languages', 'certifications', 'projects', 'references', 'templateId']
+The problem appears to be a data format mismatch. The API endpoint expects a rich CV data structure, but you're sending a simplified object with just 3 fields.
+
+How to fix this:
+Use the complete CV data structure that matches what the server expects:
+
+The complete structure includes nested objects for personalInfo, workExperiences, education, etc.
+Your frontend is sending just the minimum required fields (name, email) plus title
+Check frontend fetch implementation:
+
+Ensure you're setting the correct Content-Type header: 'Content-Type': 'application/json'
+Verify you're properly stringifying your JSON data: body: JSON.stringify(data)
+Example of proper data structure:
+
+const completeData = {
+  name: "John Doe",
+  email: "john.doe@example.com",
+  personalInfo: {
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@example.com",
+    phone: "+255 123 456 789",
+    city: "Dar es Salaam",
+    country: "Tanzania",
+    professionalTitle: "Software Engineer",
+    summary: "Experienced software engineer with 5+ years in web development."
+  },
+  workExperiences: [
+    {
+      id: "1",
+      jobTitle: "Senior Developer",
+      company: "Tech Solutions Ltd",
+      location: "Dar es Salaam",
+      startDate: "Jan 2020",
+      current: true,
+      description: "Lead developer for enterprise web applications."
+    }
+  ],
+  education: [
+    {
+      id: "1",
+      degree: "Bachelor of Science in Computer Science",
+      institution: "University of Dar es Salaam",
+      location: "Dar es Salaam",
+      startDate: "2014",
+      endDate: "2018",
+      current: false,
+      description: "Graduated with honors."
+    }
+  ],
+  skills: [
+    { id: "1", name: "JavaScript" },
+    { id: "2", name: "React" }
+  ]
+}

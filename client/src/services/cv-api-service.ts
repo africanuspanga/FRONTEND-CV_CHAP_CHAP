@@ -134,11 +134,23 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
     // This includes required fields name and email at root level
     const transformedCVData = transformCVDataForBackend(cvData);
     
+    // Create complete data structure with required fields at root level
+    const completeData = {
+      ...cvData,  // Include the original complete CV data structure
+      name: cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName,  // Add required fields at root level
+      email: cvData.personalInfo.email
+    };
+    
     // Construct the complete request body with template ID and CV data
+    // Send both data formats for the server to choose the one it can handle
     const requestBody = {
       template_id: templateId.toLowerCase(), // Ensure lowercase to match backend expectations
-      cv_data: transformedCVData
+      cv_data: completeData
     };
+    
+    // Log both data formats for debugging
+    console.log('Transformed data:', JSON.stringify(transformedCVData, null, 2));
+    console.log('Complete data being sent:', JSON.stringify(completeData, null, 2));
     
     // Log the full request payload for debugging
     console.log('Request payload:', JSON.stringify(requestBody, null, 2));
@@ -366,7 +378,17 @@ export const directDownloadCV = async (templateId: string, cvData: CVData): Prom
     // Transform CV data to backend format
     // This includes required fields name and email at root level
     const transformedCVData = transformCVDataForBackend(cvData);
-    console.log('Data being sent:', JSON.stringify(transformedCVData, null, 2));
+    
+    // Create complete data structure with required fields at root level
+    const completeData = {
+      ...cvData,  // Include the original complete CV data structure
+      name: cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName,  // Add required fields at root level
+      email: cvData.personalInfo.email
+    };
+    
+    // Log both formats for debugging
+    console.log('Transformed data being sent:', JSON.stringify(transformedCVData, null, 2));
+    console.log('Complete original data structure:', JSON.stringify(completeData, null, 2));
     
     const response = await fetch(url, {
       method: 'POST',
@@ -377,7 +399,7 @@ export const directDownloadCV = async (templateId: string, cvData: CVData): Prom
         'X-Requested-With': 'XMLHttpRequest'
       },
       credentials: 'include',
-      body: JSON.stringify(transformedCVData)
+      body: JSON.stringify(completeData)
     });
 
     if (!response.ok) {
@@ -447,14 +469,16 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
     // This includes required fields name and email at root level
     const transformedCVData = transformCVDataForBackend(cvData);
     
-    // Log the full data being sent - but only name and first few fields to avoid log pollution
-    const logData = {
-      name: transformedCVData.name,
-      email: transformedCVData.email,
-      title: transformedCVData.title,
-      // Include other important fields but not the entire object
+    // Send the original CV data structure as well (unmodified) - this might be what the API expects
+    const completeData = {
+      ...cvData,  // Include the original complete CV data structure
+      name: cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName,  // Add required fields at root level
+      email: cvData.personalInfo.email
     };
-    console.log('Data being sent (partial):', JSON.stringify(logData, null, 2));
+    
+    // Log both data formats for debugging
+    console.log('Transformed data being sent:', JSON.stringify(transformedCVData, null, 2));
+    console.log('Complete original data structure:', JSON.stringify(completeData, null, 2));
     
     // Using retry pattern for better reliability
     const result = await retry(async () => {
@@ -477,8 +501,8 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
           },
           // Enable credentials to allow cookies if needed
           credentials: 'include',
-          // Send the transformed data with required fields
-          body: JSON.stringify(transformedCVData),
+          // Send the complete data with required fields at root level
+          body: JSON.stringify(completeData),
           signal: controller.signal,
           // Disable cache to prevent stale responses
           cache: 'no-store'
