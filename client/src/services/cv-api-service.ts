@@ -255,13 +255,36 @@ export const checkPaymentStatus = async (requestId: string): Promise<CVRequestSt
     const url = `${API_BASE_URL}/api/cv-pdf/${requestId}/status`;
     console.log(`Checking payment status at: ${url}`);
     
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        'Origin': window.location.origin,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'include'
+    });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({
-        error: `Server responded with status ${response.status}`
-      }));
-      throw new Error(errorData.error || 'Failed to check payment status');
+      let errorMessage = '';
+      
+      // Try to get error as JSON first
+      try {
+        const responseText = await response.text();
+        console.log('Error response body:', responseText);
+        
+        // Try to parse as JSON
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.error || `Server responded with status ${response.status}`;
+        } catch (parseError) {
+          // If can't parse JSON, use text directly
+          errorMessage = `Server responded with status ${response.status}: ${responseText}`;
+        }
+      } catch (readError) {
+        errorMessage = `Server responded with status ${response.status} (could not read response)`;
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
@@ -391,6 +414,28 @@ export const directDownloadCV = async (templateId: string, cvData: CVData): Prom
  * @param cvData The user's CV data
  * @returns A Promise that resolves to a Blob containing the PDF
  */
+/**
+ * Retry function for fetch operations that may fail due to network issues
+ * 
+ * @param operation Function that returns a promise to retry
+ * @param retries Number of retries before giving up
+ * @param delayMs Delay between retries in milliseconds
+ * @returns Promise with the operation result
+ */
+const retry = async <T>(operation: () => Promise<T>, retries = 3, delayMs = 1000): Promise<T> => {
+  try {
+    return await operation();
+  } catch (error) {
+    if (retries <= 0) {
+      throw error;
+    }
+    
+    console.log(`Operation failed, retrying in ${delayMs}ms... (${retries} retries left)`);
+    await new Promise(resolve => setTimeout(resolve, delayMs));
+    return retry(operation, retries - 1, delayMs * 1.5);
+  }
+};
+
 export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: CVData): Promise<Blob> => {
   try {
     // Convert templateId to lowercase to match backend expectations
@@ -402,65 +447,102 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
     // This includes required fields name and email at root level
     const transformedCVData = transformCVDataForBackend(cvData);
     
-    // Log the full data being sent
-    console.log('Data being sent:', JSON.stringify(transformedCVData, null, 2));
+    // Log the full data being sent - but only name and first few fields to avoid log pollution
+    const logData = {
+      name: transformedCVData.name,
+      email: transformedCVData.email,
+      title: transformedCVData.title,
+      // Include other important fields but not the entire object
+    };
+    console.log('Data being sent (partial):', JSON.stringify(logData, null, 2));
     
-    // Set a longer timeout for the fetch operation (30 seconds)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/pdf, application/json',
-        'Origin': window.location.origin,
-        // Additional headers to handle CORS
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      // Enable credentials to allow cookies if needed
-      credentials: 'include',
-      // Send the transformed data with required fields
-      body: JSON.stringify(transformedCVData),
-      signal: controller.signal
-    });
-    
-    // Clear the timeout if the request completes
-    clearTimeout(timeoutId);
-
-    // Log all response information for debugging
-    console.log('Response status:', response.status);
-    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-    
-    // Check for success status
-    if (!response.ok) {
-      let errorMessage = '';
+    // Using retry pattern for better reliability
+    const result = await retry(async () => {
+      // Set a longer timeout for the fetch operation (45 seconds)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+        console.log('Request timed out after 45 seconds');
+      }, 45000);
       
-      // Try to get error as JSON first
       try {
-        const responseText = await response.text();
-        console.log('Error response body:', responseText);
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/pdf, application/json',
+            'Origin': window.location.origin,
+            // Additional headers to handle CORS
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          // Enable credentials to allow cookies if needed
+          credentials: 'include',
+          // Send the transformed data with required fields
+          body: JSON.stringify(transformedCVData),
+          signal: controller.signal,
+          // Disable cache to prevent stale responses
+          cache: 'no-store'
+        });
         
-        // Try to parse as JSON
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.error || `Server responded with status ${response.status}`;
-        } catch (parseError) {
-          // If can't parse JSON, use text directly
-          errorMessage = `Server responded with status ${response.status}: ${responseText}`;
+        // Clear the timeout if the request completes
+        clearTimeout(timeoutId);
+    
+        // Log all response information for debugging
+        console.log('Response status:', response.status);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+        
+        // Check for success status
+        if (!response.ok) {
+          let errorMessage = '';
+          
+          // Try to get error as JSON first
+          try {
+            const responseText = await response.text();
+            console.log('Error response body:', responseText);
+            
+            // Try to parse as JSON
+            try {
+              const errorData = JSON.parse(responseText);
+              errorMessage = errorData.error || `Server responded with status ${response.status}`;
+            } catch (parseError) {
+              // If can't parse JSON, use text directly
+              errorMessage = `Server responded with status ${response.status}: ${responseText}`;
+            }
+          } catch (readError) {
+            errorMessage = `Server responded with status ${response.status} (could not read response)`;
+          }
+          
+          throw new Error(errorMessage);
         }
-      } catch (readError) {
-        errorMessage = `Server responded with status ${response.status} (could not read response)`;
+    
+        // Handle successful response
+        const blob = await response.blob();
+        if (blob.size === 0) {
+          throw new Error('Received empty PDF file');
+        }
+        
+        console.log('Preview endpoint PDF download successful', { size: blob.size, type: blob.type });
+        return blob;
+      } finally {
+        // Make sure to clear the timeout in case of exceptions
+        clearTimeout(timeoutId);
       }
-      
-      throw new Error(errorMessage);
-    }
-
-    const blob = await response.blob();
-    console.log('Preview endpoint PDF download successful', { size: blob.size, type: blob.type });
-    return blob;
+    }, 3, 2000); // 3 retries with increasing delay starting at 2 seconds
+    
+    return result;
   } catch (error) {
     console.error('Error downloading PDF from preview endpoint:', error);
-    throw new Error('Failed to download PDF: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    // Create a more user-friendly error message
+    let errorMessage = 'Failed to download PDF';
+    if (error instanceof Error) {
+      if (error.name === 'AbortError' || error.message.includes('abort')) {
+        errorMessage = 'Request timed out. The server took too long to respond.';
+      } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    throw new Error(errorMessage);
   }
 };
