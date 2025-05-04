@@ -350,19 +350,31 @@ export const directDownloadCV = async (templateId: string, cvData: CVData): Prom
  */
 export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: CVData): Promise<Blob> => {
   try {
-    const url = `${API_BASE_URL}/api/preview-template/${templateId}`;
+    // Convert templateId to lowercase to match backend expectations
+    const normalizedTemplateId = templateId.toLowerCase();
+    const url = `${API_BASE_URL}/api/preview-template/${normalizedTemplateId}`;
     console.log(`Attempting PDF download from preview endpoint: ${url}`);
     
     // Transform CV data to backend format
     const transformedCVData = transformCVDataForBackend(cvData);
+    console.log('Transformed data being sent:', JSON.stringify(transformedCVData, null, 2));
+    
+    // Set a longer timeout for the fetch operation (30 seconds)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
     
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/pdf, application/json'
       },
-      body: JSON.stringify(transformedCVData)
+      body: JSON.stringify(transformedCVData),
+      signal: controller.signal
     });
+    
+    // Clear the timeout if the request completes
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       // Try to get error as JSON first

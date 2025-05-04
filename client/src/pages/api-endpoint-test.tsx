@@ -87,7 +87,7 @@ const sampleCVData = {
       email: 'jane@techsolutions.com'
     }
   ],
-  templateId: 'brightDiamond' // Set the template ID here
+  templateId: 'brightdiamond' // Set the template ID here (lowercase as expected by API)
 };
 
 const ApiEndpointTest: React.FC = () => {
@@ -101,8 +101,20 @@ const ApiEndpointTest: React.FC = () => {
     setSuccess(false);
     
     try {
+      // Show generating state for at least 3 seconds
+      const startTime = Date.now();
+      
       // Call the API directly with our sample data
-      const pdfBlob = await downloadCVWithPreviewEndpoint('brightDiamond', sampleCVData);
+      console.log('Starting download with template ID: brightdiamond');
+      console.log('Data being sent:', JSON.stringify(sampleCVData, null, 2));
+      
+      const pdfBlob = await downloadCVWithPreviewEndpoint('brightdiamond', sampleCVData);
+      
+      // Ensure we show "generating" for at least 3 seconds
+      const elapsedTime = Date.now() - startTime;
+      if (elapsedTime < 3000) {
+        await new Promise(resolve => setTimeout(resolve, 3000 - elapsedTime));
+      }
       
       // Create download link
       const url = URL.createObjectURL(pdfBlob);
@@ -150,7 +162,7 @@ const ApiEndpointTest: React.FC = () => {
           <div className="bg-slate-50 p-4 rounded-md">
             <h3 className="font-medium mb-2">Testing Endpoint:</h3>
             <code className="text-sm bg-slate-100 p-1 rounded">
-              POST https://cv-screener-africanuspanga.replit.app/api/preview-template/brightDiamond
+              POST https://cv-screener-africanuspanga.replit.app/api/preview-template/brightdiamond
             </code>
           </div>
           
@@ -188,7 +200,7 @@ const ApiEndpointTest: React.FC = () => {
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Testing API Endpoint...
+                Generating PDF... (Please wait 3-5 seconds)
               </>
             ) : (
               <>
