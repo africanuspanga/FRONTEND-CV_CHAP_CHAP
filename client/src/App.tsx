@@ -59,6 +59,7 @@ import BackendTest from "@/pages/backend-test";
 import APIStatusCheck from "@/pages/api-status-check";
 import ApiEndpointTest from "@/pages/api-endpoint-test";
 import CVScreenerTest from "@/pages/cv-screener-test";
+import ProxyTestPage from "@/pages/proxy-test-page";
 
 function Router() {
   return (

@@ -1,8 +1,13 @@
 import { CVData } from '@/types/cv-form-types';
 import { fetchFromCVScreener } from '@/lib/cors-proxy';
 
-// API base URL for our backend service
-export const API_BASE_URL = 'https://cv-screener-africanuspanga.replit.app';
+// API base URL for our backend service - used for reference only
+// All requests should go through the proxy service instead of direct API calls
+const BACKEND_API_URL = 'https://cv-screener-africanuspanga.replit.app';
+
+// Never use this URL directly in fetch calls - always use the fetchFromCVScreener helper
+// which routes requests through our server-side proxy to avoid CORS issues
+export const API_BASE_URL = BACKEND_API_URL;
 
 /**
  * Transform our internal CV data format to the backend expected format
@@ -370,52 +375,29 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
  */
 export const directDownloadCV = async (templateId: string, cvData: CVData): Promise<Blob> => {
   try {
-    const url = `${API_BASE_URL}/download-pdf-test/${templateId}`;
-    console.log(`Attempting direct PDF download from: ${url}`);
+    // Convert templateId to lowercase to match backend expectations
+    const normalizedTemplateId = templateId.toLowerCase();
+    console.log(`Attempting direct PDF download for template: ${normalizedTemplateId}`);
     
     // Transform CV data to backend format
-    // This includes required fields name and email at root level
-    const transformedCVData = transformCVDataForBackend(cvData);
+    const transformedData = transformCVDataForBackend(cvData);
     
-    // Create complete data structure with required fields at root level
-    const completeData = {
-      ...cvData,  // Include the original complete CV data structure
-      name: cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName,  // Add required fields at root level
-      email: cvData.personalInfo.email
-    };
+    console.log('Transformed data being sent:', JSON.stringify(transformedData, null, 2));
     
-    // Log both formats for debugging
-    console.log('Transformed data being sent:', JSON.stringify(transformedCVData, null, 2));
-    console.log('Complete original data structure:', JSON.stringify(completeData, null, 2));
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/pdf, application/json',
-        'Origin': window.location.origin,
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      credentials: 'include',
-      body: JSON.stringify(completeData)
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error response body:', errorText);
-      
-      let errorMessage;
-      try {
-        const errorData = JSON.parse(errorText);
-        errorMessage = errorData.error || `Server responded with status ${response.status}`;
-      } catch (e) {
-        errorMessage = `Server responded with status ${response.status}: ${errorText}`;
+    // Use our CORS proxy to make the request
+    const blob = await fetchFromCVScreener<Blob>(
+      `api/download-pdf-test/${normalizedTemplateId}`,
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/pdf',
+        },
+        responseType: 'blob',
+        body: transformedData,
+        includeCredentials: true
       }
-      
-      throw new Error(errorMessage);
-    }
-
-    const blob = await response.blob();
+    );
+    
     console.log('Direct PDF download successful', { size: blob.size, type: blob.type });
     return blob;
   } catch (error) {
