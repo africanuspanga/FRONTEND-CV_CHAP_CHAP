@@ -1,7 +1,7 @@
 import { CVData, WorkExperience, Education, Skill, Language, Certification, Project, Reference } from '@shared/schema';
 
-// Backend API URL - always use local mock server during development
-export const API_BASE_URL = window.location.origin;
+// Backend API URL - production backend for CV generation
+export const API_BASE_URL = 'https://cv-screener-africanuspanga.replit.app';
 
 /**
  * Transform our internal CV data format to the backend expected format
@@ -203,7 +203,7 @@ export const verifyUSSDPayment = async (requestId: string, paymentMessage: strin
         const location = response.headers.get('Location');
         return { 
           success: true, 
-          redirect_url: location || `/api/cv-pdf/${requestId}/status-page`
+          redirect_url: location || `${API_BASE_URL}/api/cv-pdf/${requestId}/status-page`
         };
       }
 
@@ -215,7 +215,7 @@ export const verifyUSSDPayment = async (requestId: string, paymentMessage: strin
 
     const data = await response.json().catch(() => ({ success: true }));
     console.log('Payment verification successful:', data);
-    return { ...data, success: true, redirect_url: `/api/cv-pdf/${requestId}/status-page` };
+    return { ...data, success: true, redirect_url: `${API_BASE_URL}/api/cv-pdf/${requestId}/status-page` };
   } catch (error) {
     console.error('Error verifying USSD payment:', error);
     
