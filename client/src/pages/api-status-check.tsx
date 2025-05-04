@@ -97,7 +97,14 @@ const APIStatusCheck: React.FC = () => {
     setEndpoints(updatedEndpoints);
 
     try {
-      const response = await fetch(updatedEndpoints[index].url, {
+      // Ensure the URL is valid
+      const url = updatedEndpoints[index].url;
+      
+      if (!url) {
+        throw new Error('URL is undefined or invalid');
+      }
+      
+      const response = await fetch(url, {
         method: updatedEndpoints[index].method,
         headers: {
           'Content-Type': 'application/json'
@@ -121,9 +128,10 @@ const APIStatusCheck: React.FC = () => {
         setRequestId(responseData.request_id);
         // Update subsequent endpoint URLs with the new request ID
         for (let i = 1; i < updatedEndpoints.length; i++) {
+          const newUrl = updatedEndpoints[i].url.replace("{requestId}", responseData.request_id);
           updatedEndpoints[i] = {
             ...updatedEndpoints[i],
-            url: updatedEndpoints[i].url.replace("{requestId}", responseData.request_id)
+            url: newUrl
           };
         }
       }
@@ -154,7 +162,14 @@ const APIStatusCheck: React.FC = () => {
     setEndpoints(updatedEndpoints);
 
     try {
-      const response = await fetch(updatedEndpoints[index].url, {
+      // Ensure the URL is valid
+      const url = updatedEndpoints[index].url;
+      
+      if (!url) {
+        throw new Error('URL is undefined or invalid');
+      }
+      
+      const response = await fetch(url, {
         method: updatedEndpoints[index].method,
         headers: {
           'Content-Type': 'application/json'
@@ -204,7 +219,14 @@ const APIStatusCheck: React.FC = () => {
     setEndpoints(updatedEndpoints);
 
     try {
-      const response = await fetch(updatedEndpoints[index].url);
+      // Ensure the URL is valid
+      const url = updatedEndpoints[index].url;
+      
+      if (!url) {
+        throw new Error('URL is undefined or invalid');
+      }
+      
+      const response = await fetch(url);
       const responseData = await response.json();
 
       updatedEndpoints[index] = {
@@ -240,7 +262,14 @@ const APIStatusCheck: React.FC = () => {
     setEndpoints(updatedEndpoints);
 
     try {
-      const response = await fetch(updatedEndpoints[index].url);
+      // Ensure the URL is valid
+      const url = updatedEndpoints[index].url;
+      
+      if (!url) {
+        throw new Error('URL is undefined or invalid');
+      }
+      
+      const response = await fetch(url);
       const blob = await response.blob();
 
       updatedEndpoints[index] = {
