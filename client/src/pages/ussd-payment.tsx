@@ -116,27 +116,27 @@ const USSDPaymentPage: React.FC = () => {
     
     // Validation for complete Selcom SMS message (must be between 145-180 characters)
     if (smsText.length < 145 || smsText.length > 180) {
-      setVerificationError(`The SMS length (${smsText.length}) is invalid. A complete Selcom message should be between 145-180 characters. Please copy and paste the entire message.`);
+      setVerificationError(`Invalid SMS format. Please copy and paste the complete SMS received from Selcom.`);
       setIsVerifying(false);
       return;
     }
     
     // Check for required security elements
     const requiredElements = [
-      { text: 'DRIFTMARK TECHNOLOGI', error: 'Message must contain "DRIFTMARK TECHNOLOGI"' },
-      { text: 'Merchant# 61115073', error: 'Message must contain "Merchant# 61115073"' },
-      { text: 'TZS 10,000.00', error: 'Payment amount must be TZS 10,000.00' },
-      { text: 'Selcom Pay', error: 'Not a valid Selcom payment message' },
-      { text: 'TransID', error: 'Missing transaction ID' },
-      { text: 'Ref', error: 'Missing reference number' },
-      { text: 'Channel', error: 'Missing payment channel' },
-      { text: 'From', error: 'Missing sender information' }
+      { text: 'DRIFTMARK TECHNOLOGI' },
+      { text: 'Merchant# 61115073' },
+      { text: 'TZS 10,000.00' },
+      { text: 'Selcom Pay' },
+      { text: 'TransID' },
+      { text: 'Ref' },
+      { text: 'Channel' },
+      { text: 'From' }
     ];
     
     // Check all required elements
     for (const element of requiredElements) {
       if (!smsText.includes(element.text)) {
-        setVerificationError(`Invalid SMS format: ${element.error}. Please use the complete Selcom message.`);
+        setVerificationError(`Invalid SMS format. Please copy and paste the complete SMS received from Selcom.`);
         setIsVerifying(false);
         return;
       }
@@ -145,7 +145,7 @@ const USSDPaymentPage: React.FC = () => {
     // Validate structure - should have around 8-10 lines
     const lines = smsText.split('\n').filter(line => line.trim().length > 0);
     if (lines.length < 7) {
-      setVerificationError('The SMS format is incorrect. Make sure you copied the complete message with all lines intact.');
+      setVerificationError('Invalid SMS format. Please copy and paste the complete SMS received from Selcom.');
       setIsVerifying(false);
       return;
     }
@@ -165,7 +165,7 @@ const USSDPaymentPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Error extracting reference:', error);
-      setVerificationError('Could not find a valid reference number in the message. Please ensure you\'ve pasted the complete SMS.');
+      setVerificationError('Invalid SMS format. Please copy and paste the complete SMS received from Selcom.');
       setIsVerifying(false);
       return;
     }
