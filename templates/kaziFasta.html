@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kazi Fasta CV</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Arial:wght@400;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      color: #333;
+      background-color: #fff;
+      line-height: 1.5;
+    }
+    
+    .kazi-fasta-template {
+      font-family: Arial, sans-serif;
+      color: #333;
+      background-color: #fff;
+      max-width: 900px;
+      margin: 0 auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 40px 30px;
+      position: relative;
+    }
+    
+    header .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .name-title h1 {
+      margin: 0 0 5px 0;
+      font-size: 2.4rem;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+    }
+    
+    .name-title h2 {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: normal;
+      letter-spacing: 0.05em;
+    }
+    
+    .contact-info {
+      text-align: right;
+    }
+    
+    .contact-info div {
+      margin: 5px 0;
+      font-size: 0.9rem;
+    }
+    
+    main {
+      padding: 30px;
+    }
+    
+    section {
+      margin-bottom: 25px;
+    }
+    
+    h2 {
+      font-size: 1.2rem;
+      color: #2c3e50;
+      border-bottom: 2px solid #2c3e50;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+    }
+    
+    .columns {
+      display: flex;
+      gap: 30px;
+    }
+    
+    .left-column {
+      flex: 2;
+      padding-right: 15px;
+    }
+    
+    .right-column {
+      flex: 1;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    
+    .job, .education-item {
+      margin-bottom: 20px;
+    }
+    
+    .job-header, .education-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    
+    .job h3, .education-item h3 {
+      margin: 0 0 5px 0;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    
+    .job-date, .education-date {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .job-company, .education-institution {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #444;
+    }
+    
+    .job p, .education-item p {
+      margin: 10px 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    .job ul, .education-item ul {
+      margin: 10px 0;
+      padding-left: 20px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    .skill-item {
+      margin-bottom: 12px;
+    }
+    
+    .skill-name {
+      font-size: 0.95rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .skill-bar-container {
+      height: 8px;
+      background-color: #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .skill-bar {
+      height: 100%;
+      background-color: #3498db;
+      border-radius: 4px;
+    }
+    
+    .language-item {
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .language-name {
+      font-size: 0.95rem;
+      font-weight: bold;
+    }
+    
+    .language-level {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    
+    .reference-item {
+      margin-bottom: 15px;
+    }
+    
+    .reference-item h3 {
+      font-size: 1rem;
+      font-weight: bold;
+      margin: 0 0 5px 0;
+    }
+    
+    .reference-item p {
+      font-size: 0.9rem;
+      margin: 0 0 2px 0;
+    }
+    
+    .reference-item p.position {
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="kazi-fasta-template">
+    <div class="document">
+      <header>
+        <div class="header-content">
+          <div class="name-title">
+            <h1 id="full-name">{{ personalInfo.firstName }} {{ personalInfo.lastName }}</h1>
+            <h2 id="job-title">{{ personalInfo.jobTitle }}</h2>
+          </div>
+          <div class="contact-info">
+            {% if personalInfo.email %}<div id="email">{{ personalInfo.email }}</div>{% endif %}
+            {% if personalInfo.phone %}<div id="phone">{{ personalInfo.phone }}</div>{% endif %}
+            {% if personalInfo.location %}<div id="location">{{ personalInfo.location }}</div>{% endif %}
+            {% if personalInfo.website %}<div id="website">{{ personalInfo.website }}</div>{% endif %}
+          </div>
+        </div>
+      </header>
+
+      <main>
+        {% if summary %}
+        <section class="summary">
+          <h2>PROFESSIONAL SUMMARY</h2>
+          <p id="summary">{{ summary }}</p>
+        </section>
+        {% endif %}
+
+        <div class="columns">
+          <div class="left-column">
+            {% if workExperience and workExperience|length > 0 %}
+            <section class="work-experience">
+              <h2>WORK EXPERIENCE</h2>
+              <div id="experience-container">
+                {% for job in workExperience %}
+                <div class="job">
+                  <div class="job-header">
+                    <h3 class="job-title">{{ job.jobTitle }}</h3>
+                    <div class="job-date">{{ job.startDate }}{% if job.endDate %} - {{ job.endDate }}{% endif %}</div>
+                  </div>
+                  <div class="job-company">{{ job.company }}{% if job.location %} • {{ job.location }}{% endif %}</div>
+                  {% if job.description %}
+                  <p class="job-description">{{ job.description }}</p>
+                  {% endif %}
+                  {% if job.achievements and job.achievements|length > 0 %}
+                  <ul class="job-achievements">
+                    {% for achievement in job.achievements %}
+                    <li>{{ achievement }}</li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              </div>
+            </section>
+            {% endif %}
+
+            {% if education and education|length > 0 %}
+            <section class="education">
+              <h2>EDUCATION</h2>
+              <div id="education-container">
+                {% for edu in education %}
+                <div class="education-item">
+                  <div class="education-header">
+                    <h3 class="degree">{{ edu.degree }}</h3>
+                    <div class="education-date">{{ edu.startDate }}{% if edu.endDate %} - {{ edu.endDate }}{% endif %}</div>
+                  </div>
+                  <div class="education-institution">{{ edu.institution }}{% if edu.fieldOfStudy %} • {{ edu.fieldOfStudy }}{% endif %}</div>
+                  {% if edu.description %}
+                  <p class="education-description">{{ edu.description }}</p>
+                  {% endif %}
+                  {% if edu.achievements and edu.achievements|length > 0 %}
+                  <ul class="education-achievements">
+                    {% for achievement in edu.achievements %}
+                    <li>{{ achievement }}</li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              </div>
+            </section>
+            {% endif %}
+          </div>
+
+          <div class="right-column">
+            {% if skills and skills|length > 0 %}
+            <section class="skills">
+              <h2>SKILLS</h2>
+              <div class="skills-container" id="skills-container">
+                {% for skill in skills %}
+                <div class="skill-item">
+                  <div class="skill-name">{{ skill.name }}</div>
+                  <div class="skill-bar-container">
+                    <div class="skill-bar" style="width: {{ (skill.level|default(3)) * 20 }}%"></div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </section>
+            {% endif %}
+
+            {% if languages and languages|length > 0 %}
+            <section class="languages">
+              <h2>LANGUAGES</h2>
+              <div class="languages-container" id="languages-container">
+                {% for language in languages %}
+                <div class="language-item">
+                  <span class="language-name">{{ language.name }}</span>
+                  <span class="language-level">{{ language.proficiency }}</span>
+                </div>
+                {% endfor %}
+              </div>
+            </section>
+            {% endif %}
+
+            {% if references and references|length > 0 %}
+            <section class="references">
+              <h2>REFERENCES</h2>
+              <div id="references-container">
+                {% for reference in references %}
+                <div class="reference-item">
+                  <h3>{{ reference.name }}</h3>
+                  {% if reference.position %}<p class="position">{{ reference.position }}</p>{% endif %}
+                  {% if reference.company %}<p class="company">{{ reference.company }}</p>{% endif %}
+                  {% if reference.email %}<p class="email">{{ reference.email }}</p>{% endif %}
+                  {% if reference.phone %}<p class="phone">{{ reference.phone }}</p>{% endif %}
+                </div>
+                {% endfor %}
+              </div>
+            </section>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div id="additional-sections-container"></div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
