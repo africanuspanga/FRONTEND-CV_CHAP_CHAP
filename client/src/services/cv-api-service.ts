@@ -357,7 +357,15 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
     
     // Transform CV data to backend format
     const transformedCVData = transformCVDataForBackend(cvData);
-    console.log('Transformed data being sent:', JSON.stringify(transformedCVData, null, 2));
+    
+    // Add required fields according to backend requirements
+    const dataToSend = {
+      ...transformedCVData,
+      name: `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`,
+      email: cvData.personalInfo.email
+    };
+    
+    console.log('Data being sent:', JSON.stringify(dataToSend, null, 2));
     
     // Set a longer timeout for the fetch operation (30 seconds)
     const controller = new AbortController();
@@ -367,25 +375,47 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/pdf, application/json'
+        'Accept': 'application/pdf, application/json',
+        'Origin': window.location.origin,
+        // Additional headers to handle CORS
+        'X-Requested-With': 'XMLHttpRequest'
       },
-      body: JSON.stringify(transformedCVData),
+      // Enable credentials to allow cookies if needed
+      credentials: 'include',
+      // Send the updated data format
+      body: JSON.stringify(dataToSend),
       signal: controller.signal
     });
     
     // Clear the timeout if the request completes
     clearTimeout(timeoutId);
 
+    // Log all response information for debugging
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+    
+    // Check for success status
     if (!response.ok) {
+      let errorMessage = '';
+      
       // Try to get error as JSON first
       try {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Server responded with status ${response.status}`);
-      } catch (jsonError) {
-        // If not JSON, get as text
-        const errorText = await response.text();
-        throw new Error(`Server responded with status ${response.status}: ${errorText}`);
+        const responseText = await response.text();
+        console.log('Error response body:', responseText);
+        
+        // Try to parse as JSON
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.error || `Server responded with status ${response.status}`;
+        } catch (parseError) {
+          // If can't parse JSON, use text directly
+          errorMessage = `Server responded with status ${response.status}: ${responseText}`;
+        }
+      } catch (readError) {
+        errorMessage = `Server responded with status ${response.status} (could not read response)`;
       }
+      
+      throw new Error(errorMessage);
     }
 
     const blob = await response.blob();
