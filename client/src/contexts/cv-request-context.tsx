@@ -91,6 +91,11 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsLoading(true);
     setError(null);
     
+    // Log the data being sent to backend
+    console.log('Data being sent to backend:');
+    console.log('Template ID:', templateId);
+    console.log('CV Data:', JSON.stringify(cvData, null, 2));
+    
     try {
       const result = await initiateUSSDPayment(templateId, cvData);
       

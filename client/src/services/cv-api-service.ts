@@ -22,26 +22,50 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
   try {
     const url = `${API_BASE_URL}/api/cv-pdf/anonymous/initiate-ussd`;
     console.log(`Attempting to initiate payment at: ${url}`);
+    
+    // Log the exact JSON being sent
+    const requestBody = {
+      template_id: templateId,
+      cv_data: cvData
+    };
+    console.log('Request payload:', JSON.stringify(requestBody, null, 2));
 
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        template_id: templateId,
-        cv_data: cvData
-      })
+      body: JSON.stringify(requestBody)
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response headers:', [...response.headers.entries()]);
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({
-        error: `Server responded with status ${response.status}`
-      }));
+      const errorText = await response.text();
+      console.log('Error response body:', errorText);
+      
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch (e) {
+        errorData = { error: `Server responded with status ${response.status}: ${errorText}` };
+      }
+      
       throw new Error(errorData.error || 'Failed to initiate payment');
     }
 
-    const data = await response.json();
+    const responseText = await response.text();
+    console.log('Response body:', responseText);
+    
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Error parsing JSON response:', e);
+      throw new Error('Invalid JSON response from server');
+    }
+    
     console.log('Payment initiation successful:', data);
     return data;
   } catch (error) {
