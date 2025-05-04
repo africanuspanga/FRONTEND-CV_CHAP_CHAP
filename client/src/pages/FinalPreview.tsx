@@ -272,7 +272,7 @@ const FinalPreview = () => {
             {/* All Templates */}
             <div className="p-4 overflow-y-auto" style={isMobile ? {maxHeight: 'calc(100vh - 130px)'} : {}}>
               <h4 className="text-sm font-medium text-gray-500 mb-3">All templates</h4>
-              <div className="space-y-4">
+              <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'space-y-4'}`}>
                 {allTemplates.map((template) => (
                   <div 
                     key={template.id}
@@ -288,6 +288,7 @@ const FinalPreview = () => {
                         src={template.previewImage} 
                         alt={template.name}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                       
                       {/* Selected Indicator */}
@@ -310,12 +311,14 @@ const FinalPreview = () => {
         )}
         
         {/* CV Preview Area */}
-        <div className={`flex-grow overflow-auto flex justify-center items-start ${isMobile ? 'p-2' : 'p-4'} bg-gray-100`}>
-          <div className="bg-white shadow-md overflow-hidden max-w-screen-md w-full aspect-[210/297] print:shadow-none">
+        <div className={`flex-grow overflow-auto flex justify-center items-start ${isMobile ? 'p-1 pt-3' : 'p-4'} bg-gray-100`}>
+          <div className="bg-white shadow-md overflow-hidden max-w-screen-md w-full aspect-[210/297] print:shadow-none" 
+            style={isMobile ? {maxHeight: 'calc(100vh - 220px)'} : {}}
+          >
             <DirectTemplateRenderer
               templateId={currentTemplateId}
               cvData={formData}
-              height={800}
+              height={isMobile ? 600 : 800}
             />
           </div>
         </div>

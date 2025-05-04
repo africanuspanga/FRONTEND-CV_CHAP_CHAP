@@ -272,10 +272,10 @@ const APIStatusCheck: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">API Endpoint Status Check</h1>
+    <div className="container mx-auto px-4 py-4 md:py-8">
+      <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">API Endpoint Status Check</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
         {/* CV PDF Endpoints */}
         <Card>
           <CardHeader>
@@ -286,39 +286,39 @@ const APIStatusCheck: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label>Request ID:</Label>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <Label className="md:w-1/3">Request ID:</Label>
                 <Input 
                   value={requestId} 
                   onChange={(e) => setRequestId(e.target.value)} 
                   placeholder="Will be populated after initiate test"
-                  className="max-w-xs"
+                  className="w-full md:max-w-xs"
                 />
               </div>
               
-              <div className="flex items-center justify-between">
-                <Label>Payment Message:</Label>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <Label className="md:w-1/3">Payment Message:</Label>
                 <Input 
                   value={paymentMessage} 
                   onChange={(e) => setPaymentMessage(e.target.value)} 
-                  className="max-w-xs"
+                  className="w-full md:max-w-xs"
                 />
               </div>
             </div>
             
             <div className="space-y-4 mt-4">
               {endpoints.map((endpoint, index) => (
-                <div key={index} className="border rounded-md p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <div>
+                <div key={index} className="border rounded-md p-3 md:p-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+                    <div className="overflow-hidden">
                       <Badge variant="outline" className="mr-2">{endpoint.method}</Badge>
-                      <code className="text-sm">{endpoint.url}</code>
+                      <code className="text-xs md:text-sm overflow-hidden text-ellipsis">{endpoint.url}</code>
                     </div>
-                    <div>{getStatusBadge(endpoint.status)}</div>
+                    <div className="flex-shrink-0">{getStatusBadge(endpoint.status)}</div>
                   </div>
                   
                   {endpoint.status === 'success' && (
-                    <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                    <div className="mt-2 p-2 bg-gray-50 rounded text-xs sm:text-sm">
                       <p className="font-medium">Status: {endpoint.statusCode}</p>
                       {endpoint.method === 'GET' && index === 3 && endpoint.response ? (
                         <div>
@@ -333,7 +333,7 @@ const APIStatusCheck: React.FC = () => {
                           </a>
                         </div>
                       ) : (
-                        <pre className="overflow-auto max-h-40">
+                        <pre className="overflow-auto max-h-32 sm:max-h-40 text-xs sm:text-sm p-1 bg-gray-100 rounded">
                           {JSON.stringify(endpoint.response, null, 2)}
                         </pre>
                       )}
@@ -341,10 +341,10 @@ const APIStatusCheck: React.FC = () => {
                   )}
                   
                   {endpoint.status === 'error' && (
-                    <div className="mt-2 p-2 bg-red-50 text-red-700 rounded text-sm">
+                    <div className="mt-2 p-2 bg-red-50 text-red-700 rounded text-xs sm:text-sm">
                       <p>Error: {endpoint.error || `HTTP ${endpoint.statusCode}`}</p>
                       {endpoint.response && (
-                        <pre className="overflow-auto max-h-40 mt-1">
+                        <pre className="overflow-auto max-h-32 sm:max-h-40 mt-1 text-xs sm:text-sm p-1 bg-red-100 rounded">
                           {JSON.stringify(endpoint.response, null, 2)}
                         </pre>
                       )}
@@ -355,6 +355,7 @@ const APIStatusCheck: React.FC = () => {
                     <Button 
                       variant="outline" 
                       size="sm"
+                      className="w-full sm:w-auto text-xs sm:text-sm py-1 px-2 h-auto"
                       onClick={() => {
                         switch (index) {
                           case 0: return testInitiateEndpoint();
@@ -372,10 +373,16 @@ const APIStatusCheck: React.FC = () => {
               ))}
             </div>
           </CardContent>
-          <CardFooter>
-            <Button variant="outline" onClick={resetTests}>Reset All Tests</Button>
+          <CardFooter className="flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
             <Button 
-              className="ml-2" 
+              variant="outline" 
+              onClick={resetTests}
+              className="w-full sm:w-auto"
+            >
+              Reset All Tests
+            </Button>
+            <Button 
+              className="w-full sm:w-auto" 
               onClick={() => {
                 testInitiateEndpoint().then(() => {
                   // Wait a bit for the request ID to be set
