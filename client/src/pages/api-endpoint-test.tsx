@@ -1,0 +1,206 @@
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Loader2, ArrowLeft, Check, Download } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { downloadCVWithPreviewEndpoint } from '@/services/cv-api-service';
+import { Link } from 'wouter';
+
+// Sample CV data that matches backend requirements
+const sampleCVData = {
+  personalInfo: {
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@example.com',
+    phone: '+255 123 456 789',
+    city: 'Dar es Salaam',
+    country: 'Tanzania',
+    professionalTitle: 'Software Engineer',
+    summary: 'Experienced software engineer with 5+ years in web development, specialized in React and Node.js.'
+  },
+  workExperiences: [
+    {
+      id: '1',
+      jobTitle: 'Senior Developer',
+      company: 'Tech Solutions Ltd',
+      location: 'Dar es Salaam',
+      startDate: 'Jan 2020',
+      current: true,
+      description: 'Lead developer for enterprise web applications. Managed team of 5 developers.'
+    },
+    {
+      id: '2',
+      jobTitle: 'Web Developer',
+      company: 'Digital Innovations',
+      location: 'Arusha',
+      startDate: 'Mar 2018',
+      endDate: 'Dec 2019',
+      current: false,
+      description: 'Developed and maintained client websites using React and Node.js.'
+    }
+  ],
+  education: [
+    {
+      id: '1',
+      degree: 'Bachelor of Science in Computer Science',
+      institution: 'University of Dar es Salaam',
+      location: 'Dar es Salaam',
+      startDate: '2014',
+      endDate: '2018',
+      current: false,
+      description: 'Graduated with honors. Specialized in software engineering.'
+    }
+  ],
+  skills: [
+    { id: '1', name: 'JavaScript' },
+    { id: '2', name: 'React' },
+    { id: '3', name: 'Node.js' },
+    { id: '4', name: 'TypeScript' },
+    { id: '5', name: 'HTML/CSS' }
+  ],
+  languages: [
+    { id: '1', name: 'English', proficiency: 'fluent' as const },
+    { id: '2', name: 'Swahili', proficiency: 'native' as const }
+  ],
+  certifications: [
+    {
+      id: '1',
+      name: 'React Developer Certification',
+      issuer: 'Meta',
+      date: 'June 2022'
+    }
+  ],
+  projects: [
+    {
+      id: '1',
+      name: 'E-commerce Platform',
+      description: 'Built a complete e-commerce solution with payment integration',
+      url: 'https://example.com/project'
+    }
+  ],
+  references: [
+    {
+      id: '1',
+      name: 'Jane Smith',
+      position: 'CTO',
+      company: 'Tech Solutions Ltd',
+      email: 'jane@techsolutions.com'
+    }
+  ],
+  templateId: 'brightDiamond' // Set the template ID here
+};
+
+const ApiEndpointTest: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleTestDownload = async () => {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(false);
+    
+    try {
+      // Call the API directly with our sample data
+      const pdfBlob = await downloadCVWithPreviewEndpoint('brightDiamond', sampleCVData);
+      
+      // Create download link
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'JOHN_DOE-CV.pdf';
+      document.body.appendChild(a);
+      a.click();
+      
+      // Cleanup
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 100);
+      
+      setSuccess(true);
+    } catch (err) {
+      console.error('Test download failed:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="container mx-auto py-8 px-4">
+      <div className="mb-6">
+        <Link href="/">
+          <Button variant="ghost" className="flex items-center text-primary p-2">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Button>
+        </Link>
+      </div>
+      
+      <Card className="max-w-3xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl">API Endpoint Test</CardTitle>
+          <CardDescription>
+            Test the direct download from the preview template endpoint using the BrightDiamond template
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          <div className="bg-slate-50 p-4 rounded-md">
+            <h3 className="font-medium mb-2">Testing Endpoint:</h3>
+            <code className="text-sm bg-slate-100 p-1 rounded">
+              POST https://cv-screener-africanuspanga.replit.app/api/preview-template/brightDiamond
+            </code>
+          </div>
+          
+          <div className="bg-slate-50 p-4 rounded-md">
+            <h3 className="font-medium mb-2">Using Sample Data:</h3>
+            <pre className="text-xs bg-slate-100 p-2 rounded overflow-auto max-h-60">
+              {JSON.stringify(sampleCVData, null, 2)}
+            </pre>
+          </div>
+          
+          {success && (
+            <Alert className="bg-green-50 border-green-200">
+              <Check className="h-4 w-4 text-green-500" />
+              <AlertTitle>Success!</AlertTitle>
+              <AlertDescription>
+                The PDF was successfully generated and downloaded.
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {error && (
+            <Alert variant="destructive">
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+        
+        <CardFooter>
+          <Button 
+            onClick={handleTestDownload} 
+            disabled={isLoading}
+            className="w-full flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Testing API Endpoint...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4" />
+                Test Download BrightDiamond Template
+              </>
+            )}
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};
+
+export default ApiEndpointTest;

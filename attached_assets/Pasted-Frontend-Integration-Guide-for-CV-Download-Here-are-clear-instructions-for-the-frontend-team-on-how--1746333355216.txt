@@ -1,0 +1,109 @@
+Frontend Integration Guide for CV Download
+Here are clear instructions for the frontend team on how to implement the PDF CV download feature:
+
+1. Direct PDF Download Endpoint
+POST https://cv-screener-africanuspanga.replit.app/api/preview-template/{template_id}
+Required Parameters:
+template_id (in URL): Use "brightdiamond" or "basic"
+Request Body Format:
+Send a JSON object containing the CV data with these mandatory fields:
+
+{
+  "name": "Person Name",         // required
+  "email": "email@example.com",  // required
+  "title": "Job Title",
+  "phone": "+255 123 456 789",
+  "location": "City, Country",
+  "summary": "Professional summary text...",
+  "skills": ["Skill 1", "Skill 2", "Skill 3"],
+  "experience": [
+    {
+      "position": "Job Title",
+      "company": "Company Name",
+      "location": "City",
+      "startDate": "Jan 2020",
+      "endDate": "Present",
+      "description": "Job description text"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Degree Name",
+      "school": "Institution Name",
+      "location": "City",
+      "startDate": "2013",
+      "endDate": "2017",
+      "description": "Education description"
+    }
+  ]
+}
+Response:
+Success: PDF file with Content-Type: application/pdf
+Error: JSON response with error details
+2. Frontend Implementation Example
+// Example function to handle CV download
+function downloadCV(cvData, templateId) {
+  // Show loading state
+  setIsLoading(true);
+  
+  fetch(`https://cv-screener-africanuspanga.replit.app/api/preview-template/${templateId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(cvData)
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(error => {
+        throw new Error(error.error || 'Failed to generate PDF');
+      });
+    }
+    return response.blob();
+  })
+  .then(blob => {
+    // Create a download link
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    
+    // Use person's name for filename
+    const filename = `${cvData.name.replace(/\s+/g, '_').toUpperCase()}-CV.pdf`;
+    a.download = filename;
+    
+    // Trigger download
+    document.body.appendChild(a);
+    a.click();
+    
+    // Cleanup
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    setIsLoading(false);
+  })
+  .catch(error => {
+    console.error('Error downloading CV:', error);
+    setIsLoading(false);
+    setError(error.message);
+  });
+}
+3. Error Handling
+The API will return detailed error messages in case of failure. Common errors:
+
+400: Missing required fields (name, email)
+400: Invalid JSON format
+500: PDF generation failed
+Always check for error responses and display appropriate messages to users.
+
+4. After Payment Verification
+If you're using the payment verification flow:
+
+First call: POST /api/cv-pdf/anonymous/initiate-ussd (Returns a request_id)
+After payment verification: GET /api/cv-pdf/{request_id}/download
+Or you can simply use the direct endpoint described above if payment is already verified.
+
+5. Notes on PDF Generation
+PDF generation happens server-side and returns the complete PDF file
+The filename will be based on the person's name (e.g., "JOHN_DOE-CV.pdf")
+Generated PDFs will use the A4 format and are properly styled based on the template
+Tests show PDF generation takes 1-2 seconds for most templates
+Let me know if you need any clarification or additional examples!
