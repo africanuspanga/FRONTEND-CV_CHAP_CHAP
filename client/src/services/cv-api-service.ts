@@ -179,22 +179,22 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
   }
 };
 
-// Function to verify payment with confirmation message
-export const verifyUSSDPayment = async (requestId: string, paymentMessage: string): Promise<{
+// Function to verify payment with reference
+export const verifyUSSDPayment = async (requestId: string, paymentReference: string): Promise<{
   success: boolean;
   redirect_url?: string;
   error?: string;
 }> => {
   try {
-    const formData = new FormData();
-    formData.append('payment_message', paymentMessage);
-    
     const url = `${API_BASE_URL}/api/cv-pdf/${requestId}/verify`;
     console.log(`Attempting to verify payment at: ${url}`);
     
     const response = await fetch(url, {
       method: 'POST',
-      body: formData
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ payment_reference: paymentReference })
     });
 
     if (!response.ok) {

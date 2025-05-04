@@ -16,7 +16,7 @@ interface CVRequestContextType {
   error: string | null;
   isPolling: boolean;
   initiatePayment: (templateId: string, cvData: CVData) => Promise<boolean>;
-  verifyPayment: (paymentMessage: string) => Promise<boolean>;
+  verifyPayment: (paymentReference: string) => Promise<boolean>;
   checkStatus: () => Promise<CVRequestStatus | null>;
   downloadPDF: () => Promise<Blob | null>;
   resetRequest: () => void;
@@ -130,7 +130,7 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   // Function to verify payment
-  const verifyPayment = async (paymentMessage: string): Promise<boolean> => {
+  const verifyPayment = async (paymentReference: string): Promise<boolean> => {
     if (!requestId) {
       setError('No active payment request');
       return false;
@@ -140,7 +140,7 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     
     try {
-      const result = await verifyUSSDPayment(requestId, paymentMessage);
+      const result = await verifyUSSDPayment(requestId, paymentReference);
       
       if (result.success) {
         // Start polling for status updates

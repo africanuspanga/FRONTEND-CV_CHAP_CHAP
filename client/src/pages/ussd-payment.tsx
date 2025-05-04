@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 
 const USSDPaymentPage: React.FC = () => {
-  const [paymentMessage, setPaymentMessage] = useState('');
+  const [paymentReference, setPaymentReference] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationError, setVerificationError] = useState('');
   const [, navigate] = useLocation();
@@ -106,63 +106,30 @@ const USSDPaymentPage: React.FC = () => {
     setIsVerifying(true);
     setVerificationError('');
     
-    // Check if there is a payment message
-    const trimmedMessage = paymentMessage.trim();
-    if (!trimmedMessage) {
-      setVerificationError('Please paste the payment confirmation message');
+    // Check if there is a payment reference
+    const trimmedReference = paymentReference.trim();
+    if (!trimmedReference) {
+      setVerificationError('Please enter the payment reference from the SMS message');
       setIsVerifying(false);
       return;
     }
     
-    // Basic validation for message length
-    if (trimmedMessage.length < 150) {
-      setVerificationError('The payment message is too short. Please paste the complete Selcom message.');
+    // Basic validation for reference format
+    if (trimmedReference.length < 6) {
+      setVerificationError('The payment reference is too short. Please check and try again.');
       setIsVerifying(false);
       return;
     }
     
-    if (trimmedMessage.length > 180) {
-      setVerificationError('The message is too long. Please paste only the Selcom payment message.');
-      setIsVerifying(false);
-      return;
-    }
-    
-    // Perform frontend validation first as a security measure
-    // The backend will do its own validation as well
-    
-    // Make a normalized version for case-insensitive checks
-    const normalizedMessage = trimmedMessage.toLowerCase();
-    
-    // 1. Exact String Matching - Check for DRIFTMARK TECHNOLOGI (exact spelling)
-    if (!trimmedMessage.includes('DRIFTMARK TECHNOLOGI')) {
-      setVerificationError('Invalid payment recipient. Please ensure this payment was made correctly.');
-      setIsVerifying(false);
-      return;
-    }
-    
-    // 2. Format Structure Verification
-    const requiredTerms = [
-      'Selcom Pay',
-      'Merchant#',
-      '61115073',
-      'TZS',
-      'TransID',
-      'Ref',
-      'Channel',
-      'From'
-    ];
-    
-    const missingTerms = requiredTerms.filter(term => !trimmedMessage.includes(term));
-    
-    if (missingTerms.length > 0) {
-      setVerificationError('This doesn\'t appear to be a valid payment message. Please check and try again.');
+    if (trimmedReference.length > 20) {
+      setVerificationError('The reference is too long. Please enter just the reference number from the SMS message.');
       setIsVerifying(false);
       return;
     }
     
     // All validations passed, send to API for verification
     try {
-      const success = await verifyPaymentAPI(trimmedMessage);
+      const success = await verifyPaymentAPI(trimmedReference);
       
       if (!success) {
         setVerificationError(requestError || 'Payment verification failed. Please try again.');
@@ -270,23 +237,23 @@ const USSDPaymentPage: React.FC = () => {
                 </p>
                 <ol className="list-decimal pl-4 text-sm sm:text-base text-blue-700 space-y-1">
                   <li>Wait for SMS confirmation from <span className="font-bold">Selcom</span></li>
-                  <li>Copy the <span className="font-bold">entire</span> SMS message</li>
-                  <li>Paste it in the box below</li>
+                  <li>Find the <span className="font-bold">payment reference</span> in the SMS (e.g. ABC123XYZ)</li>
+                  <li>Enter the reference in the box below</li>
                   <li>Click the "Verify Payment" button</li>
                 </ol>
               </div>
               
               <Textarea 
-                placeholder="Paste Selcom payment confirmation message here..."
-                value={paymentMessage}
-                onChange={(e) => setPaymentMessage(e.target.value)}
-                className="h-28 sm:h-32 mb-2 text-sm sm:text-base"
-                maxLength={200}
+                placeholder="Enter payment reference from the SMS (e.g., ABC123XYZ)..."
+                value={paymentReference}
+                onChange={(e) => setPaymentReference(e.target.value)}
+                className="h-20 sm:h-24 mb-2 text-sm sm:text-base"
+                maxLength={20}
               />
               <div className="flex justify-between text-xs text-gray-500">
-                <span>Expected characters: 150-160</span>
-                <span className={paymentMessage.length < 150 ? "text-amber-500" : paymentMessage.length > 180 ? "text-red-500" : "text-green-500"}>
-                  {paymentMessage.length}/200 characters
+                <span>Reference from SMS message</span>
+                <span className={paymentReference.length < 6 ? "text-amber-500" : "text-green-500"}>
+                  {paymentReference.length}/20 characters
                 </span>
               </div>
             </div>
@@ -301,7 +268,7 @@ const USSDPaymentPage: React.FC = () => {
             <Button 
               onClick={handleVerifyPayment} 
               className="w-full bg-primary hover:bg-primary/90 py-3 sm:py-4 text-base sm:text-lg"
-              disabled={isVerifying || !paymentMessage.trim() || isLoading || isPending}
+              disabled={isVerifying || !paymentReference.trim() || isLoading || isPending}
             >
               {isVerifying ? (
                 <>
