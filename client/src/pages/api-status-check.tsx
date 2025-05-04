@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { API_BASE_URL } from '@/services/cv-api-service';
+import { API_BASE_URL, transformCVDataForBackend } from '@/services/cv-api-service';
 
 interface EndpointStatus {
   url: string;
@@ -19,14 +19,45 @@ const APIStatusCheck: React.FC = () => {
   const [requestId, setRequestId] = useState('');
   const [paymentMessage, setPaymentMessage] = useState('123456'); // Default test message
   const [dummyData, setDummyData] = useState({
-    templateId: 'kaziFasta',
     personalInfo: {
       firstName: 'John',
       lastName: 'Doe',
       email: 'john@example.com',
-      phone: '+255 123 456 789'
-    }
+      phone: '+255 123 456 789',
+      professionalTitle: 'Software Developer',
+      summary: 'Experienced software developer with 5 years of experience.'
+    },
+    workExperiences: [
+      {
+        id: '1',
+        jobTitle: 'Senior Developer',
+        company: 'Tech Solutions Ltd',
+        location: 'Dar es Salaam',
+        startDate: '2020-01',
+        endDate: '2023-01',
+        description: 'Led development team on multiple projects.'
+      }
+    ],
+    education: [
+      {
+        id: '1',
+        institution: 'University of Dar es Salaam',
+        degree: 'Bachelor of Science',
+        field: 'Computer Science',
+        startDate: '2014-09',
+        endDate: '2018-05'
+      }
+    ],
+    skills: [
+      { id: '1', name: 'JavaScript' },
+      { id: '2', name: 'React' },
+      { id: '3', name: 'Node.js' },
+      { id: '4', name: 'Python' }
+    ]
   });
+  
+  // Template ID for testing
+  const [templateId, setTemplateId] = useState('kaziFasta');
 
   // Define endpoints to test
   const [endpoints, setEndpoints] = useState<EndpointStatus[]>([
@@ -69,8 +100,8 @@ const APIStatusCheck: React.FC = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          template_id: dummyData.templateId,
-          cv_data: dummyData
+          template_id: templateId,
+          cv_data: transformCVDataForBackend(dummyData)
         })
       });
 
