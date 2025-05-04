@@ -131,6 +131,7 @@ function Router() {
                 <Route path="/api-status-check" component={APIStatusCheck} />
                 <Route path="/api-endpoint-test" component={ApiEndpointTest} />
                 <Route path="/cv-screener-test" component={CVScreenerTest} />
+                <Route path="/proxy-test" component={ProxyTestPage} />
                 <Route path="/template-gallery" component={TemplateGallery} />
                 <Route component={NotFound} />
               </Switch>
