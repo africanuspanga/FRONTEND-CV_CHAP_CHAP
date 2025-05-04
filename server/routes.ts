@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
 import crypto from 'crypto';
+import { openaiProxyHandler } from './openai-proxy';
 
 // In-memory storage for CV requests
 interface CVRequest {
@@ -21,6 +22,13 @@ const cvRequests: Record<string, CVRequest> = {};
 const upload = multer();
 
 export function registerRoutes(app: Express): Server {
+  // API key status endpoint
+  app.get("/api/keys/status", (req, res) => {
+    res.status(200).json({
+      openai: !!process.env.OPENAI_API_KEY
+    });
+  });
+
   // Health check endpoint
   app.get("/api/cv-pdf/health", (req, res) => {
     res.status(200).json({
@@ -163,6 +171,9 @@ export function registerRoutes(app: Express): Server {
       });
     }
   });
+
+  // OpenAI proxy endpoint
+  app.post("/api/openai/proxy", openaiProxyHandler);
 
   // API route for downloading PDF
   app.get("/api/cv-pdf/:requestId/download", (req, res) => {
