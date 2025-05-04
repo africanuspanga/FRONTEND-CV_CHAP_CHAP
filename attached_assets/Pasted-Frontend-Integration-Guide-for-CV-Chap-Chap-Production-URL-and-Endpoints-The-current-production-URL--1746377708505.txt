@@ -1,0 +1,166 @@
+Frontend Integration Guide for CV Chap Chap
+Production URL and Endpoints
+The current production URL is:
+
+https://cv-screener-africanuspanga.replit.app
+Available Endpoints
+Get All Templates
+
+GET https://cv-screener-africanuspanga.replit.app/api/templates
+Returns all available templates as JSON
+No authentication required
+Response includes template details: id, name, description, thumbnail_url, etc.
+Preview Template with Data (Generate PDF without payment)
+
+POST https://cv-screener-africanuspanga.replit.app/api/preview-template/{template_id}
+Used for testing/previewing templates with CV data
+Requires CV data in JSON format
+Returns PDF directly or as Base64 (if X-Prefer-JSON-Response header used)
+Download Test PDF (Pre-generated sample)
+
+GET https://cv-screener-africanuspanga.replit.app/api/download-test-pdf/{template_id}
+Returns a pre-generated sample PDF for the specified template
+Good for testing download functionality
+CV Creation Flow (with payment)
+
+Initiate: POST https://cv-screener-africanuspanga.replit.app/api/cv-pdf/anonymous/initiate-ussd
+Verify Payment: POST https://cv-screener-africanuspanga.replit.app/api/cv-pdf/{request_id}/verify
+Check Status: GET https://cv-screener-africanuspanga.replit.app/api/cv-pdf/{request_id}/status
+Download: GET https://cv-screener-africanuspanga.replit.app/api/cv-pdf/{request_id}/download
+JSON Format for Templates
+Here's the expected JSON structure for the CV data that needs to be sent to the template rendering endpoints:
+
+{
+  "name": "John Doe",              // REQUIRED
+  "email": "john@example.com",     // REQUIRED
+  "phone": "+255 123 456 789",     // Optional but recommended
+  "title": "Software Engineer",     // Professional title
+  "location": "Dar es Salaam, Tanzania", // Location
+  "summary": "Experienced software engineer with 5+ years...", // Professional summary
+  
+  "experience": [
+    {
+      "position": "Senior Developer",
+      "company": "Tech Solutions Ltd",
+      "location": "Dar es Salaam",
+      "startDate": "Jan 2020",
+      "endDate": "Present",
+      "description": "Led development of enterprise applications..."
+    },
+    // More work experiences...
+  ],
+  
+  "education": [
+    {
+      "degree": "BSc in Computer Science",
+      "school": "University of Dar es Salaam",
+      "location": "Dar es Salaam",
+      "startDate": "2014",
+      "endDate": "2018",
+      "description": "Graduated with honors, specialized in AI"
+    },
+    // More education entries...
+  ],
+  
+  "skills": [
+    "JavaScript",
+    "React",
+    "Node.js",
+    "Python",
+    // More skills...
+  ],
+  
+  "languages": [
+    "English (Fluent)",
+    "Swahili (Native)",
+    // More languages...
+  ],
+  
+  "certifications": [
+    {
+      "name": "AWS Certified Developer",
+      "issuer": "Amazon Web Services",
+      "date": "2021",
+      "description": "Professional certification for AWS cloud development"
+    },
+    // More certifications...
+  ],
+  
+  "hobbies": "Reading, hiking, and community volunteer work",
+  
+  "references": [
+    {
+      "name": "Jane Smith",
+      "position": "CTO",
+      "company": "Tech Innovations",
+      "email": "jane@example.com",
+      "phone": "+255 987 654 321"
+    },
+    // More references...
+  ]
+}
+Example API Integration
+Here's a sample JavaScript code to preview a template:
+
+// Preview template with CV data
+async function previewTemplate(templateId, cvData) {
+  try {
+    const response = await fetch(`https://cv-screener-africanuspanga.replit.app/api/preview-template/${templateId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Prefer-JSON-Response': '1'  // For base64 response
+      },
+      body: JSON.stringify(cvData)
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success && data.pdf_base64) {
+        // Create download link with base64 data
+        const pdfBlob = base64ToBlob(data.pdf_base64, 'application/pdf');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        downloadPdf(pdfUrl, data.filename || 'cv.pdf');
+      } else {
+        console.error('Failed to get PDF data:', data.error);
+      }
+    } else {
+      console.error('API request failed:', response.status);
+    }
+  } catch (error) {
+    console.error('Error previewing template:', error);
+  }
+}
+Testing Template Options
+If you want to test a specific template, you can use the direct test endpoints:
+
+Direct PDF Test (no API needed):
+
+https://cv-screener-africanuspanga.replit.app/direct-pdf-test
+Template Tester Interface:
+
+https://cv-screener-africanuspanga.replit.app/template-tester
+Simple Test Without Frontend:
+
+https://cv-screener-africanuspanga.replit.app/download-pdf-test/brightdiamond
+(Replace "brightdiamond" with any template ID from our list)
+
+Complete Template List
+All 16 template IDs that can be used with the system:
+
+basic - Basic CV Template
+bigboss - Big Boss
+brightdiamond - Bright Diamond
+jijengeclassic - Jijenge Classic
+kazifasta - Kazi Fasta
+kilimanjaro - Kilimanjaro
+madinimob - Madini Mob
+mjenziwataifa - Mjenzi wa Taifa
+mkalimodern - Mkali Modern
+moonlightsonata - Moonlight Sonata
+mwalimuone - Mwalimu One
+safarioriginal - Safari Original
+serengetiflow - Serengeti Flow
+smartbongo - Smart Bongo
+streethustler - Street Hustler
+tanzanitepro - Tanzanite Pro
