@@ -9,6 +9,9 @@ import { Badge } from '@/components/ui/badge';
 
 // Sample CV data that matches backend requirements
 const sampleCVData = {
+  // Add name and email at root level to meet API requirements
+  name: 'John Doe',
+  email: 'john.doe@example.com',
   personalInfo: {
     firstName: 'John',
     lastName: 'Doe',

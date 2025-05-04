@@ -24,6 +24,13 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
   if (personalInfo.city) locationParts.push(personalInfo.city);
   if (personalInfo.country) locationParts.push(personalInfo.country);
   const location = locationParts.length > 0 ? locationParts.join(', ') : '';
+  
+  // IMPORTANT: These fields are required by the backend API
+  // and must be at the root level of the JSON object
+  const rootRequiredFields = {
+    name: fullName,
+    email: personalInfo.email,
+  };
 
   // Transform work experiences
   const experience = (workExperiences || []).map(job => ({
@@ -84,11 +91,12 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
     contact: ref.email || ref.phone || ''
   }));
 
-  // Construct the final transformed object
+  // Construct the final transformed object with required fields at root level
   return {
-    name: fullName,
+    // IMPORTANT: Include the required fields at root level
+    ...rootRequiredFields,
+    // Then include all other CV fields
     title: personalInfo.professionalTitle || '',
-    email: personalInfo.email,
     phone: personalInfo.phone || '',
     location,
     summary: personalInfo.summary || '',
@@ -122,19 +130,29 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
     const url = `${API_BASE_URL}/api/cv-pdf/anonymous/initiate-ussd`;
     console.log(`Attempting to initiate payment at: ${url}`);
     
-    // Transform CV data to backend format and log the exact JSON being sent
+    // Transform CV data to backend format
+    // This includes required fields name and email at root level
     const transformedCVData = transformCVDataForBackend(cvData);
+    
+    // Construct the complete request body with template ID and CV data
     const requestBody = {
-      template_id: templateId,
+      template_id: templateId.toLowerCase(), // Ensure lowercase to match backend expectations
       cv_data: transformedCVData
     };
+    
+    // Log the full request payload for debugging
     console.log('Request payload:', JSON.stringify(requestBody, null, 2));
 
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': window.location.origin,
+        'X-Requested-With': 'XMLHttpRequest'
       },
+      // Enable credentials to allow cookies if needed
+      credentials: 'include',
       body: JSON.stringify(requestBody)
     });
 
@@ -192,8 +210,12 @@ export const verifyUSSDPayment = async (requestId: string, paymentReference: str
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': window.location.origin,
+        'X-Requested-With': 'XMLHttpRequest'
       },
+      credentials: 'include',
       body: JSON.stringify({ payment_reference: paymentReference })
     });
 
@@ -264,13 +286,28 @@ export const downloadGeneratedPDF = async (requestId: string): Promise<Blob> => 
     const url = `${API_BASE_URL}/api/cv-pdf/${requestId}/download`;
     console.log(`Attempting to download PDF from: ${url}`);
     
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/pdf, application/json',
+        'Origin': window.location.origin,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'include'
+    });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ 
-        error: `Server responded with status ${response.status}` 
-      }));
-      throw new Error(errorData.error || 'Failed to download PDF');
+      const errorText = await response.text();
+      console.error('Error response body:', errorText);
+      
+      let errorMessage;
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.error || `Server responded with status ${response.status}`;
+      } catch (e) {
+        errorMessage = `Server responded with status ${response.status}: ${errorText}`;
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const blob = await response.blob();
@@ -304,13 +341,19 @@ export const directDownloadCV = async (templateId: string, cvData: CVData): Prom
     console.log(`Attempting direct PDF download from: ${url}`);
     
     // Transform CV data to backend format
+    // This includes required fields name and email at root level
     const transformedCVData = transformCVDataForBackend(cvData);
+    console.log('Data being sent:', JSON.stringify(transformedCVData, null, 2));
     
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/pdf, application/json',
+        'Origin': window.location.origin,
+        'X-Requested-With': 'XMLHttpRequest'
       },
+      credentials: 'include',
       body: JSON.stringify(transformedCVData)
     });
 
@@ -356,16 +399,11 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
     console.log(`Attempting PDF download from preview endpoint: ${url}`);
     
     // Transform CV data to backend format
+    // This includes required fields name and email at root level
     const transformedCVData = transformCVDataForBackend(cvData);
     
-    // Add required fields according to backend requirements
-    const dataToSend = {
-      ...transformedCVData,
-      name: `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`,
-      email: cvData.personalInfo.email
-    };
-    
-    console.log('Data being sent:', JSON.stringify(dataToSend, null, 2));
+    // Log the full data being sent
+    console.log('Data being sent:', JSON.stringify(transformedCVData, null, 2));
     
     // Set a longer timeout for the fetch operation (30 seconds)
     const controller = new AbortController();
@@ -382,8 +420,8 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
       },
       // Enable credentials to allow cookies if needed
       credentials: 'include',
-      // Send the updated data format
-      body: JSON.stringify(dataToSend),
+      // Send the transformed data with required fields
+      body: JSON.stringify(transformedCVData),
       signal: controller.signal
     });
     
