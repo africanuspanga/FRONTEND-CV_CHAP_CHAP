@@ -92,6 +92,12 @@ async function makeOpenAIRequest(
 
 /**
  * Get AI-generated work experience bullet points
+ * 
+ * @param jobTitle The job title
+ * @param company The company name
+ * @param industry Optional industry context
+ * @param tone The tone for the recommendations
+ * @returns Array of 3 bullet point recommendations
  */
 export async function getWorkExperienceRecommendations(
   jobTitle: string,
@@ -99,12 +105,23 @@ export async function getWorkExperienceRecommendations(
   industry?: string,
   tone: ToneType = 'professional'
 ): Promise<string[]> {
+  // Add industry context if provided
   const industryContext = industry ? ` in the ${industry} industry` : '';
+  
+  // Construct a detailed prompt with examples
   const prompt = `Job Title: ${jobTitle}
 Company: ${company}${industryContext}
 
-Please provide professional bullet points for this position that highlight achievements and responsibilities.`;
+Please provide specific, achievement-oriented bullet points for this role at ${company}.
 
+For a Copywriter, examples might include:
+• Created compelling marketing content that increased click-through rates by 35% for major client campaigns
+• Led rebranding initiative that improved brand recognition by 28% according to customer surveys
+• Collaborated with design team to develop integrated campaigns that increased conversion rates by 40%
+
+Aim for specific, measurable achievements that would be relevant to this exact role at ${company}. Include metrics where appropriate.`;
+
+  // Make the OpenAI request
   const result = await makeOpenAIRequest({
     prompt,
     maxTokens: 600,
@@ -152,7 +169,11 @@ export async function getSkillRecommendations(
   const prompt = `Job Title: ${jobTitle}
 Experience Level: ${experienceLevel}${industryContext}
 
-Please provide a list of professional skills relevant for this position.`;
+Please provide a list of the most relevant, specific professional skills for a ${jobTitle} position.
+
+For example, for a Copywriter, include specific skills like "SEO Optimization", "Content Strategy", "Social Media Copywriting", "A/B Testing" rather than generic skills like "writing" or "communication".
+
+Be specific to the exact role and include both technical and soft skills that would be most impressive on a CV for this exact position.`;
 
   const result = await makeOpenAIRequest({
     prompt,
