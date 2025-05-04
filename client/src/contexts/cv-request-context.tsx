@@ -4,10 +4,12 @@ import {
   verifyUSSDPayment,
   checkPaymentStatus,
   downloadGeneratedPDF,
+  downloadCVWithPreviewEndpoint,
   CVRequestStatus
 } from '../services/cv-api-service';
 import { CVData } from '@shared/schema';
 import { useToast } from '@/hooks/use-toast';
+import { useCVForm } from './cv-form-context';
 
 interface CVRequestContextType {
   requestId: string | null;
@@ -33,6 +35,7 @@ export const useCVRequest = () => {
 };
 
 export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { formData } = useCVForm();
   const [requestId, setRequestId] = useState<string | null>(() => {
     // Try to restore from localStorage on initial render
     const savedRequestId = localStorage.getItem('cv_request_id');
@@ -212,8 +215,29 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     
     try {
-      const pdfBlob = await downloadGeneratedPDF(requestId);
-      return pdfBlob;
+      // First check if payment is completed
+      if (paymentStatus?.status !== 'completed') {
+        const status = await checkPaymentStatus(requestId);
+        setPaymentStatus(status);
+        
+        if (status.status !== 'completed') {
+          throw new Error('Payment not completed. Please verify your payment first.');
+        }
+      }
+      
+      console.log('Using formData.templateId:', formData.templateId);
+      
+      // Use the preview template endpoint if payment is completed and we have the template ID
+      if (formData.templateId) {
+        // Use the preview endpoint for more reliable PDF generation
+        const pdfBlob = await downloadCVWithPreviewEndpoint(formData.templateId, formData);
+        return pdfBlob;
+      } else {
+        // Fallback to the original endpoint if we somehow lost the template ID
+        console.warn('Template ID not found, falling back to downloadGeneratedPDF');
+        const pdfBlob = await downloadGeneratedPDF(requestId);
+        return pdfBlob;
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to download PDF';
       setError(errorMessage);
