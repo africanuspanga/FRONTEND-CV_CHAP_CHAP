@@ -146,9 +146,7 @@ const FinalPreview = () => {
   const handleDownload = async () => {
     // Use the payment flow method for normal operation
     await handlePaymentFlow();
-    
-    // For testing direct download without payment, uncomment this line:
-    // await handleDirectDownload();
+    // Never call direct download here - we always want to go through payment flow
   };
   
   // Handle print - disabled as requested
