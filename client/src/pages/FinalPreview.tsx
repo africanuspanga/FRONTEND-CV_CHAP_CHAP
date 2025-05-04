@@ -16,7 +16,7 @@ const FinalPreview = () => {
   const [, navigate] = useLocation();
   const isMobile = useIsMobile();
   const { toast } = useToast();
-  const { formData } = useCVForm();
+  const { formData, updateFormField } = useCVForm();
   const { isAuthenticated } = useAuth();
   const { initiatePayment, resetRequest, paymentStatus } = useCVRequest();
   
@@ -36,6 +36,12 @@ const FinalPreview = () => {
   // Handle template selection
   const handleSelectTemplate = (id: string) => {
     setCurrentTemplateId(id);
+    
+    // Also update the URL to reflect the new template
+    navigate(`/cv/${id}/final-preview`, { replace: true });
+    
+    // Most importantly, update the templateId in the form data
+    updateFormField('templateId', id);
   };
   
   // Handle CV download (initiate payment and redirect to payment page)
@@ -47,9 +53,18 @@ const FinalPreview = () => {
     resetRequest();
     
     try {
+      // Ensure form data has the most current template ID
+      if (currentTemplateId !== formData.templateId) {
+        console.log('Updating template ID before download:', currentTemplateId);
+        updateFormField('templateId', currentTemplateId);
+      }
+      
       console.log("Initiating payment with template ID:", currentTemplateId);
-      // Initiate payment with backend API
-      const paymentInitiated = await initiatePayment(currentTemplateId, formData);
+      // Initiating payment using the current template ID and updated form data
+      const paymentInitiated = await initiatePayment(currentTemplateId, {
+        ...formData,
+        templateId: currentTemplateId // Ensure consistent template ID
+      });
       
       if (paymentInitiated) {
         toast({
@@ -111,6 +126,15 @@ const FinalPreview = () => {
   
 
   
+  // Synchronize template ID from URL params when component mounts
+  useEffect(() => {
+    // If URL has a template ID that's different from form data, update form data
+    if (templateId && templateId !== formData.templateId) {
+      console.log('Updating template ID from URL:', templateId);
+      updateFormField('templateId', templateId);
+    }
+  }, [templateId, formData.templateId, updateFormField]);
+
   // Check if we need to redirect
   useEffect(() => {
     // If no template is selected, redirect to template selection
