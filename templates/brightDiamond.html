@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bright Diamond CV</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Lato', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8f8f8;
+      color: #4a4a4a;
+      line-height: 1.6;
+      font-size: 10pt;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .cv-container {
+      max-width: 850px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 3px solid #20c997;
+    }
+    
+    h1 {
+      font-size: 2.8em;
+      color: #1a1a1a;
+      margin-bottom: 0px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 900;
+    }
+    
+    h2 {
+      font-size: 1.2em;
+      color: #555;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 0;
+    }
+    
+    .contact-bar {
+      text-align: center;
+      margin-bottom: 25px;
+      padding-bottom: 5px;
+      font-size: 0.9em;
+      color: #555;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px 8px;
+    }
+    
+    .divider {
+      color: #ccc;
+    }
+    
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    
+    h3 {
+      font-size: 1.15em;
+      color: #20c997;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #e0e0e0;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+    }
+    
+    section {
+      margin-bottom: 25px;
+    }
+    
+    .summary {
+      font-size: 0.95em;
+      color: #4a4a4a;
+      line-height: 1.7;
+    }
+    
+    ul {
+      margin: 0;
+      list-style: none;
+    }
+    
+    .job-item, .edu-item {
+      margin-bottom: 25px;
+    }
+    
+    .job-item:last-child, .edu-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .job-header, .edu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .job-info, .edu-info {
+      flex-grow: 1;
+    }
+    
+    .job-title, .degree {
+      display: block;
+      font-size: 1.1em;
+      color: #2a2a2a;
+      margin-bottom: 2px;
+      font-weight: bold;
+    }
+    
+    .job-company, .institution {
+      display: block;
+      font-size: 0.95em;
+      color: #555;
+    }
+    
+    .job-date, .edu-date {
+      flex-shrink: 0;
+      text-align: right;
+      font-size: 0.9em;
+      color: #555;
+      padding-left: 15px;
+      font-weight: 700;
+    }
+    
+    .date-range {
+      display: block;
+      line-height: 1.4;
+    }
+    
+    .detail-list {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 5px;
+    }
+    
+    .detail-item {
+      font-size: 0.95em;
+      color: #4a4a4a;
+      margin-bottom: 5px;
+      padding-left: 18px;
+      position: relative;
+    }
+    
+    .detail-item::before {
+      content: '•';
+      color: #20c997;
+      position: absolute;
+      left: 0;
+      top: 0.1em;
+      font-size: 1em;
+    }
+    
+    .multi-column {
+      column-count: 3;
+      column-gap: 25px;
+      -webkit-column-count: 3;
+      -moz-column-count: 3;
+    }
+    
+    .column-item {
+      font-size: 0.95em;
+      color: #4a4a4a;
+      margin-bottom: 8px;
+      padding-left: 18px;
+      position: relative;
+      break-inside: avoid-column;
+    }
+    
+    .column-item::before {
+      content: '•';
+      color: #20c997;
+      position: absolute;
+      left: 0;
+      top: 0.1em;
+      font-size: 1em;
+    }
+    
+    .reference-item {
+      margin-bottom: 15px;
+    }
+    
+    .reference-name {
+      display: block;
+      font-size: 1.1em;
+      color: #2a2a2a;
+      margin-bottom: 2px;
+      font-weight: bold;
+    }
+    
+    .reference-details {
+      display: block;
+      font-size: 0.95em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="cv-container">
+    <!-- Header -->
+    <header>
+      <h1 id="full-name">{{ personalInfo.firstName }} {{ personalInfo.lastName }}</h1>
+      <h2 id="job-title">{{ personalInfo.professionalTitle or personalInfo.jobTitle }}</h2>
+    </header>
+
+    <!-- Contact Bar -->
+    <section class="contact-bar">
+      {% if personalInfo.phone %}<span>Phone: {{ personalInfo.phone }}</span>{% endif %}
+      {% if personalInfo.phone and (personalInfo.address or personalInfo.location) %}<span class="divider">|</span>{% endif %}
+      {% if personalInfo.address or personalInfo.location %}<span>Address: {{ personalInfo.address or personalInfo.location }}</span>{% endif %}
+      {% if (personalInfo.address or personalInfo.location) and personalInfo.email %}<span class="divider">|</span>{% endif %}
+      {% if personalInfo.email %}<span>Email: {{ personalInfo.email }}</span>{% endif %}
+      {% if personalInfo.email and personalInfo.linkedin %}<span class="divider">|</span>{% endif %}
+      {% if personalInfo.linkedin %}<span>LinkedIn: <a href="{{ personalInfo.linkedin }}">{{ personalInfo.linkedin|replace('https://', '') }}</a></span>{% endif %}
+      {% if personalInfo.linkedin and personalInfo.website %}<span class="divider">|</span>{% endif %}
+      {% if personalInfo.website %}<span>Website: <a href="{{ personalInfo.website }}">{{ personalInfo.website|replace('https://', '') }}</a></span>{% endif %}
+    </section>
+
+    <!-- Summary Section -->
+    <section>
+      <h3>PROFESSIONAL SUMMARY</h3>
+      <p class="summary" id="summary">{{ summary }}</p>
+    </section>
+
+    <!-- Experience Section -->
+    {% if workExperience and workExperience|length > 0 %}
+    <section>
+      <h3>EXPERIENCE</h3>
+      <ul id="experience-container">
+        {% for job in workExperience %}
+        <li class="job-item">
+          <div class="job-header">
+            <div class="job-info">
+              <strong class="job-title">{{ job.jobTitle }}</strong>
+              <span class="job-company">{{ job.company }}{% if job.location %} - {{ job.location }}{% endif %}</span>
+            </div>
+            <div class="job-date">
+              <span class="date-range">{{ job.startDate }} to {% if job.endDate %}{{ job.endDate }}{% else %}Present{% endif %}</span>
+            </div>
+          </div>
+          <ul class="detail-list">
+            {% if job.description %}
+              {% for point in job.description.split('\n') %}
+                {% if point.strip() %}
+                  <li class="detail-item">{{ point.strip() }}</li>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+            {% if job.achievements %}
+              {% for achievement in job.achievements %}
+                <li class="detail-item">{{ achievement }}</li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <!-- Education Section -->
+    {% if education and education|length > 0 %}
+    <section>
+      <h3>EDUCATION</h3>
+      <ul id="education-container">
+        {% for edu in education %}
+        <li class="edu-item">
+          <div class="edu-header">
+            <div class="edu-info">
+              <strong class="degree">{{ edu.degree }}{% if edu.fieldOfStudy %} In {{ edu.fieldOfStudy }}{% endif %}</strong>
+              <span class="institution">{{ edu.institution }}</span>
+              {% if edu.gpa %}
+                <span class="institution">GPA: {{ edu.gpa }} / 4.0</span>
+              {% endif %}
+            </div>
+            <div class="edu-date">
+              <span class="date-range">{{ edu.endDate }}</span>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <!-- Skills Section -->
+    {% if skills and skills|length > 0 %}
+    <section>
+      <h3>SKILLS</h3>
+      <div class="multi-column" id="skills-container">
+        {% for skill in skills %}
+        <div class="column-item">{{ skill.name }}</div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Certifications Section -->
+    {% if certifications and certifications|length > 0 %}
+    <section>
+      <h3>CERTIFICATIONS</h3>
+      <div class="multi-column" id="certifications-container">
+        {% for cert in certifications %}
+        <div class="column-item">{{ cert.name }}</div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Languages Section -->
+    {% if languages and languages|length > 0 %}
+    <section>
+      <h3>LANGUAGES</h3>
+      <div class="multi-column" id="languages-container">
+        {% for language in languages %}
+        <div class="column-item">{{ language.name }} - {{ language.proficiency }}</div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Hobbies Section -->
+    {% if hobbies %}
+    <section>
+      <h3>HOBBIES & INTERESTS</h3>
+      <p class="summary">{{ hobbies }}</p>
+    </section>
+    {% endif %}
+
+    <!-- References Section -->
+    {% if references and references|length > 0 %}
+    <section>
+      <h3>REFERENCES</h3>
+      <ul id="references-container">
+        {% for reference in references %}
+        <li class="reference-item">
+          <strong class="reference-name">{{ reference.name }}</strong>
+          <span class="reference-details">{{ reference.position }} at {{ reference.company }}</span>
+          <span class="reference-details">Email: {{ reference.email }}</span>
+          <span class="reference-details">Phone: {{ reference.phone }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+  </div>
+</body>
+</html>

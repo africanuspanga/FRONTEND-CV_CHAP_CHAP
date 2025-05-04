@@ -22,39 +22,79 @@ const baseUrl = 'http://localhost:5000';
 // Template definitions
 const templates = [
   {
+    id: 'moonlightSonata',
+    name: 'Moonlight Sonata',
+    description: 'An elegant, professional template with a sophisticated design and clean layout.'
+  },
+  {
+    id: 'kaziFasta',
+    name: 'Kazi Fasta',
+    description: 'A modern, professional template with a two-column layout, perfect for highlighting key skills.'
+  },
+  {
+    id: 'jijengeClassic',
+    name: 'Jijenge Classic',
+    description: 'A classic, professional CV template with a traditional layout that emphasizes work experience.'
+  },
+  {
     id: 'kilimanjaro',
-    name: 'Kilimanjaro Professional',
+    name: 'Kilimanjaro',
     description: 'A clean, professional template with a modern design suitable for corporate environments.'
   },
   {
-    id: 'serengeti-elegant',
-    name: 'Serengeti Elegant',
-    description: 'An elegant, minimalist design with sophisticated typography perfect for creative professionals.'
+    id: 'brightDiamond',
+    name: 'Bright Diamond',
+    description: 'A bright and modern template with a sleek design and excellent readability.'
   },
   {
-    id: 'safari-original',
+    id: 'mjenziWaTaifa',
+    name: 'Mjenzi wa Taifa',
+    description: 'A sophisticated template with warm tones and a well-structured layout.'
+  },
+  {
+    id: 'safariOriginal',
     name: 'Safari Original',
     description: 'A bold, colorful template with a vibrant header that suits creative roles and industries.'
   },
   {
-    id: 'modern-zanzibar',
-    name: 'Modern Zanzibar',
-    description: 'A contemporary two-column layout with a calming blue color scheme ideal for technical professionals.'
-  },
-  {
-    id: 'mkali-modern',
-    name: 'Mkali Modern',
-    description: 'A sleek, modern design with minimal accents and focus on readability.'
-  },
-  {
-    id: 'street-hustler',
+    id: 'streetHustler',
     name: 'Street Hustler',
     description: 'A high-energy design with vibrant colors and street-style typography for creative fields.'
   },
   {
-    id: 'big-boss',
+    id: 'bigBoss',
     name: 'Big Boss',
     description: 'A powerful, executive-style template that conveys authority and experience.'
+  },
+  {
+    id: 'mkaliModern',
+    name: 'Mkali Modern',
+    description: 'A sleek, modern design with minimal accents and focus on readability.'
+  },
+  {
+    id: 'tanzanitePro',
+    name: 'Tanzanite Pro',
+    description: 'A contemporary template with professional styling and attractive visual elements.'
+  },
+  {
+    id: 'mwalimuOne',
+    name: 'Mwalimu One',
+    description: 'A teacher-oriented template ideal for education professionals.'
+  },
+  {
+    id: 'serengetiFlow',
+    name: 'Serengeti Flow',
+    description: 'An elegant, flowing design with sophisticated typography perfect for creative professionals.'
+  },
+  {
+    id: 'smartBongo',
+    name: 'Smart Bongo',
+    description: 'A smart, clean template with modern styling suitable for tech professionals.'
+  },
+  {
+    id: 'madiniMob',
+    name: 'Madini Mob',
+    description: 'A robust template with strong visual hierarchy, ideal for a wide range of professions.'
   }
 ];
 
