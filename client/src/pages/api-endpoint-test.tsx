@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, Check, Download, Wifi, WifiOff, AlertCircle, ExternalLink } from 'lucide-react';
+import { Loader2, ArrowLeft, Check, Download, Wifi, WifiOff, AlertCircle, ExternalLink, FileJson, FileText } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { downloadCVWithPreviewEndpoint, API_BASE_URL } from '@/services/cv-api-service';
+import { downloadCVWithPreviewEndpoint, downloadTestPDF, testDataExchange, API_BASE_URL } from '@/services/cv-api-service';
 import { Link } from 'wouter';
 import { Badge } from '@/components/ui/badge';
 
@@ -152,6 +152,23 @@ const ApiEndpointTest: React.FC = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  // Common download helper function
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    
+    // Cleanup
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }, 100);
+  };
+
+  // Test the main preview endpoint that generates and downloads a PDF
   const handleTestDownload = async () => {
     setIsLoading(true);
     setError(null);
@@ -173,23 +190,54 @@ const ApiEndpointTest: React.FC = () => {
         await new Promise(resolve => setTimeout(resolve, 3000 - elapsedTime));
       }
       
-      // Create download link
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'JOHN_DOE-CV.pdf';
-      document.body.appendChild(a);
-      a.click();
-      
-      // Cleanup
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      }, 100);
-      
+      downloadBlob(pdfBlob, 'JOHN_DOE-CV-preview.pdf');
       setSuccess(true);
     } catch (err) {
       console.error('Test download failed:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Test the pre-generated PDF download endpoint
+  const handleTestPreGeneratedPDF = async () => {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(false);
+    
+    try {
+      console.log('Testing pre-generated PDF download');
+      const pdfBlob = await downloadTestPDF('brightdiamond');
+      downloadBlob(pdfBlob, 'JOHN_DOE-CV-pregenerated.pdf');
+      setSuccess(true);
+    } catch (err) {
+      console.error('Pre-generated PDF test failed:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Test JSON data exchange with the server
+  const handleTestDataExchange = async () => {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(false);
+    
+    try {
+      console.log('Testing data exchange with server');
+      const responseData = await testDataExchange('brightdiamond', sampleCVData);
+      console.log('Server response:', responseData);
+      
+      // Format the JSON response for display
+      const jsonStr = JSON.stringify(responseData, null, 2);
+      const jsonBlob = new Blob([jsonStr], { type: 'application/json' });
+      
+      downloadBlob(jsonBlob, 'server-response.json');
+      setSuccess(true);
+    } catch (err) {
+      console.error('Data exchange test failed:', err);
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
     } finally {
       setIsLoading(false);
@@ -247,7 +295,7 @@ const ApiEndpointTest: React.FC = () => {
             </div>
           </div>
           <CardDescription>
-            Test the direct download from the preview template endpoint using the BrightDiamond template
+            Test different PDF download approaches to diagnose browser compatibility issues. Try all three methods to identify which one works best in your environment.
           </CardDescription>
         </CardHeader>
         
@@ -284,24 +332,60 @@ const ApiEndpointTest: React.FC = () => {
           )}
         </CardContent>
         
-        <CardFooter>
-          <Button 
-            onClick={handleTestDownload} 
-            disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <>
+        <CardFooter className="flex flex-col space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+            {/* Option 1: Test main PDF generation endpoint */}
+            <Button 
+              onClick={handleTestDownload} 
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2"
+              variant="default"
+            >
+              {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Generating PDF... (Please wait 3-5 seconds)
-              </>
-            ) : (
-              <>
+              ) : (
                 <Download className="h-4 w-4" />
-                Test Download BrightDiamond Template
-              </>
-            )}
-          </Button>
+              )}
+              <span>Main PDF Endpoint</span>
+            </Button>
+
+            {/* Option 2: Test pre-generated PDF */}
+            <Button 
+              onClick={handleTestPreGeneratedPDF} 
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2"
+              variant="outline"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FileText className="h-4 w-4" />
+              )}
+              <span>Get Pre-Generated PDF</span>
+            </Button>
+
+            {/* Option 3: JSON Data Exchange Test */}
+            <Button 
+              onClick={handleTestDataExchange} 
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2"
+              variant="outline"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FileJson className="h-4 w-4" />
+              )}
+              <span>Test Data Exchange</span>
+            </Button>
+          </div>
+          
+          {isLoading && (
+            <div className="w-full py-2 flex items-center justify-center bg-slate-50 rounded-md">
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <span>Processing request... (Please wait 3-5 seconds)</span>
+            </div>
+          )}
         </CardFooter>
       </Card>
     </div>

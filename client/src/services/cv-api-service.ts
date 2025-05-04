@@ -458,6 +458,97 @@ const retry = async <T>(operation: () => Promise<T>, retries = 3, delayMs = 1000
   }
 };
 
+/**
+ * Test the pre-generated PDF endpoint
+ * 
+ * This function tests if we can download a pre-generated test PDF from the server
+ * to verify browser PDF handling capabilities.
+ * 
+ * @param templateId The ID of the template to test with
+ * @returns A Promise that resolves to a Blob containing the PDF
+ */
+export const downloadTestPDF = async (templateId: string): Promise<Blob> => {
+  try {
+    // Convert templateId to lowercase to match backend expectations
+    const normalizedTemplateId = templateId.toLowerCase();
+    const url = `${API_BASE_URL}/api/download-test-pdf/${normalizedTemplateId}`;
+    console.log(`Attempting to download test PDF from: ${url}`);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/pdf',
+        'Origin': window.location.origin,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'include'
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Server responded with status ${response.status}`);
+    }
+    
+    const blob = await response.blob();
+    console.log('Test PDF download successful', { size: blob.size, type: blob.type });
+    return blob;
+  } catch (error) {
+    console.error('Error downloading test PDF:', error);
+    throw new Error('Failed to download test PDF: ' + (error instanceof Error ? error.message : 'Unknown error'));
+  }
+};
+
+/**
+ * Test JSON data exchange with the server
+ * 
+ * This function tests if the JSON data we're sending to the server is correctly processed
+ * by sending it to a special endpoint that returns the data as JSON instead of a PDF.
+ * 
+ * @param templateId The ID of the template to test with
+ * @param cvData The user's CV data
+ * @returns A Promise that resolves to the server's JSON response
+ */
+export const testDataExchange = async (templateId: string, cvData: CVData): Promise<any> => {
+  try {
+    // Convert templateId to lowercase to match backend expectations
+    const normalizedTemplateId = templateId.toLowerCase();
+    const url = `${API_BASE_URL}/api/preview-template-json/${normalizedTemplateId}`;
+    console.log(`Testing data exchange at: ${url}`);
+    
+    // Create complete data structure with required fields at root level
+    const completeData = {
+      ...cvData,  // Include the original complete CV data structure
+      name: cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName,  // Add required fields at root level
+      email: cvData.personalInfo.email
+    };
+    
+    // Log data being sent
+    console.log('Complete data being sent:', JSON.stringify(completeData, null, 2));
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': window.location.origin,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'include',
+      body: JSON.stringify(completeData)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Server responded with status ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Data exchange test successful:', data);
+    return data;
+  } catch (error) {
+    console.error('Error testing data exchange:', error);
+    throw new Error('Failed to test data exchange: ' + (error instanceof Error ? error.message : 'Unknown error'));
+  }
+};
+
 export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: CVData): Promise<Blob> => {
   try {
     // Convert templateId to lowercase to match backend expectations
