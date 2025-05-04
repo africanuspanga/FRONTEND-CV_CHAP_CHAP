@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{ name }} - CV</title>
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+    .cv-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
+      color: #fff;
+      padding: 40px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      font-size: 36px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    .title {
+      font-size: 18px;
+      margin-top: 10px;
+      font-weight: 300;
+    }
+    .contact-info {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .main-content {
+      padding: 40px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      color: #ff7e5f;
+      position: relative;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .section-title:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background-color: #ff7e5f;
+    }
+    .experience-item, .education-item {
+      margin-bottom: 25px;
+      position: relative;
+      padding-left: 20px;
+    }
+    .experience-item:before, .education-item:before {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #feb47b;
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    .item-title {
+      font-weight: bold;
+      color: #444;
+      margin: 0;
+    }
+    .item-date {
+      color: #777;
+    }
+    .item-subtitle {
+      color: #666;
+      margin: 5px 0;
+    }
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .skill-item {
+      background-color: #f8f2ee;
+      color: #ff7e5f;
+      padding: 7px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="cv-container">
+    <div class="header">
+      <h1>{{ name }}</h1>
+      <p class="title">{{ title }}</p>
+      <div class="contact-info">
+        <div class="contact-item">{{ email }}</div>
+        {% if phone %}
+        <div class="contact-item">{{ phone }}</div>
+        {% endif %}
+        {% if location %}
+        <div class="contact-item">{{ location }}</div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <div class="main-content">
+      {% if summary %}
+      <div class="section">
+        <h2 class="section-title">About Me</h2>
+        <p>{{ summary }}</p>
+      </div>
+      {% endif %}
+      
+      {% if experience and experience|length > 0 %}
+      <div class="section">
+        <h2 class="section-title">Experience</h2>
+        {% for exp in experience %}
+        <div class="experience-item">
+          <div class="item-header">
+            <h3 class="item-title">{{ exp.position }}</h3>
+            <span class="item-date">{{ exp.duration }}</span>
+          </div>
+          <p class="item-subtitle">{{ exp.company }}</p>
+          <p>{{ exp.description }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      {% if education and education|length > 0 %}
+      <div class="section">
+        <h2 class="section-title">Education</h2>
+        {% for edu in education %}
+        <div class="education-item">
+          <div class="item-header">
+            <h3 class="item-title">{{ edu.degree }}</h3>
+            <span class="item-date">{{ edu.duration }}</span>
+          </div>
+          <p class="item-subtitle">{{ edu.school }}</p>
+          {% if edu.description %}
+          <p>{{ edu.description }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      {% if skills and skills|length > 0 %}
+      <div class="section">
+        <h2 class="section-title">Skills</h2>
+        <div class="skills-list">
+          {% for skill in skills %}
+          <div class="skill-item">{{ skill }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if languages and languages|length > 0 %}
+      <div class="section">
+        <h2 class="section-title">Languages</h2>
+        <div class="skills-list">
+          {% for language in languages %}
+          <div class="skill-item">{{ language }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

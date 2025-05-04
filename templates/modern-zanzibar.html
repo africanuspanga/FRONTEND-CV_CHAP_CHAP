@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{ name }} - CV</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background-color: #f6f9fc;
+    }
+    .cv-container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      background-color: #fff;
+    }
+    .sidebar {
+      width: 30%;
+      background-color: #1e88e5;
+      color: white;
+      padding: 40px 20px;
+    }
+    .main-content {
+      width: 70%;
+      padding: 40px;
+    }
+    .profile {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .profile-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 15px;
+      background-color: #90caf9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: bold;
+    }
+    h1 {
+      font-size: 28px;
+      margin: 10px 0 5px;
+    }
+    .title {
+      font-size: 16px;
+      font-weight: 300;
+      margin-bottom: 20px;
+    }
+    .contact-info {
+      margin-top: 30px;
+    }
+    .contact-item {
+      display: flex;
+      margin-bottom: 15px;
+      align-items: center;
+      gap: 10px;
+    }
+    .contact-icon {
+      width: 20px;
+      height: 20px;
+      background-color: white;
+      color: #1e88e5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 12px;
+    }
+    .skills-section, .languages-section {
+      margin-top: 30px;
+    }
+    .sidebar-title {
+      font-size: 20px;
+      margin-bottom: 15px;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    .sidebar-title:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background-color: white;
+    }
+    .skill-item, .language-item {
+      margin-bottom: 12px;
+    }
+    .skill-name, .language-name {
+      margin-bottom: 5px;
+    }
+    .skill-bar, .language-bar {
+      height: 6px;
+      background-color: rgba(255,255,255,0.2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .skill-level, .language-level {
+      height: 100%;
+      background-color: white;
+    }
+    .main-section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      color: #1e88e5;
+      font-size: 24px;
+      margin-bottom: 20px;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    .section-title:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 2px;
+      background-color: #1e88e5;
+    }
+    .experience-item, .education-item {
+      margin-bottom: 25px;
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .item-title {
+      font-weight: bold;
+      color: #444;
+      margin: 0;
+      font-size: 18px;
+    }
+    .item-date {
+      color: #777;
+    }
+    .item-subtitle {
+      color: #666;
+      margin: 5px 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="cv-container">
+    <div class="sidebar">
+      <div class="profile">
+        <div class="profile-img">{{ name|slice:"0:1" }}</div>
+        <h1>{{ name }}</h1>
+        <p class="title">{{ title }}</p>
+      </div>
+      
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="contact-icon">@</div>
+          <div>{{ email }}</div>
+        </div>
+        {% if phone %}
+        <div class="contact-item">
+          <div class="contact-icon">T</div>
+          <div>{{ phone }}</div>
+        </div>
+        {% endif %}
+        {% if location %}
+        <div class="contact-item">
+          <div class="contact-icon">L</div>
+          <div>{{ location }}</div>
+        </div>
+        {% endif %}
+      </div>
+      
+      {% if skills and skills|length > 0 %}
+      <div class="skills-section">
+        <h2 class="sidebar-title">Skills</h2>
+        {% for skill in skills %}
+        <div class="skill-item">
+          <div class="skill-name">{{ skill }}</div>
+          <div class="skill-bar">
+            <div class="skill-level" style="width: 85%"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      {% if languages and languages|length > 0 %}
+      <div class="languages-section">
+        <h2 class="sidebar-title">Languages</h2>
+        {% for language in languages %}
+        <div class="language-item">
+          <div class="language-name">{{ language }}</div>
+          <div class="language-bar">
+            <div class="language-level" style="width: 80%"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    
+    <div class="main-content">
+      {% if summary %}
+      <div class="main-section">
+        <h2 class="section-title">Profile</h2>
+        <p>{{ summary }}</p>
+      </div>
+      {% endif %}
+      
+      {% if experience and experience|length > 0 %}
+      <div class="main-section">
+        <h2 class="section-title">Work Experience</h2>
+        {% for exp in experience %}
+        <div class="experience-item">
+          <div class="item-header">
+            <h3 class="item-title">{{ exp.position }}</h3>
+            <span class="item-date">{{ exp.duration }}</span>
+          </div>
+          <p class="item-subtitle">{{ exp.company }}</p>
+          <p>{{ exp.description }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      {% if education and education|length > 0 %}
+      <div class="main-section">
+        <h2 class="section-title">Education</h2>
+        {% for edu in education %}
+        <div class="education-item">
+          <div class="item-header">
+            <h3 class="item-title">{{ edu.degree }}</h3>
+            <span class="item-date">{{ edu.duration }}</span>
+          </div>
+          <p class="item-subtitle">{{ edu.school }}</p>
+          {% if edu.description %}
+          <p>{{ edu.description }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

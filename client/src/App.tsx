@@ -40,6 +40,7 @@ import WebsitesPortfoliosForm from "@/pages/WebsitesPortfoliosForm";
 import CertificationsForm from "@/pages/CertificationsForm";
 import AccomplishmentsForm from "@/pages/AccomplishmentsForm";
 import HobbiesForm from "@/pages/HobbiesForm";
+import TemplateGallery from "@/pages/template-gallery";
 import NotFound from "@/pages/not-found";
 
 // Admin pages
@@ -112,6 +113,7 @@ function Router() {
                 <Route path="/register" component={Register} />
                 <Route path="/openai-test" component={OpenAITestPage} />
                 <Route path="/backend-test" component={BackendTest} />
+                <Route path="/template-gallery" component={TemplateGallery} />
                 <Route component={NotFound} />
               </Switch>
             </div>
