@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big Boss CV</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Lato', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+      color: #444;
+      line-height: 1.6;
+      font-size: 10pt;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      max-width: 100%;
+      box-sizing: border-box;
+      border-top: 5px solid #333;
+    }
+    
+    header {
+      text-align: center;
+      padding: 25px 30px;
+      background-color: #2d2d2d;
+      color: #ffffff;
+    }
+    
+    h1 {
+      font-size: 2.6em;
+      color: #ffffff;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      line-height: 1.2;
+      font-weight: 400;
+    }
+    
+    h2 {
+      font-size: 1.1em;
+      color: #ccc;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0;
+    }
+    
+    main {
+      padding: 30px 40px;
+    }
+    
+    .top-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 30px;
+      margin-bottom: 25px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .objective-column {
+      flex: 2;
+      padding-right: 20px;
+    }
+    
+    .contact-column {
+      flex: 1;
+      text-align: right;
+    }
+    
+    h3 {
+      font-size: 1.1em;
+      color: #333;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #eee;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+    }
+    
+    h3.no-border {
+      margin-bottom: 10px;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    
+    .contact-item {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+      color: #555;
+    }
+    
+    .contact-text {
+      order: 1;
+    }
+    
+    .contact-icon {
+      order: 2;
+      margin-left: 10px;
+      width: 18px;
+      text-align: center;
+      color: #888;
+      flex-shrink: 0;
+    }
+    
+    a {
+      color: #555;
+      text-decoration: none;
+    }
+    
+    section {
+      margin-bottom: 25px;
+    }
+    
+    ul {
+      margin: 0;
+      list-style: none;
+    }
+    
+    .job-item, .education-item {
+      margin-bottom: 20px;
+    }
+    
+    .job-item:last-child, .education-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .job-title, .degree {
+      display: block;
+      font-size: 1.1em;
+      color: #222;
+      font-weight: bold;
+    }
+    
+    .job-info, .education-info {
+      display: block;
+      font-size: 0.9em;
+      color: #777;
+    }
+    
+    .list-item {
+      font-size: 0.95em;
+      color: #555;
+      margin-bottom: 5px;
+      padding-left: 15px;
+      position: relative;
+    }
+    
+    .list-item::before {
+      content: '■';
+      color: #888;
+      position: absolute;
+      left: 0;
+      top: 0.1em;
+      font-size: 0.8em;
+    }
+    
+    .reference-item {
+      font-size: 0.95em;
+      color: #555;
+      margin-bottom: 5px;
+    }
+    
+    .reference-name {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- CV Header (Dark Background) -->
+  <header>
+    <h1 id="full-name">{{ personalInfo.firstName }} {{ personalInfo.lastName }}</h1>
+    <h2 id="job-title">{{ personalInfo.jobTitle }}</h2>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Top Section (Objective + Contact) -->
+    <section class="top-section">
+      <!-- Objective Column -->
+      <div class="objective-column">
+        <h3 class="no-border">CAREER OBJECTIVE</h3>
+        <p id="summary">{{ summary }}</p>
+      </div>
+
+      <!-- Contact Column -->
+      <div class="contact-column">
+        <div>
+          {% if personalInfo.phone %}
+          <p class="contact-item">
+            <span class="contact-text" id="phone">{{ personalInfo.phone }}</span>
+            <span class="contact-icon">[P]</span>
+          </p>
+          {% endif %}
+
+          {% if personalInfo.email %}
+          <p class="contact-item">
+            <span class="contact-text" id="email">{{ personalInfo.email }}</span>
+            <span class="contact-icon">[E]</span>
+          </p>
+          {% endif %}
+
+          {% if personalInfo.location %}
+          <p class="contact-item">
+            <span class="contact-text" id="location">{{ personalInfo.location }}</span>
+            <span class="contact-icon">[A]</span>
+          </p>
+          {% endif %}
+
+          {% if personalInfo.website %}
+          <p class="contact-item">
+            <span class="contact-text">
+              <a href="{{ personalInfo.website }}" id="website">{{ personalInfo.website }}</a>
+            </span>
+            <span class="contact-icon">[W]</span>
+          </p>
+          {% endif %}
+
+          {% if personalInfo.linkedin %}
+          <p class="contact-item">
+            <span class="contact-text">
+              <a href="{{ personalInfo.linkedin }}" id="linkedin">{{ personalInfo.linkedin }}</a>
+            </span>
+            <span class="contact-icon">[L]</span>
+          </p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience Section -->
+    {% if workExperience and workExperience|length > 0 %}
+    <section>
+      <h3>PROFESSIONAL EXPERIENCE</h3>
+      <ul id="experience-container">
+        {% for exp in workExperience %}
+        <li class="job-item">
+          <div>
+            <div style="margin-bottom: 8px">
+              <strong class="job-title">{{ exp.jobTitle }}</strong>
+              <span class="job-info">
+                {{ exp.startDate }} - {% if exp.endDate %}{{ exp.endDate }}{% else %}PRESENT{% endif %} | {{ exp.company }}{% if exp.location %}, {{ exp.location }}{% endif %}
+              </span>
+            </div>
+            
+            {% if exp.achievements and exp.achievements|length > 0 %}
+            <ul>
+              {% for achievement in exp.achievements %}
+              <li class="list-item">{{ achievement }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <!-- Education Section -->
+    {% if education and education|length > 0 %}
+    <section>
+      <h3>EDUCATION</h3>
+      <ul id="education-container">
+        {% for edu in education %}
+        <li class="education-item">
+          <div>
+            <div>
+              <strong class="degree">{{ edu.degree }}{% if edu.fieldOfStudy %}, {{ edu.fieldOfStudy }}{% endif %}</strong>
+              <span class="education-info">
+                {{ edu.endDate or edu.startDate }} | {{ edu.institution }}{% if edu.location %}, {{ edu.location }}{% endif %}
+              </span>
+            </div>
+            {% if edu.description %}
+            <p>{{ edu.description }}</p>
+            {% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <!-- Skills Section -->
+    {% if skills and skills|length > 0 %}
+    <section>
+      <h3>SKILLS</h3>
+      <ul id="skills-container">
+        {% for skill in skills %}
+        <li class="list-item">{{ skill.name }}{% if skill.level %} ({{ skill.level }}){% endif %}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <!-- Languages Section -->
+    {% if languages and languages|length > 0 %}
+    <section>
+      <h3>Languages</h3>
+      <ul id="languages-container">
+        {% for lang in languages %}
+        <li class="list-item">{{ lang.name }}{% if lang.level %} ({{ lang.level }}){% endif %}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <!-- References Section -->
+    {% if references and references|length > 0 %}
+    <section>
+      <h3>References</h3>
+      <ul id="references-container">
+        {% for ref in references %}
+        <li class="reference-item">
+          <strong class="reference-name">{{ ref.name }}</strong> - {{ ref.position }} at {{ ref.company }}
+          {% if ref.email %} | {{ ref.email }}{% endif %}
+          {% if ref.phone %} | {{ ref.phone }}{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <!-- Hobbies Section -->
+    {% if hobbies %}
+    <section>
+      <h3>HOBBIES & INTERESTS</h3>
+      <p>{{ hobbies }}</p>
+    </section>
+    {% endif %}
+  </main>
+</body>
+</html>

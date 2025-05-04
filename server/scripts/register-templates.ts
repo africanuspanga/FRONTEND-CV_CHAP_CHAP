@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Templates directory
-const templatesDir = path.join(process.cwd(), 'templates');
+const templatesDir = path.join(process.cwd(), 'templates/pdf');
 
 // Base server URL
 const baseUrl = 'http://localhost:5000';
@@ -100,7 +100,7 @@ const templates = [
 
 // Function to upload a template to the API
 async function uploadTemplate(template: {id: string; name: string; description: string}) {
-  const htmlFilePath = path.join(templatesDir, `${template.id}.html`);
+  const htmlFilePath = path.join(templatesDir, `${template.id}/template.html`);
   
   // Check if template file exists
   if (!fs.existsSync(htmlFilePath)) {
