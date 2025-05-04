@@ -18,14 +18,14 @@ export default function CVScreenerTest() {
     message: '',
   });
 
-  // Test a simple GET request to check API health
+  // Test a simple GET request to check API templates
   const testHealthCheck = async () => {
     setLoading(true);
-    setResult({ success: false, message: 'Testing health endpoint...' });
+    setResult({ success: false, message: 'Testing templates endpoint...' });
     
     try {
-      const data = await fetchFromCVScreener<{status: string; message: string}>(
-        'api/health', 
+      const data = await fetchFromCVScreener<any>(
+        'api/templates', 
         {
           method: 'GET',
           responseType: 'json',
@@ -34,7 +34,7 @@ export default function CVScreenerTest() {
       
       setResult({
         success: true,
-        message: 'Successfully connected to CV Screener API',
+        message: 'Successfully retrieved templates from CV Screener API',
         data,
       });
     } catch (error) {
@@ -158,14 +158,14 @@ export default function CVScreenerTest() {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <Card className="p-4">
-          <h2 className="text-lg font-semibold mb-4">Health Check</h2>
-          <p className="mb-4">Tests the basic connectivity to the CV Screener API.</p>
+          <h2 className="text-lg font-semibold mb-4">Templates List</h2>
+          <p className="mb-4">Retrieves the list of available templates from the CV Screener API.</p>
           <Button 
             onClick={testHealthCheck}
             disabled={loading}
           >
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Test Health Endpoint
+            Get Templates
           </Button>
         </Card>
         
