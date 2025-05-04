@@ -5,6 +5,7 @@ import multer from 'multer';
 import crypto from 'crypto';
 import { openaiProxyHandler } from './openai-proxy';
 import { registerTemplateAPI } from './template-api';
+import { cvScreenerProxyHandler } from './cv-screener-proxy';
 
 // In-memory storage for CV requests
 interface CVRequest {
@@ -178,6 +179,22 @@ export function registerRoutes(app: Express): Server {
 
   // OpenAI proxy endpoint
   app.post("/api/openai/proxy", openaiProxyHandler);
+  
+  // CV Screener API Proxy routes
+  app.all("/cv-screener-proxy/*", upload.any(), (req, res) => {
+    // Extract the path part after /cv-screener-proxy/
+    const path = req.path.replace(/^\/cv-screener-proxy\//i, '');
+    req.params.path = path;
+    cvScreenerProxyHandler(req, res);
+  });
+  
+  // CORS preflight for the proxy
+  app.options("/cv-screener-proxy/*", (req, res) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Accept, X-Prefer-JSON-Response');
+    res.status(200).send();
+  });
 
   // API route for downloading PDF
   app.get("/api/cv-pdf/:requestId/download", (req, res) => {

@@ -3,9 +3,14 @@
  *
  * This module implements a client-side approach to handling CORS issues
  * by providing methods to make requests to the external CV Screener API.
+ * It now uses our server-side proxy for better CORS handling.
  */
 
-export const CV_SCREENER_API = 'https://cv-screener-africanuspanga.replit.app';
+// Original direct API URL (for reference only)
+// const CV_SCREENER_API = 'https://cv-screener-africanuspanga.replit.app';
+
+// Our server-side proxy URL
+const CV_SCREENER_PROXY = '/cv-screener-proxy';
 
 type RequestOptions = {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
@@ -16,7 +21,7 @@ type RequestOptions = {
 };
 
 /**
- * Make a CORS-friendly API request to the CV Screener API
+ * Make a CORS-friendly API request to the CV Screener API through our server proxy
  * 
  * @param endpoint The API endpoint path (without the base URL)
  * @param options Request options
@@ -27,26 +32,23 @@ export async function fetchFromCVScreener<T>(
   options: RequestOptions
 ): Promise<T> {
   // Ensure endpoint starts with / for proper URL construction
-  const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = `${CV_SCREENER_API}${normalizedEndpoint}`;
+  const normalizedEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+  const url = `${CV_SCREENER_PROXY}/${normalizedEndpoint}`;
   
-  // Set up headers with CORS requirements
+  // Set up headers
   const headers = {
     'Content-Type': 'application/json',
     'Accept': options.responseType === 'blob' ? 'application/pdf' : 'application/json',
-    'Origin': window.location.origin,
-    'X-Requested-With': 'XMLHttpRequest',
     ...(options.headers || {})
   };
 
   try {
-    console.log(`Making ${options.method} request to: ${url}`);
+    console.log(`Making ${options.method} request through proxy to: ${normalizedEndpoint}`);
     
-    // Make the request with appropriate CORS settings
+    // Make the request through our proxy
     const response = await fetch(url, {
       method: options.method,
       headers,
-      mode: 'cors', // Explicitly request CORS
       credentials: options.includeCredentials ? 'include' : 'same-origin',
       body: options.body ? JSON.stringify(options.body) : undefined,
       cache: 'no-store', // Don't cache responses for API calls
@@ -54,7 +56,7 @@ export async function fetchFromCVScreener<T>(
 
     // Handle error responses
     if (!response.ok) {
-      console.error(`Error response from server: ${response.status} ${response.statusText}`);
+      console.error(`Error response from proxy: ${response.status} ${response.statusText}`);
       let errorMessage;
       try {
         // Try to get detailed error message from JSON response
@@ -77,7 +79,7 @@ export async function fetchFromCVScreener<T>(
       return await response.json() as T;
     }
   } catch (error) {
-    console.error('Error making request to CV Screener API:', error);
+    console.error('Error making request to CV Screener API through proxy:', error);
     throw error;
   }
 }

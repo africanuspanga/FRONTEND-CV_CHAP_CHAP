@@ -58,6 +58,7 @@ import OpenAITestPage from "@/pages/OpenAITestPage";
 import BackendTest from "@/pages/backend-test";
 import APIStatusCheck from "@/pages/api-status-check";
 import ApiEndpointTest from "@/pages/api-endpoint-test";
+import CVScreenerTest from "@/pages/cv-screener-test";
 
 function Router() {
   return (
@@ -117,6 +118,7 @@ function Router() {
                 <Route path="/backend-test" component={BackendTest} />
                 <Route path="/api-status-check" component={APIStatusCheck} />
                 <Route path="/api-endpoint-test" component={ApiEndpointTest} />
+                <Route path="/cv-screener-test" component={CVScreenerTest} />
                 <Route path="/template-gallery" component={TemplateGallery} />
                 <Route component={NotFound} />
               </Switch>
