@@ -1,0 +1,75 @@
+This new endpoint:
+
+Requires a POST request with JSON data
+Has better error handling and will clearly tell you what's wrong
+Validates the required fields (name, email)
+Returns better error messages if anything fails
+Try this approach:
+
+Send a POST request to the new endpoint with a JSON body:
+{
+  "name": "John Doe",
+  "title": "Software Engineer",
+  "email": "john@example.com",
+  "phone": "+255 123 456 789",
+  "location": "Dar es Salaam, Tanzania",
+  "summary": "Experienced software developer with a passion for creating efficient, maintainable solutions.",
+  "skills": ["JavaScript", "React", "Node.js", "Python", "Django"],
+  "experience": [
+    {
+      "position": "Senior Developer",
+      "company": "Tech Company",
+      "location": "Dar es Salaam",
+      "startDate": "Jan 2020",
+      "endDate": "Present",
+      "description": "Led development of web applications."
+    }
+  ],
+  "education": [
+    {
+      "degree": "BSc in Computer Science",
+      "school": "University of Dar es Salaam",
+      "location": "Dar es Salaam",
+      "startDate": "2013",
+      "endDate": "2017",
+      "description": "Graduated with honors."
+    }
+  ]
+}
+You can use fetch in JavaScript:
+
+fetch('https://cv-screener-africanuspanga.replit.app/api/preview-template/brightdiamond', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    "name": "John Doe",
+    "title": "Software Engineer",
+    "email": "john@example.com",
+    // other fields...
+  })
+})
+.then(response => {
+  if (response.ok) {
+    // This will download the PDF
+    return response.blob();
+  }
+  return response.json().then(error => {
+    throw new Error(error.error || 'Unknown error');
+  });
+})
+.then(blob => {
+  // Create download link
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'JOHN_DOE-CV.pdf';
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+})
+.catch(error => {
+  console.error('Error:', error);
+});
+The GET endpoint should still work with default data, but the POST endpoint is more reliable when you need to send custom CV data.

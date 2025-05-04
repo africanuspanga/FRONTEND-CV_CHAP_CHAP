@@ -1,6 +1,6 @@
 import html2pdf from 'html2pdf.js';
 import { CVData } from '@shared/schema';
-import { directDownloadCV } from '@/services/cv-api-service';
+import { directDownloadCV, downloadCVWithPreviewEndpoint } from '@/services/cv-api-service';
 
 /**
  * Download a blob as a file
@@ -277,6 +277,36 @@ export const directDownloadCVAsPDF = async (cvData: CVData, templateId: string):
     console.log(`PDF downloaded as ${filename}`);
   } catch (error) {
     console.error('Error in direct download:', error);
+    alert('Failed to download CV. Please try again.');
+    throw error;
+  }
+};
+
+/**
+ * Download CV as PDF using the preview template endpoint
+ * @param cvData The CV data to use
+ * @param templateId The template ID to use
+ * @returns Promise that resolves when the download is complete
+ */
+export const downloadCVUsingPreviewEndpoint = async (cvData: CVData, templateId: string): Promise<void> => {
+  try {
+    console.log(`Attempting download with preview endpoint for template: ${templateId}`);
+    
+    // Import the service function to avoid circular reference
+    const { downloadCVWithPreviewEndpoint } = await import('@/services/cv-api-service');
+    
+    // Get the PDF blob from the service function in cv-api-service.ts
+    const pdfBlob = await downloadCVWithPreviewEndpoint(templateId, cvData);
+    
+    // Generate filename based on user data
+    const filename = `${cvData.personalInfo.firstName}_${cvData.personalInfo.lastName}_CV.pdf`.replace(/\s+/g, '_').toUpperCase();
+    
+    // Download the blob
+    downloadBlob(pdfBlob, filename);
+    
+    console.log(`PDF downloaded as ${filename}`);
+  } catch (error) {
+    console.error('Error in preview endpoint download:', error);
     alert('Failed to download CV. Please try again.');
     throw error;
   }

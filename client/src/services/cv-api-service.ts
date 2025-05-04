@@ -337,3 +337,50 @@ export const directDownloadCV = async (templateId: string, cvData: CVData): Prom
     throw new Error('Failed to download PDF: ' + (error instanceof Error ? error.message : 'Unknown error'));
   }
 };
+
+/**
+ * Download CV using template preview endpoint
+ * 
+ * This function uses the preview template endpoint which returns a PDF directly
+ * after posting the CV data in the required format.
+ * 
+ * @param templateId The ID of the template to use
+ * @param cvData The user's CV data
+ * @returns A Promise that resolves to a Blob containing the PDF
+ */
+export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: CVData): Promise<Blob> => {
+  try {
+    const url = `${API_BASE_URL}/api/preview-template/${templateId}`;
+    console.log(`Attempting PDF download from preview endpoint: ${url}`);
+    
+    // Transform CV data to backend format
+    const transformedCVData = transformCVDataForBackend(cvData);
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(transformedCVData)
+    });
+
+    if (!response.ok) {
+      // Try to get error as JSON first
+      try {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Server responded with status ${response.status}`);
+      } catch (jsonError) {
+        // If not JSON, get as text
+        const errorText = await response.text();
+        throw new Error(`Server responded with status ${response.status}: ${errorText}`);
+      }
+    }
+
+    const blob = await response.blob();
+    console.log('Preview endpoint PDF download successful', { size: blob.size, type: blob.type });
+    return blob;
+  } catch (error) {
+    console.error('Error downloading PDF from preview endpoint:', error);
+    throw new Error('Failed to download PDF: ' + (error instanceof Error ? error.message : 'Unknown error'));
+  }
+};

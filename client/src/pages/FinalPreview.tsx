@@ -142,10 +142,13 @@ const FinalPreview = () => {
     }
   };
   
-  // Handle the download button click - use direct download for testing
+  // Handle the download button click - use payment flow for production
   const handleDownload = async () => {
-    // Use the direct download method
-    await handleDirectDownload();
+    // Use the payment flow method for normal operation
+    await handlePaymentFlow();
+    
+    // For testing direct download without payment, uncomment this line:
+    // await handleDirectDownload();
   };
   
   // Handle print - disabled as requested
