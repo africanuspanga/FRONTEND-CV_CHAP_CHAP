@@ -1,0 +1,171 @@
+CV Template Integration Guide
+Overview
+This guide explains how to add new CV templates to the backend system. Each template consists of HTML/CSS that defines the appearance of the CV and variables for inserting user data.
+
+Template Management API
+Adding a New Template
+Endpoint: POST /api/templates/
+Content-Type: multipart/form-data
+
+Required Fields:
+
+id - Unique identifier for the template (e.g., "modern-blue", "professional-dark")
+name - Display name of the template (e.g., "Modern Blue", "Professional Dark")
+html_file - HTML file containing the template design
+Optional Fields:
+
+description - Detailed description of the template
+Example implementation in JavaScript:
+
+// Function to upload a new template
+async function uploadTemplate(templateId, templateName, htmlFile, description = '') {
+  // Create FormData object
+  const formData = new FormData();
+  formData.append('id', templateId);
+  formData.append('name', templateName);
+  formData.append('description', description);
+  formData.append('html_file', htmlFile);
+  
+  // Send POST request to API
+  const response = await fetch('/api/templates/', {
+    method: 'POST',
+    body: formData
+  });
+  
+  // Parse response
+  const result = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(`Failed to upload template: ${result.error}`);
+  }
+  
+  return result;
+}
+// Example usage with file input:
+document.getElementById('templateForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const templateId = document.getElementById('templateId').value;
+  const templateName = document.getElementById('templateName').value;
+  const description = document.getElementById('templateDescription').value;
+  const htmlFile = document.getElementById('htmlFile').files[0];
+  
+  try {
+    const result = await uploadTemplate(templateId, templateName, htmlFile, description);
+    console.log('Template uploaded successfully:', result);
+    alert('Template uploaded successfully!');
+  } catch (error) {
+    console.error('Upload failed:', error);
+    alert(`Upload failed: ${error.message}`);
+  }
+});
+HTML Template Requirements
+Required Variables
+Your HTML template must include these variables (enclosed in double curly braces):
+
+{{ name }} - User's full name
+{{ title }} - Professional title
+{{ email }} - Email address
+{{ phone }} - Phone number
+{{ location }} - Location/Address
+Optional Variables
+These variables should be conditionally rendered:
+
+{{ summary }} - Professional summary
+{{ experience }} - Array of experience items, each with:
+{{ exp.position }} - Job title
+{{ exp.company }} - Company name
+{{ exp.duration }} - Employment period
+{{ exp.description }} - Job description
+{{ education }} - Array of education items, each with:
+{{ edu.degree }} - Degree/certificate name
+{{ edu.school }} - School/institution name
+{{ edu.duration }} - Study period
+{{ edu.description }} - Description
+{{ skills }} - Array of skills
+{{ languages }} - Array of languages
+Example Template Structure
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{ name }} - CV</title>
+  <style>
+    /* Your CSS styles here */
+    body { font-family: Arial, sans-serif; }
+    .header { text-align: center; }
+    /* ... more styles ... */
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>{{ name }}</h1>
+    <p>{{ title }}</p>
+    <div class="contact">
+      <p>{{ email }} | {{ phone }} | {{ location }}</p>
+    </div>
+  </div>
+  
+  {% if summary %}
+  <div class="section">
+    <h2>Professional Summary</h2>
+    <p>{{ summary }}</p>
+  </div>
+  {% endif %}
+  
+  {% if experience %}
+  <div class="section">
+    <h2>Experience</h2>
+    {% for exp in experience %}
+    <div class="exp-item">
+      <h3>{{ exp.position }} - {{ exp.company }}</h3>
+      <p class="duration">{{ exp.duration }}</p>
+      <p>{{ exp.description }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  
+  <!-- Similar sections for education, skills, languages -->
+</body>
+</html>
+Testing Templates
+After uploading a template, you can test it with:
+
+async function testTemplate(templateId) {
+  try {
+    const response = await fetch(`/api/templates/${templateId}/test`, {
+      method: 'POST'
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Test failed: ${error.error}`);
+    }
+    
+    // Handle success - show PDF or download
+    const result = await response.json();
+    console.log('Test successful:', result);
+    
+    // If the result contains a download URL
+    if (result.pdf_path) {
+      window.open(`/download-test-pdf?path=${result.pdf_path}`, '_blank');
+    }
+  } catch (error) {
+    console.error('Template test failed:', error);
+    alert(`Template test failed: ${error.message}`);
+  }
+}
+Managing Templates
+The following APIs are available for template management:
+
+List all templates: GET /api/templates/
+Get template details: GET /api/templates/{template_id}
+Update template: PUT /api/templates/{template_id}
+Get template HTML: GET /api/templates/{template_id}/html
+Update template HTML: PUT /api/templates/{template_id}/html
+Common Issues
+Template not found: Ensure the template ID is correctly registered in the database
+PDF generation fails: Check that all required variables are included in your HTML
+Empty or small PDF: Verify your CSS is properly formatted and doesn't have syntax errors
+Missing template ID: Template IDs must be URL-safe (alphanumeric with hyphens/underscores)

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
 import crypto from 'crypto';
 import { openaiProxyHandler } from './openai-proxy';
+import { registerTemplateAPI } from './template-api';
 
 // In-memory storage for CV requests
 interface CVRequest {
@@ -22,6 +23,9 @@ const cvRequests: Record<string, CVRequest> = {};
 const upload = multer();
 
 export function registerRoutes(app: Express): Server {
+  // Register template API
+  registerTemplateAPI(app);
+
   // API key status endpoint
   app.get("/api/keys/status", (req, res) => {
     res.status(200).json({
