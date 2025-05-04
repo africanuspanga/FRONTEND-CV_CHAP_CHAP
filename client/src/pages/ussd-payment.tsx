@@ -106,30 +106,74 @@ const USSDPaymentPage: React.FC = () => {
     setIsVerifying(true);
     setVerificationError('');
     
-    // Check if there is a payment reference
-    const trimmedReference = paymentReference.trim();
-    if (!trimmedReference) {
-      setVerificationError('Please enter the payment reference from the SMS message');
+    // Check if there is a payment message
+    const smsText = paymentReference.trim();
+    if (!smsText) {
+      setVerificationError('Please paste the complete SMS message from Selcom');
       setIsVerifying(false);
       return;
     }
     
-    // Basic validation for reference format
-    if (trimmedReference.length < 6) {
-      setVerificationError('The payment reference is too short. Please check and try again.');
+    // Validation for complete Selcom SMS message (must be between 145-180 characters)
+    if (smsText.length < 145 || smsText.length > 180) {
+      setVerificationError(`The SMS length (${smsText.length}) is invalid. A complete Selcom message should be between 145-180 characters. Please copy and paste the entire message.`);
       setIsVerifying(false);
       return;
     }
     
-    if (trimmedReference.length > 20) {
-      setVerificationError('The reference is too long. Please enter just the reference number from the SMS message.');
+    // Check for required security elements
+    const requiredElements = [
+      { text: 'DRIFTMARK TECHNOLOGI', error: 'Message must contain "DRIFTMARK TECHNOLOGI"' },
+      { text: 'Merchant# 61115073', error: 'Message must contain "Merchant# 61115073"' },
+      { text: 'TZS 10,000.00', error: 'Payment amount must be TZS 10,000.00' },
+      { text: 'Selcom Pay', error: 'Not a valid Selcom payment message' },
+      { text: 'TransID', error: 'Missing transaction ID' },
+      { text: 'Ref', error: 'Missing reference number' },
+      { text: 'Channel', error: 'Missing payment channel' },
+      { text: 'From', error: 'Missing sender information' }
+    ];
+    
+    // Check all required elements
+    for (const element of requiredElements) {
+      if (!smsText.includes(element.text)) {
+        setVerificationError(`Invalid SMS format: ${element.error}. Please use the complete Selcom message.`);
+        setIsVerifying(false);
+        return;
+      }
+    }
+    
+    // Validate structure - should have around 8-10 lines
+    const lines = smsText.split('\n').filter(line => line.trim().length > 0);
+    if (lines.length < 7) {
+      setVerificationError('The SMS format is incorrect. Make sure you copied the complete message with all lines intact.');
+      setIsVerifying(false);
+      return;
+    }
+    
+    // Extract the reference number for verification
+    let refNumber = '';
+    try {
+      const refLine = lines.find(line => line.startsWith('Ref'));
+      if (refLine) {
+        refNumber = refLine.replace('Ref', '').trim();
+      } else {
+        throw new Error('Could not find reference number line');
+      }
+      
+      if (!refNumber) {
+        throw new Error('Reference number is empty');
+      }
+    } catch (error) {
+      console.error('Error extracting reference:', error);
+      setVerificationError('Could not find a valid reference number in the message. Please ensure you\'ve pasted the complete SMS.');
       setIsVerifying(false);
       return;
     }
     
     // All validations passed, send to API for verification
     try {
-      const success = await verifyPaymentAPI(trimmedReference);
+      // We use the extracted reference number for the API call
+      const success = await verifyPaymentAPI(refNumber);
       
       if (!success) {
         setVerificationError(requestError || 'Payment verification failed. Please try again.');
@@ -237,23 +281,23 @@ const USSDPaymentPage: React.FC = () => {
                 </p>
                 <ol className="list-decimal pl-4 text-sm sm:text-base text-blue-700 space-y-1">
                   <li>Wait for SMS confirmation from <span className="font-bold">Selcom</span></li>
-                  <li>Find the <span className="font-bold">payment reference</span> in the SMS (e.g. ABC123XYZ)</li>
-                  <li>Enter the reference in the box below</li>
+                  <li>Copy the <span className="font-bold">entire SMS message</span> from Selcom</li>
+                  <li>Paste the complete message in the box below</li>
                   <li>Click the "Verify Payment" button</li>
                 </ol>
               </div>
               
               <Textarea 
-                placeholder="Enter payment reference from the SMS (e.g., ABC123XYZ)..."
+                placeholder="Paste the ENTIRE Selcom SMS message here..."
                 value={paymentReference}
                 onChange={(e) => setPaymentReference(e.target.value)}
                 className="h-20 sm:h-24 mb-2 text-sm sm:text-base"
-                maxLength={20}
+                maxLength={180}
               />
               <div className="flex justify-between text-xs text-gray-500">
-                <span>Reference from SMS message</span>
-                <span className={paymentReference.length < 6 ? "text-amber-500" : "text-green-500"}>
-                  {paymentReference.length}/20 characters
+                <span>Full SMS message from Selcom</span>
+                <span className={paymentReference.length >= 145 && paymentReference.length <= 180 ? "text-green-500" : "text-amber-500"}>
+                  {paymentReference.length}/180 characters
                 </span>
               </div>
             </div>
