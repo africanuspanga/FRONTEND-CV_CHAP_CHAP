@@ -1,0 +1,260 @@
+Template Upload Guide for Frontend Team
+Overview
+Here's a step-by-step guide to help your frontend team upload template files through our API. You can share this with them to make the process easier.
+
+Step 1: Prepare Template Files
+Each CV template should be a single HTML file with CSS included in the <style> section. The file should:
+
+Use template variables enclosed in double curly braces like {{ name }}
+Follow Jinja2 templating syntax for conditional sections and loops
+Include all necessary styling within the file
+Step 2: Upload Templates Using API
+Method 1: Using Fetch API (JavaScript)
+// Function to upload a template
+async function uploadTemplate(templateId, templateName, htmlFile, description = '') {
+  // Create FormData for multipart/form-data request
+  const formData = new FormData();
+  formData.append('id', templateId);          // e.g., "modern", "basic"
+  formData.append('name', templateName);      // e.g., "Modern CV Template"
+  formData.append('description', description);
+  formData.append('html_file', htmlFile);     // File object from input[type=file]
+  
+  try {
+    const response = await fetch('/api/templates/', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to upload template');
+    }
+    
+    console.log('Template uploaded successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('Template upload failed:', error);
+    throw error;
+  }
+}
+// Example usage:
+document.getElementById('templateForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const templateId = document.getElementById('templateId').value;
+  const templateName = document.getElementById('templateName').value;
+  const description = document.getElementById('templateDescription').value;
+  const htmlFile = document.getElementById('templateFile').files[0];
+  
+  try {
+    await uploadTemplate(templateId, templateName, htmlFile, description);
+    alert('Template uploaded successfully');
+  } catch (error) {
+    alert(`Upload failed: ${error.message}`);
+  }
+});
+Method 2: Using cURL (for testing)
+curl -X POST http://your-backend-url/api/templates/ \
+  -F "id=professional" \
+  -F "name=Professional CV Template" \
+  -F "description=A clean professional CV template" \
+  -F "html_file=@/path/to/professional-template.html"
+Step 3: Update Existing Templates
+If you need to update an existing template's HTML content:
+
+async function updateTemplateHTML(templateId, htmlContent) {
+  try {
+    const response = await fetch(`/api/templates/${templateId}/html`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        html_content: htmlContent
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to update template HTML');
+    }
+    
+    console.log('Template HTML updated successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('Template HTML update failed:', error);
+    throw error;
+  }
+}
+// Example usage:
+const templateId = 'modern';
+const htmlContent = document.getElementById('htmlEditor').value;
+updateTemplateHTML(templateId, htmlContent)
+  .then(() => alert('Template updated successfully'))
+  .catch(error => alert(`Update failed: ${error.message}`));
+Step 4: Test Template Rendering
+After uploading a template, you should test if it renders correctly:
+
+async function testTemplate(templateId) {
+  try {
+    const response = await fetch(`/api/templates/${templateId}/test`, {
+      method: 'POST'
+    });
+    
+    if (response.ok) {
+      // For successful tests, you may get back a PDF file
+      const blob = await response.blob();
+      
+      // Create a download link for the PDF
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${templateId}-test.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      
+      alert('Template test successful! Downloading PDF...');
+    } else {
+      const result = await response.json();
+      throw new Error(result.error || 'Template test failed');
+    }
+  } catch (error) {
+    console.error('Template test failed:', error);
+    alert(`Test failed: ${error.message}`);
+  }
+}
+// Example usage:
+document.getElementById('testButton').addEventListener('click', () => {
+  const templateId = document.getElementById('templateSelect').value;
+  testTemplate(templateId);
+});
+Required Template Variables
+Ensure your template HTML includes these variables:
+
+{{ name }}         - Full name
+{{ title }}        - Job title/position
+{{ email }}        - Email address
+{{ phone }}        - Phone number
+{{ location }}     - Location/address
+{{ summary }}      - Professional summary
+{{ experience }}   - List of work experiences (loop through this)
+{{ education }}    - List of education entries (loop through this)
+{{ skills }}       - List of skills (loop through this)
+{{ languages }}    - List of languages (loop through this)
+Complete Example HTML Template
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{ name }} - CV</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      color: #333;
+      line-height: 1.5;
+      margin: 0;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 28px;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .section h2 {
+      color: #2c3e50;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    .experience-item, .education-item {
+      margin-bottom: 15px;
+    }
+    .experience-item h3, .education-item h3 {
+      margin: 0;
+      color: #34495e;
+    }
+    .skill-list {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .skill-item {
+      background-color: #eee;
+      padding: 5px 10px;
+      margin: 0 5px 5px 0;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>{{ name }}</h1>
+    <p>{{ title }}</p>
+    <p>{{ email }} | {{ phone }} | {{ location }}</p>
+  </div>
+  
+  {% if summary %}
+  <div class="section">
+    <h2>Summary</h2>
+    <p>{{ summary }}</p>
+  </div>
+  {% endif %}
+  
+  {% if experience %}
+  <div class="section">
+    <h2>Experience</h2>
+    {% for exp in experience %}
+    <div class="experience-item">
+      <h3>{{ exp.position }} - {{ exp.company }}</h3>
+      <p>{{ exp.duration }}</p>
+      <p>{{ exp.description }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  
+  {% if education %}
+  <div class="section">
+    <h2>Education</h2>
+    {% for edu in education %}
+    <div class="education-item">
+      <h3>{{ edu.degree }} - {{ edu.school }}</h3>
+      <p>{{ edu.duration }}</p>
+      <p>{{ edu.description }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  
+  {% if skills %}
+  <div class="section">
+    <h2>Skills</h2>
+    <div class="skill-list">
+      {% for skill in skills %}
+      <div class="skill-item">{{ skill }}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  
+  {% if languages %}
+  <div class="section">
+    <h2>Languages</h2>
+    <ul>
+      {% for language in languages %}
+      <li>{{ language }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</body>
+</html>
+Let me know if you'd like to see any specific part of this implementation in more detail!

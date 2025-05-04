@@ -129,6 +129,82 @@ export async function fetchTemplateHTML(templateId: string): Promise<string> {
   }
 }
 
+// Function to update a template's HTML content
+export async function updateTemplateHTML(templateId: string, htmlContent: string): Promise<boolean> {
+  try {
+    const formData = new FormData();
+    const htmlFile = new File([htmlContent], `${templateId}.html`, { type: 'text/html' });
+    formData.append('html_file', htmlFile);
+    
+    const response = await fetch(`/api/templates/${templateId}/html`, {
+      method: 'PUT',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to update template HTML: ${response.statusText}`);
+    }
+    
+    return true;
+  } catch (error) {
+    console.error(`Error updating template HTML for ${templateId}:`, error);
+    return false;
+  }
+}
+
+// Function to test template rendering
+export async function testTemplate(templateId: string): Promise<Blob | null> {
+  try {
+    const response = await fetch(`/api/templates/${templateId}/test`, {
+      method: 'POST'
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to test template: ${response.statusText}`);
+    }
+    
+    // Return the PDF blob
+    return await response.blob();
+  } catch (error) {
+    console.error(`Error testing template ${templateId}:`, error);
+    return null;
+  }
+}
+
+// Function to upload a new template
+export async function uploadTemplate(
+  templateId: string,
+  templateName: string,
+  htmlContent: string,
+  description: string = ''
+): Promise<Template | null> {
+  try {
+    // Create FormData for multipart/form-data request
+    const formData = new FormData();
+    formData.append('id', templateId);
+    formData.append('name', templateName);
+    formData.append('description', description);
+    
+    // Create a File object from the HTML content
+    const htmlFile = new File([htmlContent], `${templateId}.html`, { type: 'text/html' });
+    formData.append('html_file', htmlFile);
+    
+    const response = await fetch('/api/templates/', {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to upload template: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Template upload failed:', error);
+    return null;
+  }
+}
+
 // Default templates to use as fallback if API fails
 const defaultTemplates: Template[] = [
   {
