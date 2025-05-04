@@ -1,0 +1,107 @@
+Here's the exact JSON data structure we expect from the frontend team for CV download:
+
+{
+  "name": "Full Name", 
+  "title": "Professional Title",
+  "email": "email@example.com",
+  "phone": "+255 123 456 789",
+  "location": "City, Country",
+  "summary": "Professional summary paragraph that highlights expertise, experience, and career goals.",
+  
+  "experience": [
+    {
+      "position": "Job Title",
+      "company": "Company Name",
+      "location": "City, Country",
+      "startDate": "Month Year",
+      "endDate": "Month Year or Present",
+      "description": "Detailed description of responsibilities and achievements"
+    },
+    {
+      // Additional job entries follow the same format
+    }
+  ],
+  
+  "education": [
+    {
+      "degree": "Degree Name",
+      "school": "Institution Name",
+      "location": "City, Country",
+      "startDate": "Year",
+      "endDate": "Year",
+      "description": "Brief description including honors, relevant coursework, etc."
+    },
+    {
+      // Additional education entries follow the same format
+    }
+  ],
+  
+  "skills": [
+    "Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"
+    // List of strings representing professional skills
+  ],
+  
+  "languages": [
+    "English (Fluent)", "Swahili (Native)", "French (Basic)"
+    // List of strings representing language proficiencies
+  ],
+  
+  "certifications": [
+    {
+      "name": "Certification Name",
+      "issuer": "Issuing Organization",
+      "date": "Month Year",
+      "description": "Brief description (optional)"
+    }
+  ],
+  
+  "projects": [
+    {
+      "name": "Project Name",
+      "description": "Brief description of the project",
+      "url": "https://projectlink.com (optional)"
+    }
+  ],
+  
+  "references": [
+    {
+      "name": "Reference Name",
+      "position": "Reference Position",
+      "company": "Reference Company",
+      "contact": "Phone or Email (optional)"
+    }
+  ]
+}
+Required Fields
+The following fields are required for all CV templates:
+
+name
+title
+email
+phone
+location
+summary
+At least one entry in experience
+At least one entry in education
+At least four entries in skills
+Optional Fields
+The following fields are optional and will only be rendered if provided:
+
+languages
+certifications
+projects
+references
+Field Limitations
+name: Maximum 50 characters
+title: Maximum 100 characters
+summary: Maximum 500 characters
+experience[].description: Maximum 500 characters per entry
+education[].description: Maximum 300 characters per entry
+skills: Maximum 15 skills
+API Usage
+The frontend team should:
+
+Collect the user's CV data in this exact JSON format
+Send a POST request to /download-pdf-test/{template_id} with the JSON in the request body
+When the response is successful, redirect to the same URL with a GET request to download the generated PDF
+Would you like me to provide a specific example of this JSON data structure with sample values?

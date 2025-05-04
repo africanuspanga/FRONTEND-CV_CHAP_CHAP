@@ -1,7 +1,106 @@
-import { CVData } from '@shared/schema';
+import { CVData, WorkExperience, Education, Skill, Language, Certification, Project, Reference } from '@shared/schema';
 
 // Backend API URL - always use local mock server during development
 export const API_BASE_URL = window.location.origin;
+
+/**
+ * Transform our internal CV data format to the backend expected format
+ * 
+ * This function converts our frontend CV data structure to the exact format
+ * expected by the backend PDF generation API. This allows us to maintain our
+ * internal structure while adapting to backend requirements at the API boundary.
+ * 
+ * @param cvData Our internal CV data structure
+ * @returns Transformed data in the backend's expected format
+ */
+export const transformCVDataForBackend = (cvData: CVData): Record<string, any> => {
+  const { personalInfo, workExperiences, education, skills, languages, references, projects, certifications } = cvData;
+  
+  // Construct the full name from first and last name
+  const fullName = `${personalInfo.firstName} ${personalInfo.lastName}`;
+  
+  // Construct location string from city, region, country if available
+  const locationParts = [];
+  if (personalInfo.city) locationParts.push(personalInfo.city);
+  if (personalInfo.country) locationParts.push(personalInfo.country);
+  const location = locationParts.length > 0 ? locationParts.join(', ') : '';
+
+  // Transform work experiences
+  const experience = (workExperiences || []).map(job => ({
+    position: job.jobTitle,
+    company: job.company,
+    location: job.location || '',
+    startDate: job.startDate,
+    endDate: job.current ? 'Present' : (job.endDate || ''),
+    description: job.description || ''
+  }));
+
+  // Transform education
+  const transformedEducation = (education || []).map(edu => ({
+    degree: edu.degree,
+    school: edu.institution,
+    location: edu.location || '',
+    startDate: edu.startDate,
+    endDate: edu.current ? 'Present' : (edu.endDate || ''),
+    description: edu.description || ''
+  }));
+
+  // Transform skills
+  const transformedSkills = (skills || []).map(skill => skill.name);
+
+  // Transform languages
+  const transformedLanguages = (languages || []).map(lang => {
+    // Map our proficiency levels to human-readable format
+    const proficiencyMap: Record<string, string> = {
+      beginner: 'Basic',
+      intermediate: 'Intermediate',
+      advanced: 'Advanced',
+      fluent: 'Fluent',
+      native: 'Native'
+    };
+    return `${lang.name} (${proficiencyMap[lang.proficiency] || lang.proficiency})`;
+  });
+
+  // Transform certifications
+  const transformedCertifications = (certifications || []).map(cert => ({
+    name: cert.name,
+    issuer: cert.issuer,
+    date: cert.date,
+    description: ''
+  }));
+
+  // Transform projects
+  const transformedProjects = (projects || []).map(project => ({
+    name: project.name,
+    description: project.description || '',
+    url: project.url || ''
+  }));
+
+  // Transform references
+  const transformedReferences = (references || []).map(ref => ({
+    name: ref.name,
+    position: ref.position || '',
+    company: ref.company || '',
+    contact: ref.email || ref.phone || ''
+  }));
+
+  // Construct the final transformed object
+  return {
+    name: fullName,
+    title: personalInfo.professionalTitle || '',
+    email: personalInfo.email,
+    phone: personalInfo.phone || '',
+    location,
+    summary: personalInfo.summary || '',
+    experience,
+    education: transformedEducation,
+    skills: transformedSkills,
+    languages: transformedLanguages,
+    certifications: transformedCertifications,
+    projects: transformedProjects,
+    references: transformedReferences
+  };
+};
 
 export interface CVRequestStatus {
   status: 'pending_payment' | 'verifying_payment' | 'generating_pdf' | 'completed' | 'failed';
@@ -23,10 +122,11 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
     const url = `${API_BASE_URL}/api/cv-pdf/anonymous/initiate-ussd`;
     console.log(`Attempting to initiate payment at: ${url}`);
     
-    // Log the exact JSON being sent
+    // Transform CV data to backend format and log the exact JSON being sent
+    const transformedCVData = transformCVDataForBackend(cvData);
     const requestBody = {
       template_id: templateId,
-      cv_data: cvData
+      cv_data: transformedCVData
     };
     console.log('Request payload:', JSON.stringify(requestBody, null, 2));
 
