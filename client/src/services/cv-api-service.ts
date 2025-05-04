@@ -119,7 +119,7 @@ export interface CVRequestStatus {
   error?: string;
 }
 
-// Function to initiate USSD payment flow - Frontend Only Implementation
+// Function to initiate USSD payment flow - Backend API Implementation
 export const initiateUSSDPayment = async (templateId: string, cvData: CVData): Promise<{
   success: boolean;
   request_id?: string; 
@@ -127,35 +127,48 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
   error?: string;
 }> => {
   try {
-    console.log('Initiating frontend-only USSD payment flow');
+    console.log('Initiating USSD payment with backend API');
     
-    // Create complete data structure with required fields at root level
-    const completeData = {
-      ...cvData,  // Include the original complete CV data structure
-      name: cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName,  // Add required fields at root level
-      email: cvData.personalInfo.email
+    // Transform CV data to match backend expectations
+    const transformedData = transformCVDataForBackend(cvData);
+    
+    // Prepare request payload
+    const requestPayload = {
+      template_id: templateId.toLowerCase(),
+      cv_data: transformedData
     };
     
-    // Generate a random request ID (timestamp + random number)
-    const requestId = `frontend-${Date.now()}-${Math.floor(Math.random() * 1000)}`;  
+    // Log the template ID for debugging
+    console.log('Template ID:', templateId.toLowerCase());
+    console.log('Request data prepared for backend');
     
-    // Store the CV data in localStorage for later use
-    localStorage.setItem(`cv_data_${requestId}`, JSON.stringify({
+    // Make API request to initiate payment
+    const response = await fetchFromCVScreener<{success: boolean; request_id: string; error?: string}>(
+      'api/cv-pdf/anonymous/initiate-ussd',
+      {
+        method: 'POST',
+        body: requestPayload,
+        responseType: 'json'
+      }
+    );
+    
+    if (!response.success || !response.request_id) {
+      throw new Error(response.error || 'Failed to get valid response from payment initiation');
+    }
+    
+    // Store the CV data in localStorage for reference
+    // This is still helpful for the frontend even with the backend implementation
+    localStorage.setItem(`cv_data_${response.request_id}`, JSON.stringify({
       templateId: templateId.toLowerCase(),
-      cvData: completeData
+      cvData: transformedData
     }));
     
-    // Log the details for debugging
-    console.log('Template ID:', templateId.toLowerCase());
-    console.log('Request ID generated:', requestId);
+    console.log('Request ID received from backend:', response.request_id);
     
-    // Small artificial delay to simulate network request (200ms)
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
-    // Always return success in this frontend-only implementation
+    // Return the response from the server
     return {
       success: true,
-      request_id: requestId
+      request_id: response.request_id
     };
   } catch (error) {
     console.error('Error initiating USSD payment:', error);
@@ -168,7 +181,7 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
   }
 };
 
-// Function to verify payment with reference (frontend simulation)
+// Function to verify payment with reference (backend API implementation)
 export const verifyUSSDPayment = async (requestId: string, paymentReference: string): Promise<{
   success: boolean;
   redirect_url?: string;
@@ -178,31 +191,50 @@ export const verifyUSSDPayment = async (requestId: string, paymentReference: str
     console.log('Verifying payment for request ID:', requestId);
     console.log('Payment reference:', paymentReference);
     
-    // Add a 2-second delay to simulate network latency and payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Check if we have stored CV data for this request ID
-    const storedData = localStorage.getItem(`cv_data_${requestId}`);
-    
-    if (!storedData) {
-      throw new Error('No CV data found for this request ID');
-    }
-    
-    // Parse the stored data
-    const { templateId, cvData } = JSON.parse(storedData);
-    
-    // Validate payment reference code (simple check)
+    // Client-side validation for better UX before making API call
     if (!paymentReference || paymentReference.length < 4) {
       throw new Error('Invalid payment reference code. Please check and try again.');
     }
     
-    // Mark payment as verified in localStorage
+    // Option: Pre-validate SMS content (existing validation)
+    const requiredPhrases = [
+      "DRIFTMARK TECHNOLOGI", 
+      "Merchant# 61115073", 
+      "TZS 10,000.00"
+    ];
+    
+    const isValidSMS = requiredPhrases.every(phrase => 
+      paymentReference.includes(phrase)
+    );
+    
+    if (!isValidSMS) {
+      throw new Error('The SMS content does not match the expected Selcom payment confirmation. Please ensure you\'ve copied the entire SMS correctly.');
+    }
+    
+    // Make the API call to verify payment
+    const response = await fetchFromCVScreener<{success: boolean; redirect_url?: string; error?: string}>(
+      `api/cv-pdf/${requestId}/verify`,
+      {
+        method: 'POST',
+        responseType: 'json',
+        body: {
+          payment_reference: paymentReference,
+          sms_content: paymentReference // Include full SMS for backend validation
+        }
+      }
+    );
+    
+    if (!response.success) {
+      throw new Error(response.error || 'Payment verification failed on the server');
+    }
+    
+    // Still maintain local storage flag for frontend state
     localStorage.setItem(`payment_verified_${requestId}`, 'true');
     
-    console.log('Payment verification successful with template ID:', templateId);
+    console.log('Payment verification successful with request ID:', requestId);
     return { 
       success: true,
-      redirect_url: `/download-success`
+      redirect_url: response.redirect_url || '/download-success'
     };
   } catch (error) {
     console.error('Error verifying USSD payment:', error);
@@ -215,27 +247,33 @@ export const verifyUSSDPayment = async (requestId: string, paymentReference: str
   }
 };
 
-// Function to check payment status (frontend simulation)
+// Function to check payment status (backend API implementation)
 export const checkPaymentStatus = async (requestId: string): Promise<CVRequestStatus> => {
   try {
     console.log('Checking payment status for request ID:', requestId);
+
+    // Check with backend API for payment status
+    const response = await fetchFromCVScreener<CVRequestStatus>(
+      `api/cv-pdf/${requestId}/status`,
+      {
+        method: 'GET',
+        responseType: 'json'
+      }
+    );
     
-    // Introduce a small delay to simulate network request (200ms)
-    await new Promise(resolve => setTimeout(resolve, 200));
+    // Log the status for debugging
+    console.log('Payment status from backend:', response.status);
     
-    // Check if we have stored CV data for this request ID
-    const storedData = localStorage.getItem(`cv_data_${requestId}`);
-    
-    if (!storedData) {
-      return {
-        status: 'failed',
-        request_id: requestId,
-        created_at: new Date().toISOString(),
-        error: 'No CV data found for this request ID'
-      };
+    // If the status is completed, maintain our local storage flag
+    if (response.status === 'completed') {
+      localStorage.setItem(`payment_verified_${requestId}`, 'true');
     }
     
-    // Get payment verification status
+    return response;
+  } catch (error) {
+    console.error('Error checking payment status:', error);
+    
+    // If API call fails, try to fall back to local storage
     const paymentVerified = localStorage.getItem(`payment_verified_${requestId}`) === 'true';
     
     if (paymentVerified) {
@@ -245,15 +283,7 @@ export const checkPaymentStatus = async (requestId: string): Promise<CVRequestSt
         created_at: new Date(Date.now() - 5000).toISOString(),
         completed_at: new Date().toISOString()
       };
-    } else {
-      return {
-        status: 'pending_payment',
-        request_id: requestId,
-        created_at: new Date().toISOString()
-      };
     }
-  } catch (error) {
-    console.error('Error checking payment status:', error);
     
     // Return a pending status to allow the UI to retry
     return {
@@ -265,40 +295,55 @@ export const checkPaymentStatus = async (requestId: string): Promise<CVRequestSt
   }
 };
 
-// Function to download the generated PDF (frontend implementation)
+// Function to download the generated PDF (backend API implementation)
 export const downloadGeneratedPDF = async (requestId: string): Promise<Blob> => {
   try {
     console.log(`Attempting to download PDF for request ID: ${requestId}`);
     
-    // Check if payment has been verified
-    const paymentVerified = localStorage.getItem(`payment_verified_${requestId}`) === 'true';
+    // First check payment status with the backend
+    const statusResponse = await checkPaymentStatus(requestId);
     
-    if (!paymentVerified) {
-      throw new Error('Payment has not been verified yet. Please complete payment verification first.');
+    if (statusResponse.status !== 'completed') {
+      throw new Error('Payment has not been completed yet. Please complete payment verification first.');
     }
     
-    // Get the CV data from localStorage
-    const storedData = localStorage.getItem(`cv_data_${requestId}`);
+    console.log('Payment verified, downloading PDF...');
     
-    if (!storedData) {
-      throw new Error('CV data not found. Please try creating your CV again.');
-    }
+    // Download the PDF using the proper endpoint
+    const pdfBlob = await fetchFromCVScreener<Blob>(
+      `api/cv-pdf/${requestId}/download`,
+      {
+        method: 'GET',
+        responseType: 'blob'
+      }
+    );
     
-    // Parse the stored data
-    const { templateId, cvData } = JSON.parse(storedData);
-    
-    // Add a short delay to simulate processing (2 seconds)
-    // This gives users the feeling that something is happening
-    console.log('Generating PDF, please wait...');
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Use the downloadCVWithPreviewEndpoint function to generate and download the PDF
-    return await downloadCVWithPreviewEndpoint(templateId, cvData);
+    console.log('PDF download successful', { size: pdfBlob.size, type: pdfBlob.type });
+    return pdfBlob;
   } catch (error) {
     console.error('Error downloading PDF:', error);
     
-    // If download fails, throw an error with a useful message
-    throw new Error('Failed to download PDF: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    // If API call fails, try to use our preview endpoint as fallback
+    try {
+      console.log('Trying fallback to preview endpoint...');
+      
+      // Get the CV data from localStorage
+      const storedData = localStorage.getItem(`cv_data_${requestId}`);
+      
+      if (!storedData) {
+        throw new Error('CV data not found. Please try creating your CV again.');
+      }
+      
+      // Parse the stored data
+      const { templateId, cvData } = JSON.parse(storedData);
+      
+      // Use the downloadCVWithPreviewEndpoint function as fallback
+      return await downloadCVWithPreviewEndpoint(templateId, cvData);
+    } catch (fallbackError) {
+      console.error('Fallback also failed:', fallbackError);
+      // If fallback also fails, throw the original error
+      throw new Error('Failed to download PDF: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
   }
 };
 
@@ -858,16 +903,10 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
     const normalizedTemplateId = templateId.toLowerCase();
     console.log(`Attempting PDF download for template: ${normalizedTemplateId}`);
     
-    // Process the data to clean up values that should be displayed in the PDF
-    // Create a deep clone first to avoid modifying the original data
-    const cleanedData = JSON.parse(JSON.stringify(cvData));
+    // Use our data transformation function to prepare data in the backend-expected format
+    const transformedData = transformCVDataForBackend(cvData);
     
-    // Clean up skills data - convert complex objects to simple strings
-    if (cleanedData.skills && Array.isArray(cleanedData.skills)) {
-      cleanedData.skills = cleanedData.skills.map((skill: any) => {
-        return typeof skill === 'object' && skill.name ? skill.name : skill;
-      });
-    }
+    console.log('Sending transformed data to backend:', transformedData);
     
     // Clean up languages data - convert complex objects to simple strings
     if (cleanedData.languages && Array.isArray(cleanedData.languages)) {
