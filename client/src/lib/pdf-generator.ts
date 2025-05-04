@@ -1,5 +1,22 @@
 import html2pdf from 'html2pdf.js';
 import { CVData } from '@shared/schema';
+import { directDownloadCV } from '@/services/cv-api-service';
+
+/**
+ * Download a blob as a file
+ * @param blob The blob to download
+ * @param filename The filename to use
+ */
+export const downloadBlob = (blob: Blob, filename: string): void => {
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+};
 
 /**
  * Generates a PDF from the provided CV data and template
@@ -234,6 +251,33 @@ export const generatePDF = async (cvData: CVData, templateId: string): Promise<v
     
   } catch (error) {
     console.error('Error generating PDF:', error);
+    throw error;
+  }
+};
+
+/**
+ * Direct download CV as PDF using the backend API
+ * @param cvData The CV data to use
+ * @param templateId The template ID to use
+ * @returns Promise that resolves when the download is complete
+ */
+export const directDownloadCVAsPDF = async (cvData: CVData, templateId: string): Promise<void> => {
+  try {
+    console.log(`Attempting direct download with template: ${templateId}`);
+    
+    // Get the PDF blob from the backend API
+    const pdfBlob = await directDownloadCV(templateId, cvData);
+    
+    // Generate filename based on user data
+    const filename = `${cvData.personalInfo.firstName}_${cvData.personalInfo.lastName}_CV.pdf`.replace(/\s+/g, '_').toUpperCase();
+    
+    // Download the blob
+    downloadBlob(pdfBlob, filename);
+    
+    console.log(`PDF downloaded as ${filename}`);
+  } catch (error) {
+    console.error('Error in direct download:', error);
+    alert('Failed to download CV. Please try again.');
     throw error;
   }
 };

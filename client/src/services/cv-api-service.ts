@@ -287,3 +287,53 @@ export const downloadGeneratedPDF = async (requestId: string): Promise<Blob> => 
     throw new Error('Failed to download PDF: ' + (error instanceof Error ? error.message : 'Unknown error'));
   }
 };
+
+/**
+ * Direct download CV using the test endpoint
+ * 
+ * This function bypasses the payment flow and directly generates and downloads
+ * a PDF of the CV using the test endpoint provided by the backend.
+ * 
+ * @param templateId The ID of the template to use for generating the CV
+ * @param cvData The user's CV data
+ * @returns A Promise that resolves to a Blob containing the PDF data
+ */
+export const directDownloadCV = async (templateId: string, cvData: CVData): Promise<Blob> => {
+  try {
+    const url = `${API_BASE_URL}/download-pdf-test/${templateId}`;
+    console.log(`Attempting direct PDF download from: ${url}`);
+    
+    // Transform CV data to backend format
+    const transformedCVData = transformCVDataForBackend(cvData);
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(transformedCVData)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response body:', errorText);
+      
+      let errorMessage;
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.error || `Server responded with status ${response.status}`;
+      } catch (e) {
+        errorMessage = `Server responded with status ${response.status}: ${errorText}`;
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    const blob = await response.blob();
+    console.log('Direct PDF download successful', { size: blob.size, type: blob.type });
+    return blob;
+  } catch (error) {
+    console.error('Error directly downloading PDF:', error);
+    throw new Error('Failed to download PDF: ' + (error instanceof Error ? error.message : 'Unknown error'));
+  }
+};

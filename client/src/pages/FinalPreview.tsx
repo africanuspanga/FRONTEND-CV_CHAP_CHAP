@@ -7,7 +7,7 @@ import { useCVRequest } from '@/contexts/cv-request-context';
 import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
 import { getAllTemplates, getTemplateById } from '@/lib/templates-registry';
 import { X, Download, Printer, Mail, CheckCircle, ArrowLeft, Edit, RefreshCw, ChevronRight } from 'lucide-react';
-import { generatePDF } from '@/lib/pdf-generator';
+import { generatePDF, directDownloadCVAsPDF } from '@/lib/pdf-generator';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/auth-context';
 
@@ -44,8 +44,38 @@ const FinalPreview = () => {
     updateFormField('templateId', id);
   };
   
+  // Direct download CV without payment
+  const handleDirectDownload = async () => {
+    setIsDownloading(true);
+    
+    try {
+      // Ensure form data has the most current template ID
+      if (currentTemplateId !== formData.templateId) {
+        updateFormField('templateId', currentTemplateId);
+      }
+      
+      // Use the direct API download that bypasses payment flow
+      await directDownloadCVAsPDF(formData, currentTemplateId);
+      
+      toast({
+        title: "Download Complete",
+        description: "Your CV has been downloaded successfully.",
+        variant: "default"
+      });
+    } catch (error) {
+      console.error("Error downloading CV:", error);
+      toast({
+        title: "Download Failed",
+        description: error instanceof Error ? error.message : "Failed to download CV",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+  
   // Handle CV download (initiate payment and redirect to payment page)
-  const handleDownload = async () => {
+  const handlePaymentFlow = async () => {
     // Set downloading state to true to disable the button
     setIsDownloading(true);
     
@@ -110,6 +140,12 @@ const FinalPreview = () => {
       });
       setIsDownloading(false);
     }
+  };
+  
+  // Handle the download button click - use direct download for testing
+  const handleDownload = async () => {
+    // Use the direct download method
+    await handleDirectDownload();
   };
   
   // Handle print - disabled as requested
