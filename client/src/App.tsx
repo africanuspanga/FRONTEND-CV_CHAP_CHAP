@@ -76,16 +76,24 @@ function Router() {
         
         {/* Final Preview and Payment routes without navbar or footer */}
         <Route path="/cv/:templateId/final-preview">
-          <FinalPreview />
+          <div className="container">
+            <FinalPreview />
+          </div>
         </Route>
         <Route path="/cv/:templateId/ussd-payment">
-          <USSDPaymentPage />
+          <div className="container">
+            <USSDPaymentPage />
+          </div>
         </Route>
         <Route path="/payment">
-          <PaymentPage />
+          <div className="container">
+            <PaymentPage />
+          </div>
         </Route>
         <Route path="/ussd-payment">
-          <USSDPaymentPage />
+          <div className="container">
+            <USSDPaymentPage />
+          </div>
         </Route>
         
         {/* All other routes with navbar and footer */}
