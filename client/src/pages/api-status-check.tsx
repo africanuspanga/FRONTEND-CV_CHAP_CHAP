@@ -123,7 +123,7 @@ const APIStatusCheck: React.FC = () => {
         for (let i = 1; i < updatedEndpoints.length; i++) {
           updatedEndpoints[i] = {
             ...updatedEndpoints[i],
-            url: updatedEndpoints[i].url.replace(/{requestId}|\/${requestId}/, `/${responseData.request_id}`)
+            url: updatedEndpoints[i].url.replace("{requestId}", responseData.request_id)
           };
         }
       }
