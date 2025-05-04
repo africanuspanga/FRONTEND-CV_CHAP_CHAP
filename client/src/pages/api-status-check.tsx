@@ -17,7 +17,8 @@ interface EndpointStatus {
 
 const APIStatusCheck: React.FC = () => {
   const [requestId, setRequestId] = useState('');
-  const [paymentMessage, setPaymentMessage] = useState('123456'); // Default test message
+  const [paymentReference, setPaymentReference] = useState('ABC123XYZ'); // Default test reference
+  const [templateId, setTemplateId] = useState('kaziFasta'); // Default template ID
   const [dummyData, setDummyData] = useState({
     personalInfo: {
       firstName: 'John',
@@ -56,8 +57,10 @@ const APIStatusCheck: React.FC = () => {
     ]
   });
   
-  // Template ID for testing
-  const [templateId, setTemplateId] = useState('kaziFasta');
+  // Add template ID input field under paymentReference
+  const handleTemplateIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTemplateId(e.target.value);
+  };
 
   // Define endpoints to test
   const [endpoints, setEndpoints] = useState<EndpointStatus[]>([
@@ -151,12 +154,14 @@ const APIStatusCheck: React.FC = () => {
     setEndpoints(updatedEndpoints);
 
     try {
-      const formData = new FormData();
-      formData.append('payment_message', paymentMessage);
-
       const response = await fetch(updatedEndpoints[index].url, {
         method: updatedEndpoints[index].method,
-        body: formData
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          payment_reference: paymentReference
+        })
       });
 
       let responseData;
@@ -263,6 +268,9 @@ const APIStatusCheck: React.FC = () => {
   // Reset all tests
   const resetTests = () => {
     setRequestId('');
+    // Reset to defaults
+    setPaymentReference('ABC123XYZ');
+    setTemplateId('kaziFasta');
     setEndpoints([
       {
         url: `${API_BASE_URL}/api/cv-pdf/anonymous/initiate-ussd`,
@@ -328,11 +336,22 @@ const APIStatusCheck: React.FC = () => {
               </div>
               
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                <Label className="md:w-1/3">Payment Message:</Label>
+                <Label className="md:w-1/3">Template ID:</Label>
                 <Input 
-                  value={paymentMessage} 
-                  onChange={(e) => setPaymentMessage(e.target.value)} 
+                  value={templateId} 
+                  onChange={handleTemplateIdChange} 
                   className="w-full md:max-w-xs"
+                  placeholder="e.g., kaziFasta"
+                />
+              </div>
+              
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <Label className="md:w-1/3">Payment Reference:</Label>
+                <Input 
+                  value={paymentReference} 
+                  onChange={(e) => setPaymentReference(e.target.value)} 
+                  className="w-full md:max-w-xs"
+                  placeholder="e.g., ABC123XYZ"
                 />
               </div>
             </div>
