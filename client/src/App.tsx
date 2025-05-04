@@ -78,6 +78,9 @@ function Router() {
         <Route path="/cv/:templateId/final-preview">
           <FinalPreview />
         </Route>
+        <Route path="/cv/:templateId/ussd-payment">
+          <USSDPaymentPage />
+        </Route>
         <Route path="/payment">
           <PaymentPage />
         </Route>
