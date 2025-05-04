@@ -471,24 +471,21 @@ export const downloadTestPDF = async (templateId: string): Promise<Blob> => {
   try {
     // Convert templateId to lowercase to match backend expectations
     const normalizedTemplateId = templateId.toLowerCase();
-    const url = `${API_BASE_URL}/api/download-test-pdf/${normalizedTemplateId}`;
-    console.log(`Attempting to download test PDF from: ${url}`);
+    console.log(`Attempting to download test PDF for template: ${normalizedTemplateId}`);
     
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/pdf',
-        'Origin': window.location.origin,
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      credentials: 'include'
-    });
+    // Use our CORS proxy to get the test PDF
+    const blob = await fetchFromCVScreener<Blob>(
+      `/api/download-test-pdf/${normalizedTemplateId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/pdf',
+        },
+        responseType: 'blob',
+        includeCredentials: true
+      }
+    );
     
-    if (!response.ok) {
-      throw new Error(`Server responded with status ${response.status}`);
-    }
-    
-    const blob = await response.blob();
     console.log('Test PDF download successful', { size: blob.size, type: blob.type });
     return blob;
   } catch (error) {
@@ -507,6 +504,8 @@ export const downloadTestPDF = async (templateId: string): Promise<Blob> => {
  * @param cvData The user's CV data
  * @returns A Promise that resolves to the server's JSON response
  */
+import { fetchFromCVScreener } from '@/lib/cors-proxy';
+
 /**
  * Download PDF as base64 encoded string in JSON response
  * 
@@ -521,8 +520,7 @@ export const downloadPDFAsBase64 = async (templateId: string, cvData: CVData): P
   try {
     // Convert templateId to lowercase to match backend expectations
     const normalizedTemplateId = templateId.toLowerCase();
-    const url = `${API_BASE_URL}/api/preview-template/${normalizedTemplateId}`;
-    console.log(`Attempting to download PDF as base64 from: ${url}`);
+    console.log(`Attempting to download PDF as base64 for template: ${normalizedTemplateId}`);
     
     // Create complete data structure with required fields at root level
     const completeData = {
@@ -531,47 +529,50 @@ export const downloadPDFAsBase64 = async (templateId: string, cvData: CVData): P
       email: cvData.personalInfo.email
     };
     
-    // Request JSON with base64 PDF rather than binary PDF
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json', // Only accept JSON
-        'X-Prefer-JSON-Response': '1', // Custom header to signal we want base64
-        'Origin': window.location.origin
-      },
-      credentials: 'include',
-      body: JSON.stringify(completeData)
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Server responded with status ${response.status}`);
-    }
-    
-    // Parse JSON response
-    const data = await response.json();
-    console.log('Base64 response received:', data);
-    
-    if (data.success && data.pdf_base64) {
-      // Convert base64 to blob
-      const byteCharacters = atob(data.pdf_base64);
-      const byteArrays = [];
-      
-      for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-        const slice = byteCharacters.slice(offset, offset + 512);
-        const byteNumbers = new Array(slice.length);
-        for (let i = 0; i < slice.length; i++) {
-          byteNumbers[i] = slice.charCodeAt(i);
+    // Use two different approaches and take the first one that succeeds
+    try {
+      // Method 1: Use the special base64 download endpoint (ideal case)
+      console.log('Trying special base64 download endpoint...');
+      const response = await fetchFromCVScreener<{success: boolean, pdf_base64: string, filename?: string}>(
+        `/api/download-pdf-base64/${normalizedTemplateId}`,
+        {
+          method: 'POST',
+          headers: {
+            'X-Prefer-JSON-Response': '1',
+          },
+          responseType: 'json',
+          body: completeData,
+          includeCredentials: true
         }
-        const byteArray = new Uint8Array(byteNumbers);
-        byteArrays.push(byteArray);
+      );
+
+      if (response.success && response.pdf_base64) {
+        return convertBase64ToBlob(response.pdf_base64, 'application/pdf');
       }
+      throw new Error('No PDF data in response');
+    } catch (error1) {
+      console.log('First approach failed, trying alternative...', error1);
       
-      const blob = new Blob(byteArrays, {type: 'application/pdf'});
-      console.log('Base64 PDF converted to blob successfully', { size: blob.size, type: blob.type });
-      return blob;
-    } else {
-      throw new Error('No PDF data received in the response');
+      // Method 2: Try sending special header to existing endpoint
+      console.log('Trying existing endpoint with special header...');
+      const response = await fetchFromCVScreener<{success: boolean, pdf_base64: string, filename?: string}>(
+        `/api/preview-template/${normalizedTemplateId}`,
+        {
+          method: 'POST',
+          headers: {
+            'X-Prefer-JSON-Response': '1',
+            'Accept': 'application/json',
+          },
+          responseType: 'json',
+          body: completeData,
+          includeCredentials: true
+        }
+      );
+      
+      if (response.success && response.pdf_base64) {
+        return convertBase64ToBlob(response.pdf_base64, 'application/pdf');
+      }
+      throw new Error('No PDF data in response from alternative endpoint');
     }
   } catch (error) {
     console.error('Error downloading PDF as base64:', error);
@@ -579,12 +580,39 @@ export const downloadPDFAsBase64 = async (templateId: string, cvData: CVData): P
   }
 };
 
+/**
+ * Helper function to convert base64 string to Blob
+ */
+function convertBase64ToBlob(base64String: string, mimeType: string): Blob {
+  // Remove data URL prefix if present
+  const base64Data = base64String.includes('base64,') 
+    ? base64String.split('base64,')[1] 
+    : base64String;
+    
+  // Convert base64 to blob
+  const byteCharacters = atob(base64Data);
+  const byteArrays = [];
+  
+  for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+    const slice = byteCharacters.slice(offset, offset + 512);
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+  
+  const blob = new Blob(byteArrays, {type: mimeType});
+  console.log('Base64 converted to blob successfully', { size: blob.size, type: blob.type });
+  return blob;
+}
+
 export const testDataExchange = async (templateId: string, cvData: CVData): Promise<any> => {
   try {
     // Convert templateId to lowercase to match backend expectations
     const normalizedTemplateId = templateId.toLowerCase();
-    const url = `${API_BASE_URL}/api/preview-template-json/${normalizedTemplateId}`;
-    console.log(`Testing data exchange at: ${url}`);
+    console.log(`Testing data exchange for template: ${normalizedTemplateId}`);
     
     // Create complete data structure with required fields at root level
     const completeData = {
@@ -596,23 +624,20 @@ export const testDataExchange = async (templateId: string, cvData: CVData): Prom
     // Log data being sent
     console.log('Complete data being sent:', JSON.stringify(completeData, null, 2));
     
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Origin': window.location.origin,
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      credentials: 'include',
-      body: JSON.stringify(completeData)
-    });
+    // Use our CORS proxy to avoid preflight issues
+    const data = await fetchFromCVScreener<any>(
+      `/api/preview-template-json/${normalizedTemplateId}`,
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+        },
+        responseType: 'json',
+        body: completeData,
+        includeCredentials: true
+      }
+    );
     
-    if (!response.ok) {
-      throw new Error(`Server responded with status ${response.status}`);
-    }
-    
-    const data = await response.json();
     console.log('Data exchange test successful:', data);
     return data;
   } catch (error) {
@@ -625,98 +650,43 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
   try {
     // Convert templateId to lowercase to match backend expectations
     const normalizedTemplateId = templateId.toLowerCase();
-    const url = `${API_BASE_URL}/api/preview-template/${normalizedTemplateId}`;
-    console.log(`Attempting PDF download from preview endpoint: ${url}`);
+    console.log(`Attempting PDF download for template: ${normalizedTemplateId}`);
     
-    // Transform CV data to backend format
-    // This includes required fields name and email at root level
-    const transformedCVData = transformCVDataForBackend(cvData);
-    
-    // Send the original CV data structure as well (unmodified) - this might be what the API expects
+    // Create complete data structure with required fields at root level
     const completeData = {
       ...cvData,  // Include the original complete CV data structure
       name: cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName,  // Add required fields at root level
       email: cvData.personalInfo.email
     };
     
-    // Log both data formats for debugging
-    console.log('Transformed data being sent:', JSON.stringify(transformedCVData, null, 2));
-    console.log('Complete original data structure:', JSON.stringify(completeData, null, 2));
+    // Log data for debugging
+    console.log('Data being sent:', JSON.stringify(completeData, null, 2));
     
-    // Using retry pattern for better reliability
-    const result = await retry(async () => {
-      // Set a longer timeout for the fetch operation (45 seconds)
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => {
-        controller.abort();
-        console.log('Request timed out after 45 seconds');
-      }, 45000);
+    // Using retry pattern with our CORS proxy for better reliability
+    return await retry(async () => {
+      console.log('Attempting to fetch PDF through CORS proxy...');
       
-      try {
-        const response = await fetch(url, {
+      // Use our CORS proxy to make the request
+      const blob = await fetchFromCVScreener<Blob>(
+        `/api/preview-template/${normalizedTemplateId}`,
+        {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/pdf, application/json',
-            'Origin': window.location.origin,
-            // Additional headers to handle CORS
-            'X-Requested-With': 'XMLHttpRequest'
+            'Accept': 'application/pdf',
           },
-          // Enable credentials to allow cookies if needed
-          credentials: 'include',
-          // Send the complete data with required fields at root level
-          body: JSON.stringify(completeData),
-          signal: controller.signal,
-          // Disable cache to prevent stale responses
-          cache: 'no-store'
-        });
-        
-        // Clear the timeout if the request completes
-        clearTimeout(timeoutId);
-    
-        // Log all response information for debugging
-        console.log('Response status:', response.status);
-        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-        
-        // Check for success status
-        if (!response.ok) {
-          let errorMessage = '';
-          
-          // Try to get error as JSON first
-          try {
-            const responseText = await response.text();
-            console.log('Error response body:', responseText);
-            
-            // Try to parse as JSON
-            try {
-              const errorData = JSON.parse(responseText);
-              errorMessage = errorData.error || `Server responded with status ${response.status}`;
-            } catch (parseError) {
-              // If can't parse JSON, use text directly
-              errorMessage = `Server responded with status ${response.status}: ${responseText}`;
-            }
-          } catch (readError) {
-            errorMessage = `Server responded with status ${response.status} (could not read response)`;
-          }
-          
-          throw new Error(errorMessage);
+          responseType: 'blob',
+          body: completeData,
+          includeCredentials: true
         }
-    
-        // Handle successful response
-        const blob = await response.blob();
-        if (blob.size === 0) {
-          throw new Error('Received empty PDF file');
-        }
-        
-        console.log('Preview endpoint PDF download successful', { size: blob.size, type: blob.type });
-        return blob;
-      } finally {
-        // Make sure to clear the timeout in case of exceptions
-        clearTimeout(timeoutId);
+      );
+      
+      if (blob.size === 0) {
+        throw new Error('Received empty PDF file');
       }
+      
+      console.log('Preview endpoint PDF download successful', { size: blob.size, type: blob.type });
+      return blob;
     }, 3, 2000); // 3 retries with increasing delay starting at 2 seconds
-    
-    return result;
   } catch (error) {
     console.error('Error downloading PDF from preview endpoint:', error);
     // Create a more user-friendly error message
