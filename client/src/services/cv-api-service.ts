@@ -594,9 +594,82 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
     const normalizedTemplateId = templateId.toLowerCase();
     console.log(`Attempting PDF download for template: ${normalizedTemplateId}`);
     
+    // Process the data to clean up values that should be displayed in the PDF
+    // Create a deep clone first to avoid modifying the original data
+    const cleanedData = JSON.parse(JSON.stringify(cvData));
+    
+    // Clean up skills data - convert complex objects to simple strings
+    if (cleanedData.skills && Array.isArray(cleanedData.skills)) {
+      cleanedData.skills = cleanedData.skills.map((skill: any) => {
+        return typeof skill === 'object' && skill.name ? skill.name : skill;
+      });
+    }
+    
+    // Clean up languages data - convert complex objects to simple strings
+    if (cleanedData.languages && Array.isArray(cleanedData.languages)) {
+      cleanedData.languages = cleanedData.languages.map((lang: any) => {
+        if (typeof lang === 'object' && lang.name) {
+          // If level/proficiency exists, include it, otherwise just return the name
+          const level = lang.level || lang.proficiency;
+          return level ? `${lang.name} - ${level}` : lang.name;
+        }
+        return lang;
+      });
+    }
+    
+    // Clean up work experiences - ensure all fields are properly formatted
+    if (cleanedData.workExperiences && Array.isArray(cleanedData.workExperiences)) {
+      cleanedData.workExperiences = cleanedData.workExperiences.map((job: any) => {
+        if (typeof job === 'object') {
+          // Format dates properly
+          const endDate = job.current ? 'Present' : (job.endDate || '');
+          
+          // Clean up bullets/achievements if they exist and are complex objects
+          let achievements = job.achievements || [];
+          if (Array.isArray(achievements)) {
+            achievements = achievements.map((item: any) => 
+              typeof item === 'object' && item.text ? item.text : item
+            );
+          }
+          
+          return {
+            ...job,
+            endDate,
+            achievements
+          };
+        }
+        return job;
+      });
+    }
+    
+    // Clean up education - ensure all fields are properly formatted
+    if (cleanedData.education && Array.isArray(cleanedData.education)) {
+      cleanedData.education = cleanedData.education.map((edu: any) => {
+        if (typeof edu === 'object') {
+          // Format dates properly
+          const endDate = edu.current ? 'Present' : (edu.endDate || '');
+          
+          // Clean up any complex objects
+          let achievements = edu.achievements || [];
+          if (Array.isArray(achievements)) {
+            achievements = achievements.map((item: any) => 
+              typeof item === 'object' && item.text ? item.text : item
+            );
+          }
+          
+          return {
+            ...edu,
+            endDate,
+            achievements
+          };
+        }
+        return edu;
+      });
+    }
+    
     // Create complete data structure with required fields at root level
     const completeData = {
-      ...cvData,  // Include the original complete CV data structure
+      ...cleanedData,  // Include the cleaned data structure
       name: cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName,  // Add required fields at root level
       email: cvData.personalInfo.email
     };
