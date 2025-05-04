@@ -56,6 +56,7 @@ import AdminSettingsPage from "@/pages/admin-settings";
 // Test Pages
 import OpenAITestPage from "@/pages/OpenAITestPage";
 import BackendTest from "@/pages/backend-test";
+import APIStatusCheck from "@/pages/api-status-check";
 
 function Router() {
   return (
@@ -113,6 +114,7 @@ function Router() {
                 <Route path="/register" component={Register} />
                 <Route path="/openai-test" component={OpenAITestPage} />
                 <Route path="/backend-test" component={BackendTest} />
+                <Route path="/api-status-check" component={APIStatusCheck} />
                 <Route path="/template-gallery" component={TemplateGallery} />
                 <Route component={NotFound} />
               </Switch>
