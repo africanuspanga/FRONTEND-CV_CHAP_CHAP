@@ -9,12 +9,105 @@ import FormData from 'form-data';
 
 const CV_SCREENER_API = 'https://cv-screener-africanuspanga.replit.app';
 
+// Track rate limited endpoints to apply exponential backoff
+const rateLimitedEndpoints = new Map<string, {
+  lastAttempt: number;
+  backoffMs: number;
+  failures: number;
+}>();
+
+// Maximum backoff time (5 minutes)
+const MAX_BACKOFF_MS = 5 * 60 * 1000;
+
+// Initial backoff time (3 seconds)
+const INITIAL_BACKOFF_MS = 3000;
+
+/**
+ * Checks if an endpoint is currently rate limited and should wait
+ * before making a new request.
+ * 
+ * @param path The API path being accessed
+ * @returns True if should proceed, false if should wait
+ */
+function checkRateLimit(path: string): boolean {
+  const rateLimit = rateLimitedEndpoints.get(path);
+  
+  // If we have no rate limit info for this endpoint, allow the request
+  if (!rateLimit) {
+    return true;
+  }
+  
+  const now = Date.now();
+  const timeSinceLastAttempt = now - rateLimit.lastAttempt;
+  
+  // If we've waited long enough since the last rate limit, allow the request
+  if (timeSinceLastAttempt >= rateLimit.backoffMs) {
+    return true;
+  }
+  
+  // Still in backoff period, don't allow the request
+  return false;
+}
+
+/**
+ * Updates the rate limit tracking for an endpoint based on response success or failure
+ * 
+ * @param path The API path being accessed
+ * @param status The HTTP status code received
+ */
+function updateRateLimit(path: string, status: number): void {
+  const now = Date.now();
+  const isRateLimited = status === 429;
+  const isServerError = status >= 500 && status < 600;
+  
+  // Get existing rate limit info or create new entry
+  const rateLimit = rateLimitedEndpoints.get(path) || {
+    lastAttempt: now,
+    backoffMs: INITIAL_BACKOFF_MS,
+    failures: 0
+  };
+  
+  // Update the last attempt time
+  rateLimit.lastAttempt = now;
+  
+  // If we got a rate limit or server error, increase the backoff and failure count
+  if (isRateLimited || isServerError) {
+    rateLimit.failures += 1;
+    rateLimit.backoffMs = Math.min(rateLimit.backoffMs * 1.5, MAX_BACKOFF_MS);
+    console.log(`[CV Screener Proxy] Rate limiting ${path} with backoff ${rateLimit.backoffMs}ms (failures: ${rateLimit.failures})`);
+  } else {
+    // Success - gradually reduce backoff if we've had failures before
+    if (rateLimit.failures > 0) {
+      rateLimit.failures = Math.max(0, rateLimit.failures - 1);
+      rateLimit.backoffMs = Math.max(INITIAL_BACKOFF_MS, rateLimit.backoffMs * 0.8);
+      console.log(`[CV Screener Proxy] Reducing backoff for ${path} to ${rateLimit.backoffMs}ms (failures: ${rateLimit.failures})`);
+    }
+  }
+  
+  // Update the rate limit tracking
+  rateLimitedEndpoints.set(path, rateLimit);
+}
+
 export async function cvScreenerProxyHandler(req: Request, res: Response) {
   try {
     // Extract path from request URL
     const path = req.params.path;
     if (!path) {
       return res.status(400).json({ error: 'API path is required' });
+    }
+
+    // Check if this endpoint is currently rate limited
+    if (!checkRateLimit(path)) {
+      const rateLimit = rateLimitedEndpoints.get(path);
+      const retryAfter = Math.ceil(rateLimit!.backoffMs / 1000); // Convert to seconds
+      
+      console.log(`[CV Screener Proxy] Rate limited request to ${path}, retry after ${retryAfter}s`);
+      
+      return res.status(429).json({
+        error: 'Too many requests to the backend API',
+        retry_after: retryAfter,
+        message: `This endpoint is being rate limited. Please retry after ${retryAfter} seconds.`
+      });
     }
 
     // Construct target URL
@@ -101,6 +194,9 @@ export async function cvScreenerProxyHandler(req: Request, res: Response) {
     
     // Log response status
     console.log(`[CV Screener Proxy] Response status: ${response.status}`);
+    
+    // Update rate limit tracking based on response status
+    updateRateLimit(path, response.status);
 
     // Get all headers from response
     const responseHeaders = response.headers.raw();

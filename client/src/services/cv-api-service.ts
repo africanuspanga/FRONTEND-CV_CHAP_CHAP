@@ -561,7 +561,30 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
     return await retry(async () => {
       console.log('Attempting to fetch PDF through CORS proxy...');
       
-      // Use our CORS proxy to make the request
+      // First get the JSON response to make sure the server can handle the request
+      try {
+        const jsonResponse = await fetchFromCVScreener<any>(
+          `api/preview-template/${normalizedTemplateId}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Prefer-JSON-Response': '1'
+            },
+            body: transformedData
+          }
+        );
+        
+        console.log('JSON preview successful, proceeding to PDF request:', jsonResponse);
+        
+        // Give the server a moment to process before requesting PDF
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } catch (previewError) {
+        console.warn('JSON preview failed, but still trying PDF:', previewError);
+        // If preview fails, continue with PDF attempt anyway
+      }
+      
+      // Now request the actual PDF
       const blob = await fetchFromCVScreener<Blob>(
         `api/preview-template/${normalizedTemplateId}`,
         {
@@ -582,7 +605,7 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
       
       console.log('Preview endpoint PDF download successful', { size: blob.size, type: blob.type });
       return blob;
-    }, 3, 2000); // 3 retries with increasing delay starting at 2 seconds
+    }, 5, 3000); // 5 retries with increasing delay starting at 3 seconds
   } catch (error) {
     console.error('Error downloading PDF from preview endpoint:', error);
     // Create a more user-friendly error message
@@ -662,17 +685,23 @@ export const directDownloadCV = async (templateId: string, cvData: CVData): Prom
  * @param delayMs Delay between retries in milliseconds
  * @returns Promise with the operation result
  */
-const retry = async <T>(operation: () => Promise<T>, retries = 3, delayMs = 1000): Promise<T> => {
+const retry = async <T>(operation: () => Promise<T>, retries = 5, delayMs = 3000): Promise<T> => {
   try {
     return await operation();
-  } catch (error) {
+  } catch (error: any) {
     if (retries <= 0) {
       throw error;
     }
     
-    console.log(`Operation failed, retrying in ${delayMs}ms... (${retries} retries left)`);
-    await new Promise(resolve => setTimeout(resolve, delayMs));
-    return retry(operation, retries - 1, delayMs * 1.5);
+    // If we got a 429 Too Many Requests, use a longer delay
+    const isRateLimited = error.status === 429 || (error.message && error.message.includes('429'));
+    const waitTime = isRateLimited ? delayMs * 2 : delayMs;
+    
+    console.log(`Operation failed with ${error.status || 'unknown error'}, retrying in ${waitTime}ms... (${retries} retries left)`);
+    console.log(`Error details: ${error.message || 'Unknown error'}`);
+    
+    await new Promise(resolve => setTimeout(resolve, waitTime));
+    return retry(operation, retries - 1, isRateLimited ? waitTime * 1.5 : delayMs * 1.5);
   }
 };
 
