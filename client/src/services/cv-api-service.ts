@@ -19,70 +19,145 @@ export const API_BASE_URL = BACKEND_API_URL;
  * @param cvData Our internal CV data structure
  * @returns Transformed data in the backend's expected format
  */
+/**
+ * Transform our internal CV data format to match exactly what the backend expects
+ * 
+ * According to the backend API documentation, the expected format is:
+ * {
+ *   name: "John Doe",              // REQUIRED
+ *   email: "john@example.com",     // REQUIRED
+ *   phone: "+255 123 456 789",     // Optional but recommended
+ *   title: "Software Engineer",     // Professional title
+ *   location: "Dar es Salaam, Tanzania", // Location
+ *   summary: "Experienced software engineer with 5+ years...", // Professional summary
+ *   experience: [{ position, company, location, startDate, endDate, description }],
+ *   education: [{ degree, school, location, startDate, endDate, description }],
+ *   skills: ["JavaScript", "React", ...],
+ *   languages: ["English (Fluent)", ...],
+ *   certifications: [{ name, issuer, date, description }],
+ *   hobbies: "Reading, hiking, and community volunteer work",
+ *   references: [{ name, position, company, email, phone }]
+ * }
+ */
 export const transformCVDataForBackend = (cvData: CVData): Record<string, any> => {
   // Create a new object with the transformed data
   const transformed: Record<string, any> = {
-    // Required root level fields
+    // Required root level fields according to the API docs
     name: cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName,
     email: cvData.personalInfo.email,
-    phone: cvData.personalInfo.phone,
-    // Add a location field combining address components
+    
+    // Optional but recommended fields
+    phone: cvData.personalInfo.phone || '',
+    
+    // Professional title - use professionalTitle if available
+    title: cvData.personalInfo.professionalTitle || '',
+    
+    // Location field - combine address components
     location: [
+      cvData.personalInfo.address,
       cvData.personalInfo.city,
       cvData.personalInfo.region,
       cvData.personalInfo.country
     ].filter(Boolean).join(', '),
-    // Map skills directly (cleaned in the API)
-    skills: cvData.skills || [],
-    // Transform work experiences to expected format
+    
+    // Professional summary
+    summary: cvData.personalInfo.professionalSummary || cvData.personalInfo.summary || '',
+    
+    // Work experience section - match exact field names expected by backend
     experience: (cvData.workExperiences || []).map(job => ({
-      company: job.company,
-      position: job.position,
-      startDate: job.startDate,
+      position: job.jobTitle || job.position || '',  // Map to correct field name
+      company: job.company || '',
+      location: job.location || '',
+      startDate: job.startDate || '',
       endDate: job.current ? 'Present' : (job.endDate || ''),
-      description: job.description,
-      // Flatten achievements if they're objects
+      description: job.description || '',
+      // Format achievements as array of strings
       achievements: Array.isArray(job.achievements) 
         ? job.achievements.map(a => typeof a === 'object' && a.text ? a.text : a)
         : []
     })),
-    // Transform education entries
+    
+    // Education section - use 'school' instead of 'institution' as per API docs
     education: (cvData.education || []).map(edu => ({
-      institution: edu.institution,
-      degree: edu.degree,
-      field: edu.field,
-      startDate: edu.startDate,
+      degree: edu.degree || '',
+      school: edu.institution || edu.school || '', // Map to correct field name
+      location: edu.location || '',
+      startDate: edu.startDate || '',
       endDate: edu.current ? 'Present' : (edu.endDate || ''),
-      description: edu.description,
-      // Handle achievements similarly to experience
+      description: edu.description || '',
+      // Format achievements as array of strings
       achievements: Array.isArray(edu.achievements)
         ? edu.achievements.map(a => typeof a === 'object' && a.text ? a.text : a) 
         : []
     })),
-    // Copy over summary/profile
-    summary: cvData.personalInfo.professionalSummary || '',
-    // Handle languages
-    languages: (cvData.languages || []).map(lang => 
-      typeof lang === 'object' && lang.name
-        ? `${lang.name}${lang.level ? ` - ${lang.level}` : ''}`
-        : lang
-    ),
-    // Handle other sections
-    references: cvData.references || [],
-    certifications: cvData.certifications || [],
-    projects: cvData.projects || [],
-    hobbies: (cvData.hobbies || []).map(hobby => 
-      typeof hobby === 'object' && hobby.name ? hobby.name : hobby
-    ),
+    
+    // Skills section
+    skills: cvData.skills || [],
+    
+    // Languages section - format as strings with proficiency level
+    languages: (cvData.languages || []).map(lang => {
+      if (typeof lang === 'string') return lang;
+      if (typeof lang === 'object' && lang.name) {
+        return lang.level ? `${lang.name} (${lang.level})` : lang.name;
+      }
+      return '';
+    }).filter(Boolean),
+    
+    // Certifications section
+    certifications: (cvData.certifications || []).map(cert => {
+      if (typeof cert === 'string') return { name: cert };
+      return {
+        name: cert.name || '',
+        issuer: cert.issuer || cert.organization || '',
+        date: cert.date || cert.year || '',
+        description: cert.description || ''
+      };
+    }),
+    
+    // Hobbies section - format as a string with comma-separated values
+    hobbies: Array.isArray(cvData.hobbies) 
+      ? cvData.hobbies.map(hobby => 
+          typeof hobby === 'object' && hobby.name ? hobby.name : hobby
+        ).join(', ')
+      : (typeof cvData.hobbies === 'string' ? cvData.hobbies : ''),
+    
+    // References section
+    references: (cvData.references || []).map(ref => {
+      if (typeof ref === 'string') return { name: ref };
+      return {
+        name: ref.name || '',
+        position: ref.position || ref.title || '',
+        company: ref.company || ref.organization || '',
+        email: ref.email || '',
+        phone: ref.phone || ''
+      };
+    }),
+    
+    // Projects section if available
+    projects: (cvData.projects || []).map(proj => {
+      if (typeof proj === 'string') return { name: proj };
+      return {
+        name: proj.name || proj.title || '',
+        description: proj.description || '',
+        startDate: proj.startDate || '',
+        endDate: proj.current ? 'Present' : (proj.endDate || ''),
+        url: proj.url || proj.link || ''
+      };
+    })
   };
   
-  // Add optional fields if they exist
+  // Add optional fields that may enhance the CV
   if (cvData.personalInfo.linkedin) {
     transformed.linkedin = cvData.personalInfo.linkedin;
   }
   
   if (cvData.personalInfo.website) {
     transformed.website = cvData.personalInfo.website;
+  }
+  
+  // Ensure we're including accomplishments if they exist
+  if (cvData.accomplishments && cvData.accomplishments.length > 0) {
+    transformed.accomplishments = cvData.accomplishments;
   }
   
   // Add any additional fields that might be in the CV but not explicitly mapped
@@ -96,7 +171,8 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
       'references',
       'certifications',
       'projects',
-      'hobbies'
+      'hobbies',
+      'accomplishments'
     ].includes(key) && value) {
       transformed[key] = value;
     }
@@ -312,6 +388,18 @@ export const downloadGeneratedPDF = async (requestId: string): Promise<Blob> => 
  * @param cvData The user's CV data
  * @returns A Promise that resolves to a Blob containing the PDF
  */
+/**
+ * Download CV using template preview endpoint with the exact format the backend expects
+ * 
+ * According to the backend documentation, this endpoint requires:
+ * - POST request to /api/preview-template/{template_id}
+ * - CV data in JSON format matching the backend's expected schema
+ * - Accept: application/pdf header for binary PDF response
+ * 
+ * @param templateId The ID of the template to use
+ * @param cvData The user's CV data
+ * @returns A Promise that resolves to a Blob containing the PDF
+ */
 export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: CVData): Promise<Blob> => {
   try {
     // Convert templateId to lowercase to match backend expectations
@@ -329,11 +417,12 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
       
       // Use our CORS proxy to make the request
       const blob = await fetchFromCVScreener<Blob>(
-        `/api/preview-template/${normalizedTemplateId}`,
+        `api/preview-template/${normalizedTemplateId}`,
         {
           method: 'POST',
           headers: {
-            'Accept': 'application/pdf',
+            'Content-Type': 'application/json',
+            'Accept': 'application/pdf'
           },
           responseType: 'blob',
           body: transformedData,
@@ -375,6 +464,16 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
  * @param cvData The user's CV data
  * @returns A Promise that resolves to a Blob containing the PDF data
  */
+/**
+ * Direct download CV using the test endpoint
+ * 
+ * This function bypasses the payment flow and directly generates and downloads
+ * a PDF of the CV using the test endpoint provided by the backend.
+ * 
+ * @param templateId The ID of the template to use for generating the CV
+ * @param cvData The user's CV data
+ * @returns A Promise that resolves to a Blob containing the PDF data
+ */
 export const directDownloadCV = async (templateId: string, cvData: CVData): Promise<Blob> => {
   try {
     // Convert templateId to lowercase to match backend expectations
@@ -387,15 +486,16 @@ export const directDownloadCV = async (templateId: string, cvData: CVData): Prom
     console.log('Transformed data being sent:', JSON.stringify(transformedData, null, 2));
     
     // Use our CORS proxy to make the request
+    // According to API docs, the correct endpoint is /api/download-test-pdf/{template_id}
     const blob = await fetchFromCVScreener<Blob>(
-      `api/download-pdf-test/${normalizedTemplateId}`,
+      `api/download-test-pdf/${normalizedTemplateId}`,
       {
-        method: 'POST',
+        method: 'GET',  // This endpoint uses GET method according to docs
         headers: {
-          'Accept': 'application/pdf',
+          'Content-Type': 'application/json',
+          'Accept': 'application/pdf'
         },
         responseType: 'blob',
-        body: transformedData,
         includeCredentials: true
       }
     );

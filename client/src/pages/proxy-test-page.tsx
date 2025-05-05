@@ -55,10 +55,14 @@ export default function ProxyTestPage() {
     try {
       const templateId = 'brightdiamond';
       
+      // Use the correct endpoint according to the API docs
       const blob = await fetchFromCVScreener<Blob>(
         `api/download-test-pdf/${templateId}`,
         {
-          method: 'GET',
+          method: 'GET',  // This endpoint uses GET method
+          headers: {
+            'Accept': 'application/pdf'
+          },
           responseType: 'blob',
         }
       );
@@ -97,32 +101,47 @@ export default function ProxyTestPage() {
     setResult({ success: false, message: 'Testing template preview...' });
     
     try {
-      // Sample minimal CV data
+      // Sample minimal CV data matching the backend expected format exactly
       const sampleData = {
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '+255 123 456 789',
-        title: 'Software Developer',
-        location: 'Dar es Salaam, Tanzania',
+        name: 'John Doe',               // REQUIRED
+        email: 'john@example.com',      // REQUIRED
+        phone: '+255 123 456 789',      // Optional but recommended
+        title: 'Software Developer',     // Professional title
+        location: 'Dar es Salaam, Tanzania', // Location
         summary: 'Experienced software developer with skills in web application development.',
+        
+        // Work experience section
         experience: [
           {
             position: 'Senior Developer',
             company: 'Tech Solutions Ltd',
+            location: 'Dar es Salaam',
             startDate: 'Jan 2020',
             endDate: 'Present',
             description: 'Leading development of enterprise applications.'
           }
         ],
+        
+        // Education section - using 'school' instead of 'institution' as per API docs
         education: [
           {
             degree: 'BSc in Computer Science',
-            institution: 'University of Dar es Salaam',
+            school: 'University of Dar es Salaam',
+            location: 'Dar es Salaam',
             startDate: '2014',
             endDate: '2018',
+            description: 'Graduated with honors'
           }
         ],
-        skills: ['JavaScript', 'React', 'Node.js']
+        
+        // Skills section
+        skills: ['JavaScript', 'React', 'Node.js'],
+        
+        // Languages section
+        languages: ['English (Fluent)', 'Swahili (Native)'],
+        
+        // Hobbies as a string
+        hobbies: 'Reading, coding, and traveling'
       };
       
       const templateId = 'brightdiamond';
@@ -133,6 +152,7 @@ export default function ProxyTestPage() {
         {
           method: 'POST',
           headers: {
+            'Content-Type': 'application/json',
             'X-Prefer-JSON-Response': '1'
           },
           body: sampleData,
