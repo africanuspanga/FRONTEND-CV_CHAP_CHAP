@@ -54,12 +54,14 @@ import AdminAnalyticsPage from "@/pages/admin-analytics";
 import AdminSettingsPage from "@/pages/admin-settings";
 
 // Test Pages
+import TestPagesIndex from "@/pages/test-pages-index";
 import OpenAITestPage from "@/pages/OpenAITestPage";
 import BackendTest from "@/pages/backend-test";
 import APIStatusCheck from "@/pages/api-status-check";
 import ApiEndpointTest from "@/pages/api-endpoint-test";
 import CVScreenerTest from "@/pages/cv-screener-test";
 import ProxyTestPage from "@/pages/proxy-test-page";
+import USSDPaymentTest from "@/pages/ussd-payment-test";
 
 function Router() {
   return (
@@ -126,12 +128,14 @@ function Router() {
                 <Route path="/about" component={About} />
                 <Route path="/login" component={Login} />
                 <Route path="/register" component={Register} />
+                <Route path="/test-pages" component={TestPagesIndex} />
                 <Route path="/openai-test" component={OpenAITestPage} />
                 <Route path="/backend-test" component={BackendTest} />
                 <Route path="/api-status-check" component={APIStatusCheck} />
                 <Route path="/api-endpoint-test" component={ApiEndpointTest} />
                 <Route path="/cv-screener-test" component={CVScreenerTest} />
                 <Route path="/proxy-test" component={ProxyTestPage} />
+                <Route path="/ussd-payment-test" component={USSDPaymentTest} />
                 <Route path="/template-gallery" component={TemplateGallery} />
                 <Route component={NotFound} />
               </Switch>
