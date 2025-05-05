@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CVData, Accomplishment, Hobby } from '@shared/schema';
 import * as cvStorage from '../utils/cv-storage';
+import StorageWarningToast from '@/components/StorageWarningToast';
 
 // Define form data structure with additional template information
 export interface CVFormData extends CVData {
@@ -79,14 +80,16 @@ const formSteps = [
 export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const [formData, setFormData] = useState<CVFormData>(initialFormData);
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const [storageWarningShown, setStorageWarningShown] = useState<boolean>(false);
   
-  // Load saved data on initial mount using IndexedDB
+  // Load saved data on initial mount
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load form data
+        // Load form data from any available storage method
         const savedData = await cvStorage.loadFormData();
         if (savedData) {
+          console.log('Successfully loaded saved CV data');
           setFormData(savedData);
         }
         
@@ -103,22 +106,36 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
     loadData();
   }, []);
   
-  // Save form data using IndexedDB whenever it changes
+  // Track data size for monitoring
+  const [dataSize, setDataSize] = useState(0);
+  
+  // Save form data whenever it changes, with multi-tiered storage
   useEffect(() => {
     const saveData = async () => {
       try {
+        // Calculate data size (JSON-stringified) for monitoring
+        const dataString = JSON.stringify(formData);
+        const currentSize = dataString.length;
+        setDataSize(currentSize);
+        
+        // Save using our multi-tiered storage system
         await cvStorage.saveFormData(formData);
       } catch (error) {
         console.error('Failed to save form data:', error);
-        // Only show alert if it's a critical error
-        if (error instanceof Error && error.message.includes('quota')) {
-          alert('Warning: Your CV data is too large to save locally. Your progress might not be saved if you close the browser.');
+        
+        // No need to show alerts since we now use a tiered storage system with fallbacks
+        if (error instanceof Error) {
+          console.warn(`Storage issue details: ${error.message}`);
+          // If it's a quota error, mark that we've shown the warning
+          if (error.message.includes('quota') && !storageWarningShown) {
+            setStorageWarningShown(true);
+          }
         }
       }
     };
     
     saveData();
-  }, [formData]);
+  }, [formData, storageWarningShown]);
   
   // Save current step whenever it changes
   useEffect(() => {

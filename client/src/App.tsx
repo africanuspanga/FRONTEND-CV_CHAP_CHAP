@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/auth-context";
 import { AdminAuthProvider } from "@/contexts/admin-auth-context";
 import { CVRequestProvider } from "@/contexts/cv-request-context";
 import { ProtectedAdminRoute } from "@/components/admin/ProtectedAdminRoute";
+import { StorageWarningModal } from "@/components/StorageWarningModal";
 import SEO from "@/components/SEO";
 import StructuredData from "@/components/StructuredData";
 
@@ -164,6 +165,7 @@ function App() {
                 
                 <Router />
                 <Toaster />
+                <StorageWarningModal />
               </CVRequestProvider>
             </CVFormProvider>
           </AdminAuthProvider>
