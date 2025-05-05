@@ -194,21 +194,10 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
     setFormData(initialFormData);
     setCurrentStep(0);
     
-    // Clean up all CV form data from localStorage
-    localStorage.removeItem('cv-form-data');
-    localStorage.removeItem('cv-form-step');
-    localStorage.removeItem('cv-form-data-chunked');
-    localStorage.removeItem('cv-form-data-chunks');
-    
-    // Remove all chunk entries
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('cv-form-data-chunk-')) {
-        localStorage.removeItem(key);
-        // Adjust counter since we're removing items
-        i--;
-      }
-    }
+    // Clear data from both localStorage and IndexedDB
+    cvStorage.clearFormData().catch(err => {
+      console.error('Error clearing form data:', err);
+    });
   };
   
   // Validate form step (basic implementation)
