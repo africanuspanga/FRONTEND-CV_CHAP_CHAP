@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CVData, Accomplishment, Hobby } from '@shared/schema';
+import * as cvStorage from '../utils/cv-storage';
 
 // Define form data structure with additional template information
 export interface CVFormData extends CVData {
@@ -79,105 +80,52 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   const [formData, setFormData] = useState<CVFormData>(initialFormData);
   const [currentStep, setCurrentStep] = useState<number>(0);
   
-  // Load saved data from localStorage on initial mount
+  // Load saved data on initial mount using IndexedDB
   useEffect(() => {
-    const isChunked = localStorage.getItem('cv-form-data-chunked') === 'true';
-    const savedStep = localStorage.getItem('cv-form-step');
-    
-    if (isChunked) {
+    const loadData = async () => {
       try {
-        // Get the number of chunks
-        const chunksStr = localStorage.getItem('cv-form-data-chunks');
-        if (!chunksStr) return;
-        
-        const chunks = parseInt(chunksStr, 10);
-        let fullData = '';
-        
-        // Reconstruct the data from chunks
-        for (let i = 0; i < chunks; i++) {
-          const chunk = localStorage.getItem(`cv-form-data-chunk-${i}`);
-          if (chunk) {
-            fullData += chunk;
-          }
+        // Load form data
+        const savedData = await cvStorage.loadFormData();
+        if (savedData) {
+          setFormData(savedData);
         }
         
-        if (fullData) {
-          setFormData(JSON.parse(fullData));
-          console.log('Loaded CV data from chunks');
+        // Load current step
+        const savedStep = cvStorage.loadStep();
+        if (savedStep !== null) {
+          setCurrentStep(savedStep);
         }
-      } catch (e) {
-        console.error('Failed to load chunked form data:', e);
+      } catch (error) {
+        console.error('Failed to load saved form data:', error);
       }
-    } else {
-      const savedData = localStorage.getItem('cv-form-data');
-      if (savedData) {
-        try {
-          setFormData(JSON.parse(savedData));
-        } catch (e) {
-          console.error('Failed to parse saved form data:', e);
-        }
-      }
-    }
+    };
     
-    if (savedStep) {
-      try {
-        setCurrentStep(parseInt(savedStep, 10));
-      } catch (e) {
-        console.error('Failed to parse saved step:', e);
-      }
-    }
+    loadData();
   }, []);
   
-  // Save to localStorage whenever form data or step changes
+  // Save form data using IndexedDB whenever it changes
   useEffect(() => {
-    try {
-      // Split large form data into smaller chunks to avoid quota limits
-      const formDataStr = JSON.stringify(formData);
-      
-      // Clear previous chunks
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('cv-form-data-chunk-')) {
-          localStorage.removeItem(key);
+    const saveData = async () => {
+      try {
+        await cvStorage.saveFormData(formData);
+      } catch (error) {
+        console.error('Failed to save form data:', error);
+        // Only show alert if it's a critical error
+        if (error instanceof Error && error.message.includes('quota')) {
+          alert('Warning: Your CV data is too large to save locally. Your progress might not be saved if you close the browser.');
         }
       }
-      
-      // If the data is small enough, just store it directly
-      if (formDataStr.length < 400000) { // ~400KB chunk size
-        localStorage.setItem('cv-form-data', formDataStr);
-        localStorage.removeItem('cv-form-data-chunked');
-        return;
-      }
-      
-      // Mark that we're using chunked storage
-      localStorage.setItem('cv-form-data-chunked', 'true');
-      
-      // Split into chunks of ~400KB (well below the 5MB limit)
-      const chunkSize = 400000;
-      const chunks = Math.ceil(formDataStr.length / chunkSize);
-      
-      for (let i = 0; i < chunks; i++) {
-        const start = i * chunkSize;
-        const end = Math.min(start + chunkSize, formDataStr.length);
-        const chunk = formDataStr.substring(start, end);
-        localStorage.setItem(`cv-form-data-chunk-${i}`, chunk);
-      }
-      
-      // Store the number of chunks for future retrieval
-      localStorage.setItem('cv-form-data-chunks', chunks.toString());
-      console.log(`CV data stored in ${chunks} chunks`);  
-    } catch (error) {
-      console.error('Failed to save form data to localStorage:', error);
-      // Display a warning to the user
-      alert('Warning: Your CV data is too large to save locally. Your progress might not be saved if you close the browser.');
-    }
+    };
+    
+    saveData();
   }, [formData]);
   
+  // Save current step whenever it changes
   useEffect(() => {
     try {
-      localStorage.setItem('cv-form-step', currentStep.toString());
+      cvStorage.saveStep(currentStep);
     } catch (error) {
-      console.error('Failed to save step to localStorage:', error);
+      console.error('Failed to save step:', error);
     }
   }, [currentStep]);
   
