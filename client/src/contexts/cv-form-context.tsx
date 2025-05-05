@@ -81,14 +81,41 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   
   // Load saved data from localStorage on initial mount
   useEffect(() => {
-    const savedData = localStorage.getItem('cv-form-data');
+    const isChunked = localStorage.getItem('cv-form-data-chunked') === 'true';
     const savedStep = localStorage.getItem('cv-form-step');
     
-    if (savedData) {
+    if (isChunked) {
       try {
-        setFormData(JSON.parse(savedData));
+        // Get the number of chunks
+        const chunksStr = localStorage.getItem('cv-form-data-chunks');
+        if (!chunksStr) return;
+        
+        const chunks = parseInt(chunksStr, 10);
+        let fullData = '';
+        
+        // Reconstruct the data from chunks
+        for (let i = 0; i < chunks; i++) {
+          const chunk = localStorage.getItem(`cv-form-data-chunk-${i}`);
+          if (chunk) {
+            fullData += chunk;
+          }
+        }
+        
+        if (fullData) {
+          setFormData(JSON.parse(fullData));
+          console.log('Loaded CV data from chunks');
+        }
       } catch (e) {
-        console.error('Failed to parse saved form data:', e);
+        console.error('Failed to load chunked form data:', e);
+      }
+    } else {
+      const savedData = localStorage.getItem('cv-form-data');
+      if (savedData) {
+        try {
+          setFormData(JSON.parse(savedData));
+        } catch (e) {
+          console.error('Failed to parse saved form data:', e);
+        }
       }
     }
     
@@ -103,11 +130,55 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   
   // Save to localStorage whenever form data or step changes
   useEffect(() => {
-    localStorage.setItem('cv-form-data', JSON.stringify(formData));
+    try {
+      // Split large form data into smaller chunks to avoid quota limits
+      const formDataStr = JSON.stringify(formData);
+      
+      // Clear previous chunks
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('cv-form-data-chunk-')) {
+          localStorage.removeItem(key);
+        }
+      }
+      
+      // If the data is small enough, just store it directly
+      if (formDataStr.length < 400000) { // ~400KB chunk size
+        localStorage.setItem('cv-form-data', formDataStr);
+        localStorage.removeItem('cv-form-data-chunked');
+        return;
+      }
+      
+      // Mark that we're using chunked storage
+      localStorage.setItem('cv-form-data-chunked', 'true');
+      
+      // Split into chunks of ~400KB (well below the 5MB limit)
+      const chunkSize = 400000;
+      const chunks = Math.ceil(formDataStr.length / chunkSize);
+      
+      for (let i = 0; i < chunks; i++) {
+        const start = i * chunkSize;
+        const end = Math.min(start + chunkSize, formDataStr.length);
+        const chunk = formDataStr.substring(start, end);
+        localStorage.setItem(`cv-form-data-chunk-${i}`, chunk);
+      }
+      
+      // Store the number of chunks for future retrieval
+      localStorage.setItem('cv-form-data-chunks', chunks.toString());
+      console.log(`CV data stored in ${chunks} chunks`);  
+    } catch (error) {
+      console.error('Failed to save form data to localStorage:', error);
+      // Display a warning to the user
+      alert('Warning: Your CV data is too large to save locally. Your progress might not be saved if you close the browser.');
+    }
   }, [formData]);
   
   useEffect(() => {
-    localStorage.setItem('cv-form-step', currentStep.toString());
+    try {
+      localStorage.setItem('cv-form-step', currentStep.toString());
+    } catch (error) {
+      console.error('Failed to save step to localStorage:', error);
+    }
   }, [currentStep]);
   
   // Update a simple field
@@ -174,8 +245,22 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   const resetForm = () => {
     setFormData(initialFormData);
     setCurrentStep(0);
+    
+    // Clean up all CV form data from localStorage
     localStorage.removeItem('cv-form-data');
     localStorage.removeItem('cv-form-step');
+    localStorage.removeItem('cv-form-data-chunked');
+    localStorage.removeItem('cv-form-data-chunks');
+    
+    // Remove all chunk entries
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('cv-form-data-chunk-')) {
+        localStorage.removeItem(key);
+        // Adjust counter since we're removing items
+        i--;
+      }
+    }
   };
   
   // Validate form step (basic implementation)
