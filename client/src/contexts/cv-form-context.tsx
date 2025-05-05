@@ -269,6 +269,12 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   
   return (
     <CVFormContext.Provider value={value}>
+      {/* Show a storage warning toast when data size is getting large */}
+      <StorageWarningToast 
+        dataSize={dataSize} 
+        threshold={1.5 * 1024 * 1024} // 1.5MB threshold
+        onDismiss={() => setStorageWarningShown(true)} 
+      />
       {children}
     </CVFormContext.Provider>
   );
