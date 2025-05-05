@@ -126,7 +126,7 @@ const APIStatusCheck: React.FC = () => {
       
       // Use our proxy service instead of direct fetch
       const responseData = await fetchFromCVScreener<any>(apiPath, {
-        method: endpoint.method,
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
@@ -174,7 +174,7 @@ const APIStatusCheck: React.FC = () => {
       
       // Use our proxy service instead of direct fetch
       const responseData = await fetchFromCVScreener<any>(apiPath, {
-        method: endpoint.method,
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
