@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { API_BASE_URL, transformCVDataForBackend } from '@/services/cv-api-service';
+import { fetchFromCVScreener } from '@/lib/cors-proxy';
 
 interface EndpointStatus {
   id: string;
@@ -119,29 +120,34 @@ const APIStatusCheck: React.FC = () => {
     updateEndpointStatus('initiate', { status: 'loading' });
 
     try {
-      const response = await fetch(endpoint.url, {
+      // Extract the path part from the full URL - remove the API_BASE_URL prefix
+      const apiPath = endpoint.url.replace(API_BASE_URL, '');
+      console.log('Initiating payment at path:', apiPath);
+      
+      // Use our proxy service instead of direct fetch
+      const responseData = await fetchFromCVScreener<any>(apiPath, {
         method: endpoint.method,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify({
+        body: {
           template_id: templateId,
           cv_data: transformCVDataForBackend(sampleCVData)
-        })
+        }
       });
-
-      const responseData = await response.json();
       
       updateEndpointStatus('initiate', {
-        status: response.ok ? 'success' : 'error',
-        statusCode: response.status,
+        status: 'success',
+        statusCode: 200,
         response: responseData
       });
 
-      if (response.ok && responseData.request_id) {
+      if (responseData.request_id) {
         setRequestId(responseData.request_id);
       }
     } catch (error) {
+      console.error('Error initiating payment:', error);
       updateEndpointStatus('initiate', {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -162,29 +168,29 @@ const APIStatusCheck: React.FC = () => {
     updateEndpointStatus('verify', { status: 'loading' });
 
     try {
-      const response = await fetch(endpoint.url, {
+      // Extract the path part from the full URL - remove the API_BASE_URL prefix
+      const apiPath = endpoint.url.replace(API_BASE_URL, '');
+      console.log('Verifying payment at path:', apiPath);
+      
+      // Use our proxy service instead of direct fetch
+      const responseData = await fetchFromCVScreener<any>(apiPath, {
         method: endpoint.method,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify({
+        body: {
           payment_reference: paymentReference
-        })
+        }
       });
 
-      let responseData;
-      try {
-        responseData = await response.json();
-      } catch (e) {
-        responseData = await response.text();
-      }
-
       updateEndpointStatus('verify', {
-        status: response.ok ? 'success' : 'error',
-        statusCode: response.status,
+        status: 'success',
+        statusCode: 200,
         response: responseData
       });
     } catch (error) {
+      console.error('Error verifying payment:', error);
       updateEndpointStatus('verify', {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -205,15 +211,25 @@ const APIStatusCheck: React.FC = () => {
     updateEndpointStatus('status', { status: 'loading' });
 
     try {
-      const response = await fetch(endpoint.url);
-      const responseData = await response.json();
+      // Extract the path part from the full URL - remove the API_BASE_URL prefix
+      const apiPath = endpoint.url.replace(API_BASE_URL, '');
+      console.log('Checking status from path:', apiPath);
+      
+      // Use our proxy service instead of direct fetch
+      const responseData = await fetchFromCVScreener<any>(apiPath, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
 
       updateEndpointStatus('status', {
-        status: response.ok ? 'success' : 'error',
-        statusCode: response.status,
+        status: 'success',
+        statusCode: 200,
         response: responseData
       });
     } catch (error) {
+      console.error('Error checking status:', error);
       updateEndpointStatus('status', {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -234,12 +250,22 @@ const APIStatusCheck: React.FC = () => {
     updateEndpointStatus('download', { status: 'loading' });
 
     try {
-      const response = await fetch(endpoint.url);
-      const blob = await response.blob();
+      // Extract the path part from the full URL - remove the API_BASE_URL prefix
+      const apiPath = endpoint.url.replace(API_BASE_URL, '');
+      console.log('Downloading from path:', apiPath);
+      
+      // Use our proxy service instead of direct fetch
+      const blob = await fetchFromCVScreener<Blob>(apiPath, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/pdf'
+        },
+        responseType: 'blob'
+      });
 
       updateEndpointStatus('download', {
-        status: response.ok ? 'success' : 'error',
-        statusCode: response.status,
+        status: 'success',
+        statusCode: 200,
         response: {
           type: blob.type,
           size: blob.size,
@@ -247,6 +273,7 @@ const APIStatusCheck: React.FC = () => {
         }
       });
     } catch (error) {
+      console.error('Error downloading PDF:', error);
       updateEndpointStatus('download', {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error'
