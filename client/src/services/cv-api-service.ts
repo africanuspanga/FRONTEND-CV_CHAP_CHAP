@@ -399,7 +399,7 @@ export const verifyUSSDPayment = async (requestId: string, paymentReference: str
  * Check the status of a CV generation request
  * 
  * This function checks the current status of a CV generation request by querying
- * the backend's status endpoint with the request ID or by checking localStorage
+ * the backend's status endpoint with the request ID or by checking sessionStorage/localStorage
  * for verification status.
  * 
  * @param requestId The ID of the CV generation request
@@ -409,33 +409,55 @@ export const checkPaymentStatus = async (requestId: string): Promise<CVRequestSt
   try {
     console.log(`Checking status for request ID: ${requestId}`);
     
-    // Try to get payment status from the backend API first
-    try {
-      // Try to call the CV status endpoint through our proxy
-      const status = await fetchFromCVScreener<CVRequestStatus>(
-        `api/cv-pdf/${requestId}/status`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
+    // Check if this is a local fallback ID
+    const isLocalId = requestId.startsWith('local-');
+    
+    // If not a local ID, try to get payment status from the backend API first
+    if (!isLocalId) {
+      try {
+        // Try to call the CV status endpoint through our proxy
+        const status = await fetchFromCVScreener<CVRequestStatus>(
+          `api/cv-pdf/${requestId}/status`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      );
-      
-      console.log('Status check response from backend:', status);
-      return status;
-    } catch (apiError) {
-      // API error - fall back to localStorage verification
-      console.warn('Backend status endpoint failed:', apiError);
-      console.log('Falling back to localStorage verification');
+        );
+        
+        console.log('Status check response from backend:', status);
+        return status;
+      } catch (apiError) {
+        // API error - fall back to storage verification
+        console.warn('Backend status endpoint failed:', apiError);
+        console.log('Falling back to storage verification');
+      }
+    } else {
+      console.log('Using local verification for fallback ID');
     }
     
-    // Check if verification status exists in localStorage as fallback
-    const isVerified = localStorage.getItem(`payment_verified_${requestId}`) === 'true';
-    const verifiedAt = localStorage.getItem(`payment_verified_time_${requestId}`);
-    const transactionId = localStorage.getItem(`payment_transaction_${requestId}`);
+    // Check verification status in session/local storage
+    const getStorageItem = (key: string): string | null => {
+      // Try sessionStorage first
+      const sessionValue = sessionStorage.getItem(key);
+      if (sessionValue !== null) return sessionValue;
+      
+      // Fall back to localStorage
+      try {
+        return localStorage.getItem(key);
+      } catch (e) {
+        console.warn(`Error reading ${key} from localStorage:`, e);
+        return null;
+      }
+    };
     
-    // Create status object based on localStorage verification
+    // Check if verification status exists in storage as fallback
+    const isVerified = getStorageItem(`payment_verified_${requestId}`) === 'true';
+    const verifiedAt = getStorageItem(`payment_verified_time_${requestId}`);
+    const transactionId = getStorageItem(`payment_transaction_${requestId}`);
+    
+    // Create status object based on storage verification
     const status: CVRequestStatus = {
       status: isVerified ? 'completed' : 'pending_payment',
       request_id: requestId,
@@ -452,11 +474,15 @@ export const checkPaymentStatus = async (requestId: string): Promise<CVRequestSt
     // If the status is verified, add timestamp if it doesn't exist
     if (isVerified && !verifiedAt) {
       const now = new Date().toISOString();
-      localStorage.setItem(`payment_verified_time_${requestId}`, now);
+      try {
+        sessionStorage.setItem(`payment_verified_time_${requestId}`, now);
+      } catch (e) {
+        console.warn('Error saving timestamp to sessionStorage:', e);
+      }
       status.completed_at = now;
     }
     
-    console.log('Status check result (localStorage):', status);
+    console.log('Status check result (client storage):', status);
     return status;
   } catch (error) {
     console.error('Error checking payment status:', error);

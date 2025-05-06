@@ -37,9 +37,30 @@ export const useCVRequest = () => {
 export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { formData } = useCVForm();
   const [requestId, setRequestId] = useState<string | null>(() => {
-    // Try to restore from localStorage on initial render
-    const savedRequestId = localStorage.getItem('cv_request_id');
-    return savedRequestId ? savedRequestId : null;
+    // Try to restore from sessionStorage first, then localStorage as fallback
+    try {
+      const sessionRequestId = sessionStorage.getItem('cv_request_id');
+      if (sessionRequestId) {
+        return sessionRequestId;
+      }
+      
+      const localRequestId = localStorage.getItem('cv_request_id');
+      if (localRequestId) {
+        // Migrate from localStorage to sessionStorage
+        try {
+          sessionStorage.setItem('cv_request_id', localRequestId);
+          return localRequestId;
+        } catch (sessionError) {
+          console.warn('Failed to migrate requestId to sessionStorage:', sessionError);
+          return localRequestId;
+        }
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error accessing storage during initialization:', error);
+      return null;
+    }
   });
   const [paymentStatus, setPaymentStatus] = useState<CVRequestStatus | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -80,12 +101,32 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   }, [requestId, isPolling]);
   
-  // Save requestId to localStorage when it changes
+  // Save requestId to sessionStorage when it changes
   useEffect(() => {
-    if (requestId) {
-      localStorage.setItem('cv_request_id', requestId);
-    } else {
-      localStorage.removeItem('cv_request_id');
+    try {
+      if (requestId) {
+        // Store in sessionStorage for better reliability
+        sessionStorage.setItem('cv_request_id', requestId);
+        
+        // Also store in localStorage as backup, but catch any errors
+        try {
+          localStorage.setItem('cv_request_id', requestId);
+        } catch (localStorageError) {
+          console.warn('Failed to store requestId in localStorage:', localStorageError);
+          // Non-critical error, continue execution
+        }
+      } else {
+        // Clear both storages
+        sessionStorage.removeItem('cv_request_id');
+        try {
+          localStorage.removeItem('cv_request_id');
+        } catch (localStorageError) {
+          console.warn('Failed to remove requestId from localStorage:', localStorageError);
+          // Non-critical error, continue execution
+        }
+      }
+    } catch (error) {
+      console.error('Error updating requestId in storage:', error);
     }
   }, [requestId]);
 
@@ -258,7 +299,21 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setPaymentStatus(null);
     setError(null);
     setIsPolling(false);
-    localStorage.removeItem('cv_request_id');
+    
+    try {
+      // Clear from sessionStorage (primary storage)
+      sessionStorage.removeItem('cv_request_id');
+      sessionStorage.removeItem('cv_template_id');
+      
+      // Also clean up localStorage as a backup
+      try {
+        localStorage.removeItem('cv_request_id');
+      } catch (localStorageError) {
+        console.warn('Failed to clear localStorage:', localStorageError);
+      }
+    } catch (error) {
+      console.error('Error clearing storage during reset:', error);
+    }
   };
 
   const value = {

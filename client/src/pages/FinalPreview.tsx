@@ -115,17 +115,32 @@ const FinalPreview = () => {
       }
       
       // If we reach here, API call failed - proceed to fallback
-      console.log("Using fallback payment flow");
-      
-      // Create a local storage key for CV data that we'll use later
-      const storageKey = `cv_data_${Date.now()}`;
-      const localStorageData = { templateId: currentTemplateId, cvData: updatedFormData };
-      localStorage.setItem(storageKey, JSON.stringify(localStorageData));
-      
-      // Generate a request ID using timestamp
-      const fallbackRequestId = `local-${Date.now()}`;
-      localStorage.setItem('cv_request_id', fallbackRequestId);
-      localStorage.setItem(`cv_data_${fallbackRequestId}`, JSON.stringify(localStorageData));
+      try {
+        console.log("Using fallback payment flow");
+        
+        // Create simplified data object to avoid storage issues
+        const minimalCVData = {
+          templateId: currentTemplateId,
+          personalInfo: updatedFormData.personalInfo || {},
+          // Include only essential fields
+          workExperiences: updatedFormData.workExperiences?.slice(0, 2) || [],
+          education: updatedFormData.education?.slice(0, 2) || [],
+          skills: updatedFormData.skills?.slice(0, 10) || []
+        };
+        
+        // Generate a unique ID that we'll use for navigation only
+        const fallbackRequestId = `local-${Date.now()}`;
+        
+        // Store in sessionStorage instead of localStorage to avoid quota issues
+        sessionStorage.setItem('cv_request_id', fallbackRequestId);
+        sessionStorage.setItem('cv_template_id', currentTemplateId);
+        
+        // Skip storing large data - we'll use what's already in the form context
+        console.log("Using fallback with ID:", fallbackRequestId);
+      } catch (storageError) {
+        console.error("Storage error in fallback flow:", storageError);
+        // Even if storage fails, we still want to proceed to payment page
+      }
       
       // Use the dialog to ask user what to do
       toast({

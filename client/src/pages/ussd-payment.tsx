@@ -34,28 +34,44 @@ const USSDPaymentPage: React.FC = () => {
   // Initialize payment request if not already done
   useEffect(() => {
     const initializePayment = async () => {
-      if (!requestId && formData.templateId) {
-        // Clone the formData to avoid modifying the original and ensure all required properties exist
-        const cvData = JSON.parse(JSON.stringify(formData));
+      try {
+        // Check if we have a fallback ID in sessionStorage
+        const fallbackId = sessionStorage.getItem('cv_request_id');
+        const storedTemplateId = sessionStorage.getItem('cv_template_id');
         
-        cvData.personalInfo = cvData.personalInfo || {};
-        cvData.workExperiences = cvData.workExperiences || [];
-        cvData.education = cvData.education || [];
-        cvData.skills = cvData.skills || [];
-        cvData.certifications = cvData.certifications || [];
-        cvData.languages = cvData.languages || [];
-        cvData.accomplishments = cvData.accomplishments || [];
-        cvData.projects = cvData.projects || [];
-        cvData.hobbies = Array.isArray(cvData.hobbies) ? cvData.hobbies : [];
-        cvData.references = cvData.references || [];
-        
-        // Make sure templateId is included
-        if (!cvData.templateId) {
-          cvData.templateId = formData.templateId;
+        if (fallbackId && fallbackId.startsWith('local-')) {
+          console.log('Using fallback payment ID from session:', fallbackId);
+          // We have a fallback ID - use it instead of making an API call
+          return;
         }
         
-        console.log('Initiating payment with template ID:', formData.templateId);
-        await initiatePayment(formData.templateId, cvData);
+        // Regular initialization flow - only if we don't have an existing requestId
+        if (!requestId && formData.templateId) {
+          // Create minimal CV data to avoid storage issues
+          const minimalCVData = {
+            templateId: formData.templateId,
+            personalInfo: formData.personalInfo || {},
+            // Include only essential fields and limit array sizes
+            workExperiences: (formData.workExperiences || []).slice(0, 2),
+            education: (formData.education || []).slice(0, 2),
+            skills: (formData.skills || []).slice(0, 10),
+            languages: (formData.languages || []).slice(0, 3)
+          };
+          
+          console.log('Initiating payment with template ID:', formData.templateId);
+          await initiatePayment(formData.templateId, minimalCVData);
+        }
+      } catch (error) {
+        console.error('Error in payment initialization:', error);
+        // Create a fallback request ID if API call fails
+        try {
+          const fallbackId = `local-${Date.now()}`;
+          sessionStorage.setItem('cv_request_id', fallbackId);
+          sessionStorage.setItem('cv_template_id', formData.templateId || '');
+          console.log('Created fallback payment ID:', fallbackId);
+        } catch (storageError) {
+          console.error('Storage error in fallback creation:', storageError);
+        }
       }
     };
     
