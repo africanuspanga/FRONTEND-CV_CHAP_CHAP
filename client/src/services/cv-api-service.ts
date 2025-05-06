@@ -64,7 +64,17 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
     summary: cvData.personalInfo.professionalSummary || cvData.personalInfo.summary || '',
     
     // Work experience section - match exact field names expected by backend
-    experience: (cvData.workExperiences || []).map(job => ({
+    experience: (cvData.workExperiences || []).map((job: {
+      jobTitle?: string;
+      position?: string;
+      company?: string;
+      location?: string;
+      startDate?: string;
+      endDate?: string;
+      current?: boolean;
+      description?: string;
+      achievements?: Array<string | { text: string }>;
+    }) => ({
       position: job.jobTitle || job.position || '',  // Map to correct field name
       company: job.company || '',
       location: job.location || '',
@@ -73,12 +83,23 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
       description: job.description || '',
       // Format achievements as array of strings
       achievements: Array.isArray(job.achievements) 
-        ? job.achievements.map(a => typeof a === 'object' && a.text ? a.text : a)
+        ? job.achievements.map((a: string | { text: string }) => 
+            typeof a === 'object' && a.text ? a.text : a)
         : []
     })),
     
     // Education section - use 'school' instead of 'institution' as per API docs
-    education: (cvData.education || []).map(edu => ({
+    education: (cvData.education || []).map((edu: {
+      degree?: string;
+      institution?: string;
+      school?: string;
+      location?: string;
+      startDate?: string;
+      endDate?: string;
+      current?: boolean;
+      description?: string;
+      achievements?: Array<string | { text: string }>;
+    }) => ({
       degree: edu.degree || '',
       school: edu.institution || edu.school || '', // Map to correct field name
       location: edu.location || '',
@@ -87,7 +108,7 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
       description: edu.description || '',
       // Format achievements as array of strings
       achievements: Array.isArray(edu.achievements)
-        ? edu.achievements.map(a => typeof a === 'object' && a.text ? a.text : a) 
+        ? edu.achievements.map((a: string | { text: string }) => typeof a === 'object' && a.text ? a.text : a) 
         : []
     })),
     
@@ -95,16 +116,28 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
     skills: cvData.skills || [],
     
     // Languages section - format as strings with proficiency level
-    languages: (cvData.languages || []).map(lang => {
+    languages: (cvData.languages || []).map((lang: string | { 
+      name: string; 
+      level?: string; 
+      proficiency?: string;
+    }) => {
       if (typeof lang === 'string') return lang;
       if (typeof lang === 'object' && lang.name) {
-        return lang.level ? `${lang.name} (${lang.level})` : lang.name;
+        const level = lang.level || lang.proficiency;
+        return level ? `${lang.name} (${level})` : lang.name;
       }
       return '';
     }).filter(Boolean),
     
     // Certifications section
-    certifications: (cvData.certifications || []).map(cert => {
+    certifications: (cvData.certifications || []).map((cert: string | {
+      name?: string;
+      issuer?: string;
+      organization?: string;
+      date?: string;
+      year?: string;
+      description?: string;
+    }) => {
       if (typeof cert === 'string') return { name: cert };
       return {
         name: cert.name || '',
@@ -116,13 +149,21 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
     
     // Hobbies section - format as a string with comma-separated values
     hobbies: Array.isArray(cvData.hobbies) 
-      ? cvData.hobbies.map(hobby => 
+      ? cvData.hobbies.map((hobby: string | { name: string }) => 
           typeof hobby === 'object' && hobby.name ? hobby.name : hobby
         ).join(', ')
       : (typeof cvData.hobbies === 'string' ? cvData.hobbies : ''),
     
     // References section
-    references: (cvData.references || []).map(ref => {
+    references: (cvData.references || []).map((ref: string | {
+      name?: string;
+      position?: string;
+      title?: string;
+      company?: string;
+      organization?: string;
+      email?: string;
+      phone?: string;
+    }) => {
       if (typeof ref === 'string') return { name: ref };
       return {
         name: ref.name || '',
@@ -134,7 +175,16 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
     }),
     
     // Projects section if available
-    projects: (cvData.projects || []).map(proj => {
+    projects: (cvData.projects || []).map((proj: string | {
+      name?: string;
+      title?: string;
+      description?: string;
+      startDate?: string;
+      endDate?: string;
+      current?: boolean;
+      url?: string;
+      link?: string;
+    }) => {
       if (typeof proj === 'string') return { name: proj };
       return {
         name: proj.name || proj.title || '',

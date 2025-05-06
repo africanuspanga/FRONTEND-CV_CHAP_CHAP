@@ -64,14 +64,34 @@ export const generatePDF = async (cvData: CVData, templateId: string): Promise<v
     // Handle website entries if they exist
     if (cvData.websites && cvData.websites.length > 0) {
       // Find personal website if it exists
-      const personalWebsite = cvData.websites.find(site => site.type === 'personal');
+      const personalWebsite = cvData.websites.find((site: {
+        id: string;
+        name: string;
+        url: string;
+        type?: string; // Add type which might not be in the schema but needed
+      }) => {
+        // Try to identify personal website based on name or URL if type is missing
+        if (site.type === 'personal') return true;
+        if (!site.type && site.name?.toLowerCase().includes('personal')) return true;
+        if (!site.type && site.url && !site.url.includes('linkedin.com') && 
+            !site.url.includes('facebook.com') && !site.url.includes('twitter.com')) return true;
+        return false;
+      });
       updateElement('website', personalWebsite?.url || '');
       
       // Find LinkedIn if it exists
-      const linkedin = cvData.websites.find(site => 
-        site.type === 'linkedin' || 
-        (site.url && site.url.includes('linkedin.com'))
-      );
+      const linkedin = cvData.websites.find((site: {
+        id: string;
+        name: string;
+        url: string;
+        type?: string; // Add type which might not be in the schema but needed
+      }) => {
+        // Look for LinkedIn in type, name, or URL
+        if (site.type === 'linkedin') return true;
+        if (site.name?.toLowerCase().includes('linkedin')) return true;
+        if (site.url && site.url.includes('linkedin.com')) return true;
+        return false;
+      });
       updateElement('linkedin', linkedin?.url || '');
     } else {
       updateElement('website', '');
@@ -81,16 +101,28 @@ export const generatePDF = async (cvData: CVData, templateId: string): Promise<v
     // Use professionalTitle from personalInfo for job-title
     updateElement('job-title', personalInfo.professionalTitle || '');
     
-    // Use either standalone summary or from personalInfo
-    updateElement('summary', cvData.summary || personalInfo.summary || '');
+    // Extract the summary from personalInfo
+    // This is safer as personalInfo.summary is properly typed in the schema
+    const summaryText = personalInfo.summary || '';
+    updateElement('summary', summaryText);
     
     // Work Experience - support both field names for backward compatibility
-    const workExperienceData = cvData.workExperiences || cvData.workExperience || [];
+    const workExperienceData = cvData.workExperiences || [];
     const experienceContainer = doc.getElementById('experience-container');
     if (experienceContainer && workExperienceData.length) {
       experienceContainer.innerHTML = '';
       
-      workExperienceData.forEach(exp => {
+      workExperienceData.forEach((exp: {
+        id?: string;
+        jobTitle?: string;
+        company?: string;
+        location?: string;
+        startDate?: string;
+        endDate?: string;
+        current?: boolean;
+        description?: string;
+        achievements?: Array<string | { text: string }>;
+      }) => {
         const expElement = doc.createElement('div');
         expElement.className = 'experience-item';
         
@@ -111,7 +143,16 @@ export const generatePDF = async (cvData: CVData, templateId: string): Promise<v
     if (educationContainer && cvData.education?.length) {
       educationContainer.innerHTML = '';
       
-      cvData.education.forEach(edu => {
+      cvData.education.forEach((edu: {
+        id?: string;
+        degree?: string;
+        institution?: string;
+        startDate?: string;
+        endDate?: string;
+        current?: boolean;
+        description?: string;
+        achievements?: Array<string | { text: string }>;
+      }) => {
         const eduElement = doc.createElement('div');
         eduElement.className = 'education-item';
         
@@ -132,7 +173,11 @@ export const generatePDF = async (cvData: CVData, templateId: string): Promise<v
     if (skillsContainer && cvData.skills?.length) {
       skillsContainer.innerHTML = '';
       
-      cvData.skills.forEach(skill => {
+      cvData.skills.forEach((skill: {
+        id?: string;
+        name: string;
+        level?: string | number;
+      }) => {
         const skillElement = doc.createElement('div');
         skillElement.className = 'skill-item';
         
@@ -150,7 +195,12 @@ export const generatePDF = async (cvData: CVData, templateId: string): Promise<v
     if (languagesContainer && cvData.languages?.length) {
       languagesContainer.innerHTML = '';
       
-      cvData.languages.forEach(language => {
+      cvData.languages.forEach((language: {
+        id?: string;
+        name: string;
+        proficiency?: string;
+        level?: string;
+      }) => {
         const langElement = doc.createElement('div');
         langElement.className = 'language-item';
         
@@ -168,7 +218,14 @@ export const generatePDF = async (cvData: CVData, templateId: string): Promise<v
     if (referencesContainer && cvData.references?.length) {
       referencesContainer.innerHTML = '';
       
-      cvData.references.forEach(reference => {
+      cvData.references.forEach((reference: {
+        id?: string;
+        name: string;
+        position?: string;
+        company?: string;
+        email?: string;
+        phone?: string;
+      }) => {
         const refElement = doc.createElement('div');
         refElement.className = 'reference-item';
         
