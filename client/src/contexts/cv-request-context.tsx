@@ -536,9 +536,9 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         console.log('Calling backend with properly structured data:', properlyFormattedData);
         
         try {
-          // Use the download-test-pdf endpoint from the documentation
-          // This endpoint is specifically designed for frontend testing without payment
-          const testEndpoint = `/cv-screener-proxy/download-test-pdf/${templateId}`;
+          // Use our own server endpoint that proxies to the real API
+          // This solves CORS issues and ensures proper error handling
+          const testEndpoint = `/api/test-pdf/${templateId}`;
           console.log(`Using test PDF endpoint: ${testEndpoint}`);
           
           // Try the test endpoint which should return a PDF directly

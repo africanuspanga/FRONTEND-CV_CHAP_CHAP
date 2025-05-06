@@ -348,6 +348,56 @@ export function registerRoutes(app: Express): Server {
       });
     }
   });
+  
+  // Direct proxy to the test PDF endpoint
+  app.get("/api/test-pdf/:templateId", async (req, res) => {
+    try {
+      const { templateId } = req.params;
+      
+      // Use the documented test PDF endpoint directly
+      const apiUrl = `https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/download-test-pdf/${templateId}`;
+      console.log(`Direct proxy to test PDF URL: ${apiUrl}`);
+      
+      // Make the request to the PDF API
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/pdf',
+          'User-Agent': 'CV-Chap-Chap-App'
+        }
+      });
+      
+      // Check if the response was successful
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Test PDF API error (${response.status}): ${errorText}`);
+        return res.status(response.status).json({
+          success: false,
+          error: `Test PDF API error: ${response.statusText}`
+        });
+      }
+      
+      // Forward the response directly to the client
+      const contentType = response.headers.get('content-type');
+      if (contentType) {
+        res.setHeader('Content-Type', contentType);
+      }
+      
+      // Content-Disposition header for download
+      res.setHeader('Content-Disposition', `attachment; filename="cv_${templateId}.pdf"`);
+      
+      // Get the response as an array buffer and send it
+      const data = await response.arrayBuffer();
+      res.status(200).send(Buffer.from(data));
+      
+    } catch (error: any) {
+      console.error('Error fetching test PDF:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error'
+      });
+    }
+  });
 
   // Create HTTP server
   const httpServer = createServer(app);
