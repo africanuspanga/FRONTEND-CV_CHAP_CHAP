@@ -122,14 +122,24 @@ const loadCompressedData = (): any => {
   }
 };
 
-// Save CV data to IndexedDB with compression fallback
+// Save CV data to IndexedDB with compression fallback and sessionStorage
 export const saveFormData = async (formData: any): Promise<void> => {
   try {
     console.log('Attempting to save CV data...');
-    // First try to save in localStorage as a convenience
+    // Save the data and size for later use
     const formDataStr = JSON.stringify(formData);
     console.log(`Data size: ${formDataStr.length} bytes`);
     
+    // Try to save in sessionStorage first (more reliable for payment flow)
+    try {
+      sessionStorage.setItem('cv_form_data', formDataStr);
+      console.log('CV data stored in sessionStorage');
+    } catch (sessionStorageError) {
+      console.error('Error storing in sessionStorage:', sessionStorageError);
+      // Continue to other storage methods
+    }
+    
+    // Then try localStorage as another option
     if (formDataStr.length < 200000) { // ~200KB (safe for most browsers)
       try {
         localStorage.setItem(CV_DATA_KEY, formDataStr);
@@ -298,7 +308,19 @@ export const loadFormData = async (): Promise<any | null> => {
   console.log('Attempting to load CV form data...');
   
   try {
-    // First try localStorage for simplicity and speed
+    // First try sessionStorage (more reliable for payment flow)
+    try {
+      const sessionData = sessionStorage.getItem('cv_form_data');
+      if (sessionData) {
+        console.log('CV data found in sessionStorage');
+        const parsed = JSON.parse(sessionData);
+        return parsed;
+      }
+    } catch (sessionStorageError) {
+      console.error('Error loading from sessionStorage:', sessionStorageError);
+    }
+    
+    // Then try localStorage as a fallback
     try {
       const savedData = localStorage.getItem(CV_DATA_KEY);
       if (savedData) {
@@ -431,6 +453,15 @@ export const loadStep = (): number | null => {
 export const clearFormData = async (): Promise<void> => {
   console.log('Clearing all CV form data...');
   try {
+    // Clear from sessionStorage first
+    try {
+      sessionStorage.removeItem('cv_form_data');
+      sessionStorage.removeItem('cv_template_id');
+      sessionStorage.removeItem('cv_request_id');
+    } catch (sessionStorageError) {
+      console.error('Error clearing sessionStorage:', sessionStorageError);
+    }
+    
     // Clear from localStorage
     localStorage.removeItem(CV_DATA_KEY);
     localStorage.removeItem(CV_STEP_KEY);
@@ -488,10 +519,17 @@ export const clearFormData = async (): Promise<void> => {
     
     // Make a more aggressive attempt to clear everything
     try {
+      // Try to clear sessionStorage completely
+      try {
+        sessionStorage.clear();
+      } catch (clearError) {
+        console.error('Error clearing sessionStorage:', clearError);
+      }
+      
       // Try to clear any localStorage items related to CV data
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && (key.includes('cv-') || key.includes('CV'))) {
+        if (key && (key.includes('cv-') || key.includes('CV') || key.includes('cv_'))) {
           localStorage.removeItem(key);
           i--; // Adjust index
         }
