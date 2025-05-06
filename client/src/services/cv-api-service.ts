@@ -1,4 +1,4 @@
-import { CVData } from '@/types/cv-form-types';
+import { CVData } from '@shared/schema';
 import { fetchFromCVScreener } from '@/lib/cors-proxy';
 
 // API base URL for our backend service - used for reference only

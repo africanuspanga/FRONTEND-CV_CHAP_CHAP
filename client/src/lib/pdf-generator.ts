@@ -255,14 +255,24 @@ export const generatePDF = async (cvData: CVData, templateId: string): Promise<v
         const projectsList = doc.createElement('div');
         projectsList.className = 'projects-list';
         
-        cvData.projects.forEach(project => {
+        cvData.projects.forEach((project: {
+          id?: string;
+          name?: string;
+          title?: string;
+          description?: string;
+          url?: string;
+          link?: string;
+          startDate?: string;
+          endDate?: string;
+          current?: boolean;
+        }) => {
           const projElement = doc.createElement('div');
           projElement.className = 'project-item';
           
           projElement.innerHTML = `
-            <h3 class="project-name">${project.name || ''}</h3>
+            <h3 class="project-name">${project.name || project.title || ''}</h3>
             <div class="project-description">${project.description || ''}</div>
-            ${project.url ? `<div class="project-url">${project.url}</div>` : ''}
+            ${project.url || project.link ? `<div class="project-url">${project.url || project.link}</div>` : ''}
           `;
           
           projectsList.appendChild(projElement);
@@ -281,14 +291,23 @@ export const generatePDF = async (cvData: CVData, templateId: string): Promise<v
         const certsList = doc.createElement('div');
         certsList.className = 'certifications-list';
         
-        cvData.certifications.forEach(cert => {
+        cvData.certifications.forEach((cert: {
+          id?: string;
+          name?: string;
+          issuer?: string;
+          organization?: string;
+          date?: string;
+          year?: string;
+          description?: string;
+        }) => {
           const certElement = doc.createElement('div');
           certElement.className = 'certification-item';
           
           certElement.innerHTML = `
             <h3 class="certification-name">${cert.name || ''}</h3>
-            <div class="certification-issuer">${cert.issuer || ''}</div>
-            <div class="certification-date">${cert.date || ''}</div>
+            <div class="certification-issuer">${cert.issuer || cert.organization || ''}</div>
+            <div class="certification-date">${cert.date || cert.year || ''}</div>
+            ${cert.description ? `<div class="certification-description">${cert.description}</div>` : ''}
           `;
           
           certsList.appendChild(certElement);
@@ -298,14 +317,29 @@ export const generatePDF = async (cvData: CVData, templateId: string): Promise<v
         additionalContainer.appendChild(certsSection);
       }
       
-      // Hobbies
+      // Hobbies - handle both string and array formats
       if (cvData.hobbies) {
         const hobbiesSection = doc.createElement('div');
         hobbiesSection.className = 'hobbies-section';
-        hobbiesSection.innerHTML = `
-          <h2>Hobbies & Interests</h2>
-          <div class="hobbies-content">${cvData.hobbies}</div>
-        `;
+        hobbiesSection.innerHTML = '<h2>Hobbies & Interests</h2>';
+        
+        // Convert hobbies to string for display
+        let hobbiesContent = '';
+        if (typeof cvData.hobbies === 'string') {
+          hobbiesContent = cvData.hobbies;
+        } else if (Array.isArray(cvData.hobbies)) {
+          hobbiesContent = cvData.hobbies
+            .map((hobby: string | { name: string; description?: string }) => {
+              if (typeof hobby === 'string') return hobby;
+              return hobby.name + (hobby.description ? `: ${hobby.description}` : '');
+            })
+            .join(', ');
+        }
+        
+        const contentDiv = doc.createElement('div');
+        contentDiv.className = 'hobbies-content';
+        contentDiv.textContent = hobbiesContent;
+        hobbiesSection.appendChild(contentDiv);
         
         additionalContainer.appendChild(hobbiesSection);
       }
