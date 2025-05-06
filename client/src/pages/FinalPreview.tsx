@@ -91,39 +91,61 @@ const FinalPreview = () => {
       
       console.log("Initiating payment with template ID:", currentTemplateId);
       // Initiating payment using the current template ID and updated form data
-      const paymentInitiated = await initiatePayment(currentTemplateId, {
+      const updatedFormData = {
         ...formData,
         templateId: currentTemplateId // Ensure consistent template ID
+      };
+      
+      try {
+        // First attempt: try to initiate payment via API
+        const paymentInitiated = await initiatePayment(currentTemplateId, updatedFormData);
+        
+        if (paymentInitiated) {
+          toast({
+            title: "Payment Initiated",
+            description: "Redirecting to payment verification page",
+          });
+          // Redirect to USSD payment page for manual payment verification
+          navigate('/ussd-payment');
+          return;
+        }
+      } catch (apiError) {
+        // Log the API error but continue to fallback
+        console.warn("Payment API error:", apiError);
+      }
+      
+      // If we reach here, API call failed - proceed to fallback
+      console.log("Using fallback payment flow");
+      
+      // Create a local storage key for CV data that we'll use later
+      const storageKey = `cv_data_${Date.now()}`;
+      const localStorageData = { templateId: currentTemplateId, cvData: updatedFormData };
+      localStorage.setItem(storageKey, JSON.stringify(localStorageData));
+      
+      // Generate a request ID using timestamp
+      const fallbackRequestId = `local-${Date.now()}`;
+      localStorage.setItem('cv_request_id', fallbackRequestId);
+      localStorage.setItem(`cv_data_${fallbackRequestId}`, JSON.stringify(localStorageData));
+      
+      // Use the dialog to ask user what to do
+      toast({
+        title: "Connection Issue",
+        description: "Would you like to proceed with manual payment verification anyway?",
+        action: (
+          <Button 
+            variant="default" 
+            onClick={() => navigate('/ussd-payment')}
+            className="bg-primary text-white hover:bg-primary/90"
+          >
+            Proceed
+          </Button>
+        ),
+        duration: 10000, // 10 seconds
       });
       
-      if (paymentInitiated) {
-        toast({
-          title: "Payment Initiated",
-          description: "Redirecting to payment verification page",
-        });
-        // Redirect to USSD payment page for manual payment verification
-        navigate('/ussd-payment');
-      } else {
-        // Error message is handled in the initiatePayment function
-        setIsDownloading(false);
-        
-        // Fallback option if API connection fails
-        toast({
-          title: "Connection Issue",
-          description: "Would you like to proceed with manual payment verification anyway?",
-          action: (
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/ussd-payment')}
-              className="bg-primary text-white hover:bg-primary/90"
-            >
-              Proceed
-            </Button>
-          ),
-        });
-      }
+      setIsDownloading(false);
     } catch (error) {
-      console.error("Error initiating payment:", error);
+      console.error("Error in payment flow:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to initiate payment",
