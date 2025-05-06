@@ -58,15 +58,37 @@ export async function fetchFromCVScreener<T>(
     if (!response.ok) {
       console.error(`Error response from proxy: ${response.status} ${response.statusText}`);
       let errorMessage;
+      let errorDetails = {};
+      
       try {
         // Try to get detailed error message from JSON response
         const errorData = await response.json();
-        errorMessage = errorData.error || `Server responded with status ${response.status}`;
+        console.log('Error response details:', errorData);
+        
+        // Extract error message and details
+        errorMessage = errorData.error || errorData.message || `Server responded with status ${response.status}`;
+        
+        // Store full error object for more context
+        errorDetails = errorData;
       } catch (e) {
-        // If not JSON, use status text
-        errorMessage = `Server responded with status ${response.status}: ${response.statusText}`;
+        // If not JSON, try to get text
+        try {
+          const errorText = await response.text();
+          console.log('Error response text:', errorText);
+          errorMessage = errorText || `Server responded with status ${response.status}: ${response.statusText}`;
+        } catch (textError) {
+          // If both fail, use status text
+          errorMessage = `Server responded with status ${response.status}: ${response.statusText}`;
+        }
       }
-      throw new Error(errorMessage);
+      
+      // Create an enhanced error object with both message and details
+      const enhancedError = new Error(errorMessage);
+      // @ts-ignore - Add details property to the error
+      enhancedError.details = errorDetails;
+      // @ts-ignore - Add status code to the error
+      enhancedError.statusCode = response.status;
+      throw enhancedError;
     }
 
     // Return the appropriate response format

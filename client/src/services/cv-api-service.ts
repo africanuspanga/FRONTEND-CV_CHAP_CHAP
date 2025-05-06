@@ -431,10 +431,39 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
       console.log('Payment initiation successful:', ussdResponse);
       return ussdResponse;
     } catch (apiError) {
+      // Enhanced error logging with more context
       console.error('API error during payment initiation:', apiError);
+      
+      // Extract detailed error information if available
+      let errorMessage = 'Failed to connect to payment server';
+      let errorDetails = {};
+      
+      if (apiError instanceof Error) {
+        errorMessage = apiError.message;
+        
+        // Try to extract additional details if they exist
+        // @ts-ignore - Check for custom details property
+        if (apiError.details && typeof apiError.details === 'object') {
+          // @ts-ignore
+          errorDetails = apiError.details;
+          console.log('Payment API error details:', errorDetails);
+        }
+        
+        // @ts-ignore - Check for status code
+        if (apiError.statusCode) {
+          // @ts-ignore
+          console.log('Payment API error status code:', apiError.statusCode);
+        }
+      }
+      
       return {
         success: false,
-        error: apiError instanceof Error ? apiError.message : 'Failed to connect to payment server'
+        error: errorMessage,
+        details: errorDetails,
+        // Include a more user-friendly message based on common errors
+        user_message: errorMessage.includes('file_id') 
+          ? 'Unable to generate your CV. Please try again with a different template or contact support.'
+          : 'Payment initialization failed. Please try again or use the manual payment option.'
       };
     }
   } catch (error) {
