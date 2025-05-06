@@ -429,22 +429,61 @@ export const loadFormData = async (): Promise<any | null> => {
   }
 };
 
-// Save the current step to localStorage (small enough to use localStorage)
+// Save the current step to storage with multi-tier reliability
 export const saveStep = (step: number): void => {
+  const stepStr = step.toString();
+  
+  // Try sessionStorage first (more reliable for payment flow)
   try {
-    localStorage.setItem(CV_STEP_KEY, step.toString());
-  } catch (error) {
-    console.error('Error saving step:', error);
+    sessionStorage.setItem(CV_STEP_KEY, stepStr);
+    console.log('Step saved to sessionStorage:', step);
+  } catch (sessionError) {
+    console.warn('Failed to save step to sessionStorage:', sessionError);
+  }
+  
+  // Then try localStorage as backup
+  try {
+    localStorage.setItem(CV_STEP_KEY, stepStr);
+    console.log('Step saved to localStorage:', step);
+  } catch (localError) {
+    console.error('Error saving step to localStorage:', localError);
   }
 };
 
-// Load the current step from localStorage
+// Load the current step from storage with fallback mechanisms
 export const loadStep = (): number | null => {
   try {
-    const savedStep = localStorage.getItem(CV_STEP_KEY);
-    return savedStep ? parseInt(savedStep, 10) : null;
+    // Try sessionStorage first
+    try {
+      const sessionStep = sessionStorage.getItem(CV_STEP_KEY);
+      if (sessionStep) {
+        const parsed = parseInt(sessionStep, 10);
+        console.log('Step loaded from sessionStorage:', parsed);
+        return parsed;
+      }
+    } catch (sessionError) {
+      console.warn('Failed to load step from sessionStorage:', sessionError);
+    }
+    
+    // Fall back to localStorage
+    const localStep = localStorage.getItem(CV_STEP_KEY);
+    if (localStep) {
+      const parsed = parseInt(localStep, 10);
+      console.log('Step loaded from localStorage:', parsed);
+      
+      // Migrate to sessionStorage for future reliability
+      try {
+        sessionStorage.setItem(CV_STEP_KEY, localStep);
+      } catch (migrationError) {
+        console.warn('Failed to migrate step to sessionStorage:', migrationError);
+      }
+      
+      return parsed;
+    }
+    
+    return null;
   } catch (error) {
-    console.error('Error loading step:', error);
+    console.error('Error loading step from any storage:', error);
     return null;
   }
 };
