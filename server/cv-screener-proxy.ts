@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import fetch from 'node-fetch';
+import fetch, { Response as FetchResponse, RequestInit, HeadersInit } from 'node-fetch';
 import FormData from 'form-data';
 
 /**
@@ -89,13 +89,13 @@ function updateRateLimit(path: string, status: number): void {
 }
 
 export async function cvScreenerProxyHandler(req: Request, res: Response) {
-  try {
-    // Extract path from request URL
-    const path = req.params.path;
-    if (!path) {
-      return res.status(400).json({ error: 'API path is required' });
-    }
+  // Extract path from request URL
+  const path = req.params.path;
+  if (!path) {
+    return res.status(400).json({ error: 'API path is required' });
+  }
 
+  try {
     // Check if this endpoint is currently rate limited
     if (!checkRateLimit(path)) {
       const rateLimit = rateLimitedEndpoints.get(path);
@@ -135,7 +135,7 @@ export async function cvScreenerProxyHandler(req: Request, res: Response) {
     }
 
     // Options for fetch request
-    const options: any = {
+    const options: RequestInit = {
       method: req.method,
       headers,
       redirect: 'follow',
@@ -160,12 +160,12 @@ export async function cvScreenerProxyHandler(req: Request, res: Response) {
         // Add other form fields
         if (req.body) {
           Object.entries(req.body).forEach(([key, value]) => {
-            formData.append(key, value);
+            formData.append(key, value as string);
           });
         }
         
-        options.body = formData;
-        // FormData sets its own headers, so we'll use those
+        options.body = formData as any;
+        // FormData sets its own headers
         options.headers = { 
           ...options.headers,
           ...formData.getHeaders() 
@@ -181,7 +181,7 @@ export async function cvScreenerProxyHandler(req: Request, res: Response) {
         for (const [key, value] of Object.entries(req.body)) {
           params.append(key, value as string);
         }
-        options.body = params;
+        options.body = params as any;
       }
       // For other content types, pass the raw body
       else if (req.body) {
@@ -189,66 +189,98 @@ export async function cvScreenerProxyHandler(req: Request, res: Response) {
       }
     }
 
-    // Make the proxied request
-    const response = await fetch(targetUrl, options);
-    
-    // Log response status
-    console.log(`[CV Screener Proxy] Response status: ${response.status}`);
-    
-    // Update rate limit tracking based on response status
-    updateRateLimit(path, response.status);
-
-    // Get all headers from response
-    const responseHeaders = response.headers.raw();
-    
-    // Forward only safe headers to avoid security issues
-    const allowedHeaders = [
-      'content-type',
-      'content-length',
-      'content-disposition',
-      'cache-control',
-      'expires',
-      'pragma',
-      'x-powered-by'
-    ];
-    
-    // Set status and headers
-    res.status(response.status);
-    for (const header of allowedHeaders) {
-      if (responseHeaders[header]) {
-        res.setHeader(header, responseHeaders[header][0]);
-      }
+    // Make the proxied request 
+    let fetchResponse: FetchResponse;
+    try {
+      fetchResponse = await fetch(targetUrl, options);
+      // Log response status
+      console.log(`[CV Screener Proxy] Response status: ${fetchResponse.status}`);
+      
+      // Update rate limit tracking based on response status
+      updateRateLimit(path, fetchResponse.status);
+    } catch (fetchError) {
+      console.error(`[CV Screener Proxy] Network error fetching ${targetUrl}:`, fetchError);
+      // Update rate limit for failed requests
+      updateRateLimit(path, 500);
+      throw new Error(`Network error connecting to CV Screener API: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`);
     }
+
+    // Forward status code to client response
+    res.status(fetchResponse.status);
+      
+    // Get content type for body parsing
+    const contentType = fetchResponse.headers.get('content-type') || '';
 
     // Set CORS headers to allow our frontend to access the response
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Accept');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-    // Handle response body based on content type
-    const contentType = response.headers.get('content-type') || '';
-    
-    // If the response is JSON, return it as JSON
-    if (contentType.includes('application/json')) {
-      const data = await response.json();
-      res.json(data);
+    // Forward critical headers
+    const headersToForward = ['content-type', 'content-disposition'];
+    for (const header of headersToForward) {
+      const value = fetchResponse.headers.get(header);
+      if (value) {
+        res.setHeader(header, value);
+      }
     }
-    // If the response is a PDF, return it as a buffer
-    else if (contentType.includes('application/pdf')) {
-      const buffer = await response.buffer();
-      res.send(buffer);
+
+    try {
+      // Process response body based on content type
+      if (contentType.includes('application/json')) {
+        // Parse and send JSON response
+        const jsonData = await fetchResponse.json();
+        return res.json(jsonData);
+      } 
+      else if (contentType.includes('application/pdf')) {
+        // For PDFs, get the array buffer and send as binary
+        const arrayBuffer = await fetchResponse.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        return res.send(buffer);
+      } 
+      else if (contentType.includes('text/')) {
+        // For text responses
+        const text = await fetchResponse.text();
+        return res.send(text);
+      }
+      else {
+        // For other types, get as buffer and send
+        const arrayBuffer = await fetchResponse.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        return res.send(buffer);
+      }
+    } catch (bodyError) {
+      console.error('[CV Screener Proxy] Error processing response body:', bodyError);
+      
+      // If we get here, we've already set the status code to match the upstream response
+      // But we need to send a replacement body since we couldn't process the original
+      return res.json({
+        error: 'Error processing response from CV Screener API',
+        details: bodyError instanceof Error ? bodyError.message : 'Unknown error',
+        status_code: fetchResponse.status,
+        content_type: contentType
+      });
     }
-    // For other types, return the response as text
-    else {
-      const text = await response.text();
-      res.send(text);
-    }
-  } catch (error) {
+  } 
+  catch (error) {
+    // Log detailed error information for debugging
     console.error('[CV Screener Proxy] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`[CV Screener Proxy] Error details for path ${path}:`, errorMessage);
+    
+    // Send a more detailed error response
     res.status(500).json({ 
       error: 'Failed to proxy request to CV Screener API',
-      details: error instanceof Error ? error.message : 'Unknown error' 
+      path,
+      details: errorMessage,
+      retry_suggestion: 'Please try again in a few moments or contact support if the issue persists.'
     });
+    
+    // Still update rate limiting to avoid overwhelming the server
+    try {
+      updateRateLimit(path, 500);
+    } catch (rateLimitError) {
+      console.warn('[CV Screener Proxy] Failed to update rate limit after error:', rateLimitError);
+    }
   }
 }
