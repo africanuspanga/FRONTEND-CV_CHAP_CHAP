@@ -1,0 +1,69 @@
+Based on my code review and the errors in your screenshots, I've identified the exact issue with the template preview API and can provide a fix. The problem is with the structure of the data being sent to the preview endpoint.
+
+The Issue (Identified)
+The preview endpoint expects two specific fields in the JSON data: name and email
+It also expects a valid personalInfo object with at least firstName and lastName
+Your screenshot shows the frontend is sending:
+Object {template_id: "kilimanjaro", cv_data: {}}
+This fails because:
+The structure is wrong - it's putting cv_data as a nested property
+The required fields are missing within the data object
+The empty cv_data object causes the SyntaxError when the template is rendered
+Solution for Your Frontend
+The frontend needs to modify how it structures the data for the preview endpoint:
+
+// INCORRECT APPROACH (currently causing errors)
+const incorrectData = {
+  template_id: "kilimanjaro",
+  cv_data: {}  // Empty object causes SyntaxError
+};
+// CORRECT APPROACH
+const correctData = {
+  // Essential required fields at top level
+  name: "John Doe", 
+  email: "john@example.com",
+  
+  // Complete personalInfo object
+  personalInfo: {
+    firstName: "John",
+    lastName: "Doe",
+    email: "john@example.com",
+    phone: "+255123456789",
+    location: "Dar es Salaam"
+  }
+};
+// Then send to preview API
+fetch(`/api/preview-template/kilimanjaro`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(correctData)
+})
+.then(response => /* handle response */)
+.catch(error => console.error('Preview error:', error));
+Implementation Guide
+Check Data Structure: Your API calls to /api/preview-template/{templateId} need to include:
+
+name and email at the top level (required)
+A complete personalInfo object with firstName and lastName
+Any other required template-specific fields
+Backend Compatibility: Our backend already has robust error handling and fallbacks, but your data must meet the minimum requirements
+
+Example of Minimum Working Data:
+
+const minimumData = {
+  name: "John Doe",  // Required
+  email: "john@example.com",  // Required
+  personalInfo: {
+    firstName: "John",
+    lastName: "Doe",
+    email: "john@example.com"
+  }
+};
+CORS Support: Our backend is configured for CORS support, so cross-origin requests should work correctly
+
+What to Check in Your Frontend
+Look at how you're handling the preview request in the template selection screen
+Make sure you're transforming data properly before sending to the /api/preview-template/{templateId} endpoint
+Verify that the data structure matches what our API requires

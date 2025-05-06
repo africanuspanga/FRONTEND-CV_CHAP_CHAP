@@ -496,10 +496,43 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         
         // Call the preview endpoint instead of download for local flow
-        console.log('Calling backend with:', {
+        // Prepare data according to the backend requirements:
+        // 1. Need name and email at top level (required)
+        // 2. Need proper personalInfo structure
+        // 3. Need template_id at top level
+        
+        // Extract from cvData
+        const firstName = cvData.personalInfo?.firstName || 'User';
+        const lastName = cvData.personalInfo?.lastName || '';
+        const email = cvData.personalInfo?.email || 'user@example.com';
+        const name = cvData.personalInfo?.name || `${firstName} ${lastName}`.trim();
+        
+        // Create properly structured data
+        const properlyFormattedData = {
           template_id: templateId,
-          cv_data: cvData
-        });
+          name: name,  // Required at top level
+          email: email, // Required at top level
+          
+          // Create proper personalInfo - backend needs this
+          personalInfo: {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            ...(cvData.personalInfo || {})  // Include any other fields
+          },
+          
+          // Include all other CV sections
+          workExperiences: cvData.workExperiences || [],
+          education: cvData.education || [],
+          skills: cvData.skills || [],
+          languages: cvData.languages || [],
+          summary: cvData.summary || '',
+          
+          // Optional flag to tell backend we're using fallback flow
+          isFallbackFlow: true
+        };
+        
+        console.log('Calling backend with properly structured data:', properlyFormattedData);
         
         try {
           const result = await fetch('/api/preview-cv-pdf', {
@@ -507,12 +540,7 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-              template_id: templateId,
-              name: cvData.personalInfo?.name || '',
-              email: cvData.personalInfo?.email || '',
-              cv_data: cvData
-            })
+            body: JSON.stringify(properlyFormattedData)
           });
           
           if (!result.ok) {
