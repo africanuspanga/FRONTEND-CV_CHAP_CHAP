@@ -452,9 +452,14 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
     });
     
     // The backend expects this exact structure:
+    // Putting name and email BOTH at the top level and inside cv_data to satisfy all validation
     const requestBody = {
       template_id: templateId.toLowerCase(),
+      // Include these fields at the top level to pass basic validation
+      name: transformedData.name,
+      email: transformedData.email,
       cv_data: {
+        // Include them again inside cv_data for templates that expect them there
         name: transformedData.name,
         email: transformedData.email,
         phone: transformedData.phone,
@@ -1076,9 +1081,14 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
     });
     
     // The backend expects this exact structure:
+    // Putting name and email BOTH at the top level and inside cv_data to satisfy all validation
     const requestBody = {
       template_id: normalizedTemplateId,
+      // Include these fields at the top level to pass basic validation
+      name: transformedData.name,
+      email: transformedData.email,
       cv_data: {
+        // Include them again inside cv_data for templates that expect them there
         name: transformedData.name,
         email: transformedData.email,
         phone: transformedData.phone,
@@ -1309,6 +1319,9 @@ export const testDataExchange = async (templateId: string, cvData: CVData): Prom
         method: 'POST',
         body: {
           template_id: normalizedTemplateId,
+          // Include name and email at top level for basic validation
+          name: transformedData.name,
+          email: transformedData.email,
           cv_data: transformedData
         },
       }
@@ -1348,6 +1361,9 @@ export const downloadPDFAsBase64 = async (templateId: string, cvData: CVData): P
         method: 'POST',
         body: {
           template_id: normalizedTemplateId,
+          // Include name and email at top level for basic validation
+          name: transformedData.name,
+          email: transformedData.email,
           cv_data: transformedData
         },
       }

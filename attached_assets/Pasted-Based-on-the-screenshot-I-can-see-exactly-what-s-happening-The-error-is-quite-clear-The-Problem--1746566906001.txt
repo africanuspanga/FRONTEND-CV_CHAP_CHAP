@@ -1,0 +1,96 @@
+Based on the screenshot, I can see exactly what's happening. The error is quite clear:
+
+The Problem
+The backend is rejecting the request with a 400 Bad Request error because it's missing required fields: name and email. Looking at the data being sent:
+
+{
+  templateId: "jijengeclassic", 
+  personalInfo: {…}, 
+  workExperiences: Array(2), 
+  education: Array(2), 
+  skills: Array(5)
+}
+Several issues are occurring:
+
+The data structure has templateId inside the CV data object, not as a separate field
+The required fields name and email are missing at the top level
+It appears personalInfo exists but may not contain email or the data isn't being accessed properly
+How to Fix It
+Here's my advice for the frontend team:
+
+Solution 1: Use the Recommended API Format (Preferred)
+Change your request format to separate template_id from CV data:
+
+// Change from this:
+{
+  templateId: "jijengeclassic", 
+  personalInfo: {...},
+  // other fields
+}
+// To this:
+{
+  "template_id": "jijengeclassic",
+  "cv_data": {
+    "personalInfo": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john@example.com", // Make sure email exists!
+      // other personal info
+    },
+    // Add these top-level fields for compatibility with all templates
+    "name": "John Doe",
+    "email": "john@example.com",
+    // other cv data
+  }
+}
+Solution 2: Keep Current Format but Add Required Fields
+If you prefer keeping your current format with templateId inside the data:
+
+{
+  "templateId": "jijengeclassic",
+  "personalInfo": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com" // Make sure this exists!
+  },
+  // Add these top-level fields (required by the API validation)
+  "name": "John Doe", 
+  "email": "john@example.com",
+  // other cv data
+}
+Important Implementation Details
+Always include top-level name and email:
+
+The API validation specifically checks for these fields
+You can derive them from personalInfo: name = personalInfo.firstName + " " + personalInfo.lastName
+Ensure personalInfo has an email:
+
+Even when providing a top-level email, the personalInfo.email is used by templates
+The safest approach is to provide redundant data:
+
+Include data in both formats (e.g., both workExperiences and experience)
+Include data at both personalInfo level and top level
+Quick Fix Example
+Based on your screenshot, your data is missing the required fields. Add them like this:
+
+// Before sending your request:
+const finalData = {
+  // Your existing data
+  templateId: "jijengeclassic",
+  personalInfo: {
+    firstName: "John",
+    lastName: "Doe",
+    email: "john@example.com",
+    // Other personalInfo fields
+  },
+  workExperiences: [...],
+  education: [...],
+  skills: [...],
+  
+  // Add these required fields
+  name: personalInfo.firstName + " " + personalInfo.lastName,
+  email: personalInfo.email
+};
+// Then send finalData to the API
+For Maximum Compatibility
+The safest approach is to implement the first solution (separating template_id and cv_data) and ensure all required fields exist at both the top level and within personalInfo. This will work with all templates and pass all validation.
