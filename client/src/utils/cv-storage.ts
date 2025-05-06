@@ -492,29 +492,121 @@ export const loadStep = (): number | null => {
 export const clearFormData = async (): Promise<void> => {
   console.log('Clearing all CV form data...');
   try {
-    // Clear from sessionStorage first
+    // Clear from sessionStorage first (more comprehensive)
     try {
-      sessionStorage.removeItem('cv_form_data');
-      sessionStorage.removeItem('cv_template_id');
-      sessionStorage.removeItem('cv_request_id');
+      // Clear specific keys we know are important
+      const sessionKeys = [
+        'cv_form_data',
+        'cv_template_id', 
+        'cv_request_id',
+        CV_STEP_KEY,
+        'payment_status',
+        'payment_verified_time'
+      ];
+      
+      // First remove specific keys
+      sessionKeys.forEach(key => {
+        try {
+          sessionStorage.removeItem(key);
+          console.log(`Cleared ${key} from sessionStorage`);
+          
+          // Also try to clear any key variants with request IDs
+          for (let i = 0; i < sessionStorage.length; i++) {
+            const sessionKey = sessionStorage.key(i);
+            if (sessionKey && sessionKey.startsWith(`${key}_`)) {
+              sessionStorage.removeItem(sessionKey);
+              console.log(`Cleared variant ${sessionKey} from sessionStorage`);
+              i--; // Adjust index since we're removing items
+            }
+          }
+        } catch (keyError) {
+          console.warn(`Error clearing ${key} from sessionStorage:`, keyError);
+        }
+      });
+      
+      // Then try a comprehensive clear of any cv-related keys
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key && (key.includes('cv') || key.includes('payment') || key.includes('template'))) {
+          try {
+            sessionStorage.removeItem(key);
+            console.log(`Cleared ${key} from sessionStorage`);
+            i--; // Adjust index since we're removing items
+          } catch (removeError) {
+            console.warn(`Error removing ${key} from sessionStorage:`, removeError);
+          }
+        }
+      }
     } catch (sessionStorageError) {
-      console.error('Error clearing sessionStorage:', sessionStorageError);
+      console.error('Error accessing sessionStorage for clearing:', sessionStorageError);
     }
     
-    // Clear from localStorage
-    localStorage.removeItem(CV_DATA_KEY);
-    localStorage.removeItem(CV_STEP_KEY);
-    localStorage.removeItem('using-indexeddb');
-    localStorage.removeItem('using-compression');
-    localStorage.removeItem(CHUNK_COUNT_KEY);
-    
-    // Clear compressed chunks if any
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith(COMPRESSED_PREFIX)) {
-        localStorage.removeItem(key);
-        i--; // Adjust index since we're removing items
+    // Clear specific items from localStorage with robust error handling
+    try {
+      // List known important keys
+      const localKeys = [
+        CV_DATA_KEY,
+        CV_STEP_KEY,
+        'using-indexeddb',
+        'using-compression',
+        CHUNK_COUNT_KEY,
+        'cv_template_id',
+        'cv_request_id',
+        'cv_form_data'
+      ];
+      
+      // Remove specific keys first
+      localKeys.forEach(key => {
+        try {
+          localStorage.removeItem(key);
+          console.log(`Cleared ${key} from localStorage`);
+        } catch (keyError) {
+          console.warn(`Error clearing ${key} from localStorage:`, keyError);
+        }
+      });
+      
+      // Clear compressed chunks with robust error handling
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith(COMPRESSED_PREFIX)) {
+            try {
+              localStorage.removeItem(key);
+              console.log(`Cleared compressed chunk ${key} from localStorage`);
+              i--; // Adjust index since we're removing items
+            } catch (chunkError) {
+              console.warn(`Error clearing compressed chunk ${key}:`, chunkError);
+            }
+          }
+        }
+      } catch (compressedError) {
+        console.error('Error iterating through compressed chunks:', compressedError);
       }
+      
+      // Clear any payment-related data
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (
+            key.includes('payment_') || 
+            key.includes('cv_') || 
+            key.includes('template') ||
+            key.startsWith('payment')
+          )) {
+            try {
+              localStorage.removeItem(key);
+              console.log(`Cleared related key ${key} from localStorage`);
+              i--; // Adjust index since we're removing items
+            } catch (relatedError) {
+              console.warn(`Error clearing related key ${key}:`, relatedError);
+            }
+          }
+        }
+      } catch (iterationError) {
+        console.error('Error iterating through localStorage keys:', iterationError);
+      }
+    } catch (localStorageError) {
+      console.error('Error accessing localStorage for clearing:', localStorageError);
     }
     
     // Attempt to clear from IndexedDB if available
