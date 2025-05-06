@@ -1,0 +1,259 @@
+CV Data Structure Guide for Frontend Developers
+After analyzing all CV templates in our system, I've compiled a detailed specification of the expected data structure to ensure consistent rendering without "undefined" errors.
+
+Top-Level Data Structure
+Your API request to api/initiate-payment should follow this structure:
+
+{
+  "template_id": "template_name",
+  "cv_data": {
+    "personalInfo": {
+      // Personal info fields
+    },
+    // Other sections
+  }
+}
+Required Fields and Sections
+1. Personal Information (Required)
+The personalInfo object is the most critical section used by all templates. Include these fields:
+
+"personalInfo": {
+  "firstName": "John",
+  "lastName": "Doe",
+  "jobTitle": "Software Engineer",
+  "email": "john@example.com",
+  "phone": "+255 123 456 789",
+  "location": "Dar es Salaam, Tanzania",
+  "address": "123 Main St, Dar es Salaam", // Some templates use address instead of location
+  "linkedin": "https://linkedin.com/in/johndoe",
+  "website": "https://johndoe.com",
+  "summary": "Experienced software engineer with 5+ years..."
+}
+Note: Both personalInfo.summary and top-level summary are used by different templates.
+
+2. Work Experience (Highly Recommended)
+Templates expect work experience in one of these formats:
+
+// Option 1: Named workExperience (used by newer templates)
+"workExperience": [
+  {
+    "jobTitle": "Senior Developer",
+    "company": "Tech Company Ltd",
+    "location": "Dar es Salaam",
+    "startDate": "January 2020",
+    "endDate": "Present",
+    "description": "Led development of enterprise applications.\nManaged team of 5 developers.\nImplemented CI/CD pipelines."
+  }
+]
+// Option 2: Named experience (used by older templates)
+"experience": [
+  {
+    "position": "Senior Developer", // Some templates use position instead of jobTitle
+    "company": "Tech Company Ltd",
+    "location": "Dar es Salaam",
+    "startDate": "January 2020",
+    "endDate": "Present",
+    "description": "Led development of enterprise applications.\nManaged team of 5 developers.\nImplemented CI/CD pipelines."
+  }
+]
+// Option 3: Named workExperiences (plural form)
+"workExperiences": [
+  // Same structure as above
+]
+Important Notes for Experience:
+
+Use \n in description to create bullet points (some templates split by newline)
+Some templates support an achievements array instead of or alongside description
+Always include both startDate and endDate (use "Present" for current jobs)
+3. Education (Recommended)
+"education": [
+  {
+    "degree": "Bachelor of Science in Computer Science",
+    "fieldOfStudy": "Computer Science", // Optional, used by some templates
+    "school": "University of Dar es Salaam",
+    "institution": "University of Dar es Salaam", // Some templates use institution instead of school
+    "location": "Dar es Salaam",
+    "startDate": "September 2014",
+    "endDate": "June 2018",
+    "gpa": "3.8/4.0", // Optional
+    "description": "Database Systems\nData Structures\nAlgorithm Design", // Some templates use this for coursework
+    "achievements": ["Dean's List", "Academic Excellence Award"] // Optional
+  }
+]
+4. Skills (Recommended)
+Skills can be provided in three formats, depending on the template:
+
+// Option 1: Simple array of strings (most common)
+"skills": ["JavaScript", "Python", "React", "Node.js"]
+// Option 2: Array of objects with name property
+"skills": [
+  {"name": "JavaScript"},
+  {"name": "Python"},
+  {"name": "React"}
+]
+// Option 3: Object with categories (rare, but supported)
+"skills": {
+  "Programming": ["JavaScript", "Python"],
+  "Frameworks": ["React", "Node.js"]
+}
+5. Languages (Optional)
+// Option 1: Simple array of strings
+"languages": ["English", "Swahili", "French"]
+// Option 2: Array of objects with name and proficiency
+"languages": [
+  {"name": "English", "proficiency": "Native"},
+  {"name": "Swahili", "proficiency": "Fluent"},
+  {"name": "French", "proficiency": "Intermediate"}
+]
+6. Certifications (Optional)
+"certifications": [
+  {
+    "name": "AWS Certified Solutions Architect",
+    "issuer": "Amazon Web Services",
+    "date": "January 2022"
+  }
+]
+7. References (Optional)
+"references": [
+  {
+    "name": "Jane Smith",
+    "position": "Director of Engineering",
+    "company": "Previous Company Ltd",
+    "email": "jane@example.com",
+    "phone": "+255 987 654 321"
+  }
+]
+8. Additional Optional Sections
+These are used by a minority of templates:
+
+"projects": [
+  {
+    "name": "Project Name",
+    "description": "Project description",
+    "technologies": ["Technology 1", "Technology 2"]
+  }
+],
+"hobbies": "Reading, hiking, photography" // String for hobbies section
+Best Practices to Avoid Undefined Errors
+Always include personalInfo: This is the most critical section
+Use both nested and top-level fields: Some templates access {{ name }} while others use {{ personalInfo.firstName }}
+Provide empty arrays instead of omitting sections: Use "skills": [] instead of omitting the skills field
+Format multi-line text with \n: Many templates parse descriptions with newlines
+Include all date fields: Both start and end dates should be provided for all timeline entries
+Match case exactly: Field names are case-sensitive (e.g., firstName not firstname)
+Recommended Minimum Data Structure
+For best results across all templates, always include this minimal structure:
+
+{
+  "template_id": "template_name", 
+  "cv_data": {
+    "personalInfo": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "jobTitle": "Professional Title",
+      "email": "email@example.com",
+      "phone": "Phone Number",
+      "location": "Location",
+      "summary": "Professional summary text"
+    },
+    "summary": "Same professional summary text",
+    "experience": [],
+    "workExperience": [],
+    "education": [],
+    "skills": []
+  }
+}
+Sample Complete CV Data
+Here's a complete example that works with all templates:
+
+{
+  "template_id": "kilimanjaro",
+  "cv_data": {
+    "personalInfo": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "jobTitle": "Senior Software Engineer",
+      "email": "john@example.com",
+      "phone": "+255 123 456 789",
+      "location": "Dar es Salaam, Tanzania",
+      "address": "123 Main St, Dar es Salaam",
+      "linkedin": "https://linkedin.com/in/johndoe",
+      "website": "https://johndoe.com",
+      "summary": "Experienced software engineer with expertise in building scalable web applications."
+    },
+    "summary": "Experienced software engineer with expertise in building scalable web applications.",
+    "workExperience": [
+      {
+        "jobTitle": "Senior Software Engineer",
+        "company": "Tech Innovators Ltd",
+        "location": "Dar es Salaam",
+        "startDate": "January 2020",
+        "endDate": "Present",
+        "description": "Led development of enterprise web applications.\nManaged team of 5 developers.\nImplemented CI/CD pipelines."
+      },
+      {
+        "jobTitle": "Software Developer",
+        "company": "Digital Solutions Co",
+        "location": "Arusha",
+        "startDate": "June 2018",
+        "endDate": "December 2019",
+        "description": "Developed customer-facing web applications.\nOptimized database performance."
+      }
+    ],
+    "experience": [
+      {
+        "position": "Senior Software Engineer",
+        "company": "Tech Innovators Ltd",
+        "location": "Dar es Salaam",
+        "startDate": "January 2020",
+        "endDate": "Present",
+        "description": "Led development of enterprise web applications.\nManaged team of 5 developers.\nImplemented CI/CD pipelines."
+      },
+      {
+        "position": "Software Developer",
+        "company": "Digital Solutions Co",
+        "location": "Arusha",
+        "startDate": "June 2018",
+        "endDate": "December 2019",
+        "description": "Developed customer-facing web applications.\nOptimized database performance."
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor of Science in Computer Science",
+        "fieldOfStudy": "Computer Science",
+        "school": "University of Dar es Salaam",
+        "institution": "University of Dar es Salaam",
+        "location": "Dar es Salaam",
+        "startDate": "September 2014",
+        "endDate": "June 2018",
+        "gpa": "3.8/4.0",
+        "description": "Database Systems\nData Structures\nAlgorithm Design",
+        "achievements": ["Dean's List", "Academic Excellence Award"]
+      }
+    ],
+    "skills": ["JavaScript", "Python", "React", "Node.js", "AWS", "Docker", "MongoDB", "SQL"],
+    "languages": [
+      {"name": "English", "proficiency": "Fluent"},
+      {"name": "Swahili", "proficiency": "Native"}
+    ],
+    "certifications": [
+      {
+        "name": "AWS Certified Solutions Architect",
+        "issuer": "Amazon Web Services",
+        "date": "January 2022"
+      }
+    ],
+    "references": [
+      {
+        "name": "Jane Smith",
+        "position": "Director of Engineering",
+        "company": "Previous Company Ltd",
+        "email": "jane@example.com",
+        "phone": "+255 987 654 321"
+      }
+    ],
+    "hobbies": "Reading, hiking, photography"
+  }
+}
+This comprehensive data structure ensures your CV will render correctly across all templates without "undefined" errors.
