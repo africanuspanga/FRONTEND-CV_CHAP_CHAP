@@ -134,6 +134,15 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsLoading(true);
     setError(null);
     
+    // Store template ID in sessionStorage for better reliability
+    try {
+      sessionStorage.setItem('cv_template_id', templateId);
+      console.log('Template ID stored in sessionStorage:', templateId);
+    } catch (sessionError) {
+      console.warn('Failed to store template ID in sessionStorage:', sessionError);
+      // Non-critical error, continue execution
+    }
+    
     // Log the data being sent to backend
     console.log('Data being sent to backend:');
     console.log('Template ID:', templateId);
@@ -265,16 +274,29 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
       }
       
-      console.log('Using formData.templateId:', formData.templateId);
-      
-      // Store the template ID in sessionStorage for reliable retrieval during download
+      // First check if we have templateId in sessionStorage
+      let templateId = '';
       try {
-        if (formData.templateId) {
-          sessionStorage.setItem('cv_template_id', formData.templateId);
+        const storedTemplateId = sessionStorage.getItem('cv_template_id');
+        if (storedTemplateId) {
+          templateId = storedTemplateId;
+          console.log('Using template ID from sessionStorage:', templateId);
+        } else if (formData.templateId) {
+          templateId = formData.templateId;
+          console.log('Using template ID from formData:', templateId);
+          
+          // Also update sessionStorage for future use
+          sessionStorage.setItem('cv_template_id', templateId);
+        } else {
+          console.warn('No template ID found in any storage');
         }
       } catch (storageError) {
-        console.warn('Failed to store template ID in sessionStorage:', storageError);
-        // Non-critical error, continue execution
+        console.warn('Error accessing template ID from storage:', storageError);
+        // Try form data as fallback
+        if (formData.templateId) {
+          templateId = formData.templateId;
+          console.log('Using template ID from formData as fallback:', templateId);
+        }
       }
 
       // Use the download endpoint which will retrieve template ID from storage
