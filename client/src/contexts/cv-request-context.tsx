@@ -274,29 +274,89 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
       }
       
-      // First check if we have templateId in sessionStorage
+      // Check multiple storage locations for templateId with robust error handling
       let templateId = '';
+      
+      // Helper function to safely get from storage
+      const safeGetItem = (storage: Storage, key: string): string | null => {
+        try {
+          return storage.getItem(key);
+        } catch (error) {
+          console.warn(`Error accessing ${key} from ${storage === sessionStorage ? 'sessionStorage' : 'localStorage'}:`, error);
+          return null;
+        }
+      };
+      
+      // Try sessionStorage first (most reliable for payment flow)
       try {
-        const storedTemplateId = sessionStorage.getItem('cv_template_id');
-        if (storedTemplateId) {
-          templateId = storedTemplateId;
+        const sessionTemplateId = safeGetItem(sessionStorage, 'cv_template_id');
+        if (sessionTemplateId) {
+          templateId = sessionTemplateId;
           console.log('Using template ID from sessionStorage:', templateId);
-        } else if (formData.templateId) {
-          templateId = formData.templateId;
-          console.log('Using template ID from formData:', templateId);
-          
-          // Also update sessionStorage for future use
+        }
+      } catch (sessionError) {
+        console.warn('Failed to access sessionStorage for template ID:', sessionError);
+      }
+      
+      // If not found in sessionStorage, try localStorage
+      if (!templateId) {
+        try {
+          const localTemplateId = safeGetItem(localStorage, 'cv_template_id');
+          if (localTemplateId) {
+            templateId = localTemplateId;
+            console.log('Using template ID from localStorage:', templateId);
+            
+            // Also save to sessionStorage for future reliability
+            try {
+              sessionStorage.setItem('cv_template_id', templateId);
+            } catch (saveError) {
+              console.warn('Failed to save template ID to sessionStorage:', saveError);
+            }
+          }
+        } catch (localError) {
+          console.warn('Failed to access localStorage for template ID:', localError);
+        }
+      }
+      
+      // If still not found, try formData
+      if (!templateId && formData.templateId) {
+        templateId = formData.templateId;
+        console.log('Using template ID from formData:', templateId);
+        
+        // Try to save to both storage types for future reliability
+        try {
           sessionStorage.setItem('cv_template_id', templateId);
-        } else {
-          console.warn('No template ID found in any storage');
+        } catch (sessionError) {
+          console.warn('Failed to save template ID to sessionStorage:', sessionError);
         }
-      } catch (storageError) {
-        console.warn('Error accessing template ID from storage:', storageError);
-        // Try form data as fallback
-        if (formData.templateId) {
-          templateId = formData.templateId;
-          console.log('Using template ID from formData as fallback:', templateId);
+        
+        try {
+          localStorage.setItem('cv_template_id', templateId);
+        } catch (localError) {
+          console.warn('Failed to save template ID to localStorage:', localError);
         }
+      }
+      
+      // If still no template ID, check request-specific storage
+      if (!templateId) {
+        try {
+          const reqData = safeGetItem(sessionStorage, `cv_data_${requestId}`);
+          if (reqData) {
+            const parsedData = JSON.parse(reqData);
+            if (parsedData.templateId) {
+              templateId = parsedData.templateId;
+              console.log('Using template ID from session request data:', templateId);
+            }
+          }
+        } catch (reqDataError) {
+          console.warn('Failed to parse request-specific data from sessionStorage:', reqDataError);
+        }
+      }
+      
+      if (!templateId) {
+        console.warn('No template ID found in any storage, download may fail');
+      } else {
+        console.log('Final template ID being used for download:', templateId);
       }
 
       // Use the download endpoint which will retrieve template ID from storage

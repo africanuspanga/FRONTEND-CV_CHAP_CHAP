@@ -591,38 +591,89 @@ export const downloadGeneratedPDF = async (requestId: string): Promise<Blob> => 
     }
     
     // Fall back to template preview endpoint if direct download fails
-    // Get template ID from current session storage if available
-    const templateId = sessionStorage.getItem('cv_template_id') || localStorage.getItem('cv_template_id');
+    // First check sessionStorage for template ID (more reliable), then localStorage, then IndexedDB
+    let templateId = null;
     
-    // If we have a template ID from session, use the current form data from context
-    if (templateId) {
-      console.log('Using current template ID from session:', templateId);
-      
-      // Get form data from sessionStorage
+    // Helper to safely get from storage
+    const safeGetItem = (storage: Storage, key: string): string | null => {
       try {
-        const sessionData = sessionStorage.getItem('cv_form_data');
+        return storage.getItem(key);
+      } catch (error) {
+        console.warn(`Error accessing ${key} from storage:`, error);
+        return null;
+      }
+    };
+    
+    // First try sessionStorage (most reliable)
+    try {
+      templateId = safeGetItem(sessionStorage, 'cv_template_id');
+      if (templateId) {
+        console.log('Using template ID from sessionStorage:', templateId);
+      }
+    } catch (error) {
+      console.warn('Failed to access sessionStorage:', error);
+    }
+    
+    // Try localStorage if sessionStorage didn't work
+    if (!templateId) {
+      try {
+        templateId = safeGetItem(localStorage, 'cv_template_id');
+        if (templateId) {
+          console.log('Using template ID from localStorage:', templateId);
+          // Also save to sessionStorage for future use
+          try {
+            sessionStorage.setItem('cv_template_id', templateId);
+          } catch (sessionError) {
+            console.warn('Failed to save template ID to sessionStorage:', sessionError);
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to access localStorage:', error);
+      }
+    }
+    
+    // If we have a template ID from storage, use it with the latest form data
+    if (templateId) {
+      try {
+        console.log('Using template ID from storage:', templateId);
+        
+        // Try to get CV data from multiple storage mechanisms in order of priority
         let cvFormData;
         
-        if (sessionData) {
-          cvFormData = JSON.parse(sessionData);
-          console.log('Using CV data from sessionStorage');
-        } else {
-          // Try localStorage as a fallback
-          const localData = localStorage.getItem('cv_form_data');
-          if (localData) {
-            cvFormData = JSON.parse(localData);
-            console.log('Using CV data from localStorage fallback');
-          } else {
-            // If we can't find the data, use a minimal data structure that won't crash the backend
-            console.warn('No CV data found in storage, using minimal data structure');
-            cvFormData = {
-              personalInfo: {
-                firstName: 'User',
-                lastName: 'Example',
-                email: 'user@example.com'
-              }
-            };
+        // First try sessionStorage
+        try {
+          const sessionData = safeGetItem(sessionStorage, 'cv_form_data');
+          if (sessionData) {
+            cvFormData = JSON.parse(sessionData);
+            console.log('Using CV data from sessionStorage');
           }
+        } catch (error) {
+          console.warn('Error processing sessionStorage CV data:', error);
+        }
+        
+        // If not in sessionStorage, try localStorage
+        if (!cvFormData) {
+          try {
+            const localData = safeGetItem(localStorage, 'cv_form_data');
+            if (localData) {
+              cvFormData = JSON.parse(localData);
+              console.log('Using CV data from localStorage');
+            }
+          } catch (error) {
+            console.warn('Error processing localStorage CV data:', error); 
+          }
+        }
+        
+        // If still no data, use a reliable minimal structure
+        if (!cvFormData) {
+          console.warn('No CV data found in any storage, using minimal data structure');
+          cvFormData = {
+            personalInfo: {
+              firstName: 'User',
+              lastName: 'Sample',
+              email: 'user@example.com'
+            }
+          };
         }
         
         // Transform CV data for backend
@@ -672,7 +723,7 @@ export const downloadGeneratedPDF = async (requestId: string): Promise<Blob> => 
       const { templateId: storedTemplateId, cvData } = storedObj;
       
       // Use direct fetch as we did above, to avoid circular references
-      const finalTemplateId = (storedTemplateId || templateId || 'moonlightsonata').toLowerCase();
+      const finalTemplateId = (storedTemplateId || 'moonlightsonata').toLowerCase();
       console.log(`Using stored template for PDF download: ${finalTemplateId}`);
       
       // Transform CV data to backend format
