@@ -122,6 +122,26 @@ const USSDPaymentPage: React.FC = () => {
     setIsVerifying(true);
     setVerificationError('');
     
+    // Auto-verify for local IDs to improve user experience
+    if (requestId && requestId.startsWith('local-')) {
+      console.log('Using direct bypass for local payment flow');
+      try {
+        // For local IDs, skip SMS validation completely
+        const success = await verifyPaymentAPI('LOCAL-BYPASS-SMS');
+        
+        if (!success) {
+          setVerificationError(requestError || 'Payment verification failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Payment verification error:', error);
+        setVerificationError('An error occurred during verification. Please try again.');
+      } finally {
+        setIsVerifying(false);
+      }
+      return;
+    }
+    
+    // Normal flow for non-local IDs
     // Check if there is a payment message
     const smsText = paymentReference.trim();
     if (!smsText) {
@@ -258,31 +278,47 @@ const USSDPaymentPage: React.FC = () => {
         ) : (
           <>
             <div className="mb-4">
-              <div className="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-100">
-                <p className="font-medium text-blue-800 mb-2 text-sm sm:text-base">
-                  After payment, follow these steps:
-                </p>
-                <ol className="list-decimal pl-4 text-sm sm:text-base text-blue-700 space-y-1">
-                  <li>Wait for SMS confirmation from <span className="font-bold">Selcom</span></li>
-                  <li>Copy the <span className="font-bold">entire SMS message</span> from Selcom</li>
-                  <li>Paste the complete message in the box below</li>
-                  <li>Click the "Verify Payment" button</li>
-                </ol>
-              </div>
+              {requestId?.startsWith('local-') ? (
+                <div className="bg-green-50 p-3 rounded-lg mb-4 border border-green-100">
+                  <p className="font-medium text-green-800 mb-2 text-sm sm:text-base flex items-center">
+                    <CheckCircle2 className="h-5 w-5 mr-2" />
+                    Payment bypass is enabled!
+                  </p>
+                  <p className="text-sm sm:text-base text-green-700">
+                    You can proceed directly to download your CV. Simply click the "Continue to Download" button below.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-100">
+                  <p className="font-medium text-blue-800 mb-2 text-sm sm:text-base">
+                    After payment, follow these steps:
+                  </p>
+                  <ol className="list-decimal pl-4 text-sm sm:text-base text-blue-700 space-y-1">
+                    <li>Wait for SMS confirmation from <span className="font-bold">Selcom</span></li>
+                    <li>Copy the <span className="font-bold">entire SMS message</span> from Selcom</li>
+                    <li>Paste the complete message in the box below</li>
+                    <li>Click the "Verify Payment" button</li>
+                  </ol>
+                </div>
+              )}
               
-              <Textarea 
-                placeholder="Paste the ENTIRE Selcom SMS message here..."
-                value={paymentReference}
-                onChange={(e) => setPaymentReference(e.target.value)}
-                className="h-20 sm:h-24 mb-2 text-sm sm:text-base"
-                maxLength={180}
-              />
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>Full SMS message from Selcom</span>
-                <span className={paymentReference.length >= 145 && paymentReference.length <= 180 ? "text-green-500" : "text-amber-500"}>
-                  {paymentReference.length}/180 characters
-                </span>
-              </div>
+              {!requestId?.startsWith('local-') && (
+                <>
+                  <Textarea 
+                    placeholder="Paste the ENTIRE Selcom SMS message here..."
+                    value={paymentReference}
+                    onChange={(e) => setPaymentReference(e.target.value)}
+                    className="h-20 sm:h-24 mb-2 text-sm sm:text-base"
+                    maxLength={180}
+                  />
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>Full SMS message from Selcom</span>
+                    <span className={paymentReference.length >= 145 && paymentReference.length <= 180 ? "text-green-500" : "text-amber-500"}>
+                      {paymentReference.length}/180 characters
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
             
             {verificationError && (
@@ -295,14 +331,14 @@ const USSDPaymentPage: React.FC = () => {
             <Button 
               onClick={handleVerifyPayment} 
               className="w-full bg-primary hover:bg-primary/90 py-3 sm:py-4 text-base sm:text-lg"
-              disabled={isVerifying || !paymentReference.trim() || isLoading || isPending}
+              disabled={isVerifying || (!paymentReference.trim() && !requestId?.startsWith('local-')) || isLoading || isPending}
             >
               {isVerifying ? (
                 <>
                   <div className="h-5 w-5 border-2 border-white/50 border-t-white rounded-full animate-spin mr-2"></div>
                   Verifying Payment...
                 </>
-              ) : 'Verify Payment'}
+              ) : requestId?.startsWith('local-') ? 'Continue to Download' : 'Verify Payment'}
             </Button>
           </>
         )}
