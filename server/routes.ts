@@ -349,52 +349,94 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
-  // Direct proxy to the test PDF endpoint
-  app.get("/api/test-pdf/:templateId", async (req, res) => {
+  // New simplified endpoint for generating and downloading PDFs directly
+  app.post("/api/generate-and-download", async (req, res) => {
     try {
-      const { templateId } = req.params;
+      // Extract data from request body
+      const { template_id, cv_data } = req.body;
       
-      // Use the documented test PDF endpoint directly
-      const apiUrl = `https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/download-test-pdf/${templateId}`;
-      console.log(`Direct proxy to test PDF URL: ${apiUrl}`);
+      if (!template_id) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required parameter: template_id'
+        });
+      }
+      
+      // Validate cv_data exists
+      if (!cv_data) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required parameter: cv_data object'
+        });
+      }
+      
+      // Make sure cv_data has the minimum required fields
+      if (!cv_data.name || !cv_data.email || !cv_data.personalInfo) {
+        return res.status(400).json({
+          success: false,
+          error: 'cv_data must include name, email, and personalInfo'
+        });
+      }
+      
+      console.log(`Generating PDF for template: ${template_id}`);
+      
+      // Use the new simplified API endpoint
+      const apiUrl = `https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/generate-and-download`;
       
       // Make the request to the PDF API
       const response = await fetch(apiUrl, {
-        method: 'GET',
+        method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'Accept': 'application/pdf',
           'User-Agent': 'CV-Chap-Chap-App'
-        }
+        },
+        body: JSON.stringify({
+          template_id,
+          cv_data
+        })
       });
       
       // Check if the response was successful
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Test PDF API error (${response.status}): ${errorText}`);
+        let errorText = '';
+        try {
+          // Try to parse as JSON first
+          const errorJson = await response.json();
+          errorText = errorJson.error || response.statusText;
+        } catch {
+          // If not JSON, get as text
+          errorText = await response.text();
+        }
+        
+        console.error(`PDF generation API error (${response.status}): ${errorText}`);
         return res.status(response.status).json({
           success: false,
-          error: `Test PDF API error: ${response.statusText}`
+          error: `PDF generation failed: ${errorText}`
         });
       }
       
-      // Forward the response directly to the client
+      // Get content type from response
       const contentType = response.headers.get('content-type');
       if (contentType) {
         res.setHeader('Content-Type', contentType);
+      } else {
+        res.setHeader('Content-Type', 'application/pdf');
       }
       
-      // Content-Disposition header for download
-      res.setHeader('Content-Disposition', `attachment; filename="cv_${templateId}.pdf"`);
+      // Add download headers
+      const filename = `cv_${template_id}_${Date.now()}.pdf`;
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       
       // Get the response as an array buffer and send it
       const data = await response.arrayBuffer();
       res.status(200).send(Buffer.from(data));
       
     } catch (error: any) {
-      console.error('Error fetching test PDF:', error);
+      console.error('Error generating PDF:', error);
       res.status(500).json({
         success: false,
-        error: error.message || 'Internal server error'
+        error: error.message || 'Internal server error during PDF generation'
       });
     }
   });
