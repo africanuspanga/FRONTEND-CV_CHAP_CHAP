@@ -196,6 +196,62 @@ export function registerRoutes(app: Express): Server {
     res.status(200).send();
   });
 
+  // Create a dedicated route to forward requests to the CV Screener API
+  app.use('/cv-screener-proxy/:path', async (req, res) => {
+    try {
+      const basePath = req.params.path || '';
+      
+      // Set up URL and query parameters
+      const apiUrl = `https://cv-screener-africanuspanga.replit.app/${basePath}`;
+      let fullUrl = apiUrl;
+      
+      // Add query parameters if any
+      if (Object.keys(req.query).length > 0) {
+        const queryString = new URLSearchParams(req.query as Record<string, string>).toString();
+        fullUrl = `${apiUrl}?${queryString}`;
+      }
+      
+      console.log(`[CV Screener Proxy] Forwarding request to: ${fullUrl}`);
+      console.log(`[CV Screener Proxy] Method: ${req.method}`);
+      
+      // Create appropriate fetch options
+      const fetchOptions: any = {
+        method: req.method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': req.headers.accept || '*/*',
+          'User-Agent': 'CV-Chap-Chap-App'
+        }
+      };
+      
+      // Add body for non-GET requests
+      if (req.method !== 'GET' && req.body) {
+        fetchOptions.body = JSON.stringify(req.body);
+        console.log(`[CV Screener Proxy] Request body:`, JSON.stringify(req.body).substring(0, 200) + '...');
+      }
+      
+      // Make the request to the CV Screener API
+      const response = await fetch(fullUrl, fetchOptions);
+      
+      // Set headers from the response
+      const contentType = response.headers.get('content-type');
+      if (contentType) {
+        res.setHeader('Content-Type', contentType);
+      }
+      
+      // Send the response data
+      const data = await response.arrayBuffer();
+      res.status(response.status).send(Buffer.from(data));
+      
+    } catch (error: any) {
+      console.error('[CV Screener Proxy] Error:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error while proxying to CV Screener API'
+      });
+    }
+  });
+  
   // API route for previewing CV PDF - proxies to CV Screener API
   app.post("/api/preview-cv-pdf", async (req, res) => {
     try {
@@ -209,17 +265,40 @@ export function registerRoutes(app: Express): Server {
         });
       }
       
-      // Forward the request to the CV Screener service via our proxy
+      // Forward the request to the CV Screener service directly
       // This avoids CORS issues and uses the proper authentication
       console.log(`Forwarding preview request for template: ${template_id}`);
       
-      // Set up the proxy request parameters
-      req.params.path = `preview-template/${template_id}`;
+      const apiUrl = `https://cv-screener-africanuspanga.replit.app/preview-template/${template_id}`;
       
-      // Forward the request to the CV Screener proxy
-      await cvScreenerProxyHandler(req, res);
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'CV-Chap-Chap-App'
+        },
+        body: JSON.stringify({ cv_data })
+      });
       
-      // The proxy handles the response, so we don't need to do anything else here
+      // Check if the response was successful
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`CV Screener API error (${response.status}): ${errorText}`);
+        return res.status(response.status).json({
+          success: false,
+          error: `CV Screener API error: ${response.statusText}`
+        });
+      }
+      
+      // Forward the response to the client
+      const contentType = response.headers.get('content-type');
+      if (contentType) {
+        res.setHeader('Content-Type', contentType);
+      }
+      
+      const data = await response.arrayBuffer();
+      res.status(response.status).send(Buffer.from(data));
+      
     } catch (error: any) {
       console.error('Error forwarding PDF preview request:', error);
       res.status(500).json({

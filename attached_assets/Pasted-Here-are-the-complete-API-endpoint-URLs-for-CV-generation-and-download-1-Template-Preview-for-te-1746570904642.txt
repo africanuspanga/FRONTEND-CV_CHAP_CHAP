@@ -1,0 +1,65 @@
+Here are the complete API endpoint URLs for CV generation and download:
+
+1. Template Preview (for testing a template)
+Endpoint: /api/preview-template/{template_id}
+Method: POST
+Example URL: https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/preview-template/kilimanjaro
+
+Request Body Example:
+
+{
+  "template_id": "kilimanjaro",
+  "cv_data": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "personalInfo": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john@example.com",
+      "phone": "+255123456789"
+    }
+  }
+}
+2. Initiate Payment (to create CV request)
+Endpoint: /api/initiate-payment
+Method: POST
+Example URL: https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/initiate-payment
+
+Request Body Example:
+
+{
+  "template_id": "kilimanjaro",
+  "cv_data": {
+    "name": "John Doe",
+    "email": "john@example.com", 
+    "personalInfo": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john@example.com",
+      "phone": "+255123456789"
+    }
+  }
+}
+3. Verify Payment (after payment made)
+Endpoint: /api/verify-payment/{request_id}
+Method: POST
+Example URL: https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/verify-payment/12345678-1234-1234-1234-123456789012
+
+Request Body Example:
+
+{
+  "payment_reference": "CV-ABC123"
+}
+4. Generate and Download PDF
+Endpoint: /api/generate-pdf/{request_id}
+Method: GET
+Example URL: https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/generate-pdf/12345678-1234-1234-1234-123456789012
+
+This endpoint returns the actual PDF file with appropriate headers for download or display.
+
+5. Test PDF Download (for frontend testing)
+Endpoint: /api/download-test-pdf/{template_id}
+Method: GET
+Example URL: https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/download-test-pdf/kilimanjaro
+
+This endpoint provides a test PDF for frontend testing without requiring payment verification.
