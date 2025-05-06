@@ -96,18 +96,39 @@ export interface BackendCVData {
 }
 
 export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
+  console.log('Transforming CV data for backend:', cvData);
+  
   // Make sure personalInfo exists, create an empty object if it doesn't
   const personalInfo = cvData.personalInfo || {};
+  
+  // Log personalInfo to diagnose missing fields
+  console.log('Personal info for transformation:', personalInfo);
+  
+  // Extract or construct a name
+  let name = '';
+  
+  if (personalInfo.firstName && personalInfo.lastName) {
+    name = `${personalInfo.firstName} ${personalInfo.lastName}`;
+  } else if ((personalInfo as any).fullName) {
+    name = (personalInfo as any).fullName;
+  } else if (personalInfo.firstName) {
+    name = personalInfo.firstName;
+  } else if (personalInfo.lastName) {
+    name = personalInfo.lastName;
+  }
+  
+  console.log('Extracted name:', name);
+  
+  // Get email from personal info
+  const email = personalInfo.email || '';
+  console.log('Extracted email:', email);
   
   // Create a transformed object with the required fields at the root level
   const transformed: BackendCVData = {
     // Required root level fields according to the API docs
     // These are the fields the backend is specifically checking for
-    name: personalInfo.firstName && personalInfo.lastName 
-      ? `${personalInfo.firstName} ${personalInfo.lastName}`
-      : (personalInfo as any).fullName || 'CV User', // Fallback if name components missing
-    
-    email: personalInfo.email || 'user@example.com', // Default to ensure we pass validation
+    name: name,
+    email: email,
     
     // Optional but recommended fields
     phone: personalInfo.phone || '',

@@ -193,9 +193,32 @@ export async function cvScreenerProxyHandler(req: Request, res: Response) {
     // Make the proxied request 
     let fetchResponse: FetchResponse;
     try {
+      // Log exactly what we're sending to the backend
+      console.log(`[CV Screener Proxy] Sending to ${targetUrl}:`);
+      console.log(`[CV Screener Proxy] Request method: ${options.method}`);
+      console.log(`[CV Screener Proxy] Request headers:`, options.headers);
+      
+      if (options.body && typeof options.body === 'string' && options.body.includes('cv_data')) {
+        console.log(`[CV Screener Proxy] Request body: ${options.body.substring(0, 500)}...`);
+        
+        // Try to parse it to see if it's valid JSON
+        try {
+          const parsedBody = JSON.parse(options.body);
+          console.log('[CV Screener Proxy] Body has cv_data field:', 'cv_data' in parsedBody);
+          console.log('[CV Screener Proxy] Body has name:', parsedBody.cv_data?.name);
+          console.log('[CV Screener Proxy] Body has email:', parsedBody.cv_data?.email);
+        } catch (e) {
+          console.log('[CV Screener Proxy] Failed to parse body as JSON:', e);
+        }
+      }
+      
       fetchResponse = await fetch(targetUrl, options);
-      // Log response status
+      
+      // Log response status and headers
       console.log(`[CV Screener Proxy] Response status: ${fetchResponse.status}`);
+      // Log a few important headers
+      console.log(`[CV Screener Proxy] Response content-type:`, fetchResponse.headers.get('content-type'));
+      console.log(`[CV Screener Proxy] Response content-length:`, fetchResponse.headers.get('content-length'));
       
       // Update rate limit tracking based on response status
       updateRateLimit(path, fetchResponse.status);
@@ -231,6 +254,13 @@ export async function cvScreenerProxyHandler(req: Request, res: Response) {
       if (contentType.includes('application/json')) {
         // Parse and send JSON response
         const jsonData = await fetchResponse.json();
+        console.log('[CV Screener Proxy] JSON response:', jsonData);
+        
+        // If it's an error with status code 400, log more details
+        if (fetchResponse.status === 400) {
+          console.log('[CV Screener Proxy] 400 Error response details:', jsonData);
+        }
+        
         return res.json(jsonData);
       } 
       else if (contentType.includes('application/pdf')) {
