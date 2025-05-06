@@ -4,7 +4,6 @@ import {
   verifyUSSDPayment,
   checkPaymentStatus,
   downloadGeneratedPDF,
-  downloadCVWithPreviewEndpoint,
   CVRequestStatus
 } from '../services/cv-api-service';
 import { CVData } from '@shared/schema';
@@ -268,17 +267,19 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       
       console.log('Using formData.templateId:', formData.templateId);
       
-      // Use the preview template endpoint if payment is completed and we have the template ID
-      if (formData.templateId) {
-        // Use the preview endpoint for more reliable PDF generation
-        const pdfBlob = await downloadCVWithPreviewEndpoint(formData.templateId, formData);
-        return pdfBlob;
-      } else {
-        // Fallback to the original endpoint if we somehow lost the template ID
-        console.warn('Template ID not found, falling back to downloadGeneratedPDF');
-        const pdfBlob = await downloadGeneratedPDF(requestId);
-        return pdfBlob;
+      // Store the template ID in sessionStorage for reliable retrieval during download
+      try {
+        if (formData.templateId) {
+          sessionStorage.setItem('cv_template_id', formData.templateId);
+        }
+      } catch (storageError) {
+        console.warn('Failed to store template ID in sessionStorage:', storageError);
+        // Non-critical error, continue execution
       }
+
+      // Use the download endpoint which will retrieve template ID from storage
+      const pdfBlob = await downloadGeneratedPDF(requestId);
+      return pdfBlob;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to download PDF';
       setError(errorMessage);
