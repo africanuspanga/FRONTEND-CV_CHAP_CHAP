@@ -130,19 +130,25 @@ export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
       current?: boolean;
       description?: string;
       achievements?: Array<string | { text: string }>;
-    }) => ({
-      position: job.jobTitle || job.position || '',  // Map to correct field name
-      company: job.company || '',
-      location: job.location || '',
-      startDate: job.startDate || '',
-      endDate: job.current ? 'Present' : (job.endDate || ''),
-      description: job.description || '',
-      // Format achievements as array of strings
-      achievements: Array.isArray(job.achievements) 
-        ? job.achievements.map((a: string | { text: string }) => 
-            typeof a === 'object' && a.text ? a.text : a) as string[]
-        : []
-    })),
+    }) => {
+      // Process achievements array first to ensure correct type
+      let achievements: string[] = [];
+      if (Array.isArray(job.achievements)) {
+        achievements = job.achievements.map(a => {
+          return typeof a === 'object' && a.text ? a.text : String(a);
+        });
+      }
+      
+      return {
+        position: job.jobTitle || job.position || '',  // Map to correct field name
+        company: job.company || '',
+        location: job.location || '',
+        startDate: job.startDate || '',
+        endDate: job.current ? 'Present' : (job.endDate || ''),
+        description: job.description || '',
+        achievements // Use the pre-processed achievements array
+      };
+    }),
     
     // Education section - use 'school' instead of 'institution' as per API docs
     education: (cvData.education || []).map((edu: {
@@ -155,18 +161,25 @@ export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
       current?: boolean;
       description?: string;
       achievements?: Array<string | { text: string }>;
-    }) => ({
-      degree: edu.degree || '',
-      school: edu.institution || edu.school || '', // Map to correct field name
-      location: edu.location || '',
-      startDate: edu.startDate || '',
-      endDate: edu.current ? 'Present' : (edu.endDate || ''),
-      description: edu.description || '',
-      // Format achievements as array of strings
-      achievements: Array.isArray(edu.achievements)
-        ? edu.achievements.map((a: string | { text: string }) => typeof a === 'object' && a.text ? a.text : a) 
-        : []
-    })),
+    }) => {
+      // Process achievements array first to ensure correct type
+      let achievements: string[] = [];
+      if (Array.isArray(edu.achievements)) {
+        achievements = edu.achievements.map(a => {
+          return typeof a === 'object' && a.text ? a.text : String(a);
+        });
+      }
+      
+      return {
+        degree: edu.degree || '',
+        school: edu.institution || edu.school || '', // Map to correct field name
+        location: edu.location || '',
+        startDate: edu.startDate || '',
+        endDate: edu.current ? 'Present' : (edu.endDate || ''),
+        description: edu.description || '',
+        achievements // Use the pre-processed achievements array
+      };
+    }),
     
     // Skills section
     skills: cvData.skills || [],
