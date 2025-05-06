@@ -51,18 +51,46 @@ export const generatePDF = async (cvData: CVData, templateId: string): Promise<v
     updateElement('full-name', `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim());
     updateElement('email', personalInfo.email || '');
     updateElement('phone', personalInfo.phone || '');
-    updateElement('location', personalInfo.location || '');
-    updateElement('website', personalInfo.website || '');
-    updateElement('linkedin', personalInfo.linkedin || '');
-    updateElement('job-title', personalInfo.jobTitle || '');
-    updateElement('summary', cvData.summary || '');
     
-    // Work Experience
+    // Handle optional address fields safely - location comes from address fields
+    const location = [
+      personalInfo.address, 
+      personalInfo.city, 
+      personalInfo.region, 
+      personalInfo.country
+    ].filter(Boolean).join(', ');
+    updateElement('location', location || '');
+    
+    // Handle website entries if they exist
+    if (cvData.websites && cvData.websites.length > 0) {
+      // Find personal website if it exists
+      const personalWebsite = cvData.websites.find(site => site.type === 'personal');
+      updateElement('website', personalWebsite?.url || '');
+      
+      // Find LinkedIn if it exists
+      const linkedin = cvData.websites.find(site => 
+        site.type === 'linkedin' || 
+        (site.url && site.url.includes('linkedin.com'))
+      );
+      updateElement('linkedin', linkedin?.url || '');
+    } else {
+      updateElement('website', '');
+      updateElement('linkedin', '');
+    }
+    
+    // Use professionalTitle from personalInfo for job-title
+    updateElement('job-title', personalInfo.professionalTitle || '');
+    
+    // Use either standalone summary or from personalInfo
+    updateElement('summary', cvData.summary || personalInfo.summary || '');
+    
+    // Work Experience - support both field names for backward compatibility
+    const workExperienceData = cvData.workExperiences || cvData.workExperience || [];
     const experienceContainer = doc.getElementById('experience-container');
-    if (experienceContainer && cvData.workExperience?.length) {
+    if (experienceContainer && workExperienceData.length) {
       experienceContainer.innerHTML = '';
       
-      cvData.workExperience.forEach(exp => {
+      workExperienceData.forEach(exp => {
         const expElement = doc.createElement('div');
         expElement.className = 'experience-item';
         
