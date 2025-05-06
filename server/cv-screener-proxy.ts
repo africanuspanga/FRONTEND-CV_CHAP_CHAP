@@ -173,6 +173,7 @@ export async function cvScreenerProxyHandler(req: Request, res: Response) {
       } 
       // Handle regular JSON requests
       else if (req.headers['content-type']?.includes('application/json')) {
+        console.log('[CV Screener Proxy] JSON Request Body:', JSON.stringify(req.body, null, 2));
         options.body = JSON.stringify(req.body);
       }
       // Handle URL encoded forms

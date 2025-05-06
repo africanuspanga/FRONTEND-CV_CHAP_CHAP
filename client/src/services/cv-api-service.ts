@@ -105,7 +105,7 @@ export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
     // These are the fields the backend is specifically checking for
     name: personalInfo.firstName && personalInfo.lastName 
       ? `${personalInfo.firstName} ${personalInfo.lastName}`
-      : personalInfo.fullName || 'CV User', // Fallback if name components missing
+      : (personalInfo as any).fullName || 'CV User', // Fallback if name components missing
     
     email: personalInfo.email || 'user@example.com', // Default to ensure we pass validation
     
@@ -397,6 +397,20 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
     // Make the API call to initiate payment
     console.log('Sending payment initiation request with transformed data');
     
+    // Verify the transformed data has the required fields
+    console.log('Required fields check:', { 
+      name: transformedData.name, 
+      email: transformedData.email 
+    });
+    
+    // Create the request body in exactly the format expected by the backend
+    const requestBody = {
+      // Don't include template_id in the URL AND the body, it confuses the backend
+      cv_data: transformedData
+    };
+    
+    console.log('Using request body:', JSON.stringify(requestBody, null, 2));
+    
     // First, get the preview JSON response to get the file_id which we'll use as our request_id
     try {
       const response = await fetchFromCVScreener<any>(
@@ -407,10 +421,7 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
             'Content-Type': 'application/json',
             'X-Prefer-JSON-Response': '1'
           },
-          body: {
-            template_id: templateId.toLowerCase(),
-            cv_data: transformedData
-          },
+          body: requestBody,
         }
       );
       
@@ -895,7 +906,7 @@ export const downloadGeneratedPDF = async (requestId: string): Promise<Blob> => 
               'Accept': 'application/pdf'
             },
             responseType: 'blob',
-            body: transformedData,
+            body: { cv_data: transformedData },
             includeCredentials: true
           }
         );
@@ -941,7 +952,7 @@ export const downloadGeneratedPDF = async (requestId: string): Promise<Blob> => 
             'Accept': 'application/pdf'
           },
           responseType: 'blob',
-          body: transformedData,
+          body: { cv_data: transformedData },
           includeCredentials: true
         }
       );
