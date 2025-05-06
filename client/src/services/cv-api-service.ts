@@ -39,9 +39,65 @@ export const API_BASE_URL = BACKEND_API_URL;
  *   references: [{ name, position, company, email, phone }]
  * }
  */
-export const transformCVDataForBackend = (cvData: CVData): Record<string, any> => {
+// Define a type for the backend format data
+export interface BackendCVData {
+  name: string;
+  email: string;
+  phone?: string;
+  title?: string;
+  location?: string;
+  summary?: string;
+  experience?: Array<{
+    position: string;
+    company: string;
+    location?: string;
+    startDate: string;
+    endDate?: string;
+    description?: string;
+    achievements?: string[];
+  }>;
+  education?: Array<{
+    degree: string;
+    school: string;
+    location?: string;
+    startDate: string;
+    endDate?: string;
+    description?: string;
+    achievements?: string[];
+  }>;
+  skills?: Array<string | { name: string; level?: number }>;
+  languages?: string[];
+  certifications?: Array<{
+    name: string;
+    issuer?: string;
+    date?: string;
+    description?: string;
+  }>;
+  hobbies?: string;
+  references?: Array<{
+    name: string;
+    position?: string;
+    company?: string;
+    email?: string;
+    phone?: string;
+  }>;
+  projects?: Array<{
+    name: string;
+    description?: string;
+    startDate?: string;
+    endDate?: string;
+    url?: string;
+  }>;
+  linkedin?: string;
+  website?: string;
+  socialLinks?: Array<{ name: string; url: string }>;
+  accomplishments?: Array<{ title: string; description: string }>;
+  [key: string]: any; // For any additional properties
+}
+
+export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
   // Create a new object with the transformed data
-  const transformed: Record<string, any> = {
+  const transformed: BackendCVData = {
     // Required root level fields according to the API docs
     name: cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName,
     email: cvData.personalInfo.email,
@@ -60,8 +116,8 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
       cvData.personalInfo.country
     ].filter(Boolean).join(', '),
     
-    // Professional summary
-    summary: cvData.personalInfo.professionalSummary || cvData.personalInfo.summary || '',
+    // Professional summary - use summary field directly
+    summary: cvData.personalInfo.summary || '',
     
     // Work experience section - match exact field names expected by backend
     experience: (cvData.workExperiences || []).map((job: {
@@ -84,7 +140,7 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
       // Format achievements as array of strings
       achievements: Array.isArray(job.achievements) 
         ? job.achievements.map((a: string | { text: string }) => 
-            typeof a === 'object' && a.text ? a.text : a)
+            typeof a === 'object' && a.text ? a.text : a) as string[]
         : []
     })),
     
@@ -196,13 +252,41 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
     })
   };
   
-  // Add optional fields that may enhance the CV
-  if (cvData.personalInfo.linkedin) {
-    transformed.linkedin = cvData.personalInfo.linkedin;
+  // Add optional fields that may enhance the CV using a type-safe approach
+  // First, check if there are any websites in the CV data
+  if (cvData.websites && cvData.websites.length > 0) {
+    // Look for LinkedIn or other professional websites
+    const linkedinSite = cvData.websites.find(site => 
+      typeof site === 'object' && site.name && 
+      site.name.toLowerCase().includes('linkedin'));
+      
+    if (linkedinSite && typeof linkedinSite === 'object' && linkedinSite.url) {
+      transformed.linkedin = linkedinSite.url;
+    }
+    
+    // Look for personal website
+    const personalSite = cvData.websites.find(site => 
+      typeof site === 'object' && site.name && 
+      (site.name.toLowerCase().includes('website') || 
+       site.name.toLowerCase().includes('personal') || 
+       site.name.toLowerCase().includes('portfolio')));
+       
+    if (personalSite && typeof personalSite === 'object' && personalSite.url) {
+      transformed.website = personalSite.url;
+    } else if (cvData.websites.length > 0 && typeof cvData.websites[0] === 'object' && cvData.websites[0].url) {
+      // Use the first website as a fallback
+      transformed.website = cvData.websites[0].url;
+    }
   }
   
-  if (cvData.personalInfo.website) {
-    transformed.website = cvData.personalInfo.website;
+  // Add additional social media or contact links if available
+  if (cvData.websites && cvData.websites.length > 0) {
+    transformed.socialLinks = cvData.websites
+      .filter(site => typeof site === 'object' && site.url)
+      .map(site => ({
+        name: typeof site === 'object' ? (site.name || '') : '',
+        url: typeof site === 'object' ? (site.url || '') : ''
+      }));
   }
   
   // Ensure we're including accomplishments if they exist
@@ -211,8 +295,9 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
   }
   
   // Add any additional fields that might be in the CV but not explicitly mapped
-  Object.entries(cvData).forEach(([key, value]) => {
-    if (![
+  // Using type assertion to handle dynamically added properties
+  const additionalFields = Object.entries(cvData).filter(([key, value]) => {
+    return ![
       'personalInfo', 
       'workExperiences', 
       'education', 
@@ -222,10 +307,21 @@ export const transformCVDataForBackend = (cvData: CVData): Record<string, any> =
       'certifications',
       'projects',
       'hobbies',
-      'accomplishments'
-    ].includes(key) && value) {
-      transformed[key] = value;
-    }
+      'accomplishments',
+      'websites',
+      'templateId'
+    ].includes(key) && value;
+  });
+  
+  // Log any additional fields we're preserving
+  if (additionalFields.length > 0) {
+    console.log(`Preserving ${additionalFields.length} additional fields:`, 
+      additionalFields.map(([key]) => key).join(', '));
+  }
+  
+  // Add them to the transformed data using the index signature
+  additionalFields.forEach(([key, value]) => {
+    (transformed as any)[key] = value;
   });
   
   return transformed;

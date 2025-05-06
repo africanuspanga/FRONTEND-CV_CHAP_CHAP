@@ -25,13 +25,14 @@ interface CVRequestContextType {
 
 const CVRequestContext = createContext<CVRequestContextType | undefined>(undefined);
 
-export const useCVRequest = () => {
+// Define as a named function instead of anonymous arrow function for better Fast Refresh compatibility
+export function useCVRequest() {
   const context = useContext(CVRequestContext);
   if (context === undefined) {
     throw new Error('useCVRequest must be used within a CVRequestProvider');
   }
   return context;
-};
+}
 
 export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { formData } = useCVForm();
