@@ -79,7 +79,16 @@ export async function fetchFromCVScreener<T>(
       return await response.json() as T;
     }
   } catch (error) {
-    console.error('Error making request to CV Screener API through proxy:', error);
-    throw error;
+    console.error('Error making request to CV Screener API through proxy:', error instanceof Error ? error.message : 'Unknown error');
+    
+    // Ensure proper error object is returned
+    if (error instanceof Error) {
+      throw error; // Re-throw if it's already an Error object
+    } else if (typeof error === 'string') {
+      throw new Error(error); // Convert string to Error
+    } else {
+      // If it's some other type, create a generic error
+      throw new Error('Failed to connect to CV Screener API');
+    }
   }
 }
