@@ -367,6 +367,7 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
   ussd_code?: string;
   reference_number?: string;
   error?: string;
+  user_message?: string; // User-friendly message
 }> => {
   try {
     console.log(`Initiating USSD payment for template: ${templateId}`);
@@ -459,10 +460,12 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
         }
       }
       
+      // Create structured error response that matches our API response type
       return {
         success: false,
-        error: errorMessage,
-        details: errorDetails,
+        error: errorMessage + ': ' + JSON.stringify(errorDetails),
+        // Include error reference for support team
+        reference_number: `ERR-${Date.now().toString().slice(-6)}`,
         // Include a more user-friendly message based on common errors
         user_message: errorMessage.includes('file_id') 
           ? 'Unable to generate your CV. Please try again with a different template or contact support.'
@@ -473,7 +476,8 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
     console.error('Error initiating USSD payment:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error during payment initiation'
+      error: error instanceof Error ? error.message : 'Unknown error during payment initiation',
+      user_message: 'Unable to start payment process. Please try again or contact support.'
     };
   }
 };
@@ -1025,7 +1029,10 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
             'Accept': 'application/pdf'
           },
           responseType: 'blob',
-          body: transformedData,
+          body: {
+            template_id: normalizedTemplateId,
+            cv_data: transformedData
+          },
           includeCredentials: true
         }
       );
@@ -1198,7 +1205,10 @@ export const testDataExchange = async (templateId: string, cvData: CVData): Prom
       `/api/test-data-exchange/${normalizedTemplateId}`,
       {
         method: 'POST',
-        body: transformedData,
+        body: {
+          template_id: normalizedTemplateId,
+          cv_data: transformedData
+        },
       }
     );
     
@@ -1234,7 +1244,10 @@ export const downloadPDFAsBase64 = async (templateId: string, cvData: CVData): P
       `/api/download-pdf-base64/${normalizedTemplateId}`,
       {
         method: 'POST',
-        body: transformedData,
+        body: {
+          template_id: normalizedTemplateId,
+          cv_data: transformedData
+        },
       }
     );
     
