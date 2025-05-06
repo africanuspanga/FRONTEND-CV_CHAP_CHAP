@@ -399,7 +399,10 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
             'Content-Type': 'application/json',
             'X-Prefer-JSON-Response': '1'
           },
-          body: transformedData,
+          body: {
+            template_id: templateId.toLowerCase(),
+            cv_data: transformedData
+          },
         }
       );
       
@@ -996,7 +999,10 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
               'Content-Type': 'application/json',
               'X-Prefer-JSON-Response': '1'
             },
-            body: transformedData
+            body: {
+              template_id: normalizedTemplateId,
+              cv_data: transformedData
+            }
           }
         );
         
