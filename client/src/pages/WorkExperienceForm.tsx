@@ -68,6 +68,9 @@ const WorkExperienceForm = () => {
     // Check if we should display a preview
     const shouldShowPreview = jobTitle && employer && editingJobIndex === null && showJobForm;
     
+    // Create a reference to current workExperiences to avoid dependency loop
+    const currentWorkExperiences = formData.workExperiences || [];
+    
     // To prevent infinite loops, only update when the preview status changes
     if (shouldShowPreview !== hasPreview) {
       if (shouldShowPreview) {
@@ -76,7 +79,7 @@ const WorkExperienceForm = () => {
         const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
         
         // Filter out any existing preview
-        const filteredExperiences = (formData.workExperiences || []).filter(job => job.id !== 'preview-job');
+        const filteredExperiences = currentWorkExperiences.filter(job => job.id !== 'preview-job');
         
         // Add the new preview
         updateFormField('workExperiences', [
@@ -93,13 +96,14 @@ const WorkExperienceForm = () => {
           },
           ...filteredExperiences
         ]);
-      } else {
+      } else if (hasPreview) { // Only remove if a preview actually exists
         // Remove any preview items
-        const filteredExperiences = (formData.workExperiences || []).filter(job => job.id !== 'preview-job');
+        const filteredExperiences = currentWorkExperiences.filter(job => job.id !== 'preview-job');
         updateFormField('workExperiences', filteredExperiences);
       }
     }
-  }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob, aiRecommendations, showJobForm, editingJobIndex, formData.workExperiences, updateFormField]);
+  // Important: Remove formData.workExperiences from dependencies to prevent infinite loop
+  }, [jobTitle, employer, location, isRemote, startMonth, startYear, endMonth, endYear, currentJob, aiRecommendations, showJobForm, editingJobIndex, updateFormField]);
   
   // Add a new work experience to the form data
   const addWorkExperience = (achievements: string[] = []) => {

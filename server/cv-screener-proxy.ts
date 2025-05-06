@@ -198,15 +198,46 @@ export async function cvScreenerProxyHandler(req: Request, res: Response) {
       console.log(`[CV Screener Proxy] Request method: ${options.method}`);
       console.log(`[CV Screener Proxy] Request headers:`, options.headers);
       
-      if (options.body && typeof options.body === 'string' && options.body.includes('cv_data')) {
+      if (options.body && typeof options.body === 'string') {
+        // For all JSON bodies, log the truncated body
         console.log(`[CV Screener Proxy] Request body: ${options.body.substring(0, 500)}...`);
         
         // Try to parse it to see if it's valid JSON
         try {
           const parsedBody = JSON.parse(options.body);
-          console.log('[CV Screener Proxy] Body has cv_data field:', 'cv_data' in parsedBody);
-          console.log('[CV Screener Proxy] Body has name:', parsedBody.cv_data?.name);
-          console.log('[CV Screener Proxy] Body has email:', parsedBody.cv_data?.email);
+          
+          // For CV data requests
+          if ('cv_data' in parsedBody) {
+            console.log('[CV Screener Proxy] Body has cv_data field:', true);
+            
+            // Log name/email at both levels
+            if (parsedBody.name) console.log('[CV Screener Proxy] Body has name:', parsedBody.name);
+            if (parsedBody.email) console.log('[CV Screener Proxy] Body has email:', parsedBody.email);
+            
+            // Check inside cv_data too
+            console.log('[CV Screener Proxy] Body has name in cv_data:', parsedBody.cv_data?.name ? 'yes' : 'no');
+            console.log('[CV Screener Proxy] Body has email in cv_data:', parsedBody.cv_data?.email ? 'yes' : 'no');
+          }
+          
+          // For all paths containing "payment" or related terms, log more details
+          if (path.includes('payment') || path.includes('pay') || path.includes('ussd')) {
+            console.log('[CV Screener Proxy] PAYMENT REQUEST DETAILS:');
+            console.log(JSON.stringify(parsedBody, null, 2));
+            
+            // Check critical payment fields
+            if ('payment_message' in parsedBody) {
+              console.log('[CV Screener Proxy] Payment message:', parsedBody.payment_message?.substring(0, 100));
+            }
+            if ('transaction_id' in parsedBody) {
+              console.log('[CV Screener Proxy] Transaction ID:', parsedBody.transaction_id);
+            }
+            if ('reference_number' in parsedBody) {
+              console.log('[CV Screener Proxy] Reference number:', parsedBody.reference_number);
+            }
+            if ('ussd_code' in parsedBody) {
+              console.log('[CV Screener Proxy] USSD code:', parsedBody.ussd_code);
+            }
+          }
         } catch (e) {
           console.log('[CV Screener Proxy] Failed to parse body as JSON:', e);
         }
@@ -252,16 +283,55 @@ export async function cvScreenerProxyHandler(req: Request, res: Response) {
     try {
       // Process response body based on content type
       if (contentType.includes('application/json')) {
-        // Parse and send JSON response
-        const jsonData = await fetchResponse.json();
-        console.log('[CV Screener Proxy] JSON response:', jsonData);
-        
-        // If it's an error with status code 400, log more details
-        if (fetchResponse.status === 400) {
-          console.log('[CV Screener Proxy] 400 Error response details:', jsonData);
+        try {
+          // Parse and send JSON response
+          const jsonData = await fetchResponse.json();
+          console.log('[CV Screener Proxy] JSON response:', jsonData);
+          
+          // Log more details for payment endpoints
+          if (path.includes('payment') || path.includes('pay') || path.includes('ussd')) {
+            console.log('[CV Screener Proxy] PAYMENT RESPONSE DETAILS:');
+            console.log(JSON.stringify(jsonData, null, 2));
+            
+            // If it looks like an empty object, log this specifically
+            if (Object.keys(jsonData).length === 0) {
+              console.log('[CV Screener Proxy] ⚠️ WARNING: Empty JSON response object for payment endpoint!');
+            }
+          }
+          
+          // If it's an error response, log more details
+          if (fetchResponse.status >= 400) {
+            console.log(`[CV Screener Proxy] ${fetchResponse.status} Error response details:`, jsonData);
+            
+            // For payment errors, check if we have any helpful details
+            if (path.includes('payment')) {
+              if ('error' in jsonData) {
+                console.log('[CV Screener Proxy] Payment error message:', jsonData.error);
+              }
+              if ('details' in jsonData) {
+                console.log('[CV Screener Proxy] Payment error details:', jsonData.details);
+              }
+            }
+          }
+          
+          return res.json(jsonData);
+        } catch (jsonParseError) {
+          console.error('[CV Screener Proxy] Error parsing JSON response:', jsonParseError);
+          
+          // Try to get the raw text to see what was returned
+          try {
+            // We can't use fetchResponse.text() again since the body was already consumed
+            // So we'll return an error with the information we have
+            return res.status(500).json({
+              error: 'Invalid JSON returned from CV Screener API',
+              details: jsonParseError instanceof Error ? jsonParseError.message : 'Unknown JSON parse error',
+              status_code: fetchResponse.status
+            });
+          } catch (textError) {
+            console.error('[CV Screener Proxy] Could not get response text after JSON parse error:', textError);
+            throw jsonParseError; // Re-throw to trigger the outer catch block
+          }
         }
-        
-        return res.json(jsonData);
       } 
       else if (contentType.includes('application/pdf')) {
         // For PDFs, get the array buffer and send as binary

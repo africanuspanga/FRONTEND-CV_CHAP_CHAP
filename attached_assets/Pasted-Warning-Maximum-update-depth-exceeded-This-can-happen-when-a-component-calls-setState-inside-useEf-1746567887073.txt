@@ -1,0 +1,18 @@
+Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.%s 
+    at WorkExperienceForm (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/pages/WorkExperienceForm.tsx:36:24)
+    at Route (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=f5cd020a:323:16)
+    at Switch (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=f5cd020a:379:17)
+    at div
+    at div
+    at Route (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=f5cd020a:323:16)
+    at Switch (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=f5cd020a:379:17)
+    at div
+    at Router
+    at CVRequestProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/contexts/cv-request-context.tsx:37:37)
+    at CVFormProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/contexts/cv-form-context.tsx:60:34)
+    at AdminAuthProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/contexts/admin-auth-context.tsx:31:37)
+    at AuthProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/src/contexts/auth-context.tsx:20:32)
+    at Provider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-NNZVJN4K.js?v=f5cd020a:38:15)
+    at TooltipProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f5cd020a:62:5)
+    at QueryClientProvider (https://a74bfecd-c5d5-40f4-bc18-fe8458932935-00-2vu6ttmpnoai2.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=f5cd020a:2805:3)
+    at App
