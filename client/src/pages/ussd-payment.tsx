@@ -114,66 +114,33 @@ const USSDPaymentPage: React.FC = () => {
       return;
     }
     
-    // Validation for complete Selcom SMS message (must be between 145-180 characters)
-    if (smsText.length < 145 || smsText.length > 180) {
-      setVerificationError(`Invalid SMS format. Please copy and paste the complete SMS received from Selcom.`);
-      setIsVerifying(false);
-      return;
-    }
-    
-    // Check for required security elements
+    // We're now using a more simplified validation approach
+    // Check for at least some of the key required elements to be present
     const requiredElements = [
-      { text: 'DRIFTMARK TECHNOLOGI' },
-      { text: 'Merchant# 61115073' },
-      { text: 'TZS 10,000.00' },
-      { text: 'Selcom Pay' },
-      { text: 'TransID' },
-      { text: 'Ref' },
-      { text: 'Channel' },
-      { text: 'From' }
+      { text: 'DRIFTMARK', required: true },
+      { text: 'TZS', required: true },
+      { text: 'Selcom', required: true },
+      { text: 'TransID', required: false },
+      { text: 'Ref', required: false }
     ];
     
-    // Check all required elements
-    for (const element of requiredElements) {
-      if (!smsText.includes(element.text)) {
-        setVerificationError(`Invalid SMS format. Please copy and paste the complete SMS received from Selcom.`);
-        setIsVerifying(false);
-        return;
-      }
-    }
+    // Count how many required elements are present
+    const missingRequiredElements = requiredElements
+      .filter(element => element.required)
+      .filter(element => !smsText.includes(element.text));
     
-    // Validate structure - should have around 8-10 lines
-    const lines = smsText.split('\n').filter(line => line.trim().length > 0);
-    if (lines.length < 7) {
-      setVerificationError('Invalid SMS format. Please copy and paste the complete SMS received from Selcom.');
+    if (missingRequiredElements.length > 0) {
+      setVerificationError(`Invalid SMS format. Your message must include payment to DRIFTMARK and amount in TZS.`);
       setIsVerifying(false);
       return;
     }
     
-    // Extract the reference number for verification
-    let refNumber = '';
-    try {
-      const refLine = lines.find(line => line.startsWith('Ref'));
-      if (refLine) {
-        refNumber = refLine.replace('Ref', '').trim();
-      } else {
-        throw new Error('Could not find reference number line');
-      }
-      
-      if (!refNumber) {
-        throw new Error('Reference number is empty');
-      }
-    } catch (error) {
-      console.error('Error extracting reference:', error);
-      setVerificationError('Invalid SMS format. Please copy and paste the complete SMS received from Selcom.');
-      setIsVerifying(false);
-      return;
-    }
+    console.log('SMS verification passed basic validation');
     
     // All validations passed, send to API for verification
     try {
-      // We use the extracted reference number for the API call
-      const success = await verifyPaymentAPI(refNumber);
+      // We use the full SMS text for verification now
+      const success = await verifyPaymentAPI(smsText);
       
       if (!success) {
         setVerificationError(requestError || 'Payment verification failed. Please try again.');
