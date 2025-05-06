@@ -196,10 +196,11 @@ export function registerRoutes(app: Express): Server {
     res.status(200).send();
   });
 
-  // API route for previewing CV PDF without payment
+  // API route for previewing CV PDF - proxies to CV Screener API
   app.post("/api/preview-cv-pdf", async (req, res) => {
     try {
-      const { template_id, name, email, personalInfo } = req.body;
+      // Extract data from request body
+      const { template_id, cv_data } = req.body;
       
       if (!template_id) {
         return res.status(400).json({
@@ -208,70 +209,19 @@ export function registerRoutes(app: Express): Server {
         });
       }
       
-      // Validate required fields for template rendering
-      if (!name || !email) {
-        return res.status(400).json({
-          success: false,
-          error: 'Missing required fields: name and email must be provided at top level'
-        });
-      }
+      // Forward the request to the CV Screener service via our proxy
+      // This avoids CORS issues and uses the proper authentication
+      console.log(`Forwarding preview request for template: ${template_id}`);
       
-      // Validate personalInfo structure 
-      if (!personalInfo || !personalInfo.firstName || !personalInfo.lastName) {
-        return res.status(400).json({
-          success: false,
-          error: 'Missing required personalInfo fields: firstName and lastName must be provided'
-        });
-      }
+      // Set up the proxy request parameters
+      req.params.path = `preview-template/${template_id}`;
       
-      console.log(`Generating preview PDF for template: ${template_id}`);
+      // Forward the request to the CV Screener proxy
+      await cvScreenerProxyHandler(req, res);
       
-      // For development, generate a mock PDF 
-      const pdfContent = `<!DOCTYPE html>
-<html>
-<head>
-  <title>CV for ${name}</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
-    h1 { color: #333; font-size: 24px; }
-    .section { margin-bottom: 20px; }
-    .title { font-weight: bold; }
-    .info { margin-left: 10px; }
-  </style>
-</head>
-<body>
-  <h1>${name}</h1>
-  <p>Email: ${email}</p>
-  <p>Phone: ${personalInfo.phone || 'N/A'}</p>
-  
-  <div class="section">
-    <div class="title">Summary</div>
-    <div class="info">${req.body.summary || 'No summary provided'}</div>
-  </div>
-  
-  <div class="section">
-    <div class="title">Experience</div>
-    <div class="info">
-      ${(req.body.experience || []).map((exp: any) => 
-        `<p><strong>${exp.position} at ${exp.company}</strong><br>
-        ${exp.startDate} - ${exp.endDate || 'Present'}</p>`
-      ).join('')}
-    </div>
-  </div>
-</body>
-</html>`;
-      
-      // Convert HTML to Base64 (in a real implementation, this would use a PDF library)
-      const pdfBuffer = Buffer.from(pdfContent);
-      const pdfBase64 = pdfBuffer.toString('base64');
-      
-      // Return the Base64 encoded PDF
-      res.status(200).json({
-        success: true,
-        pdf_base64: pdfBase64
-      });
+      // The proxy handles the response, so we don't need to do anything else here
     } catch (error: any) {
-      console.error('Error generating PDF preview:', error);
+      console.error('Error forwarding PDF preview request:', error);
       res.status(500).json({
         success: false,
         error: error.message || 'Internal server error'

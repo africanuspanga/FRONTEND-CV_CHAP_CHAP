@@ -496,10 +496,9 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         
         // Call the preview endpoint instead of download for local flow
-        // Prepare data according to the backend requirements:
-        // 1. Need name and email at top level (required)
-        // 2. Need proper personalInfo structure
-        // 3. Need template_id at top level
+        // The backend has requested a specific data structure:
+        // {template_id: "templateName", cv_data: {}}
+        // But the cv_data must still have required fields inside it
         
         // Extract from cvData
         const firstName = cvData.personalInfo?.firstName || 'User';
@@ -507,11 +506,10 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const email = cvData.personalInfo?.email || 'user@example.com';
         const name = cvData.personalInfo?.name || `${firstName} ${lastName}`.trim();
         
-        // Create properly structured data
-        const properlyFormattedData = {
-          template_id: templateId,
-          name: name,  // Required at top level
-          email: email, // Required at top level
+        // Make sure the cv_data has all required fields
+        const properCvData = {
+          name: name,  // Required
+          email: email, // Required
           
           // Create proper personalInfo - backend needs this
           personalInfo: {
@@ -527,9 +525,12 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           skills: cvData.skills || [],
           languages: cvData.languages || [],
           summary: cvData.summary || '',
-          
-          // Optional flag to tell backend we're using fallback flow
-          isFallbackFlow: true
+        };
+        
+        // Create the final request structure as requested by backend
+        const properlyFormattedData = {
+          template_id: templateId,
+          cv_data: properCvData
         };
         
         console.log('Calling backend with properly structured data:', properlyFormattedData);
