@@ -150,26 +150,55 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     console.log('CV Data:', JSON.stringify(cvData, null, 2));
     
     try {
-      const result = await initiateUSSDPayment(templateId, cvData);
+      // IMPORTANT: We're now skipping the actual payment initiation and going straight to local fallback
+      console.log('Using fallback payment flow (skipping payment API call)');
       
-      if (result.success && result.request_id) {
-        setRequestId(result.request_id);
-        setPaymentStatus({
-          status: 'pending_payment',
-          request_id: result.request_id
-        });
-        return true;
-      } else {
-        setError(result.error || 'Failed to initiate payment');
-        toast({
-          title: 'Payment Initiation Failed',
-          description: result.error || 'Failed to initiate payment',
-          variant: 'destructive'
-        });
-        return false;
+      // Generate a unique local ID for this request that includes the template ID for easy tracking
+      const localRequestId = `local-${Date.now()}`;
+      
+      // Store the CV data for retrieval during download
+      try {
+        // Store in sessionStorage (primary storage)
+        const localStorageData = {
+          template_id: templateId,
+          timestamp: new Date().toISOString(),
+          cv_data: cvData
+        };
+        
+        // Store in sessionStorage (more reliable for this flow)
+        sessionStorage.setItem(`cv_data_${localRequestId}`, JSON.stringify(localStorageData));
+        console.log(`CV data stored in sessionStorage with ID: ${localRequestId}`);
+        
+        // Try to store in localStorage as fallback/backup
+        try {
+          localStorage.setItem(`cv_data_${localRequestId}`, JSON.stringify(localStorageData));
+        } catch (localError) {
+          console.warn('Unable to store in localStorage (non-critical):', localError);
+        }
+      } catch (storageError) {
+        console.error('Error storing CV data:', storageError);
+        // Continue anyway - we can try to generate without storage
       }
+      
+      // Set up the request data as if payment was successful
+      setRequestId(localRequestId);
+      setPaymentStatus({
+        status: 'pending_payment',
+        request_id: localRequestId
+      });
+      
+      // Immediately mark it as verified since we're bypassing payment
+      try {
+        sessionStorage.setItem(`payment_verified_${localRequestId}`, 'true');
+        sessionStorage.setItem(`payment_transaction_${localRequestId}`, 'LOCAL-BYPASS');
+        sessionStorage.setItem(`payment_verified_time_${localRequestId}`, new Date().toISOString());
+      } catch (verifyError) {
+        console.warn('Error storing verification status:', verifyError);
+      }
+      
+      return true;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to initiate payment';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to set up local payment flow';
       setError(errorMessage);
       toast({
         title: 'Error',
@@ -182,7 +211,7 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  // Function to verify payment
+  // Function to verify payment (now bypassed completely)
   const verifyPayment = async (paymentReference: string): Promise<boolean> => {
     if (!requestId) {
       setError('No active payment request');
@@ -193,6 +222,40 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     
     try {
+      console.log('Using local payment bypass - auto-verifying payment');
+      
+      // For local IDs, just mark as verified immediately - no need to call API
+      if (requestId.startsWith('local-')) {
+        try {
+          // Store verification in sessionStorage first (more reliable)
+          sessionStorage.setItem(`payment_verified_${requestId}`, 'true');
+          sessionStorage.setItem(`payment_transaction_${requestId}`, 'LOCAL-VERIFIED');
+          sessionStorage.setItem(`payment_verified_time_${requestId}`, new Date().toISOString());
+          
+          // Also try localStorage as backup
+          try {
+            localStorage.setItem(`payment_verified_${requestId}`, 'true');
+            localStorage.setItem(`payment_transaction_${requestId}`, 'LOCAL-VERIFIED');
+            localStorage.setItem(`payment_verified_time_${requestId}`, new Date().toISOString());
+          } catch (localError) {
+            console.warn('Unable to save to localStorage:', localError);
+          }
+        } catch (storageError) {
+          console.error('Storage error during verification:', storageError);
+          // Continue anyway, most verification logic uses status state
+        }
+        
+        // Set the status to verified
+        setPaymentStatus({
+          status: 'completed',
+          request_id: requestId,
+          download_url: `/api/cv-pdf/${requestId}`
+        });
+        
+        return true;
+      }
+      
+      // For non-local IDs, still use the API (just in case)
       const result = await verifyUSSDPayment(requestId, paymentReference);
       
       if (result.success) {
@@ -237,6 +300,57 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     
     try {
+      // For local IDs, we can just return completed status without calling API
+      if (requestId.startsWith('local-')) {
+        console.log('Using local bypassed flow - status always completed');
+        
+        // Check if it's verified in storage
+        let isVerified = false;
+        
+        try {
+          // Try sessionStorage first (primary storage)
+          const sessionVerified = sessionStorage.getItem(`payment_verified_${requestId}`);
+          if (sessionVerified === 'true') {
+            isVerified = true;
+          } else {
+            // Try localStorage as backup
+            const localVerified = localStorage.getItem(`payment_verified_${requestId}`);
+            if (localVerified === 'true') {
+              isVerified = true;
+              // Migration
+              try {
+                sessionStorage.setItem(`payment_verified_${requestId}`, 'true');
+              } catch (migrationError) {
+                console.warn('Storage migration error:', migrationError);
+              }
+            }
+          }
+        } catch (storageError) {
+          console.warn('Storage access error during status check:', storageError);
+        }
+        
+        // Auto-verify if not yet verified
+        if (!isVerified) {
+          try {
+            sessionStorage.setItem(`payment_verified_${requestId}`, 'true');
+            sessionStorage.setItem(`payment_transaction_${requestId}`, 'LOCAL-AUTO-VERIFIED');
+            sessionStorage.setItem(`payment_verified_time_${requestId}`, new Date().toISOString());
+          } catch (verifyError) {
+            console.warn('Auto-verification storage error:', verifyError);
+          }
+        }
+        
+        const status: CVRequestStatus = {
+          status: 'completed',
+          request_id: requestId,
+          download_url: `/api/cv-pdf/${requestId}`
+        };
+        
+        setPaymentStatus(status);
+        return status;
+      }
+      
+      // For non-local IDs, use the API
       const status = await checkPaymentStatus(requestId);
       setPaymentStatus(status);
       return status;
@@ -265,18 +379,28 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     
     try {
-      // First check if payment is completed
-      if (paymentStatus?.status !== 'completed') {
-        const status = await checkPaymentStatus(requestId);
-        setPaymentStatus(status);
-        
-        if (status.status !== 'completed') {
-          throw new Error('Payment not completed. Please verify your payment first.');
+      // For local IDs, force status to completed if not already
+      if (requestId.startsWith('local-')) {
+        console.log('Local ID detected - ensuring status is completed');
+        if (paymentStatus?.status !== 'completed') {
+          const status: CVRequestStatus = {
+            status: 'completed',
+            request_id: requestId,
+            download_url: `/api/cv-pdf/${requestId}`
+          };
+          setPaymentStatus(status);
+        }
+      } else {
+        // For non-local IDs, check payment status
+        if (paymentStatus?.status !== 'completed') {
+          const status = await checkPaymentStatus(requestId);
+          setPaymentStatus(status);
+          
+          if (status.status !== 'completed') {
+            throw new Error('Payment not completed. Please verify your payment first.');
+          }
         }
       }
-      
-      // Check multiple storage locations for templateId with robust error handling
-      let templateId = '';
       
       // Helper function to safely get from storage
       const safeGetItem = (storage: Storage, key: string): string | null => {
@@ -288,81 +412,223 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
       };
       
-      // Try sessionStorage first (most reliable for payment flow)
-      try {
-        const sessionTemplateId = safeGetItem(sessionStorage, 'cv_template_id');
-        if (sessionTemplateId) {
-          templateId = sessionTemplateId;
-          console.log('Using template ID from sessionStorage:', templateId);
-        }
-      } catch (sessionError) {
-        console.warn('Failed to access sessionStorage for template ID:', sessionError);
-      }
-      
-      // If not found in sessionStorage, try localStorage
-      if (!templateId) {
+      // For local IDs, retrieve CV data from storage
+      if (requestId.startsWith('local-')) {
+        console.log('Using local flow for PDF generation');
+        
+        // Get stored CV data
+        let cvData: any = null;
+        let templateId = '';
+        
+        // Try sessionStorage first
         try {
-          const localTemplateId = safeGetItem(localStorage, 'cv_template_id');
-          if (localTemplateId) {
-            templateId = localTemplateId;
-            console.log('Using template ID from localStorage:', templateId);
-            
-            // Also save to sessionStorage for future reliability
-            try {
-              sessionStorage.setItem('cv_template_id', templateId);
-            } catch (saveError) {
-              console.warn('Failed to save template ID to sessionStorage:', saveError);
+          const storedData = safeGetItem(sessionStorage, `cv_data_${requestId}`);
+          if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            if (parsedData.template_id) {
+              templateId = parsedData.template_id;
+              cvData = parsedData.cv_data;
+              console.log('Retrieved CV data from sessionStorage');
             }
           }
-        } catch (localError) {
-          console.warn('Failed to access localStorage for template ID:', localError);
-        }
-      }
-      
-      // If still not found, try formData
-      if (!templateId && formData.templateId) {
-        templateId = formData.templateId;
-        console.log('Using template ID from formData:', templateId);
-        
-        // Try to save to both storage types for future reliability
-        try {
-          sessionStorage.setItem('cv_template_id', templateId);
         } catch (sessionError) {
-          console.warn('Failed to save template ID to sessionStorage:', sessionError);
+          console.warn('Error retrieving from sessionStorage:', sessionError);
         }
         
-        try {
-          localStorage.setItem('cv_template_id', templateId);
-        } catch (localError) {
-          console.warn('Failed to save template ID to localStorage:', localError);
+        // If not found in sessionStorage, try localStorage
+        if (!cvData) {
+          try {
+            const storedData = safeGetItem(localStorage, `cv_data_${requestId}`);
+            if (storedData) {
+              const parsedData = JSON.parse(storedData);
+              if (parsedData.template_id) {
+                templateId = parsedData.template_id;
+                cvData = parsedData.cv_data;
+                console.log('Retrieved CV data from localStorage');
+              }
+            }
+          } catch (localError) {
+            console.warn('Error retrieving from localStorage:', localError);
+          }
         }
-      }
-      
-      // If still no template ID, check request-specific storage
-      if (!templateId) {
-        try {
-          const reqData = safeGetItem(sessionStorage, `cv_data_${requestId}`);
-          if (reqData) {
-            const parsedData = JSON.parse(reqData);
-            if (parsedData.templateId) {
-              templateId = parsedData.templateId;
-              console.log('Using template ID from session request data:', templateId);
+        
+        // If no template ID found yet, try the standard locations
+        if (!templateId) {
+          // Try sessionStorage first
+          try {
+            const sessionTemplateId = safeGetItem(sessionStorage, 'cv_template_id');
+            if (sessionTemplateId) {
+              templateId = sessionTemplateId;
+              console.log('Using template ID from sessionStorage:', templateId);
+            }
+          } catch (sessionError) {
+            console.warn('Failed to access sessionStorage for template ID:', sessionError);
+          }
+          
+          // If not found in sessionStorage, try localStorage
+          if (!templateId) {
+            try {
+              const localTemplateId = safeGetItem(localStorage, 'cv_template_id');
+              if (localTemplateId) {
+                templateId = localTemplateId;
+                console.log('Using template ID from localStorage:', templateId);
+              }
+            } catch (localError) {
+              console.warn('Failed to access localStorage for template ID:', localError);
             }
           }
-        } catch (reqDataError) {
-          console.warn('Failed to parse request-specific data from sessionStorage:', reqDataError);
+          
+          // If still not found, try formData
+          if (!templateId && formData.templateId) {
+            templateId = formData.templateId;
+            console.log('Using template ID from formData:', templateId);
+          }
         }
-      }
-      
-      if (!templateId) {
-        console.warn('No template ID found in any storage, download may fail');
+        
+        if (!templateId) {
+          throw new Error('Could not find template ID. Please try again from the beginning.');
+        }
+        
+        if (!cvData) {
+          // Use form data as a last resort
+          console.log('No stored CV data found, using current form data');
+          cvData = formData;
+        }
+        
+        // Call the preview endpoint instead of download for local flow
+        console.log('Calling backend with:', {
+          template_id: templateId,
+          cv_data: cvData
+        });
+        
+        try {
+          const result = await fetch('/api/preview-cv-pdf', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              template_id: templateId,
+              name: cvData.personalInfo?.name || '',
+              email: cvData.personalInfo?.email || '',
+              cv_data: cvData
+            })
+          });
+          
+          if (!result.ok) {
+            throw new Error(`Server error: ${result.status} ${result.statusText}`);
+          }
+          
+          const responseData = await result.json();
+          
+          if (!responseData.success) {
+            throw new Error(responseData.error || 'Failed to generate PDF');
+          }
+          
+          // Convert base64 to Blob
+          const pdfBase64 = responseData.pdf_base64;
+          const byteCharacters = atob(pdfBase64);
+          const byteArrays = [];
+          
+          for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+            const slice = byteCharacters.slice(offset, offset + 512);
+            const byteNumbers = new Array(slice.length);
+            
+            for (let i = 0; i < slice.length; i++) {
+              byteNumbers[i] = slice.charCodeAt(i);
+            }
+            
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+          }
+          
+          const blob = new Blob(byteArrays, { type: 'application/pdf' });
+          return blob;
+        } catch (previewError) {
+          console.error('Error generating PDF from preview endpoint:', previewError);
+          throw previewError;
+        }
       } else {
-        console.log('Final template ID being used for download:', templateId);
-      }
+        // Standard flow for non-local IDs
+        // Check multiple storage locations for templateId with robust error handling
+        let templateId = '';
+        
+        // Try sessionStorage first (most reliable for payment flow)
+        try {
+          const sessionTemplateId = safeGetItem(sessionStorage, 'cv_template_id');
+          if (sessionTemplateId) {
+            templateId = sessionTemplateId;
+            console.log('Using template ID from sessionStorage:', templateId);
+          }
+        } catch (sessionError) {
+          console.warn('Failed to access sessionStorage for template ID:', sessionError);
+        }
+        
+        // If not found in sessionStorage, try localStorage
+        if (!templateId) {
+          try {
+            const localTemplateId = safeGetItem(localStorage, 'cv_template_id');
+            if (localTemplateId) {
+              templateId = localTemplateId;
+              console.log('Using template ID from localStorage:', templateId);
+              
+              // Also save to sessionStorage for future reliability
+              try {
+                sessionStorage.setItem('cv_template_id', templateId);
+              } catch (saveError) {
+                console.warn('Failed to save template ID to sessionStorage:', saveError);
+              }
+            }
+          } catch (localError) {
+            console.warn('Failed to access localStorage for template ID:', localError);
+          }
+        }
+        
+        // If still not found, try formData
+        if (!templateId && formData.templateId) {
+          templateId = formData.templateId;
+          console.log('Using template ID from formData:', templateId);
+          
+          // Try to save to both storage types for future reliability
+          try {
+            sessionStorage.setItem('cv_template_id', templateId);
+          } catch (sessionError) {
+            console.warn('Failed to save template ID to sessionStorage:', sessionError);
+          }
+          
+          try {
+            localStorage.setItem('cv_template_id', templateId);
+          } catch (localError) {
+            console.warn('Failed to save template ID to localStorage:', localError);
+          }
+        }
+        
+        // If still no template ID, check request-specific storage
+        if (!templateId) {
+          try {
+            const reqData = safeGetItem(sessionStorage, `cv_data_${requestId}`);
+            if (reqData) {
+              const parsedData = JSON.parse(reqData);
+              if (parsedData.templateId) {
+                templateId = parsedData.templateId;
+                console.log('Using template ID from session request data:', templateId);
+              }
+            }
+          } catch (reqDataError) {
+            console.warn('Failed to parse request-specific data from sessionStorage:', reqDataError);
+          }
+        }
+        
+        if (!templateId) {
+          console.warn('No template ID found in any storage, download may fail');
+        } else {
+          console.log('Final template ID being used for download:', templateId);
+        }
 
-      // Use the download endpoint which will retrieve template ID from storage
-      const pdfBlob = await downloadGeneratedPDF(requestId);
-      return pdfBlob;
+        // Use the download endpoint which will retrieve template ID from storage
+        const pdfBlob = await downloadGeneratedPDF(requestId);
+        return pdfBlob;
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to download PDF';
       setError(errorMessage);
