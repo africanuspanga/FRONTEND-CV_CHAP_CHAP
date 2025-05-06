@@ -196,6 +196,89 @@ export function registerRoutes(app: Express): Server {
     res.status(200).send();
   });
 
+  // API route for previewing CV PDF without payment
+  app.post("/api/preview-cv-pdf", async (req, res) => {
+    try {
+      const { template_id, name, email, personalInfo } = req.body;
+      
+      if (!template_id) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required parameter: template_id'
+        });
+      }
+      
+      // Validate required fields for template rendering
+      if (!name || !email) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields: name and email must be provided at top level'
+        });
+      }
+      
+      // Validate personalInfo structure 
+      if (!personalInfo || !personalInfo.firstName || !personalInfo.lastName) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required personalInfo fields: firstName and lastName must be provided'
+        });
+      }
+      
+      console.log(`Generating preview PDF for template: ${template_id}`);
+      
+      // For development, generate a mock PDF 
+      const pdfContent = `<!DOCTYPE html>
+<html>
+<head>
+  <title>CV for ${name}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    h1 { color: #333; font-size: 24px; }
+    .section { margin-bottom: 20px; }
+    .title { font-weight: bold; }
+    .info { margin-left: 10px; }
+  </style>
+</head>
+<body>
+  <h1>${name}</h1>
+  <p>Email: ${email}</p>
+  <p>Phone: ${personalInfo.phone || 'N/A'}</p>
+  
+  <div class="section">
+    <div class="title">Summary</div>
+    <div class="info">${req.body.summary || 'No summary provided'}</div>
+  </div>
+  
+  <div class="section">
+    <div class="title">Experience</div>
+    <div class="info">
+      ${(req.body.experience || []).map((exp: any) => 
+        `<p><strong>${exp.position} at ${exp.company}</strong><br>
+        ${exp.startDate} - ${exp.endDate || 'Present'}</p>`
+      ).join('')}
+    </div>
+  </div>
+</body>
+</html>`;
+      
+      // Convert HTML to Base64 (in a real implementation, this would use a PDF library)
+      const pdfBuffer = Buffer.from(pdfContent);
+      const pdfBase64 = pdfBuffer.toString('base64');
+      
+      // Return the Base64 encoded PDF
+      res.status(200).json({
+        success: true,
+        pdf_base64: pdfBase64
+      });
+    } catch (error: any) {
+      console.error('Error generating PDF preview:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error'
+      });
+    }
+  });
+
   // API route for downloading PDF
   app.get("/api/cv-pdf/:requestId/download", (req, res) => {
     try {
