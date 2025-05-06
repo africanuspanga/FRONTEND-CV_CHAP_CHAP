@@ -211,7 +211,10 @@ export const websiteSchema = z.object({
 
 export const cvDataSchema = z.object({
   personalInfo: personalInfoSchema,
+  // Support both naming conventions for work experience
   workExperiences: z.array(workExperienceSchema).optional(),
+  // Some templates use workExp instead of workExperiences
+  workExp: z.array(workExperienceSchema).optional(),
   education: z.array(educationSchema).optional(),
   skills: z.array(skillSchema).optional(),
   languages: z.array(languageSchema).optional(),

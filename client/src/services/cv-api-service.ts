@@ -95,14 +95,35 @@ export interface BackendCVData {
   [key: string]: any; // For any additional properties
 }
 
+/**
+ * This function identifies if we have workExp or workExperiences in the CV data
+ * and standardizes it before transformation
+ */
+export const normalizeWorkExperiences = (cvData: CVData): CVData => {
+  const normalizedData = {...cvData};
+  
+  // If we have workExp but not workExperiences, use workExp
+  if (normalizedData.workExp && !normalizedData.workExperiences) {
+    console.log('Normalizing workExp to workExperiences');
+    normalizedData.workExperiences = normalizedData.workExp;
+  }
+  
+  // If we have workExperiences but not workExp, use workExperiences
+  if (normalizedData.workExperiences && !normalizedData.workExp) {
+    console.log('Normalizing workExperiences to workExp');
+    normalizedData.workExp = normalizedData.workExperiences;
+  }
+  
+  return normalizedData;
+};
+
 export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
-  console.log('Transforming CV data for backend:', cvData);
+  // First normalize the data to handle workExp vs workExperiences
+  const normalizedData = normalizeWorkExperiences(cvData);
+  console.log('Transforming normalized CV data for backend');
   
   // Make sure personalInfo exists, create an empty object if it doesn't
-  const personalInfo = cvData.personalInfo || {};
-  
-  // Log personalInfo to diagnose missing fields
-  console.log('Personal info for transformation:', personalInfo);
+  const personalInfo = normalizedData.personalInfo || {};
   
   // Extract or construct a name
   let name = '';
@@ -117,11 +138,17 @@ export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
     name = personalInfo.lastName;
   }
   
-  console.log('Extracted name:', name);
+  // Make sure we always have a name and email for the API
+  if (!name) {
+    console.warn('No name found in CV data, creating a placeholder');
+    name = 'CV User ' + Date.now();
+  }
   
   // Get email from personal info
   const email = personalInfo.email || '';
-  console.log('Extracted email:', email);
+  if (!email) {
+    console.warn('No email found in CV data');
+  }
   
   // Create a transformed object with the required fields at the root level
   const transformed: BackendCVData = {
@@ -424,10 +451,24 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
       email: transformedData.email 
     });
     
-    // Create the request body in exactly the format expected by the backend
+    // The backend expects this exact structure:
     const requestBody = {
-      // Don't include template_id in the URL AND the body, it confuses the backend
-      cv_data: transformedData
+      template_id: templateId.toLowerCase(),
+      cv_data: {
+        name: transformedData.name,
+        email: transformedData.email,
+        phone: transformedData.phone,
+        title: transformedData.title,
+        location: transformedData.location,
+        summary: transformedData.summary,
+        experience: transformedData.experience,
+        education: transformedData.education,
+        skills: transformedData.skills,
+        languages: transformedData.languages,
+        certifications: transformedData.certifications,
+        hobbies: transformedData.hobbies,
+        references: transformedData.references
+      }
     };
     
     console.log('Using request body:', JSON.stringify(requestBody, null, 2));
@@ -1023,10 +1064,38 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
     const normalizedTemplateId = templateId.toLowerCase();
     console.log(`Attempting PDF download for template: ${normalizedTemplateId}`);
     
-    // Use our data transformation function to prepare data in the backend-expected format
-    const transformedData = transformCVDataForBackend(cvData);
+    // First normalize the CV data to handle workExp vs workExperiences
+    const normalizedData = normalizeWorkExperiences(cvData);
     
-    console.log('Sending transformed data to backend:', transformedData);
+    // Use our data transformation function to prepare data in the backend-expected format
+    const transformedData = transformCVDataForBackend(normalizedData);
+    
+    console.log('Required fields check before sending:', { 
+      name: transformedData.name, 
+      email: transformedData.email 
+    });
+    
+    // The backend expects this exact structure:
+    const requestBody = {
+      template_id: normalizedTemplateId,
+      cv_data: {
+        name: transformedData.name,
+        email: transformedData.email,
+        phone: transformedData.phone,
+        title: transformedData.title,
+        location: transformedData.location,
+        summary: transformedData.summary,
+        experience: transformedData.experience,
+        education: transformedData.education,
+        skills: transformedData.skills,
+        languages: transformedData.languages,
+        certifications: transformedData.certifications,
+        hobbies: transformedData.hobbies,
+        references: transformedData.references
+      }
+    };
+    
+    console.log('Using request body:', JSON.stringify(requestBody, null, 2));
     
     // Using retry pattern with our CORS proxy for better reliability
     return await retry(async () => {
@@ -1042,10 +1111,7 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
               'Content-Type': 'application/json',
               'X-Prefer-JSON-Response': '1'
             },
-            body: {
-              template_id: normalizedTemplateId,
-              cv_data: transformedData
-            }
+            body: requestBody
           }
         );
         
@@ -1068,10 +1134,7 @@ export const downloadCVWithPreviewEndpoint = async (templateId: string, cvData: 
             'Accept': 'application/pdf'
           },
           responseType: 'blob',
-          body: {
-            template_id: normalizedTemplateId,
-            cv_data: transformedData
-          },
+          body: requestBody,
           includeCredentials: true
         }
       );
