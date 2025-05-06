@@ -1,6 +1,6 @@
 import html2pdf from 'html2pdf.js';
 import { CVData } from '@shared/schema';
-import { directDownloadCV, downloadCVWithPreviewEndpoint } from '@/services/cv-api-service';
+import { directDownloadCV } from '@/services/cv-api-service';
 
 /**
  * Download a blob as a file

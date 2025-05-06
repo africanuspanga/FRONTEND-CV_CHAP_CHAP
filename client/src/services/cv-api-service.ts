@@ -598,18 +598,41 @@ export const downloadGeneratedPDF = async (requestId: string): Promise<Blob> => 
     if (templateId) {
       console.log('Using current template ID from session:', templateId);
       
-      // Just use an empty object - the actual CV data will be pulled from the
-      // current form context in the download component
-      // This is a safer approach than trying to access window globals
-      const formData = {};
-      
-      // We need to use our current function here instead of the function below
-      // Use retry pattern for better reliability
-      const normalizedTemplateId = templateId.toLowerCase();
-      console.log(`Using current template for PDF download: ${normalizedTemplateId}`);
-      
-      // We'll directly fetch from the preview endpoint
+      // Get form data from sessionStorage
       try {
+        const sessionData = sessionStorage.getItem('cv_form_data');
+        let cvFormData;
+        
+        if (sessionData) {
+          cvFormData = JSON.parse(sessionData);
+          console.log('Using CV data from sessionStorage');
+        } else {
+          // Try localStorage as a fallback
+          const localData = localStorage.getItem('cv_form_data');
+          if (localData) {
+            cvFormData = JSON.parse(localData);
+            console.log('Using CV data from localStorage fallback');
+          } else {
+            // If we can't find the data, use a minimal data structure that won't crash the backend
+            console.warn('No CV data found in storage, using minimal data structure');
+            cvFormData = {
+              personalInfo: {
+                firstName: 'User',
+                lastName: 'Example',
+                email: 'user@example.com'
+              }
+            };
+          }
+        }
+        
+        // Transform CV data for backend
+        const transformedData = transformCVDataForBackend(cvFormData);
+        
+        // Use retry pattern for better reliability
+        const normalizedTemplateId = templateId.toLowerCase();
+        console.log(`Using template from session for PDF download: ${normalizedTemplateId}`);
+        
+        // We'll directly fetch from the preview endpoint
         const blob = await fetchFromCVScreener<Blob>(
           `api/preview-template/${normalizedTemplateId}`,
           {
@@ -619,7 +642,7 @@ export const downloadGeneratedPDF = async (requestId: string): Promise<Blob> => 
               'Accept': 'application/pdf'
             },
             responseType: 'blob',
-            body: {}, // Empty body will use default test data
+            body: transformedData,
             includeCredentials: true
           }
         );
