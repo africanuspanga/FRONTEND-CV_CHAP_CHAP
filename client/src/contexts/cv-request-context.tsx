@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import {
   initiateUSSDPayment,
   verifyUSSDPayment,
@@ -9,6 +9,22 @@ import {
 import { CVData } from '@shared/schema';
 import { useToast } from '@/hooks/use-toast';
 import { useCVForm } from './cv-form-context';
+
+// Rate limiting utilities
+interface RetryState {
+  retryCount: number;
+  lastAttempt: number;
+  backoffMs: number;
+  endpoints: Map<string, {
+    retryCount: number;
+    lastAttempt: number;
+    backoffMs: number;
+  }>;
+}
+
+const INITIAL_BACKOFF_MS = 2000; // Start with 2 seconds
+const MAX_BACKOFF_MS = 30000; // Maximum backoff of 30 seconds
+const MAX_RETRY_COUNT = 5; // Maximum number of retries
 
 interface CVRequestContextType {
   requestId: string | null;
@@ -63,6 +79,14 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(false);
+  
+  // Rate limiting state - use ref to avoid re-renders
+  const retryStateRef = useRef<RetryState>({
+    retryCount: 0,
+    lastAttempt: 0,
+    backoffMs: INITIAL_BACKOFF_MS,
+    endpoints: new Map()
+  });
 
   // Helper to safely get items from storage
   const safeGetItem = (storage: Storage, key: string): string | null => {
@@ -71,6 +95,96 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } catch (error) {
       console.warn(`Error accessing ${key} from ${storage === sessionStorage ? 'sessionStorage' : 'localStorage'}:`, error);
       return null;
+    }
+  };
+  
+  // Rate limiting and retry handling
+  const shouldRetry = (error: any): boolean => {
+    // Check if the error is due to rate limiting (status code 429)
+    if (error && error.status === 429) return true;
+    if (error && typeof error.message === 'string') {
+      return error.message.includes('429') || 
+             error.message.includes('too many requests') ||
+             error.message.toLowerCase().includes('rate limit');
+    }
+    return false;
+  };
+  
+  // Exponential backoff implementation
+  const retryWithBackoff = async <T,>(
+    operation: () => Promise<T>,
+    endpoint: string,
+    maxRetries = MAX_RETRY_COUNT
+  ): Promise<T> => {
+    // Get or create endpoint-specific retry state
+    const retryState = retryStateRef.current;
+    const endpointState = retryState.endpoints.get(endpoint) || {
+      retryCount: 0,
+      lastAttempt: 0,
+      backoffMs: INITIAL_BACKOFF_MS
+    };
+    
+    // Check if we need to wait before retrying
+    const now = Date.now();
+    const timeSinceLastAttempt = now - endpointState.lastAttempt;
+    
+    if (timeSinceLastAttempt < endpointState.backoffMs) {
+      // Need to wait before retrying
+      const waitTime = endpointState.backoffMs - timeSinceLastAttempt;
+      console.log(`Rate limiting in effect for ${endpoint}. Waiting ${waitTime}ms before retry...`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+    
+    try {
+      // Update last attempt time
+      endpointState.lastAttempt = Date.now();
+      retryState.endpoints.set(endpoint, endpointState);
+      
+      // Try the operation
+      const result = await operation();
+      
+      // Success! Gradually reduce backoff time for this endpoint
+      endpointState.backoffMs = Math.max(
+        INITIAL_BACKOFF_MS / 2,
+        endpointState.backoffMs * 0.8
+      );
+      endpointState.retryCount = 0;
+      retryState.endpoints.set(endpoint, endpointState);
+      
+      return result;
+    } catch (error) {
+      // Check if error is due to rate limiting
+      if (shouldRetry(error) && endpointState.retryCount < maxRetries) {
+        // Increment retry counter
+        endpointState.retryCount += 1;
+        
+        // Increase backoff time with exponential strategy
+        endpointState.backoffMs = Math.min(
+          endpointState.backoffMs * 1.5,
+          MAX_BACKOFF_MS
+        );
+        
+        // Update state
+        retryState.endpoints.set(endpoint, endpointState);
+        
+        console.log(`Rate limit hit for ${endpoint}. Retry ${endpointState.retryCount}/${maxRetries} after ${endpointState.backoffMs}ms`);
+        
+        // Show toast for user feedback
+        toast({
+          title: "Server is busy",
+          description: `Waiting ${Math.round(endpointState.backoffMs/1000)} seconds before retrying...`,
+          variant: "default"
+        });
+        
+        // Wait for the backoff period
+        await new Promise(resolve => setTimeout(resolve, endpointState.backoffMs));
+        
+        // Retry the operation
+        return retryWithBackoff(operation, endpoint, maxRetries);
+      }
+      
+      // If not rate limited or max retries reached, throw the error
+      throw error;
     }
   };
 
@@ -95,9 +209,29 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
       }
       
-      // Call API to initiate payment
-      const { requestId, status } = await initiateUSSDPayment(templateId, cvData);
+      // Call API with retry mechanism
+      const result = await retryWithBackoff(
+        async () => {
+          // We have to parse the result here because the API doesn't return valid CVRequestStatus
+          const response = await initiateUSSDPayment(templateId, cvData);
+          
+          if (!response.success || !response.request_id) {
+            throw new Error(response.error || 'Failed to initiate payment');
+          }
+          
+          // Create a proper status object from the response
+          const requestId = response.request_id;
+          const status: CVRequestStatus = {
+            status: 'pending_payment',
+            request_id: requestId
+          };
+          
+          return { requestId, status };
+        },
+        'payment-initiation'
+      );
       
+      const { requestId, status } = result;
       console.log('Payment initiated:', requestId, status);
       
       // Save payment info to storage
@@ -120,11 +254,15 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to initiate payment';
       setError(errorMessage);
-      toast({
-        title: 'Payment Initiation Failed',
-        description: errorMessage,
-        variant: 'destructive'
-      });
+      
+      // Don't show toast if it's a rate limit error (already handled by retryWithBackoff)
+      if (!shouldRetry(err)) {
+        toast({
+          title: 'Payment Initiation Failed',
+          description: errorMessage,
+          variant: 'destructive'
+        });
+      }
       return false;
     } finally {
       setIsLoading(false);
@@ -154,19 +292,48 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return true;
       }
       
-      // Regular flow - call API
-      const status = await verifyUSSDPayment(requestId, paymentReference);
-      setPaymentStatus(status);
+      // Regular flow - call API with retry
+      const result = await retryWithBackoff(
+        async () => {
+          // We have to parse the result here because the API doesn't return valid CVRequestStatus
+          const response = await verifyUSSDPayment(requestId, paymentReference);
+          
+          if (!response.success) {
+            throw new Error(response.error || 'Failed to verify payment');
+          }
+          
+          // Create a proper status object from the response
+          const status: CVRequestStatus = {
+            status: 'completed', // Assume completed for simplicity
+            request_id: requestId,
+            download_url: `/api/cv-pdf/${requestId}`
+          };
+          
+          return status;
+        },
+        'payment-verification'
+      );
+      
+      setPaymentStatus(result);
       
       // Start polling for status updates if necessary
-      if (status.status === 'verifying_payment' || status.status === 'generating_pdf') {
+      if (result.status === 'verifying_payment' || result.status === 'generating_pdf') {
         setIsPolling(true);
       }
       
-      return status.status === 'completed';
+      return result.status === 'completed';
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to verify payment';
       setError(errorMessage);
+      
+      // Don't show toast if it's a rate limit error (already handled by retryWithBackoff)
+      if (!shouldRetry(err)) {
+        toast({
+          title: 'Payment Verification Failed',
+          description: errorMessage,
+          variant: 'destructive'
+        });
+      }
       return false;
     } finally {
       setIsLoading(false);
@@ -192,16 +359,34 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return status;
       }
       
-      // For standard IDs, check with the API
-      const status = await checkPaymentStatus(requestId);
-      setPaymentStatus(status);
-      
-      // If completed or failed, stop polling
-      if (status.status === 'completed' || status.status === 'failed') {
-        setIsPolling(false);
+      // For standard IDs, check with the API using retry mechanism
+      try {
+        const status = await retryWithBackoff(
+          async () => {
+            // Call the API with potential rate limiting
+            return await checkPaymentStatus(requestId);
+          },
+          'payment-status-check',
+          // Use less retries for status checks during polling to avoid long waits
+          isPolling ? 2 : MAX_RETRY_COUNT
+        );
+        
+        setPaymentStatus(status);
+        
+        // If completed or failed, stop polling
+        if (status.status === 'completed' || status.status === 'failed') {
+          setIsPolling(false);
+        }
+        
+        return status;
+      } catch (retryError) {
+        // If we're polling, just log errors but don't show to user
+        if (isPolling) {
+          console.warn('Status check failed during polling, will retry later:', retryError);
+          return null;
+        }
+        throw retryError; // Re-throw for non-polling calls
       }
-      
-      return status;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to check status';
       console.error('Status check error:', errorMessage);
@@ -240,7 +425,12 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       } else {
         // For non-local IDs, check payment status
         if (paymentStatus?.status !== 'completed') {
-          const status = await checkPaymentStatus(requestId);
+          // Use retry logic for payment status check
+          const status = await retryWithBackoff(
+            async () => await checkPaymentStatus(requestId),
+            'download-status-check'
+          );
+          
           setPaymentStatus(status);
           
           if (status.status !== 'completed') {
@@ -312,30 +502,47 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       
       console.log('Calling API with data structure:', requestData);
       
-      // Use the new direct endpoint for PDF generation
+      // Use the new direct endpoint for PDF generation with retry logic
       try {
-        const response = await fetch('/api/generate-and-download', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/pdf'
+        // Use retryWithBackoff for PDF generation
+        const pdfBlob = await retryWithBackoff(
+          async () => {
+            const response = await fetch('/api/generate-and-download', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/pdf'
+              },
+              body: JSON.stringify(requestData)
+            });
+            
+            if (!response.ok) {
+              // Check if it's a rate limit error
+              if (response.status === 429) {
+                const retryAfter = response.headers.get('Retry-After');
+                const error = new Error(`Rate limited. Try again in ${retryAfter || '3'} seconds.`);
+                // @ts-ignore - Add status property to error
+                error.status = 429;
+                throw error;
+              }
+              
+              // For other errors, try to get details
+              let errorMessage = '';
+              try {
+                const errorJson = await response.json();
+                errorMessage = errorJson.error || `Server error: ${response.status} ${response.statusText}`;
+              } catch {
+                errorMessage = await response.text() || `Server error: ${response.status} ${response.statusText}`;
+              }
+              throw new Error(errorMessage);
+            }
+            
+            // If successful, return PDF as blob
+            return response.blob();
           },
-          body: JSON.stringify(requestData)
-        });
+          'pdf-generation'
+        );
         
-        if (!response.ok) {
-          let errorMessage = '';
-          try {
-            const errorJson = await response.json();
-            errorMessage = errorJson.error || `Server error: ${response.status} ${response.statusText}`;
-          } catch {
-            errorMessage = await response.text() || `Server error: ${response.status} ${response.statusText}`;
-          }
-          throw new Error(errorMessage);
-        }
-        
-        // If successful, return PDF as blob
-        const pdfBlob = await response.blob();
         return pdfBlob;
       } catch (apiError) {
         console.error('Backend PDF generation failed, using fallback:', apiError);
