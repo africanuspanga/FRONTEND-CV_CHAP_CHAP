@@ -1,0 +1,120 @@
+{
+  "template_id": "jijengeClassic",
+  "cv_data": {
+    "name": "Catherine Hassan",
+    "email": "africanuspanga@gmail.com",
+    "personalInfo": {
+      "firstName": "Catherine",
+      "lastName": "Hassan",
+      "email": "africanuspanga@gmail.com",
+      "phone": "+255753091526",
+      "professionalTitle": "Software Engineer",
+      "address": "FAO Street",
+      "city": "",
+      "region": "",
+      "country": "",
+      "postalCode": "",
+      "summary": "HR specialist with 4 years of experience, excelling in recruitment and onboarding. At Umoja Systems, improved onboarding processes, reducing hire processing time by 20%. At Driftmark Technologies, led talent acquisition, increasing retention by 45%. Proficient in HRIS, employee relations, and conflict resolution, enhancing productivity and workplace culture."
+    },
+    "workExperiences": [
+      {
+        "id": "1746642576405",
+        "jobTitle": "Junior HR",
+        "company": "Umoja Systems",
+        "location": "Dar es salaam, Tanzania",
+        "startDate": "May 2021",
+        "endDate": "May 2023",
+        "current": false,
+        "description": "",
+        "achievements": [
+          "Developed and implemented onboarding process improvements, reducing new hire processing time by 20% within 6 months",
+          "Coordinated employee engagement activities that boosted team morale, resulting in a 15% increase in retention rates",
+          "Managed recruitment efforts for 5 departments, successfully filling 95% of positions within the first 30 days"
+        ]
+      },
+      {
+        "id": "1746642606509",
+        "jobTitle": "Senior HR",
+        "company": "Driftmark Technologies",
+        "location": "Dar es salaam, Tanzania",
+        "startDate": "April 2023",
+        "endDate": "February 2025",
+        "current": false,
+        "description": "",
+        "achievements": [
+          "Spearheaded talent acquisition strategy, resulting in a 45% increase in retention rates over 12 months",
+          "Implemented HR analytics tools that reduced recruitment costs by 30% and improved hiring efficiency by 50%",
+          "Developed employee engagement programs boosting productivity by 20% and enhancing workplace culture"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "id": "1746642629735",
+        "institution": "University of Dar es Salaam (UDSM)",
+        "degree": "Bachelor of Arts",
+        "field": "Political Science",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "",
+        "endDate": "June 2023"
+      },
+      {
+        "id": "1746642658317",
+        "institution": "Mzumbe University (MU)",
+        "degree": "Master of Arts",
+        "field": "Political Science",
+        "location": "Morogoro, Tanzania",
+        "startDate": "",
+        "endDate": "August 2018"
+      }
+    ],
+    "skills": [
+      {
+        "id": "1",
+        "name": "Recruitment",
+        "level": 4
+      },
+      {
+        "id": "2",
+        "name": "Onboarding",
+        "level": 5
+      },
+      {
+        "id": "3",
+        "name": "HRIS",
+        "level": 5
+      },
+      {
+        "id": "4",
+        "name": "Employee Relations",
+        "level": 5
+      },
+      {
+        "id": "5",
+        "name": "Conflict Resolution",
+        "level": 4
+      }
+    ],
+    "languages": [
+      {
+        "id": "1746642676316",
+        "name": "Swahili",
+        "level": "Bilingual"
+      },
+      {
+        "id": "1746642678296",
+        "name": "English",
+        "level": "Bilingual"
+      }
+    ],
+    "references": [
+      {
+        "id": "1746642705007",
+        "name": "Richard Kimaro",
+        "relationship": "Former Manager",
+        "email": "africanuspanga@gmail.com",
+        "phone": "+255753091526"
+      }
+    ]
+  }
+}

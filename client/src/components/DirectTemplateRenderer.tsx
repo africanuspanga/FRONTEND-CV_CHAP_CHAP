@@ -34,12 +34,43 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
   const template = getTemplateByID(templateId);
 
   if (template && template.render) {
+    // Clean personal info data (trim whitespace)
+    const cleanedPersonalInfo = {
+      ...cvData?.personalInfo,
+      firstName: cvData?.personalInfo?.firstName?.trim() || '',
+      lastName: cvData?.personalInfo?.lastName?.trim() || '',
+      professionalTitle: cvData?.personalInfo?.professionalTitle?.trim() || ''
+    };
+
+    // Clean work experiences data
+    const cleanedWorkExperiences = (cvData?.workExperiences || []).map(exp => ({
+      ...exp,
+      jobTitle: exp.jobTitle?.trim() || '',
+      company: exp.company?.trim() || '',
+      location: exp.location?.trim() || ''
+    }));
+
+    // Clean education data
+    const cleanedEducation = (cvData?.education || []).map(edu => ({
+      ...edu,
+      field: edu.field?.trim() || '',
+      location: edu.location?.trim() || '',
+      institution: edu.institution?.trim() || '',
+      degree: edu.degree?.trim() || ''
+    }));
+    
     // Convert and massage data if needed
     // Make sure workExperiences is used correctly
     const processedData = {
       ...cvData,
+      // Add cleaned data
+      personalInfo: cleanedPersonalInfo,
+      workExperiences: cleanedWorkExperiences,
+      education: cleanedEducation,
+      // Set name correctly
+      name: `${cleanedPersonalInfo.firstName} ${cleanedPersonalInfo.lastName}`.trim(),
       // Ensure workExperience is available (some templates use this name)
-      workExperience: cvData?.workExperiences || [],
+      workExperience: cleanedWorkExperiences,
       // Format the hobbies field correctly
       hobbies: Array.isArray(cvData?.hobbies) ? 
         // If it's an array of hobby objects, join the names
@@ -60,27 +91,37 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
   }
 
   // Fallback if template not found
+  // Clean personal info data (trim whitespace) for the fallback view
+  const cleanedPersonalInfo = {
+    ...cvData?.personalInfo,
+    firstName: cvData?.personalInfo?.firstName?.trim() || '',
+    lastName: cvData?.personalInfo?.lastName?.trim() || '',
+    professionalTitle: cvData?.personalInfo?.professionalTitle?.trim() || '',
+    address: cvData?.personalInfo?.address?.trim() || '',
+    summary: cvData?.personalInfo?.summary || ''
+  };
+
   return (
     <div className="p-4 border rounded-md bg-white" style={containerStyle}>
       <div className="p-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            {cvData?.personalInfo?.firstName || ''} {cvData?.personalInfo?.lastName || ''}
+            {cleanedPersonalInfo.firstName} {cleanedPersonalInfo.lastName}
           </h1>
           <h2 className="text-lg text-gray-600 mb-4">
-            {cvData?.personalInfo?.professionalTitle || ''}
+            {cleanedPersonalInfo.professionalTitle}
           </h2>
           
           <div className="flex justify-center space-x-4 text-sm text-gray-500">
-            <div>{cvData?.personalInfo?.email}</div>
-            <div>{cvData?.personalInfo?.phone}</div>
-            <div>{cvData?.personalInfo?.address || ''}</div>
+            <div>{cleanedPersonalInfo.email}</div>
+            <div>{cleanedPersonalInfo.phone}</div>
+            <div>{cleanedPersonalInfo.address}</div>
           </div>
         </div>
         
         <div className="mt-6">
           <h3 className="text-lg font-medium border-b pb-1 mb-3">Summary</h3>
-          <p>{cvData?.personalInfo?.summary}</p>
+          <p>{cleanedPersonalInfo.summary}</p>
         </div>
         
         <div className="mt-6 text-center text-gray-500">

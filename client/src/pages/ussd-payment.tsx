@@ -110,19 +110,42 @@ const USSDPaymentPage: React.FC = () => {
       }
       
       // Prepare the CV data for the API
+      const cleanedPersonalInfo = {
+        ...formData.personalInfo,
+        firstName: formData.personalInfo?.firstName?.trim() || '',
+        lastName: formData.personalInfo?.lastName?.trim() || '',
+        professionalTitle: formData.personalInfo?.professionalTitle?.trim() || ''
+      };
+
+      // Clean work experiences data (remove trailing spaces)
+      const cleanedWorkExperiences = (formData.workExperiences || []).map(exp => ({
+        ...exp,
+        jobTitle: exp.jobTitle?.trim() || '',
+        company: exp.company?.trim() || '',
+        location: exp.location?.trim() || ''
+      }));
+
+      // Clean education data
+      const cleanedEducation = (formData.education || []).map(edu => ({
+        ...edu,
+        field: edu.field?.trim() || '',
+        location: edu.location?.trim() || '',
+        institution: edu.institution?.trim() || '',
+        degree: edu.degree?.trim() || ''
+      }));
+
+      // Prepare cleaned data for API
       const cvData = {
         template_id: templateId,
         cv_data: {
           // Top-level fields required by backend validation
-          name: `${formData.personalInfo?.firstName || ''} ${formData.personalInfo?.lastName || ''}`.trim(),
-          email: formData.personalInfo?.email || '',
+          name: `${cleanedPersonalInfo.firstName} ${cleanedPersonalInfo.lastName}`.trim(),
+          email: cleanedPersonalInfo.email || '',
           
-          // CV data structure
-          personalInfo: {
-            ...(formData.personalInfo || {}),
-          },
-          workExperiences: formData.workExperiences || [],
-          education: formData.education || [],
+          // CV data structure with cleaned fields
+          personalInfo: cleanedPersonalInfo,
+          workExperiences: cleanedWorkExperiences,
+          education: cleanedEducation,
           skills: formData.skills || [],
           languages: formData.languages || [],
           
@@ -237,20 +260,43 @@ const USSDPaymentPage: React.FC = () => {
       
       console.log(`Using template ID for verification: ${templateId}`);
       
-      // 2. Prepare the CV data object with proper structure for the backend API
+      // 2. Clean and prepare the CV data with the same cleaning logic as handleDownload
+      const cleanedPersonalInfo = {
+        ...formData.personalInfo,
+        firstName: formData.personalInfo?.firstName?.trim() || '',
+        lastName: formData.personalInfo?.lastName?.trim() || '',
+        professionalTitle: formData.personalInfo?.professionalTitle?.trim() || ''
+      };
+
+      // Clean work experiences data
+      const cleanedWorkExperiences = (formData.workExperiences || []).map(exp => ({
+        ...exp,
+        jobTitle: exp.jobTitle?.trim() || '',
+        company: exp.company?.trim() || '',
+        location: exp.location?.trim() || ''
+      }));
+
+      // Clean education data
+      const cleanedEducation = (formData.education || []).map(edu => ({
+        ...edu,
+        field: edu.field?.trim() || '',
+        location: edu.location?.trim() || '',
+        institution: edu.institution?.trim() || '',
+        degree: edu.degree?.trim() || ''
+      }));
+
+      // Prepare the CV data object with cleaned data structure for the backend API
       const cvData = {
         template_id: templateId,
         cv_data: {
           // Top-level fields required by backend validation
-          name: `${formData.personalInfo?.firstName || ''} ${formData.personalInfo?.lastName || ''}`.trim(),
-          email: formData.personalInfo?.email || '',
+          name: `${cleanedPersonalInfo.firstName} ${cleanedPersonalInfo.lastName}`.trim(),
+          email: cleanedPersonalInfo.email || '',
           
-          // CV data structure
-          personalInfo: {
-            ...(formData.personalInfo || {}),
-          },
-          workExperiences: formData.workExperiences || [],
-          education: formData.education || [],
+          // CV data structure with cleaned fields
+          personalInfo: cleanedPersonalInfo,
+          workExperiences: cleanedWorkExperiences,
+          education: cleanedEducation,
           skills: formData.skills || [],
           languages: formData.languages || [],
           
