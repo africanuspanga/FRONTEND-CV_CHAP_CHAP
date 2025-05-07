@@ -1446,3 +1446,60 @@ function convertBase64ToBlob(base64String: string, mimeType: string): Blob {
   
   return new Blob(byteArrays, { type: mimeType });
 }
+
+/**
+ * Test direct API generate-and-download endpoint
+ * 
+ * This function sends a request to the server's new generate-and-download endpoint
+ * which directly generates a PDF and returns it as a binary response.
+ * 
+ * @param templateId The ID of the template to use
+ * @param cvData The user's CV data
+ * @returns A Promise that resolves to a Blob containing the PDF
+ */
+export const testDirectGenerateAndDownload = async (templateId: string, cvData: CVData): Promise<Blob> => {
+  try {
+    console.log(`Testing direct generate-and-download with template ID: ${templateId}`);
+    const transformedData = transformCVDataForBackend(cvData);
+    
+    const apiUrl = `https://cv-screener-africanuspanga.replit.app/api/generate-and-download`;
+    
+    console.log('Sending request to:', apiUrl);
+    console.log('Request payload:', JSON.stringify({
+      template_id: templateId,
+      cv_data: transformedData
+    }, null, 2).substring(0, 500) + '...');
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/pdf',
+        'User-Agent': 'CV-Chap-Chap-App'
+      },
+      body: JSON.stringify({
+        template_id: templateId,
+        cv_data: transformedData
+      })
+    });
+    
+    if (!response.ok) {
+      let errorMessage = '';
+      try {
+        // Try to parse as JSON
+        const errorJson = await response.json();
+        errorMessage = errorJson.error || response.statusText;
+      } catch {
+        // If not JSON, get as text
+        errorMessage = await response.text();
+      }
+      throw new Error(`Server returned ${response.status}: ${errorMessage}`);
+    }
+    
+    // Return the response as a blob
+    return await response.blob();
+  } catch (error) {
+    console.error('Error during direct generate-and-download test:', error);
+    throw new Error(`Failed to test direct PDF generation: ${error instanceof Error ? error.message : String(error)}`);
+  }
+};

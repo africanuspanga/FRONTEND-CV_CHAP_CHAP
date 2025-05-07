@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, Check, Download, Wifi, WifiOff, AlertCircle, ExternalLink, FileJson, FileText, Database } from 'lucide-react';
+import { Loader2, ArrowLeft, Check, Download, Wifi, WifiOff, AlertCircle, ExternalLink, FileJson, FileText, Database, Globe } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { downloadCVWithPreviewEndpoint, downloadTestPDF, testDataExchange, downloadPDFAsBase64, API_BASE_URL } from '@/services/cv-api-service';
+import { downloadCVWithPreviewEndpoint, downloadTestPDF, testDataExchange, downloadPDFAsBase64, testDirectGenerateAndDownload, API_BASE_URL } from '@/services/cv-api-service';
 import { Link } from 'wouter';
 import { Badge } from '@/components/ui/badge';
 
@@ -262,6 +262,25 @@ const ApiEndpointTest: React.FC = () => {
       setIsLoading(false);
     }
   };
+  
+  // Test the direct generate-and-download endpoint
+  const handleTestDirectGenerateAndDownload = async () => {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(false);
+    
+    try {
+      console.log('Testing direct generate-and-download endpoint');
+      const pdfBlob = await testDirectGenerateAndDownload('brightdiamond', sampleCVData);
+      downloadBlob(pdfBlob, 'JOHN_DOE-CV-direct-endpoint.pdf');
+      setSuccess(true);
+    } catch (err) {
+      console.error('Direct generate-and-download test failed:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -413,6 +432,36 @@ const ApiEndpointTest: React.FC = () => {
                 <FileJson className="h-4 w-4" />
               )}
               <span>Test Data Exchange</span>
+            </Button>
+          </div>
+          
+          {/* New section: Direct Generate-and-Download Test */}
+          <div className="w-full">
+            <div className="mb-2 bg-blue-50 p-3 rounded-md border border-blue-200">
+              <h3 className="text-sm font-medium text-blue-800 mb-1 flex items-center">
+                <Globe className="h-4 w-4 mr-1" />
+                New Direct Generate-and-Download API Test
+              </h3>
+              <p className="text-xs text-blue-700">
+                Test the new direct PDF generation endpoint that combines template selection 
+                and data submission into a single request.
+              </p>
+              <code className="text-xs bg-blue-100 p-1 rounded mt-2 block">
+                POST https://cv-screener-africanuspanga.replit.app/api/generate-and-download
+              </code>
+            </div>
+            <Button 
+              onClick={handleTestDirectGenerateAndDownload}
+              disabled={isLoading}
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700"
+              variant="default"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Globe className="h-4 w-4" />
+              )}
+              <span>Test Direct Generate-and-Download API</span>
             </Button>
           </div>
           
