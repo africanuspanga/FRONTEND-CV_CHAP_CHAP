@@ -79,101 +79,29 @@ const FinalPreview = () => {
     // Set downloading state to true to disable the button
     setIsDownloading(true);
     
-    // Reset any existing request
-    resetRequest();
-    
     try {
       // Ensure form data has the most current template ID
       if (currentTemplateId !== formData.templateId) {
-        console.log('Updating template ID before download:', currentTemplateId);
+        console.log('Updating template ID before proceeding to payment:', currentTemplateId);
         updateFormField('templateId', currentTemplateId);
       }
       
-      console.log("Initiating payment with template ID:", currentTemplateId);
-      // Initiating payment using the current template ID and updated form data
-      const updatedFormData = {
-        ...formData,
-        templateId: currentTemplateId // Ensure consistent template ID
-      };
+      // Store the selected template ID in sessionStorage
+      // This will be needed at the payment verification step
+      sessionStorage.setItem('cv_template_id', currentTemplateId);
       
-      try {
-        // First attempt: try to initiate payment via API
-        const paymentInitiated = await initiatePayment(currentTemplateId, updatedFormData);
-        
-        if (paymentInitiated) {
-          toast({
-            title: "Payment Initiated",
-            description: "Redirecting to payment verification page",
-          });
-          // Redirect to USSD payment page for manual payment verification
-          navigate('/ussd-payment');
-          return;
-        }
-      } catch (apiError) {
-        // Log the API error but continue to fallback
-        console.warn("Payment API error:", apiError);
-      }
+      console.log("Proceeding to USSD payment page with templateId:", currentTemplateId);
       
-      // If we reach here, API call failed - proceed to fallback
-      try {
-        console.log("Using fallback payment flow");
-        
-        // Create simplified data object to avoid storage issues
-        const minimalCVData = {
-          templateId: currentTemplateId,
-          personalInfo: updatedFormData.personalInfo || {},
-          // Include only essential fields
-          workExperiences: updatedFormData.workExperiences?.slice(0, 2) || [],
-          education: updatedFormData.education?.slice(0, 2) || [],
-          skills: updatedFormData.skills?.slice(0, 10) || []
-        };
-        
-        // Generate a unique ID that we'll use for navigation only
-        const fallbackRequestId = `local-${Date.now()}`;
-        
-        // Store in sessionStorage instead of localStorage to avoid quota issues
-        sessionStorage.setItem('cv_request_id', fallbackRequestId);
-        sessionStorage.setItem('cv_template_id', currentTemplateId);
-        
-        // Skip storing large data - we'll use what's already in the form context
-        console.log("Using fallback with ID:", fallbackRequestId);
-      } catch (storageError) {
-        console.error("Storage error in fallback flow:", storageError);
-        // Even if storage fails, we still want to proceed to payment page
-      }
+      // Navigate directly to the USSD payment page
+      // No need to call initiatePayment API - we'll handle everything on the USSD page
+      navigate('/ussd-payment');
       
-      // Use the dialog to ask user what to do
-      toast({
-        title: "Connection Issue",
-        description: "Would you like to proceed with manual payment verification anyway?",
-        action: (
-          <Button 
-            variant="default" 
-            onClick={() => navigate('/ussd-payment')}
-            className="bg-primary text-white hover:bg-primary/90"
-          >
-            Proceed
-          </Button>
-        ),
-        duration: 10000, // 10 seconds
-      });
-      
-      setIsDownloading(false);
     } catch (error) {
-      console.error("Error in payment flow:", error);
+      console.error("Error proceeding to payment:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to initiate payment",
-        variant: "destructive",
-        action: (
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/ussd-payment')}
-            className="bg-primary text-white hover:bg-primary/90"
-          >
-            Try Anyway
-          </Button>
-        ),
+        description: "There was a problem proceeding to payment. Please try again.",
+        variant: "destructive"
       });
       setIsDownloading(false);
     }

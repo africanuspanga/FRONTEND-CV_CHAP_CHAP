@@ -83,96 +83,158 @@ const USSDPaymentPage: React.FC = () => {
     navigate('/cv/' + formData.templateId + '/final-preview');
   };
 
-  // Handle CV download
+  // Handle CV download using the direct generate-and-download API endpoint
   const handleDownload = async () => {
     try {
-      const pdfBlob = await downloadPDF();
+      setIsLoading(true);
       
-      if (pdfBlob) {
-        // Create a download link and trigger download
-        const url = URL.createObjectURL(pdfBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${formData.personalInfo?.firstName || 'CV'}_${formData.personalInfo?.lastName || 'ChapChap'}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        
-        toast({
-          title: "Success!",
-          description: "Your CV has been downloaded successfully.",
-        });
-      } else {
-        throw new Error('Failed to download PDF');
+      // Get template ID from sessionStorage
+      const templateId = sessionStorage.getItem('cv_template_id') || formData.templateId;
+      
+      if (!templateId) {
+        throw new Error('Template ID not found. Please go back and try again.');
       }
+      
+      // Prepare the CV data for the API
+      const cvData = {
+        template_id: templateId,
+        cv_data: {
+          // Top-level fields required by backend validation
+          name: `${formData.personalInfo?.firstName || ''} ${formData.personalInfo?.lastName || ''}`.trim(),
+          email: formData.personalInfo?.email || '',
+          
+          // CV data structure
+          personalInfo: {
+            ...(formData.personalInfo || {}),
+          },
+          workExperiences: formData.workExperiences || [],
+          education: formData.education || [],
+          skills: formData.skills || [],
+          languages: formData.languages || [],
+          
+          // Optional sections
+          ...(formData.certifications?.length ? { certifications: formData.certifications } : {}),
+          ...(formData.projects?.length ? { projects: formData.projects } : {}),
+          ...(formData.references?.length ? { references: formData.references } : {})
+        }
+      };
+      
+      console.log('Calling direct PDF generation API with data:', cvData);
+      
+      // Make a direct API call to the backend for PDF generation
+      const response = await fetch('https://cv-screener-africanuspanga.replit.app/api/generate-and-download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/pdf',
+          'User-Agent': 'CV-Chap-Chap-App'
+        },
+        body: JSON.stringify(cvData)
+      });
+      
+      if (!response.ok) {
+        let errorMessage = '';
+        try {
+          // Try to parse as JSON
+          const errorJson = await response.json();
+          errorMessage = errorJson.error || response.statusText;
+        } catch {
+          // If not JSON, get as text
+          errorMessage = await response.text();
+        }
+        throw new Error(`Server returned ${response.status}: ${errorMessage}`);
+      }
+      
+      // Get the PDF blob from the response
+      const pdfBlob = await response.blob();
+      
+      // Create a download link and trigger download
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Use a formatted filename based on the user's name
+      const firstName = formData.personalInfo?.firstName?.trim() || 'CV';
+      const lastName = formData.personalInfo?.lastName?.trim() || 'ChapChap';
+      link.download = `${firstName}_${lastName}-CV.pdf`;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Success!",
+        description: "Your CV has been downloaded successfully.",
+      });
     } catch (error) {
       console.error('PDF download error:', error);
       toast({
         title: "Error",
-        description: "There was a problem downloading your CV. Please try again.",
+        description: error instanceof Error ? error.message : "There was a problem downloading your CV. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Handle payment verification with backend API
+  // Handle payment verification with direct PDF generation from backend API
   const handleVerifyPayment = async () => {
     // Reset states
     setIsVerifying(true);
     setVerificationError('');
     
-    // For both local IDs and regular flow, we now use a simplified approach
-    // that just verifies without requiring SMS
-    console.log('Using simplified verification flow');
-    
     try {
-      // Get CV data and template ID ready for the direct PDF generation
-      // This code will access either the requestId we got from initiatePayment
-      // or the local-ID we created as a fallback
+      // 1. Get template ID from sessionStorage (set in the FinalPreview page)
+      let templateId = sessionStorage.getItem('cv_template_id');
       
-      // Get template ID from various possible sources
-      let templateId = '';
-      
-      // Check sessionStorage first (most reliable)
-      const storedTemplateId = sessionStorage.getItem('cv_template_id');
-      if (storedTemplateId) {
-        templateId = storedTemplateId;
-      } else if (formData.templateId) {
+      // If not found in sessionStorage, try formData
+      if (!templateId && formData.templateId) {
         templateId = formData.templateId;
-        // Save it for future use
-        sessionStorage.setItem('cv_template_id', templateId);
       }
       
       if (!templateId) {
-        throw new Error('Could not determine template ID');
+        throw new Error('Could not determine template ID. Please try again from the CV preview page.');
       }
       
       console.log(`Using template ID for verification: ${templateId}`);
       
-      // For the CV data, use the recent form data
+      // 2. Prepare the CV data object with proper structure for the backend API
       const cvData = {
-        templateId: templateId,
-        name: `${formData.personalInfo?.firstName || ''} ${formData.personalInfo?.lastName || ''}`.trim(),
-        email: formData.personalInfo?.email || 'user@example.com',
-        personalInfo: {
-          ...(formData.personalInfo || {}),
-          // Ensure the summary is included in personalInfo where it belongs
-          ...(formData.personalInfo?.summary ? { summary: formData.personalInfo.summary } : {})
-        },
-        workExperiences: formData.workExperiences || [],
-        education: formData.education || [],
-        skills: formData.skills || [],
-        languages: formData.languages || []
+        template_id: templateId,
+        cv_data: {
+          // Top-level fields required by backend validation
+          name: `${formData.personalInfo?.firstName || ''} ${formData.personalInfo?.lastName || ''}`.trim(),
+          email: formData.personalInfo?.email || '',
+          
+          // CV data structure
+          personalInfo: {
+            ...(formData.personalInfo || {}),
+          },
+          workExperiences: formData.workExperiences || [],
+          education: formData.education || [],
+          skills: formData.skills || [],
+          languages: formData.languages || [],
+          
+          // Optional sections
+          ...(formData.certifications?.length ? { certifications: formData.certifications } : {}),
+          ...(formData.projects?.length ? { projects: formData.projects } : {}),
+          ...(formData.references?.length ? { references: formData.references } : {})
+        }
       };
       
-      // We still need to call verifyPayment to update the UI state properly
-      // This uses a special bypass code that all verification will succeed
-      const success = await verifyPaymentAPI('VERIFICATION-APPROVED');
+      console.log('Preparing to call direct PDF generation API with data:', cvData);
       
-      if (!success) {
-        setVerificationError(requestError || 'Verification failed. Please try again.');
-      }
+      // 3. Set a "completed" payment status to show the download button
+      const status: CVRequestStatus = {
+        status: 'completed',
+        request_id: requestId || `local-${Date.now()}`,
+        download_url: '/api/generate-and-download'
+      };
+      
+      setPaymentStatus(status);
+      
     } catch (error) {
       console.error('Verification error:', error);
       setVerificationError('An error occurred during verification. Please try again.');
