@@ -9,9 +9,17 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 
 const USSDPaymentPage: React.FC = () => {
+  // State for SMS input and verification
   const [paymentReference, setPaymentReference] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationError, setVerificationError] = useState('');
+  
+  // State for payment and download status
+  const [isPaymentVerified, setIsPaymentVerified] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Navigation and context
   const [, navigate] = useLocation();
   const { formData } = useCVForm();
   const { toast } = useToast();
@@ -21,15 +29,21 @@ const USSDPaymentPage: React.FC = () => {
     initiatePayment, 
     verifyPayment: verifyPaymentAPI, 
     downloadPDF,
-    isLoading, 
     paymentStatus, 
     requestId,
     error: requestError
   } = useCVRequest();
   
-  // Check if payment is verified based on payment status
-  const isPaymentVerified = paymentStatus?.status === 'completed';
-  const isPending = paymentStatus?.status === 'verifying_payment' || paymentStatus?.status === 'generating_pdf';
+  // Check context payment status and update local state when it changes
+  useEffect(() => {
+    // If the context payment status changes, update our local state
+    if (paymentStatus?.status === 'completed') {
+      setIsPaymentVerified(true);
+      setIsPending(false);
+    } else if (paymentStatus?.status === 'verifying_payment' || paymentStatus?.status === 'generating_pdf') {
+      setIsPending(true);
+    }
+  }, [paymentStatus]);
   
   // Initialize payment request if not already done
   useEffect(() => {
@@ -226,14 +240,9 @@ const USSDPaymentPage: React.FC = () => {
       
       console.log('Preparing to call direct PDF generation API with data:', cvData);
       
-      // 3. Set a "completed" payment status to show the download button
-      const status: CVRequestStatus = {
-        status: 'completed',
-        request_id: requestId || `local-${Date.now()}`,
-        download_url: '/api/generate-and-download'
-      };
-      
-      setPaymentStatus(status);
+      // 3. Set status to verified to show the download button
+      setIsPaymentVerified(true);
+      setIsPending(false);
       
     } catch (error) {
       console.error('Verification error:', error);
@@ -385,7 +394,14 @@ const USSDPaymentPage: React.FC = () => {
             <Button 
               onClick={handleVerifyPayment} 
               className="w-full bg-primary hover:bg-primary/90 py-3 sm:py-4 text-base sm:text-lg"
-              disabled={isVerifying || (!paymentReference.trim() && !requestId?.startsWith('local-')) || isLoading || isPending}
+              disabled={isVerifying || 
+                // Local ID bypass doesn't need SMS verification
+                (!requestId?.startsWith('local-') && 
+                  // Only enable Verify button if SMS is between 140-170 characters
+                  (paymentReference.length < 140 || paymentReference.length > 170)
+                ) || 
+                isLoading || 
+                isPending}
             >
               {isVerifying ? (
                 <>
