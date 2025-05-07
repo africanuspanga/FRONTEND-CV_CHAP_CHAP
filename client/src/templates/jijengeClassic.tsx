@@ -193,6 +193,25 @@ export function JijengeClassicTemplate({
                           {bullet.trim()}
                         </li>
                       )) : null}
+                      
+                      {job.achievements && job.achievements.map((achievement: string, achieveIndex: number) => (
+                        <li key={`achieve-${achieveIndex}`} style={{
+                          fontSize: '0.95em',
+                          color: '#444',
+                          marginBottom: '5px',
+                          paddingLeft: '18px',
+                          position: 'relative'
+                        }}>
+                          <span style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: '0.1em',
+                            fontSize: '1em',
+                            color: '#555'
+                          }}>•</span>
+                          {typeof achievement === 'string' ? achievement.trim() : achievement}
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </li>
