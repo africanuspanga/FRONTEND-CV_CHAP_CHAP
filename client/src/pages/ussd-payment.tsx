@@ -135,16 +135,39 @@ const USSDPaymentPage: React.FC = () => {
       
       console.log('Calling direct PDF generation API with data:', cvData);
       
+      console.log('Full CV data being sent:', JSON.stringify(cvData, null, 2));
+      
       // Make a direct API call to the backend for PDF generation
-      const response = await fetch('https://cv-screener-africanuspanga.replit.app/api/generate-and-download', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/pdf',
-          'User-Agent': 'CV-Chap-Chap-App'
-        },
-        body: JSON.stringify(cvData)
-      });
+      // First, try with the user's specified backend URL
+      let response;
+      try {
+        // Use our server-side proxy endpoint instead of calling the external API directly
+        response = await fetch('/api/generate-and-download', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/pdf',
+            'User-Agent': 'CV-Chap-Chap-App'
+          },
+          body: JSON.stringify(cvData)
+        });
+        
+        console.log('Backend API response status:', response.status);
+        if (!response.ok) {
+          console.error('Error response from primary backend URL');
+        }
+      } catch (fetchError) {
+        console.error('Error calling primary backend URL:', fetchError);
+        
+        // No need for fallback since we're using the same URL
+        toast({
+          title: "PDF Generation Error",
+          description: "An error occurred while connecting to the server. Please try again.",
+          variant: "destructive"
+        });
+        
+        throw fetchError;
+      }
       
       if (!response.ok) {
         let errorMessage = '';
