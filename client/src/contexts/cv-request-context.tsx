@@ -500,65 +500,53 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
       };
       
-      console.log('Calling API with data structure:', requestData);
+      console.log('Calling direct API with data structure:', requestData);
       
-      // Use the new direct endpoint for PDF generation with retry logic
-      try {
-        // Use retryWithBackoff for PDF generation
-        const pdfBlob = await retryWithBackoff(
-          async () => {
-            const response = await fetch('/api/generate-and-download', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/pdf'
-              },
-              body: JSON.stringify(requestData)
-            });
-            
-            if (!response.ok) {
-              // Check if it's a rate limit error
-              if (response.status === 429) {
-                const retryAfter = response.headers.get('Retry-After');
-                const error = new Error(`Rate limited. Try again in ${retryAfter || '3'} seconds.`);
-                // @ts-ignore - Add status property to error
-                error.status = 429;
-                throw error;
-              }
-              
-              // For other errors, try to get details
-              let errorMessage = '';
-              try {
-                const errorJson = await response.json();
-                errorMessage = errorJson.error || `Server error: ${response.status} ${response.statusText}`;
-              } catch {
-                errorMessage = await response.text() || `Server error: ${response.status} ${response.statusText}`;
-              }
-              throw new Error(errorMessage);
+      // Use the direct endpoint for PDF generation with retry logic
+      // No fallbacks - only use server-side PDF generation
+      const pdfBlob = await retryWithBackoff(
+        async () => {
+          // Use the external API URL directly
+          const apiUrl = `https://cv-screener-africanuspanga.replit.app/api/generate-and-download`;
+          
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/pdf',
+              'User-Agent': 'CV-Chap-Chap-App'
+            },
+            body: JSON.stringify(requestData)
+          });
+          
+          if (!response.ok) {
+            // Check if it's a rate limit error
+            if (response.status === 429) {
+              const retryAfter = response.headers.get('Retry-After');
+              const error = new Error(`Rate limited. Try again in ${retryAfter || '3'} seconds.`);
+              // @ts-ignore - Add status property to error
+              error.status = 429;
+              throw error;
             }
             
-            // If successful, return PDF as blob
-            return response.blob();
-          },
-          'pdf-generation'
-        );
-        
-        return pdfBlob;
-      } catch (apiError) {
-        console.error('Backend PDF generation failed:', apiError);
-        
-        // Fallback to downloadGeneratedPDF (using standard endpoint)
-        try {
-          console.log('Trying standard download endpoint...');
-          const pdfBlob = await downloadGeneratedPDF(requestId);
-          return pdfBlob;
-        } catch (fallbackError) {
-          console.error('Standard download endpoint failed too:', fallbackError);
+            // For other errors, try to get details
+            let errorMessage = '';
+            try {
+              const errorJson = await response.json();
+              errorMessage = errorJson.error || `Server error: ${response.status} ${response.statusText}`;
+            } catch {
+              errorMessage = await response.text() || `Server error: ${response.status} ${response.statusText}`;
+            }
+            throw new Error(errorMessage);
+          }
           
-          // Instead of generating a PDF client-side, throw a user-friendly error
-          throw new Error('Unable to generate your CV from the server. Please try again or select a different template.');
-        }
-      }
+          // If successful, return PDF as blob
+          return response.blob();
+        },
+        'pdf-generation'
+      );
+      
+      return pdfBlob;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to download PDF';
       setError(errorMessage);
