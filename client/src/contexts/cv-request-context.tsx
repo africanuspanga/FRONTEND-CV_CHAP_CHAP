@@ -545,7 +545,7 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         
         return pdfBlob;
       } catch (apiError) {
-        console.error('Backend PDF generation failed, using fallback:', apiError);
+        console.error('Backend PDF generation failed:', apiError);
         
         // Fallback to downloadGeneratedPDF (using standard endpoint)
         try {
@@ -555,45 +555,8 @@ export const CVRequestProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         } catch (fallbackError) {
           console.error('Standard download endpoint failed too:', fallbackError);
           
-          // Final jsPDF fallback
-          console.log('Creating PDF with jsPDF...');
-          const { jsPDF } = await import('jspdf');
-          
-          // Create a new PDF document
-          const doc = new jsPDF();
-          
-          // Add content to the PDF
-          const fullName = name || 'CV ChapChap User';
-          
-          // Add header with name
-          doc.setFontSize(22);
-          doc.setTextColor(0, 102, 204); // Blue color for header
-          doc.text(fullName, 105, 20, { align: 'center' });
-          
-          // Add contact info
-          doc.setFontSize(10);
-          doc.setTextColor(0, 0, 0);
-          doc.text(`Email: ${email}`, 105, 30, { align: 'center' });
-          if (cvData.personalInfo?.phone) {
-            doc.text(`Phone: ${cvData.personalInfo.phone}`, 105, 35, { align: 'center' });
-          }
-          
-          // Add summary if available
-          if (cvData.summary) {
-            doc.setFontSize(14);
-            doc.setTextColor(0, 102, 204);
-            doc.text('Professional Summary', 20, 45);
-            doc.setFontSize(10);
-            doc.setTextColor(0, 0, 0);
-            
-            // Split long summary into multiple lines
-            const summaryLines = doc.splitTextToSize(cvData.summary, 170);
-            doc.text(summaryLines, 20, 55);
-          }
-          
-          // Save the PDF and return as a blob
-          const pdfOutput = doc.output('blob');
-          return pdfOutput;
+          // Instead of generating a PDF client-side, throw a user-friendly error
+          throw new Error('Unable to generate your CV from the server. Please try again or select a different template.');
         }
       }
     } catch (error) {

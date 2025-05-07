@@ -523,31 +523,14 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
         // Get more detailed error information for debugging
         console.error('Response missing file_id:', JSON.stringify(response));
         
-        // Check if the response is completely empty (likely a server issue)
+        // Create a more specific error message for troubleshooting
         if (Object.keys(response).length === 0) {
-          console.warn('Received empty response from server, generating fallback ID');
-          
-          // Generate a local fallback ID for this request
-          const fallbackId = `local-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-          
-          // Create response with fallback ID as request_id
-          const requestId = fallbackId;
-          
-          // Store the request ID and associated CV data for later retrieval
-          localStorage.setItem(`cv_data_${requestId}`, JSON.stringify(localStorageData));
-          
-          // Create a structured response to match our API format
-          const ussdResponse = {
-            success: true,
-            request_id: requestId,
-            ussd_code: '*150*50*1#', // USSD code for Selcom payment
-            reference_number: `CV-${requestId.slice(-6)}` // Last 6 characters as reference
-          };
-          
-          console.log('Using fallback ID due to empty response:', ussdResponse);
-          return ussdResponse;
+          console.error('Empty response object from server');
+          throw new Error('No data received from server. Please try again with a different template.');
         } else {
-          throw new Error(`Missing file_id in response: ${JSON.stringify(response)}`);
+          // Log the specific server response structure for debugging
+          console.error('Server response data structure:', Object.keys(response).join(', '));
+          throw new Error('Invalid server response. The system is temporarily unavailable.');
         }
       }
       
@@ -571,25 +554,15 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
       // Enhanced error logging with more context
       console.error('API error during payment initiation:', apiError);
       
-      // Generate local fallback ID
-      const fallbackId = `local-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+      // Log the complete error
+      console.error('API error details:', apiError);
       
-      // Store the CV data with the fallback ID
-      localStorage.setItem(`cv_data_${fallbackId}`, JSON.stringify(localStorageData));
-      
-      // Log about using fallback
-      console.log('Using fallback ID due to API error:', fallbackId);
-      
-      // If this is a specific "Missing file_id" error, return fallback ID as success
-      // This allows the user to continue the flow without seeing an error
+      // We don't want to use local fallbacks anymore, just propagate the error
       if (apiError instanceof Error && apiError.message.includes('file_id')) {
         return {
-          success: true,
-          request_id: fallbackId,
-          ussd_code: '*150*50*1#',
-          reference_number: `CV-${fallbackId.slice(-6)}`,
-          // Let the user know we're using a fallback
-          user_message: 'Using local CV generation due to server limitations. Your CV will still be created.'
+          success: false,
+          error: "Server couldn't process your request. Please try again with a different template.",
+          reference_number: `ERR-${Date.now().toString().slice(-6)}`
         };
       }
       
