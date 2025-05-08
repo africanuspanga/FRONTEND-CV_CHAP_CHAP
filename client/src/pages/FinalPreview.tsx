@@ -134,7 +134,6 @@ const FinalPreview = () => {
         
         {/* CV Preview Area */}
         <div className="cv-preview-container flex-grow flex justify-center">
-          {isMobile && <div className="scroll-notice">○ Scroll to view the full CV</div>}
           <div className="cv-template-container">
             <DirectTemplateRenderer
               templateId={currentTemplateId}
@@ -149,14 +148,14 @@ const FinalPreview = () => {
       
       {/* Mobile Action Button */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0">
-          <button 
-            onClick={handleDownload}
-            className="w-full py-4 bg-blue-600 text-white text-lg font-semibold"
-          >
-            {isDownloading ? 'Downloading...' : 'Download My CV'}
-          </button>
-        </div>
+        <button 
+          onClick={handleDownload}
+          disabled={isDownloading}
+          className="mobile-download-button"
+        >
+          <Download className="h-5 w-5" />
+          {isDownloading ? 'Processing...' : 'Download My CV'}
+        </button>
       )}
     </div>
   );
