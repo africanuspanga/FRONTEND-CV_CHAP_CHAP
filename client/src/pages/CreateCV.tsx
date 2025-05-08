@@ -161,10 +161,10 @@ const CreateCVContent = () => {
   return (
     <div className="flex min-h-screen">
       {/* Left Sidebar with Steps */}
-      <div className="hidden md:block w-64 bg-[#10243e] text-white">
+      <div className="hidden md:block w-64 bg-primary text-white">
         <div className="p-4">
           <h2 className="text-xl font-bold text-white mb-6 flex items-center">
-            <span className="text-[#e94f37]">my</span>perfect<span>resume</span>
+            <span className="text-accent">CV</span>Chap<span>Chap</span>
           </h2>
         </div>
         
@@ -173,7 +173,7 @@ const CreateCVContent = () => {
           {formSteps.slice(1).map((step, idx) => (
             <div 
               key={step.id}
-              className={`flex items-center px-6 py-3 ${currentStep === idx + 1 ? 'bg-[#1a3a5f]' : ''} ${idx + 1 < currentStep ? 'text-gray-300' : 'text-white'}`}
+              className={`flex items-center px-6 py-3 ${currentStep === idx + 1 ? 'bg-primary-foreground/10' : ''} ${idx + 1 < currentStep ? 'text-gray-300' : 'text-white'}`}
               onClick={() => {
                 if (idx + 1 <= currentStep) {
                   setCurrentStep(idx + 1);
@@ -181,7 +181,7 @@ const CreateCVContent = () => {
                 }
               }}
             >
-              <div className={`w-6 h-6 rounded-full mr-3 flex items-center justify-center ${currentStep === idx + 1 ? 'bg-[#e94f37]' : 'bg-gray-600'}`}>
+              <div className={`w-6 h-6 rounded-full mr-3 flex items-center justify-center ${currentStep === idx + 1 ? 'bg-accent' : 'bg-gray-600'}`}>
                 {idx + 1}
               </div>
               <span className="text-sm">{step.title}</span>
@@ -194,7 +194,7 @@ const CreateCVContent = () => {
           <div className="mb-1 text-xs uppercase">RESUME COMPLETENESS</div>
           <div className="w-full bg-gray-700 h-2 rounded-full">
             <div 
-              className="h-full bg-gradient-to-r from-[#3cba92] to-[#3cba92] rounded-full" 
+              className="h-full bg-accent rounded-full" 
               style={{ width: `${Math.round(progress)}%` }}
             ></div>
           </div>
