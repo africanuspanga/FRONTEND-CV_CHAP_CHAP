@@ -188,13 +188,14 @@
       @apply fixed bottom-0 left-0 right-0 flex justify-between p-3 bg-background border-t z-50;
     }
     
-    /* Mobile CV template scaling for perfect A4 scaling */
+    /* Mobile CV template scaling for perfect A4 scaling - centered */
     .mobile-template-content {
       @apply overflow-visible;
       width: 100%;
       min-height: 1123px; /* A4 height */
       padding-bottom: 4rem;
-      margin-top: 1.5rem;
+      margin: 1.5rem auto 0;
+      display: inline-block;
     }
     
     /* Template container in mobile view */
@@ -226,24 +227,27 @@
       background-color: white;
       padding-bottom: 60px !important;
       -webkit-overflow-scrolling: touch;
-      display: flex;
-      justify-content: center;
+      display: block;
+      text-align: center;
       width: 100%;
       overflow-x: hidden;
     }
     
-    /* CV scale container - like PDF viewer */
+    /* CV scale container - like PDF viewer - perfectly centered */
     .cv-preview-container-mobile {
-      transform: scale(0.55);
-      transform-origin: top center;
+      transform-origin: center top;
       width: 794px; /* A4 width */
       min-height: 1123px; /* A4 height */
-      margin: 0 auto 20px;
+      margin: 0;
       background-color: white;
       padding: 0;
       border: none;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       border-radius: 4px;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%) scale(0.55);
+      display: inline-block;
     }
   }
 }
