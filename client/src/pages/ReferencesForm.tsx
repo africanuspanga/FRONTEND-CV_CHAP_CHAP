@@ -6,12 +6,14 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import { Input } from '@/components/ui/input';
 import { Reference } from '@shared/schema';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 const ReferencesForm = () => {
   const [, navigate] = useLocation();
   const params = useParams<{ templateId: string }>();
   const { formData, updateFormField } = useCVForm();
   const templateId = params.templateId;
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   // State for reference information
   const [name, setName] = useState('');
