@@ -21,12 +21,8 @@ const CreationMethod = () => {
     navigate('/templates');
   };
 
-  const handleUploadExisting = () => {
-    // This would be implemented with file upload functionality
-    // For now, just show a notification and proceed to template selection
-    alert('File upload feature will be implemented in a future update. Proceeding to template selection.');
-    navigate('/templates');
-  };
+  // Upload functionality temporarily disabled
+  // Will be implemented in a future update
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
@@ -58,20 +54,25 @@ const CreationMethod = () => {
         <Card className="shadow-md hover:shadow-lg transition-shadow">
           <CardContent className="p-8 flex flex-col items-center text-center">
             <div className="w-24 h-24 bg-secondary rounded-full flex items-center justify-center mb-6">
-              <Upload className="h-12 w-12 text-primary" />
+              <Upload className="h-12 w-12 text-primary opacity-60" />
             </div>
             <h2 className="text-2xl font-bold text-darkText mb-4">Upload Existing CV</h2>
             <p className="text-lightText mb-8">
               Upload your current CV and we'll extract the information to enhance it.
             </p>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="w-full py-6" 
-              onClick={handleUploadExisting}
-            >
-              Upload CV
-            </Button>
+            <div className="relative">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="w-full py-6 opacity-70 cursor-not-allowed"
+                disabled={true}
+              >
+                Upload CV
+              </Button>
+              <div className="absolute top-full left-0 w-full text-center mt-2">
+                <span className="text-xs text-orange-600 font-medium">Coming soon</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
