@@ -21,7 +21,7 @@ const AdditionalSectionsForm = () => {
   const { formData, currentStep } = useCVForm();
   const templateId = formData.templateId;
   const isMobile = useIsMobile();
-  const [showPreview, setShowPreview] = useState(!isMobile);
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleNext = () => {
     navigate(`/cv/${templateId}/final-preview`);
@@ -123,21 +123,23 @@ const AdditionalSectionsForm = () => {
           </Button>
         </div>
 
-        {/* Toggle Preview Button */}
-        <button
-          onClick={() => setShowPreview(!showPreview)}
-          className={`w-full rounded-md border border-gray-300 flex items-center justify-center gap-2 py-3 px-4 mb-8 ${showPreview ? 'bg-white text-gray-700' : 'bg-indigo-600 text-white'}`}
-        >
-          {showPreview ? (
-            <>
-              <EyeOff className="w-5 h-5" /> Hide Preview <ChevronUp className="w-4 h-4 ml-1" />
-            </>
-          ) : (
-            <>
-              <Eye className="w-5 h-5" /> Show Preview <ChevronDown className="w-4 h-4 ml-1" />
-            </>
-          )}
-        </button>
+        {/* Toggle Preview Button - Only show on desktop */}
+        {!isMobile && (
+          <button
+            onClick={() => setShowPreview(!showPreview)}
+            className={`w-full rounded-md border border-gray-300 flex items-center justify-center gap-2 py-3 px-4 mb-8 ${showPreview ? 'bg-white text-gray-700' : 'bg-indigo-600 text-white'}`}
+          >
+            {showPreview ? (
+              <>
+                <EyeOff className="w-5 h-5" /> Hide Preview <ChevronUp className="w-4 h-4 ml-1" />
+              </>
+            ) : (
+              <>
+                <Eye className="w-5 h-5" /> Show Preview <ChevronDown className="w-4 h-4 ml-1" />
+              </>
+            )}
+          </button>
+        )}
         
         {/* Preview Section - Below the form content */}
         {showPreview && (
