@@ -282,19 +282,6 @@ const SummaryGeneration = () => {
 
         <div className="flex gap-4 justify-center mb-8">
           <Button
-            onClick={handleRegenerate}
-            disabled={loading || attemptsLeft === 0}
-            variant="outline"
-            className="text-blue-600 flex items-center"
-          >
-            <RefreshCcw className="h-4 w-4 mr-2" />
-            Regenerate
-            <span className="text-sm text-gray-500 ml-2">
-              {attemptsLeft} attempts left
-            </span>
-          </Button>
-
-          <Button
             onClick={handleWriteMyOwn}
             disabled={loading}
             className="bg-blue-100 text-blue-700 hover:bg-blue-200"
@@ -305,9 +292,9 @@ const SummaryGeneration = () => {
           <Button
             onClick={handleUseThisSummary}
             disabled={loading}
-            className="bg-teal-600 hover:bg-teal-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            Use this summary
+            Use this
           </Button>
         </div>
 
@@ -323,7 +310,7 @@ const SummaryGeneration = () => {
 
           <Button
             onClick={handleNext}
-            className="bg-teal-600 hover:bg-teal-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             Next
           </Button>
