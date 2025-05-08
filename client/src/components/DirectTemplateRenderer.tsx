@@ -35,7 +35,7 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
     borderRadius: '0',
     border: 'none',
     padding: '0',
-    margin: '0',
+    margin: '0 auto',
     touchAction: 'pan-y', // Allow vertical panning on mobile
     WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
   };
@@ -95,10 +95,10 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
     // Render the template using the template registry's render function with safe data
     return (
       <div className="template-container" style={containerStyle}>
-        <div 
-          className={`${height === "auto" ? "mobile-template-content" : ""}`}
-        >
-          {template.render(processedData)}
+        <div className="cv-preview">
+          <div className={`${height === "auto" ? "mobile-template-content" : ""}`}>
+            {template.render(processedData)}
+          </div>
         </div>
       </div>
     );
