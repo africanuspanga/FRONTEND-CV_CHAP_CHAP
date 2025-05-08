@@ -570,15 +570,15 @@ const WorkExperienceForm = () => {
                 <Button 
                   variant="outline" 
                   onClick={() => navigate(`/cv/${templateId}/personal`)}
-                  className="flex items-center"
+                  className="flex items-center gap-1 px-4"
                 >
-                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
                 
                 <Button 
                   onClick={handleContinueToEducation}
-                  className="bg-primary hover:bg-primary/90 text-white"
+                  className="bg-primary hover:bg-primary/90 text-white px-4"
                 >
                   Next
                 </Button>
@@ -595,17 +595,7 @@ const WorkExperienceForm = () => {
         )}
       </div>
       
-      {/* Fixed Next Button for Mobile */}
-      {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 px-4 py-4 bg-white shadow-lg" style={{zIndex: 999}}>
-          <Button
-            onClick={handleSubmit}
-            className="w-full h-12 text-white bg-primary hover:bg-primary/90"
-          >
-            Next
-          </Button>
-        </div>
-      )}
+      {/* Removed the fixed Next button as requested */}
       
       {/* AI Recommendation Modal */}
       {isGeneratingRecommendations && (
