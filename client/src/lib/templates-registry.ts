@@ -7,6 +7,7 @@
 
 import { getAllTemplates as getBaseTemplates, getTemplateByID as getBaseTemplateByID } from './simple-template-registry';
 import type { CVTemplate } from './simple-template-registry';
+import { sortTemplatesByPriority } from './template-priority';
 
 // Define color scheme options
 export interface ColorScheme {
@@ -208,7 +209,7 @@ const getTemplateMetadata = (templateId: string): Partial<TemplateWithMetadata> 
 export const getAllTemplatesWithMetadata = (): TemplateWithMetadata[] => {
   const templates = getBaseTemplates();
   
-  return templates.map(template => {
+  const templatesWithMetadata = templates.map(template => {
     const metadata = getTemplateMetadata(template.id);
     return {
       ...template,
@@ -219,6 +220,9 @@ export const getAllTemplatesWithMetadata = (): TemplateWithMetadata[] => {
       isPro: metadata.isPro || false,
     };
   });
+  
+  // Apply the priority ordering
+  return sortTemplatesByPriority(templatesWithMetadata);
 };
 
 // Get template by ID with metadata
