@@ -401,7 +401,7 @@ const WorkExperienceForm = () => {
               <h1 className="text-2xl font-bold mb-2 text-center">Tell us about your job</h1>
               <p className="text-gray-600 mb-8 text-center">Add your work experience details below.</p>
 
-              <form id="work-experience-form" onSubmit={handleSubmit}>
+              <form id="work-experience-form" onSubmit={handleSubmit} className={isMobile ? "pb-24" : ""}>
                 <div className="mb-6">
                   <Label htmlFor="title" className="flex items-center">
                     <Briefcase className="w-4 h-4 mr-2 text-primary" />
@@ -595,13 +595,12 @@ const WorkExperienceForm = () => {
         )}
       </div>
       
-      {/* Sticky button for mobile - always visible */}
+      {/* Fixed Next Button for Mobile */}
       {isMobile && (
-        <div className="sticky-button-container">
-          <Button 
-            type="button" 
-            className="sticky-button"
+        <div className="fixed bottom-0 left-0 right-0 px-4 py-4 bg-white shadow-lg" style={{zIndex: 999}}>
+          <Button
             onClick={handleSubmit}
+            className="w-full h-12 text-white bg-primary hover:bg-primary/90"
           >
             Next
           </Button>
