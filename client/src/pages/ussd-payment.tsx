@@ -355,27 +355,27 @@ const USSDPaymentPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto py-4 sm:py-8 px-3 sm:px-4 max-w-xl">
-      <div className="flex items-center justify-between mb-4 sm:mb-6">
+    <div className="container mx-auto py-3 sm:py-5 px-2 sm:px-4 max-w-lg">
+      <div className="flex items-center justify-between mb-4">
         <Button 
           variant="ghost" 
-          className="flex items-center text-primary p-2 sm:p-3" 
+          className="flex items-center text-primary p-2" 
           onClick={handleGoBack}
         >
-          <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" /> Rudi
+          <ArrowLeft className="h-4 w-4 mr-1" /> Rudi
         </Button>
-        <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-primary">CV Chap Chap</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-primary">CV Chap Chap</h1>
       </div>
       
-      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-        <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-center text-primary">LIPA KWA: DRIFTMARK TECHNOLOGIES LIMITED</h2>
+      <div className="bg-white rounded-lg shadow-md p-4">
+        <h2 className="text-lg sm:text-xl font-bold mb-3 text-center text-primary">LIPA KWA: DRIFTMARK TECHNOLOGIES LIMITED</h2>
         
-        <p className="text-center mb-4 sm:mb-6 text-base sm:text-lg">
+        <p className="text-center mb-4 text-sm sm:text-base">
           Tafadhali kamilisha malipo ili kupakua CV yako
         </p>
         
-        <div className="p-3 sm:p-4 mb-4 sm:mb-6 mx-auto max-w-md bg-gray-50 rounded-md">
-          <ol className="list-decimal space-y-3 sm:space-y-4 text-base sm:text-lg font-medium pl-6 sm:pl-8">
+        <div className="p-3 mb-4 mx-auto bg-gray-50 rounded-md">
+          <ol className="list-decimal space-y-2 text-sm sm:text-base font-medium pl-5">
             <li className="pb-2 border-b border-gray-200">BONYEZA <span className="font-bold text-primary">*150*50*1#</span></li>
             <li className="pb-2 border-b border-gray-200">WEKA <span className="font-bold text-primary">61115073</span></li>
             <li>LIPA TZS <span className="font-bold text-primary">5,000</span></li>
@@ -392,73 +392,73 @@ const USSDPaymentPage: React.FC = () => {
 
         {/* Payment completed - show download button */}
         {isPaymentVerified ? (
-          <div className="mb-4 sm:mb-6 text-center">
-            <div className="bg-green-50 border border-green-100 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-              <div className="flex items-center justify-center mb-2 sm:mb-4 text-green-600">
-                <CheckCircle2 className="h-6 sm:h-8 w-6 sm:w-8 mr-2" />
-                <span className="font-medium text-base sm:text-lg">Malipo Yamethibitishwa</span>
+          <div className="mb-3 sm:mb-4 text-center">
+            <div className="bg-green-50 border border-green-100 rounded-lg p-3 mb-3 sm:mb-4">
+              <div className="flex items-center justify-center mb-1 sm:mb-2 text-green-600">
+                <CheckCircle2 className="h-5 w-5 mr-1 sm:mr-2" />
+                <span className="font-medium text-sm sm:text-base">Malipo Yamethibitishwa</span>
               </div>
-              <p className="text-sm sm:text-base text-green-700">CV yako imetengenezwa kwa mafanikio!</p>
+              <p className="text-xs sm:text-sm text-green-700">CV yako imetengenezwa kwa mafanikio!</p>
             </div>
             <Button
               onClick={handleDownload}
-              className="bg-primary hover:bg-primary/90 mx-auto flex items-center gap-2 py-3 sm:py-4 text-base sm:text-lg w-full"
+              className="bg-primary hover:bg-primary/90 mx-auto flex items-center gap-1 py-2 text-sm sm:text-base w-full"
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                  <Loader2 className="h-4 w-4 animate-spin mr-1" />
                   Inapakua...
                 </>
               ) : (
                 <>
-                  <Download className="h-5 w-5" />
+                  <Download className="h-4 w-4" />
                   Pakua CV Yako
                 </>
               )}
             </Button>
           </div>
         ) : isPending ? (
-          <div className="mb-4 sm:mb-6 text-center">
-            <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-              <div className="flex items-center justify-center mb-2 sm:mb-3 text-amber-600">
-                <Loader2 className="h-6 sm:h-8 w-6 sm:w-8 mr-2 animate-spin" />
-                <span className="font-medium text-base sm:text-lg">
+          <div className="mb-3 text-center">
+            <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 mb-3">
+              <div className="flex items-center justify-center mb-1 sm:mb-2 text-amber-600">
+                <Loader2 className="h-5 w-5 mr-1 animate-spin" />
+                <span className="font-medium text-sm sm:text-base">
                   {paymentStatus?.status === 'verifying_payment' 
                     ? 'Inahakiki malipo yako...' 
                     : 'Inatengeneza CV yako...'}
                 </span>
               </div>
-              <p className="text-sm sm:text-base text-amber-700 mb-4">Hii inachukua chini ya dakika moja. Tafadhali subiri.</p>
+              <p className="text-xs sm:text-sm text-amber-700 mb-3">Hii inachukua chini ya dakika moja. Tafadhali subiri.</p>
               <Button
                 onClick={() => window.location.reload()}
                 variant="outline"
-                className="mx-auto flex items-center gap-2"
+                className="mx-auto flex items-center gap-1 text-xs"
               >
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className="h-3 w-3" />
                 Onyesha Hali Mpya
               </Button>
             </div>
           </div>
         ) : (
           <>
-            <div className="mb-4">
+            <div className="mb-3">
               {false ? ( /* Disable payment bypass completely */
-                <div className="bg-green-50 p-3 rounded-lg mb-4 border border-green-100">
-                  <p className="font-medium text-green-800 mb-2 text-sm sm:text-base flex items-center">
-                    <CheckCircle2 className="h-5 w-5 mr-2" />
+                <div className="bg-green-50 p-3 rounded-lg mb-3 border border-green-100">
+                  <p className="font-medium text-green-800 mb-1 text-xs sm:text-sm flex items-center">
+                    <CheckCircle2 className="h-4 w-4 mr-1" />
                     Payment bypass is enabled!
                   </p>
-                  <p className="text-sm sm:text-base text-green-700">
+                  <p className="text-xs sm:text-sm text-green-700">
                     You can proceed directly to download your CV. Simply click the "Continue to Download" button below.
                   </p>
                 </div>
               ) : (
-                <div className="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-100">
-                  <p className="font-medium text-blue-800 mb-2 text-sm sm:text-base">
+                <div className="bg-blue-50 p-3 rounded-lg mb-3 border border-blue-100">
+                  <p className="font-medium text-blue-800 mb-1 text-xs sm:text-sm">
                     Baada ya kulipa, fuata hatua hizi:
                   </p>
-                  <ol className="list-decimal pl-4 text-sm sm:text-base text-blue-700 space-y-1">
+                  <ol className="list-decimal pl-4 text-xs sm:text-sm text-blue-700 space-y-1">
                     <li>Subiri SMS kutoka <span className="font-bold">Selcom</span></li>
                     <li>Nakili <span className="font-bold">ujumbe wote wa SMS</span> kutoka Selcom</li>
                     <li>Bandika ujumbe huo hapo chini</li>
@@ -468,15 +468,15 @@ const USSDPaymentPage: React.FC = () => {
               )}
               
               {/* Always show SMS input box regardless of ID type */}
-              <div className="mb-3 p-4 border-2 border-gray-200 rounded-lg bg-white shadow-sm">
-                <p className="text-xs text-blue-600 mb-2">
+              <div className="mb-3 p-3 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <p className="text-xs text-blue-600 mb-1">
                   Nakili - Copy & Paste
                 </p>
                 <Textarea 
                   placeholder="Copy & Paste ujumbe wote wa SMS kutoka SELCOM hapa..."
                   value={paymentReference}
                   onChange={(e) => setPaymentReference(e.target.value)}
-                  className="h-24 mb-2 text-sm bg-white border-2 border-blue-100 focus:border-blue-300"
+                  className="h-20 mb-1 text-sm bg-white border border-blue-100 focus:border-blue-300"
                   maxLength={180}
                 />
                 <div className="flex justify-between text-xs text-gray-500">
@@ -502,7 +502,7 @@ const USSDPaymentPage: React.FC = () => {
             
             <Button 
               onClick={handleVerifyPayment} 
-              className="w-full bg-primary hover:bg-primary/90 py-3 sm:py-4 text-base sm:text-lg"
+              className="w-full bg-primary hover:bg-primary/90 py-2 text-sm sm:text-base"
               disabled={isVerifying || 
                 // Always verify SMS for any request ID - disabled bypass completely
                 (paymentReference.length < 140 || paymentReference.length > 170) || 
@@ -511,7 +511,7 @@ const USSDPaymentPage: React.FC = () => {
             >
               {isVerifying ? (
                 <>
-                  <div className="h-5 w-5 border-2 border-white/50 border-t-white rounded-full animate-spin mr-2"></div>
+                  <div className="h-4 w-4 border-2 border-white/50 border-t-white rounded-full animate-spin mr-2"></div>
                   Inahakiki Malipo...
                 </>
               ) : 'Hakiki Malipo'}
@@ -520,9 +520,9 @@ const USSDPaymentPage: React.FC = () => {
         )}
       </div>
       
-      <div className="mt-4 sm:mt-6 bg-white p-4 rounded-lg shadow-sm">
-        <p className="text-sm text-gray-600 text-center mb-3">Unahitaji msaada kwa malipo yako?</p>
-        <p className="text-center text-blue-600 font-medium">
+      <div className="mt-3 sm:mt-4 bg-white p-3 rounded-lg shadow-sm">
+        <p className="text-xs sm:text-sm text-gray-600 text-center mb-2">Unahitaji msaada kwa malipo yako?</p>
+        <p className="text-center text-blue-600 font-medium text-sm">
           +255 682 152 148
         </p>
       </div>
