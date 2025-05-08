@@ -65,7 +65,7 @@ const FinalPreview = () => {
   };
   
   return (
-    <div className="w-full h-screen flex flex-col">
+    <div className="w-full h-screen flex flex-col bg-[#f5f5f5]">
       {/* Desktop Header */}
       {!isMobile && (
         <div className="bg-white border-b py-3 px-4 flex justify-between items-center">
@@ -92,7 +92,7 @@ const FinalPreview = () => {
       )}
       
       {/* Main Content Area */}
-      <div className="flex-grow flex overflow-hidden">
+      <div className="flex-grow flex overflow-hidden bg-[#f5f5f5]">
         {/* Template Sidebar */}
         {templateSidebarOpen && (
           <div className={isMobile ? 'fixed inset-0 z-50 bg-white' : 'templates-sidebar'}>
