@@ -188,12 +188,13 @@
       @apply fixed bottom-0 left-0 right-0 flex justify-between p-3 bg-background border-t z-50;
     }
     
-    /* Mobile CV template scaling for better visibility */
+    /* Mobile CV template scaling for better visibility - matching screenshot 1 */
     .mobile-template-content {
       @apply transform-gpu overflow-visible;
       transform-origin: top center;
       min-height: 140vh;
-      padding-bottom: 2rem;
+      padding-bottom: 4rem;
+      margin-top: 1.5rem;
     }
     
     /* Template container in mobile view */

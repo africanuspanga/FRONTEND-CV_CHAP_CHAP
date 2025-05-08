@@ -34,8 +34,8 @@ const FinalPreview = () => {
   // Track payment/download in progress
   const [isDownloading, setIsDownloading] = useState(false);
   
-  // Track scale factor for mobile viewing
-  const [scaleFactor, setScaleFactor] = useState(0.65);
+  // Track scale factor for mobile viewing - match screenshot 1
+  const [scaleFactor, setScaleFactor] = useState(0.75);
   
   // Get current template name
   const currentTemplateName = getTemplateById(currentTemplateId)?.name || 'Template';
@@ -220,68 +220,33 @@ const FinalPreview = () => {
         </div>
       )}
       
-      {/* Mobile Header */}
+      {/* Mobile Header - Dark blue header with Finalize Resume */}
       {isMobile && (
-        <div className="bg-blue-900 text-white py-3 px-4 flex justify-between items-center">
-          <button onClick={handleBack} className="text-white">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <h1 className="text-lg font-semibold">FINALIZE</h1>
-          <button className="text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </button>
+        <div className="bg-[#1A2E5E] text-white py-4 px-4 flex justify-center items-center">
+          <h1 className="text-2xl font-bold">Finalize Resume</h1>
         </div>
       )}
       
-      {/* Mobile Template Editing Options */}
+      {/* Mobile Actions - Two button layout matching screenshot 1 */}
       {isMobile && (
-        <div className="bg-gray-50 border-b border-gray-200 grid grid-cols-3 divide-x divide-gray-200">
-          <button 
-            onClick={handleEditTemplate}
-            className="py-3 flex flex-col items-center text-sm text-blue-600 font-medium"
-          >
-            <Edit className="h-4 w-4 mb-1" />
-            Edit Template
-          </button>
-          
+        <div className="flex justify-between px-4 py-3 bg-[#1A2E5E]">
           <button 
             onClick={() => setTemplateSidebarOpen(true)}
-            className="py-3 flex flex-col items-center text-sm text-blue-600 font-medium"
+            className="flex-1 mr-2 py-3 px-4 bg-transparent border-2 border-white rounded-full text-white font-medium"
           >
-            <RefreshCw className="h-4 w-4 mb-1" />
-            Swap Template
+            Change Template
           </button>
           
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="py-3 flex flex-col items-center text-sm text-blue-600 font-medium">
-                <ZoomIn className="h-4 w-4 mb-1" />
-                <span className="mt-1">Size</span>
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-60 p-3">
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium">Adjust Size</h3>
-                <div className="flex items-center justify-between">
-                  <button 
-                    onClick={() => setScaleFactor(prev => Math.max(0.4, prev - 0.1))}
-                    className="p-2 bg-gray-100 rounded-md hover:bg-gray-200"
-                  >
-                    <ZoomOut className="h-4 w-4" />
-                  </button>
-                  <div className="text-xs px-2">
-                    {Math.round(scaleFactor * 100)}%
-                  </div>
-                  <button 
-                    onClick={() => setScaleFactor(prev => Math.min(1.0, prev + 0.1))}
-                    className="p-2 bg-gray-100 rounded-md hover:bg-gray-200"
-                  >
-                    <ZoomIn className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <button 
+            onClick={handleUpdateContent}
+            className="flex-1 ml-2 py-3 px-4 bg-transparent border-2 border-white rounded-full text-white font-medium flex items-center justify-center"
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 4H4C3.44772 4 3 4.44772 3 5V19C3 19.5523 3.44772 20 4 20H18C18.5523 20 19 19.5523 19 19V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M18.5 2.5C19.3284 2.5 20 3.17157 20 4C20 4.82843 19.3284 5.5 18.5 5.5L11.5 12.5L8.5 13.5L9.5 10.5L16.5 3.5C17.0304 2.96956 17.4696 2.96956 18 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Edit Resume
+          </button>
         </div>
       )}
       
@@ -343,19 +308,18 @@ const FinalPreview = () => {
           </div>
         )}
         
-        {/* CV Preview Area */}
-        <div className={`flex-grow overflow-auto flex justify-center items-start ${isMobile ? 'p-1 pt-2' : 'p-4'} bg-gray-100`}>
-          {/* Mobile-friendly message for scaling instructions */}
+        {/* CV Preview Area - Styled to match screenshot 1 */}
+        <div className={`flex-grow overflow-auto flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} bg-white`}>
+          {/* "Scroll to view" message - positioned under the header */}
           {isMobile && (
-            <div className="absolute top-[6.5rem] left-0 right-0 bg-blue-50 z-10 py-1 px-2 text-xs text-center text-blue-700 border-y border-blue-100">
+            <div className="absolute top-[6.5rem] left-0 right-0 bg-white z-10 py-1 px-2 text-xs text-center text-blue-600">
               <div className="flex justify-center items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                <span>Scroll to view the full CV</span>
+                <span>○ Scroll to view the full CV</span>
               </div>
             </div>
           )}
-          <div className="bg-white shadow-md overflow-hidden max-w-screen-md w-full print:shadow-none" 
-            style={isMobile ? {minHeight: 'calc(100vh - 220px)'} : {}}
+          <div className="bg-white overflow-hidden max-w-screen-md w-full print:shadow-none" 
+            style={isMobile ? {minHeight: 'calc(100vh - 220px)', paddingBottom: '60px'} : {}}
           >
             <DirectTemplateRenderer
               templateId={currentTemplateId}
@@ -367,24 +331,16 @@ const FinalPreview = () => {
         </div>
       </div>
       
-      {/* Mobile Action Buttons */}
+      {/* Mobile Action Button - Following the design in screenshot 1 */}
       {isMobile && (
-        <div className="bg-white px-4 py-4 space-y-3">
-          <Button 
+        <div className="fixed bottom-0 left-0 right-0">
+          <button 
             onClick={handleDownload}
             disabled={isDownloading}
-            className="w-full py-6 bg-teal-600 hover:bg-teal-700 text-white text-lg rounded-md"
+            className="w-full py-4 bg-[#0075FF] text-white text-lg font-semibold"
           >
-            {isDownloading ? 'Downloading...' : 'Get My CV'}
-          </Button>
-          
-          <Button 
-            onClick={handleUpdateContent}
-            variant="outline" 
-            className="w-full py-6 border-2 border-blue-900 text-blue-900 text-lg rounded-md"
-          >
-            Edit Content
-          </Button>
+            {isDownloading ? 'Downloading...' : 'Download My CV'}
+          </button>
         </div>
       )}
     </div>
