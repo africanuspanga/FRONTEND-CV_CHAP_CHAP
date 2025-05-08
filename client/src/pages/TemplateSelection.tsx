@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useCVData } from '@/hooks/useCVData';
 import TemplateSelectionGrid from '@/components/TemplateSelectionGrid';
 import { getAllTemplates } from '@/lib/templates-registry';
+import { sortTemplatesByPriority } from '@/lib/template-priority';
 
 const TemplateSelection = () => {
   const [, navigate] = useLocation();
@@ -11,8 +12,8 @@ const TemplateSelection = () => {
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   
-  // Get templates directly from registry
-  const templates = getAllTemplates();
+  // Get templates directly from registry with priority ordering
+  const templates = sortTemplatesByPriority(getAllTemplates());
 
   // Select template and immediately proceed to Personal Information form
   const handleSelectTemplate = (templateId: string) => {
