@@ -223,7 +223,7 @@ const CreateCVContent = () => {
             {/* Back button */}
             <button 
               onClick={handlePrevStep}
-              className="text-blue-600 flex items-center mb-6" 
+              className="text-primary flex items-center mb-6" 
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
               Go Back
@@ -254,7 +254,7 @@ const CreateCVContent = () => {
             <div className="flex justify-between mt-12">
               <Button 
                 variant="outline"
-                className="border-blue-600 text-blue-600 px-6 py-2 rounded-full hover:bg-blue-50"
+                className="border-primary text-primary px-6 py-2 rounded-full hover:bg-primary/10"
                 onClick={() => {
                   // TODO: Preview functionality 
                   toast({
@@ -268,14 +268,14 @@ const CreateCVContent = () => {
               
               {currentStep < formSteps.length - 1 ? (
                 <Button 
-                  className="bg-[#37889e] hover:bg-[#2a6a7a] text-white px-10 py-2 rounded-full"
+                  className="bg-primary hover:bg-primary/90 text-white px-10 py-2 rounded-full"
                   onClick={handleNextStep}
                 >
                   Next
                 </Button>
               ) : (
                 <Button 
-                  className="bg-green-600 hover:bg-green-700 text-white px-10 py-2 rounded-full"
+                  className="bg-accent hover:bg-accent/90 text-white px-10 py-2 rounded-full"
                   onClick={handleComplete}
                 >
                   Complete
@@ -294,7 +294,7 @@ const CreateCVContent = () => {
                   height={600}
                 />
               </div>
-              <a href="#" className="text-blue-600 text-sm mt-2" onClick={(e) => {
+              <a href="#" className="text-primary text-sm mt-2" onClick={(e) => {
                 e.preventDefault();
                 // TODO: Template change functionality
                 toast({

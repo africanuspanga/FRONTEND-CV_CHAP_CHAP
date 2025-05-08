@@ -71,7 +71,7 @@ const PersonalInfoForm = () => {
         {/* Back button */}
         <button
           onClick={() => navigate('/templates')}
-          className="text-blue-600 flex items-center mb-4"
+          className="text-primary flex items-center mb-4"
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
           Go Back
@@ -197,7 +197,7 @@ const PersonalInfoForm = () => {
 
           {!isMobile && (
             <div className="flex justify-end mt-8">
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-2 rounded-md">
+              <Button type="submit" className="bg-primary hover:bg-primary/90 text-white px-10 py-2 rounded-md">
                 Next
               </Button>
             </div>
@@ -214,7 +214,7 @@ const PersonalInfoForm = () => {
         <div className="sticky-footer">
           <Button 
             onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-700 text-white w-full py-3 text-base font-medium rounded-xl"
+            className="bg-primary hover:bg-primary/90 text-white w-full py-3 text-base font-medium rounded-xl"
           >
             Next
           </Button>
