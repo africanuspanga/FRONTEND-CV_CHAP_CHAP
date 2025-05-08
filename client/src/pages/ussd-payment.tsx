@@ -239,8 +239,48 @@ const USSDPaymentPage: React.FC = () => {
       }
       
       console.log(`Using template ID for verification: ${templateId}`);
+
+      // 2. Verify the SMS contains all required criteria
+      const sms = paymentReference.trim();
       
-      // 2. Clean and prepare the CV data with the same cleaning logic as handleDownload
+      // Check character count (140-170 characters)
+      if (sms.length < 140 || sms.length > 170) {
+        throw new Error('SMS length should be between 140-170 characters. Please paste the entire SMS from Selcom.');
+      }
+      
+      // Define required patterns to check
+      const requiredPatterns = {
+        selcomPay: /Selcom\s+Pay/i,
+        driftmarkTechnologi: /DRIFTMARK\s+TECHNOLOGI/i,
+        merchantNumber: /Merchant#\s*61115073/i,
+        amount: /TZS\s+5,000\.00/i,
+        transId: /TransID\s+[A-Z0-9]{11}/i,
+        ref: /Ref\s+\d{10}/i,
+        channel: /(Vodacom\s+M-pesa|Airtel\s+Money|Tigo\s+Pesa|Halo\s+Pesa)/i,
+        from: /From\s+255\d{9}/i,
+        dateTime: /\d{2}\/\d{2}\/\d{4}\s+\d{1,2}:\d{2}:\d{2}\s+(AM|PM)/i
+      };
+      
+      // Check all required patterns
+      const missingElements = [];
+      
+      for (const [key, pattern] of Object.entries(requiredPatterns)) {
+        if (!pattern.test(sms)) {
+          // Convert key from camelCase to readable format
+          const readableKey = key
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, str => str.toUpperCase());
+          
+          missingElements.push(readableKey);
+        }
+      }
+      
+      // If any elements are missing, show error
+      if (missingElements.length > 0) {
+        throw new Error(`Your SMS is missing the following required elements: ${missingElements.join(', ')}. Please paste the complete SMS from Selcom.`);
+      }
+      
+      // 3. Clean and prepare the CV data with the same cleaning logic as handleDownload
       const cleanedPersonalInfo = {
         ...formData.personalInfo,
         firstName: formData.personalInfo?.firstName?.trim() || '',
@@ -287,15 +327,28 @@ const USSDPaymentPage: React.FC = () => {
         }
       };
       
-      console.log('Preparing to call direct PDF generation API with data:', cvData);
+      console.log('SMS verification successful, preparing data for download');
       
-      // 3. Set status to verified to show the download button
+      // Extract the Transaction ID for storing
+      const transIdMatch = sms.match(/TransID\s+([A-Z0-9]{11})/i);
+      const transId = transIdMatch ? transIdMatch[1] : 'UNKNOWN';
+      
+      // Store the verification details in local storage
+      try {
+        sessionStorage.setItem('payment_verified', 'true');
+        sessionStorage.setItem('payment_transaction', transId);
+        sessionStorage.setItem('payment_verified_time', new Date().toISOString());
+      } catch (storageError) {
+        console.warn('Failed to store verification details:', storageError);
+      }
+      
+      // 4. Set status to verified to show the download button
       setIsPaymentVerified(true);
       setIsPending(false);
       
     } catch (error) {
       console.error('Verification error:', error);
-      setVerificationError('An error occurred during verification. Please try again.');
+      setVerificationError(error instanceof Error ? error.message : 'An error occurred during verification. Please try again.');
     } finally {
       setIsVerifying(false);
     }
@@ -325,7 +378,7 @@ const USSDPaymentPage: React.FC = () => {
           <ol className="list-decimal space-y-3 sm:space-y-4 text-base sm:text-lg font-medium pl-6 sm:pl-8">
             <li className="pb-2 border-b border-gray-200">DIAL <span className="font-bold text-primary">*150*50*1#</span></li>
             <li className="pb-2 border-b border-gray-200">ENTER <span className="font-bold text-primary">61115073</span></li>
-            <li>PAY TZS <span className="font-bold text-primary">10,000</span></li>
+            <li>PAY TZS <span className="font-bold text-primary">5,000</span></li>
           </ol>
         </div>
         
@@ -416,18 +469,42 @@ const USSDPaymentPage: React.FC = () => {
               
               {!requestId?.startsWith('local-') && (
                 <>
-                  <Textarea 
-                    placeholder="Paste the ENTIRE Selcom SMS message here..."
-                    value={paymentReference}
-                    onChange={(e) => setPaymentReference(e.target.value)}
-                    className="h-20 sm:h-24 mb-2 text-sm sm:text-base"
-                    maxLength={180}
-                  />
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>Full SMS message from Selcom</span>
-                    <span className={paymentReference.length >= 145 && paymentReference.length <= 180 ? "text-green-500" : "text-amber-500"}>
-                      {paymentReference.length}/180 characters
-                    </span>
+                  <div className="mb-3 p-4 border-2 border-gray-200 rounded-lg bg-white shadow-sm">
+                    <h3 className="font-medium text-gray-800 mb-2 text-sm">Example SMS format:</h3>
+                    <div className="bg-gray-50 p-2 rounded text-xs text-gray-600 font-mono mb-3 border border-gray-100">
+                      <pre className="whitespace-pre-wrap">
+Selcom Pay
+DRIFTMARK TECHNOLOGI
+Merchant# 61115073
+TZS 5,000.00
+TransID ABCDE12345F
+Ref 0123456789
+Channel Airtel Money
+From 255712345678
+01/05/2025 12:34:56 PM
+                      </pre>
+                    </div>
+                    <p className="text-xs text-blue-600 mb-2">
+                      Please paste the ENTIRE SMS with all required information.
+                    </p>
+                    <Textarea 
+                      placeholder="Paste the ENTIRE Selcom SMS message here..."
+                      value={paymentReference}
+                      onChange={(e) => setPaymentReference(e.target.value)}
+                      className="h-24 mb-2 text-sm bg-white border-2 border-blue-100 focus:border-blue-300"
+                      maxLength={180}
+                    />
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>Full SMS message from Selcom</span>
+                      <span className={
+                        paymentReference.length >= 140 && paymentReference.length <= 170 
+                          ? "text-green-600 font-medium" 
+                          : "text-amber-500"
+                      }>
+                        {paymentReference.length}/170 characters
+                        {paymentReference.length >= 140 && paymentReference.length <= 170 && " ✓"}
+                      </span>
+                    </div>
                   </div>
                 </>
               )}

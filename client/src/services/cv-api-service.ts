@@ -503,22 +503,51 @@ export const verifyUSSDPayment = async (requestId: string, paymentReference: str
     // we'll verify it client-side through our CORS proxy since our backend doesn't
     // have a dedicated verification endpoint yet
     
-    // Verify payment against required criteria - relaxed for testing
-    // In production, this would be more strict
-    let requiredTerms = ['DRIFTMARK', 'TZS', 'Selcom'];
-    let optionalTerms = ['TECHNOLOGI', 'Merchant', '10,000.00', 'Pay', 'TransID'];
+    // Verify payment has the required length
+    if (paymentReference.length < 140 || paymentReference.length > 170) {
+      return {
+        success: false,
+        error: 'Invalid SMS length. Please paste the complete SMS from Selcom (should be between 140-170 characters).'
+      };
+    }
     
-    // Count how many required terms are present
-    const requiredMatches = requiredTerms.filter(term => 
-      paymentReference.includes(term)).length;
+    // Define required patterns to check
+    const requiredPatterns = {
+      selcomPay: /Selcom\s+Pay/i,
+      driftmarkTechnologi: /DRIFTMARK\s+TECHNOLOGI/i,
+      merchantNumber: /Merchant#\s*61115073/i,
+      amount: /TZS\s+5,000\.00/i,
+      transId: /TransID\s+[A-Z0-9]{11}/i,
+      ref: /Ref\s+\d{10}/i,
+      channel: /(Vodacom\s+M-pesa|Airtel\s+Money|Tigo\s+Pesa|Halo\s+Pesa)/i,
+      from: /From\s+255\d{9}/i,
+      dateTime: /\d{2}\/\d{2}\/\d{4}\s+\d{1,2}:\d{2}:\d{2}\s+(AM|PM)/i
+    };
     
-    // Count how many optional terms are present
-    const optionalMatches = optionalTerms.filter(term => 
-      paymentReference.includes(term)).length;
+    // Check all required patterns
+    const missingElements = [];
     
-    // Check if payment reference contains enough identifying information
-    const isValid = requiredMatches === requiredTerms.length || 
-      (requiredMatches >= 1 && optionalMatches >= 2);
+    for (const [key, pattern] of Object.entries(requiredPatterns)) {
+      if (!pattern.test(paymentReference)) {
+        // Convert key from camelCase to readable format
+        const readableKey = key
+          .replace(/([A-Z])/g, ' $1')
+          .replace(/^./, str => str.toUpperCase());
+        
+        missingElements.push(readableKey);
+      }
+    }
+    
+    // If any elements are missing, show error
+    if (missingElements.length > 0) {
+      return {
+        success: false,
+        error: `SMS is missing: ${missingElements.join(', ')}. Please paste the complete SMS.`
+      };
+    }
+    
+    // All checks passed, payment is valid
+    const isValid = true;
     
     if (!isValid) {
       return {
