@@ -336,14 +336,16 @@ const FinalPreview = () => {
               </div>
             </div>
           ) : (
-            <div className="w-full print:shadow-none">
-              <DirectTemplateRenderer
-                templateId={currentTemplateId}
-                cvData={formData}
-                height="auto"
-                width="100%" 
-                scaleFactor={1}
-              />
+            <div className="max-w-[900px] mx-auto">
+              <div className="border shadow-sm rounded bg-white">
+                <DirectTemplateRenderer
+                  templateId={currentTemplateId}
+                  cvData={formData}
+                  height="auto"
+                  width="100%" 
+                  scaleFactor={1}
+                />
+              </div>
             </div>
           )}
         </div>
