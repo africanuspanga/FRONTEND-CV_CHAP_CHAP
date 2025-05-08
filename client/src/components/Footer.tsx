@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'wouter';
-import { FiTwitter, FiFacebook, FiInstagram, FiLinkedin } from 'react-icons/fi';
+import { FiTwitter, FiInstagram, FiLinkedin } from 'react-icons/fi';
 
 const Footer: React.FC = () => {
   return (
@@ -66,11 +66,6 @@ const Footer: React.FC = () => {
               <li>
                 <a href="#" className="text-lightText hover:text-primary flex items-center">
                   <FiTwitter className="mr-2" /> Twitter
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-lightText hover:text-primary flex items-center">
-                  <FiFacebook className="mr-2" /> Facebook
                 </a>
               </li>
               <li>
