@@ -45,52 +45,32 @@ const USSDPaymentPage: React.FC = () => {
     }
   }, [paymentStatus]);
   
-  // Initialize payment request if not already done
+  // Initialize payment data without actual API call
   useEffect(() => {
-    const initializePayment = async () => {
+    const setupPaymentData = () => {
       try {
-        // Check if we have a fallback ID in sessionStorage
-        const fallbackId = sessionStorage.getItem('cv_request_id');
+        // Check if template ID is available
         const storedTemplateId = sessionStorage.getItem('cv_template_id');
         
-        if (fallbackId && fallbackId.startsWith('local-')) {
-          console.log('Using fallback payment ID from session:', fallbackId);
-          // We have a fallback ID - use it instead of making an API call
-          return;
-        }
-        
-        // Regular initialization flow - only if we don't have an existing requestId
-        if (!requestId && formData.templateId) {
-          // Create minimal CV data to avoid storage issues
-          const minimalCVData = {
-            templateId: formData.templateId,
-            personalInfo: formData.personalInfo || {},
-            // Include only essential fields and limit array sizes
-            workExperiences: (formData.workExperiences || []).slice(0, 2),
-            education: (formData.education || []).slice(0, 2),
-            skills: (formData.skills || []).slice(0, 10),
-            languages: (formData.languages || []).slice(0, 3)
-          };
-          
-          console.log('Initiating payment with template ID:', formData.templateId);
-          await initiatePayment(formData.templateId, minimalCVData);
-        }
-      } catch (error) {
-        console.error('Error in payment initialization:', error);
-        // Create a fallback request ID if API call fails
-        try {
+        // Create a local fallback ID if we don't have one yet
+        if (!sessionStorage.getItem('cv_request_id')) {
           const fallbackId = `local-${Date.now()}`;
           sessionStorage.setItem('cv_request_id', fallbackId);
-          sessionStorage.setItem('cv_template_id', formData.templateId || '');
-          console.log('Created fallback payment ID:', fallbackId);
-        } catch (storageError) {
-          console.error('Storage error in fallback creation:', storageError);
+          console.log('Created local payment ID:', fallbackId);
         }
+        
+        // Make sure we have the template ID in session storage
+        if (!storedTemplateId && formData.templateId) {
+          sessionStorage.setItem('cv_template_id', formData.templateId);
+          console.log('Stored template ID in session:', formData.templateId);
+        }
+      } catch (storageError) {
+        console.error('Storage error:', storageError);
       }
     };
     
-    initializePayment();
-  }, [requestId, formData, initiatePayment]);
+    setupPaymentData();
+  }, [formData.templateId]);
   
   // Handle navigation back to preview
   const handleGoBack = () => {
