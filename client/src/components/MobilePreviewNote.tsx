@@ -30,7 +30,7 @@ const MobilePreviewNote: React.FC = () => {
   }
   
   return (
-    <div className="flex items-center gap-2 px-3 py-2 mb-4 bg-blue-50 text-blue-700 text-sm rounded-md">
+    <div className="flex items-center gap-2 px-3 py-2 mb-4 bg-primary/10 text-primary text-sm rounded-md">
       <Info className="h-4 w-4 flex-shrink-0" />
       <p>You'll see a complete preview of your CV on the final step.</p>
     </div>
