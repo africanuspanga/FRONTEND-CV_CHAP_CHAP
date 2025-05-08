@@ -309,7 +309,7 @@ const FinalPreview = () => {
         )}
         
         {/* CV Preview Area - Exactly matching competitor's screenshot */}
-        <div className={`flex-grow flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} relative ${isMobile ? 'bg-[#f0f0f0]' : 'bg-white'}`}>
+        <div className={`flex-grow flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} relative bg-white`}>
           {/* "Scroll to view" message - blue text centered like in screenshot */}
           {isMobile && (
             <div className="absolute top-[6.5rem] left-0 right-0 bg-white z-10 py-1 px-2 text-xs text-center text-blue-600">
@@ -322,9 +322,10 @@ const FinalPreview = () => {
           <div 
             className={`w-full print:shadow-none ${isMobile ? 'cv-preview-scroll-container' : ''}`}
             style={isMobile ? { 
-              marginTop: '8px',
-              paddingTop: '20px',
-              paddingBottom: '80px'
+              marginTop: '0',
+              paddingTop: '10px',
+              paddingBottom: '80px',
+              backgroundColor: 'white'
             } : {}}
           >
             {/* A4 CV preview scaled down to fit in viewport */}
