@@ -543,13 +543,14 @@ const WorkExperienceForm = () => {
                   </Label>
                 </div>
 
-                {!isMobile && (
-                  <div className="flex justify-end">
-                    <Button type="submit" className="bg-primary hover:bg-primary/90 text-white px-8 py-2">
-                      Next
-                    </Button>
-                  </div>
-                )}
+                <div className="flex justify-end">
+                  <Button 
+                    type="submit" 
+                    className={`bg-primary hover:bg-primary/90 text-white ${isMobile ? 'w-full mt-6' : 'px-8 py-2'}`}
+                  >
+                    Next
+                  </Button>
+                </div>
               </form>
             </>
           )}
