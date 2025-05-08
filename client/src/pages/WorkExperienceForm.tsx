@@ -372,7 +372,7 @@ const WorkExperienceForm = () => {
       {/* Progress Bar */}
       <div className="mb-4 md:mb-8">
         <div className="relative h-3 bg-gray-100 rounded-full overflow-hidden">
-          <div className="absolute left-0 top-0 h-full bg-blue-500 rounded-full" style={{ width: '22%' }}></div>
+          <div className="absolute left-0 top-0 h-full bg-primary rounded-full" style={{ width: '22%' }}></div>
         </div>
         <div className="text-right text-sm text-gray-500 mt-1">22%</div>
       </div>
@@ -386,7 +386,7 @@ const WorkExperienceForm = () => {
           {/* Back button */}
           <button
             onClick={() => navigate(`/cv/${templateId}/personal`)}
-            className="text-blue-600 flex items-center mb-4 md:mb-6"
+            className="text-primary flex items-center mb-4 md:mb-6"
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
             Go Back
@@ -400,7 +400,7 @@ const WorkExperienceForm = () => {
               <form id="work-experience-form" onSubmit={handleSubmit}>
                 <div className="mb-6">
                   <Label htmlFor="title" className="flex items-center">
-                    <Briefcase className="w-4 h-4 mr-2 text-blue-500" />
+                    <Briefcase className="w-4 h-4 mr-2 text-primary" />
                     TITLE <span className="text-red-500">*</span>
                   </Label>
                   <Input
@@ -416,7 +416,7 @@ const WorkExperienceForm = () => {
 
                 <div className="mb-6">
                   <Label htmlFor="employer" className="flex items-center">
-                    <Building2 className="w-4 h-4 mr-2 text-blue-500" />
+                    <Building2 className="w-4 h-4 mr-2 text-primary" />
                     EMPLOYER <span className="text-red-500">*</span>
                   </Label>
                   <Input
@@ -431,7 +431,7 @@ const WorkExperienceForm = () => {
 
                 <div className="mb-6">
                   <Label htmlFor="location" className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-2 text-blue-500" />
+                    <MapPin className="w-4 h-4 mr-2 text-primary" />
                     LOCATION
                   </Label>
                   <Input
@@ -541,7 +541,7 @@ const WorkExperienceForm = () => {
 
                 {!isMobile && (
                   <div className="flex justify-end">
-                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2">
+                    <Button type="submit" className="bg-primary hover:bg-primary/90 text-white px-8 py-2">
                       Next
                     </Button>
                   </div>
@@ -574,7 +574,7 @@ const WorkExperienceForm = () => {
                 
                 <Button 
                   onClick={handleContinueToEducation}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-primary hover:bg-primary/90 text-white"
                 >
                   Next
                 </Button>
