@@ -277,7 +277,7 @@ const USSDPaymentPage: React.FC = () => {
       
       // If any elements are missing, show error
       if (missingElements.length > 0) {
-        throw new Error(`Your SMS is missing the following required elements: ${missingElements.join(', ')}. Please paste the complete SMS from Selcom.`);
+        throw new Error(`Ujumbe wako haujatimiza mahitaji. Tafadhali nakili na bandika ujumbe kamili wa SMS kutoka Selcom.`);
       }
       
       // 3. Clean and prepare the CV data with the same cleaning logic as handleDownload
@@ -368,17 +368,17 @@ const USSDPaymentPage: React.FC = () => {
       </div>
       
       <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-        <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-center text-primary">PAY TO: DRIFTMARK TECHNOLOGIES LIMITED</h2>
+        <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-center text-primary">LIPA KWA: DRIFTMARK TECHNOLOGIES LIMITED</h2>
         
         <p className="text-center mb-4 sm:mb-6 text-base sm:text-lg">
-          Please complete payment to Download your CV
+          Tafadhali kamilisha malipo ili kupakua CV yako
         </p>
         
         <div className="p-3 sm:p-4 mb-4 sm:mb-6 mx-auto max-w-md bg-gray-50 rounded-md">
           <ol className="list-decimal space-y-3 sm:space-y-4 text-base sm:text-lg font-medium pl-6 sm:pl-8">
-            <li className="pb-2 border-b border-gray-200">DIAL <span className="font-bold text-primary">*150*50*1#</span></li>
-            <li className="pb-2 border-b border-gray-200">ENTER <span className="font-bold text-primary">61115073</span></li>
-            <li>PAY TZS <span className="font-bold text-primary">5,000</span></li>
+            <li className="pb-2 border-b border-gray-200">BONYEZA <span className="font-bold text-primary">*150*50*1#</span></li>
+            <li className="pb-2 border-b border-gray-200">WEKA <span className="font-bold text-primary">61115073</span></li>
+            <li>LIPA TZS <span className="font-bold text-primary">5,000</span></li>
           </ol>
         </div>
         
@@ -396,9 +396,9 @@ const USSDPaymentPage: React.FC = () => {
             <div className="bg-green-50 border border-green-100 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
               <div className="flex items-center justify-center mb-2 sm:mb-4 text-green-600">
                 <CheckCircle2 className="h-6 sm:h-8 w-6 sm:w-8 mr-2" />
-                <span className="font-medium text-base sm:text-lg">Payment Confirmed</span>
+                <span className="font-medium text-base sm:text-lg">Malipo Yamethibitishwa</span>
               </div>
-              <p className="text-sm sm:text-base text-green-700">Your CV has been generated successfully!</p>
+              <p className="text-sm sm:text-base text-green-700">CV yako imetengenezwa kwa mafanikio!</p>
             </div>
             <Button
               onClick={handleDownload}
@@ -456,51 +456,37 @@ const USSDPaymentPage: React.FC = () => {
               ) : (
                 <div className="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-100">
                   <p className="font-medium text-blue-800 mb-2 text-sm sm:text-base">
-                    After payment, follow these steps:
+                    Baada ya kulipa, fuata hatua hizi:
                   </p>
                   <ol className="list-decimal pl-4 text-sm sm:text-base text-blue-700 space-y-1">
-                    <li>Wait for SMS confirmation from <span className="font-bold">Selcom</span></li>
-                    <li>Copy the <span className="font-bold">entire SMS message</span> from Selcom</li>
-                    <li>Paste the complete message in the box below</li>
-                    <li>Click the "Verify Payment" button</li>
+                    <li>Subiri SMS kutoka <span className="font-bold">Selcom</span></li>
+                    <li>Nakili <span className="font-bold">ujumbe wote wa SMS</span> kutoka Selcom</li>
+                    <li>Bandika ujumbe huo hapo chini</li>
+                    <li>Bonyeza kitufe cha "Hakiki Malipo"</li>
                   </ol>
                 </div>
               )}
               
               {/* Always show SMS input box regardless of ID type */}
               <div className="mb-3 p-4 border-2 border-gray-200 rounded-lg bg-white shadow-sm">
-                <h3 className="font-medium text-gray-800 mb-2 text-sm">Example SMS format:</h3>
-                <div className="bg-gray-50 p-2 rounded text-xs text-gray-600 font-mono mb-3 border border-gray-100">
-                  <pre className="whitespace-pre-wrap">
-Selcom Pay
-DRIFTMARK TECHNOLOGI
-Merchant# 61115073
-TZS 5,000.00
-TransID ABCDE12345F
-Ref 0123456789
-Channel Airtel Money
-From 255712345678
-01/05/2025 12:34:56 PM
-                  </pre>
-                </div>
                 <p className="text-xs text-blue-600 mb-2">
-                  Please paste the ENTIRE SMS with all required information.
+                  Tafadhali Copy na Paste message ya malipo kutoka SELCOM kama ilivo
                 </p>
                 <Textarea 
-                  placeholder="Paste the ENTIRE Selcom SMS message here..."
+                  placeholder="Nakili na bandika ujumbe wote wa SMS kutoka Selcom hapa..."
                   value={paymentReference}
                   onChange={(e) => setPaymentReference(e.target.value)}
                   className="h-24 mb-2 text-sm bg-white border-2 border-blue-100 focus:border-blue-300"
                   maxLength={180}
                 />
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>Full SMS message from Selcom</span>
+                  <span>Ujumbe kamili kutoka Selcom</span>
                   <span className={
                     paymentReference.length >= 140 && paymentReference.length <= 170 
                       ? "text-green-600 font-medium" 
                       : "text-amber-500"
                   }>
-                    {paymentReference.length}/170 characters
+                    {paymentReference.length}/170 herufi
                     {paymentReference.length >= 140 && paymentReference.length <= 170 && " ✓"}
                   </span>
                 </div>
@@ -526,23 +512,23 @@ From 255712345678
               {isVerifying ? (
                 <>
                   <div className="h-5 w-5 border-2 border-white/50 border-t-white rounded-full animate-spin mr-2"></div>
-                  Verifying Payment...
+                  Inahakiki Malipo...
                 </>
-              ) : 'Verify Payment'}
+              ) : 'Hakiki Malipo'}
             </Button>
           </>
         )}
       </div>
       
       <div className="mt-4 sm:mt-6 bg-white p-4 rounded-lg shadow-sm">
-        <p className="text-sm text-gray-600 text-center mb-3">Need help with your payment?</p>
+        <p className="text-sm text-gray-600 text-center mb-3">Unahitaji msaada kwa malipo yako?</p>
         <div className="grid grid-cols-2 gap-3">
           <a 
             href="tel:+255682152148" 
             className="flex items-center justify-center gap-2 bg-blue-50 text-blue-600 hover:bg-blue-100 py-3 rounded-md font-medium text-sm transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-            Call Support
+            Piga Simu
           </a>
           <a 
             href="https://wa.me/255682152148" 
