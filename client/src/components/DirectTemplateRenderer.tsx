@@ -7,6 +7,7 @@ interface DirectTemplateRendererProps {
   cvData: CVData;
   templateId: string;
   height?: number | "auto";
+  width?: string | number;
   scaleFactor?: number;
 }
 
@@ -14,6 +15,7 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
   cvData,
   templateId,
   height = 600,
+  width = "auto",
   scaleFactor = 0.65
 }) => {
   // Log the data for debugging
@@ -26,10 +28,11 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
   // Create a wrapper container to maintain consistent height/scroll
   const containerStyle: React.CSSProperties = {
     height: height === "auto" ? "100%" : `${height}px`,
+    width: width === "auto" ? "100%" : typeof width === 'number' ? `${width}px` : width,
     overflow: 'auto',
     backgroundColor: '#ffffff',
-    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
-    borderRadius: '4px',
+    boxShadow: 'none',
+    borderRadius: '0',
     touchAction: 'pan-y', // Allow vertical panning on mobile
     WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
   };
@@ -91,7 +94,7 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
       <div className="template-container" style={containerStyle}>
         <div 
           className={`${height === "auto" ? "mobile-template-content" : ""}`}
-          style={height === "auto" ? { transform: `scale(${scaleFactor})` } : {}}
+          style={{ width: "100%" }}
         >
           {template.render(processedData)}
         </div>

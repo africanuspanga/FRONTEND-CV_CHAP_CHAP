@@ -318,14 +318,15 @@ const FinalPreview = () => {
               </div>
             </div>
           )}
-          {/* CV preview container - shrunk to fit entire CV on screen */}
+          {/* CV preview container - full width */}
           <div 
             className={`w-full print:shadow-none ${isMobile ? 'cv-preview-scroll-container' : ''}`}
             style={isMobile ? { 
               marginTop: '0',
-              paddingTop: '10px',
-              paddingBottom: '80px',
-              backgroundColor: 'white'
+              paddingTop: '0',
+              paddingBottom: '60px',
+              backgroundColor: 'white',
+              width: '100%'
             } : {}}
           >
             {/* A4 CV preview scaled down to fit in viewport */}
@@ -333,8 +334,9 @@ const FinalPreview = () => {
               <DirectTemplateRenderer
                 templateId={currentTemplateId}
                 cvData={formData}
-                height={isMobile ? "auto" : 800 as const}
-                scaleFactor={1} // Scale handled by CSS for better control
+                height="auto"
+                width="100%" 
+                scaleFactor={1}
               />
             </div>
           </div>
