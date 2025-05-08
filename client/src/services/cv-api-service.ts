@@ -441,7 +441,8 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
     const localStorageData = { templateId, cvData };
     
     // Generate a local ID for this CV - no API call needed
-    const localId = `local-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    // Use a format that doesn't start with 'local-' so it doesn't trigger payment bypass
+    const localId = `cvid-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     
     // Store the CV data with the local ID
     try {
@@ -496,12 +497,8 @@ export const verifyUSSDPayment = async (requestId: string, paymentReference: str
   try {
     console.log(`Verifying payment for request ID: ${requestId} with reference: ${paymentReference}`);
     
-    // Check if requestId is a local fallback ID
-    const isLocalId = requestId.startsWith('local-');
-    
-    // Normally we would send this to our backend for verification, but in this case
-    // we'll verify it client-side through our CORS proxy since our backend doesn't
-    // have a dedicated verification endpoint yet
+    // We're handling all verification client-side, regardless of the request ID type
+    // This ensures the SMS verification UI is always shown
     
     // Verify payment has the required length
     if (paymentReference.length < 140 || paymentReference.length > 170) {
@@ -565,93 +562,32 @@ export const verifyUSSDPayment = async (requestId: string, paymentReference: str
     
     console.log(`Using transaction ID: ${transId}`);
     
-    // For local fallback IDs, skip the backend verification
-    if (isLocalId) {
-      console.log('Using local fallback verification for ID:', requestId);
+    // Verification confirmed - all SMS validation passed
+    // Store the verification data in both session and local storage
+    try {
+      console.log(`Payment verification successful for ID: ${requestId}`);
+      
+      // Store in sessionStorage first (more reliable)
+      sessionStorage.setItem(`payment_verified_${requestId}`, 'true');
+      sessionStorage.setItem(`payment_transaction_${requestId}`, transId);
+      sessionStorage.setItem(`payment_verified_time_${requestId}`, new Date().toISOString());
+      
+      // Try localStorage as backup but don't fail if it errors
       try {
-        // Store verification in sessionStorage first (more reliable)
-        sessionStorage.setItem(`payment_verified_${requestId}`, 'true');
-        sessionStorage.setItem(`payment_transaction_${requestId}`, transId);
-        sessionStorage.setItem(`payment_verified_time_${requestId}`, new Date().toISOString());
-        
-        // Try localStorage as fallback but don't fail if it errors
-        try {
-          localStorage.setItem(`payment_verified_${requestId}`, 'true');
-          localStorage.setItem(`payment_transaction_${requestId}`, transId);
-          localStorage.setItem(`payment_verified_time_${requestId}`, new Date().toISOString());
-        } catch (localError) {
-          // Just log warning and continue - sessionStorage should work
-          console.warn('Unable to save to localStorage:', localError);
-        }
-      } catch (error) {
-        // Log error but still return success - we'll handle in the component
-        console.error('Storage error during verification:', error);
+        localStorage.setItem(`payment_verified_${requestId}`, 'true');
+        localStorage.setItem(`payment_transaction_${requestId}`, transId);
+        localStorage.setItem(`payment_verified_time_${requestId}`, new Date().toISOString());
+      } catch (localError) {
+        // Just log warning and continue - sessionStorage should work
+        console.warn('Unable to save to localStorage:', localError);
       }
-      return { success: true };
+    } catch (error) {
+      // Log error but still return success - we'll handle in the component
+      console.error('Storage error during verification:', error);
     }
     
-    // Only try backend verification for non-local IDs
-    try {
-      // Attempt to call the backend verification endpoint
-      await fetchFromCVScreener(
-        `api/cv-pdf/${requestId}/verify`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: {
-            payment_message: paymentReference,
-            transaction_id: transId
-          }
-        }
-      );
-      
-      // If we get here, the verification was accepted by the backend
-      try {
-        // Store in sessionStorage first (primary storage)
-        sessionStorage.setItem(`payment_verified_${requestId}`, 'true');
-        sessionStorage.setItem(`payment_transaction_${requestId}`, transId);
-        sessionStorage.setItem(`payment_verified_time_${requestId}`, new Date().toISOString());
-        
-        // Try localStorage as backup but don't fail if it errors
-        try {
-          localStorage.setItem(`payment_verified_${requestId}`, 'true');
-          localStorage.setItem(`payment_transaction_${requestId}`, transId);
-          localStorage.setItem(`payment_verified_time_${requestId}`, new Date().toISOString());
-        } catch (localError) {
-          console.warn('Unable to save to localStorage:', localError);
-        }
-      } catch (error) {
-        console.error('Storage error during backend verification:', error);
-      }
-      return { success: true };
-    } catch (apiError) {
-      console.warn('Backend verification endpoint failed:', apiError);
-      console.log('Falling back to client-side verification');
-      
-      // Fall back to client-side verification
-      try {
-        // Store in sessionStorage first (primary storage)
-        sessionStorage.setItem(`payment_verified_${requestId}`, 'true');
-        sessionStorage.setItem(`payment_transaction_${requestId}`, transId);
-        sessionStorage.setItem(`payment_verified_time_${requestId}`, new Date().toISOString());
-        
-        // Try localStorage as backup but don't fail if it errors
-        try {
-          localStorage.setItem(`payment_verified_${requestId}`, 'true');
-          localStorage.setItem(`payment_transaction_${requestId}`, transId);
-          localStorage.setItem(`payment_verified_time_${requestId}`, new Date().toISOString());
-        } catch (localError) {
-          console.warn('Unable to save to localStorage during client verification:', localError);
-        }
-      } catch (error) {
-        console.error('Storage error during client-side verification:', error);
-        // Even if storage fails, we still want to count this as a successful verification
-      }
-      
-      return { success: true };
-    }
+    // Return success for any ID type - we're doing all validation locally
+    return { success: true };
   } catch (error) {
     console.error('Error verifying payment:', error);
     return {
@@ -675,32 +611,27 @@ export const checkPaymentStatus = async (requestId: string): Promise<CVRequestSt
   try {
     console.log(`Checking status for request ID: ${requestId}`);
     
-    // Check if this is a local fallback ID
-    const isLocalId = requestId.startsWith('local-');
+    // All IDs are treated equally now - no special local fallback handling
     
-    // If not a local ID, try to get payment status from the backend API first
-    if (!isLocalId) {
-      try {
-        // Try to call the CV status endpoint through our proxy
-        const status = await fetchFromCVScreener<CVRequestStatus>(
-          `api/cv-pdf/${requestId}/status`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            }
+    // Try to get payment status from the backend API first for all IDs
+    try {
+      // Try to call the CV status endpoint through our proxy
+      const status = await fetchFromCVScreener<CVRequestStatus>(
+        `api/cv-pdf/${requestId}/status`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
           }
-        );
-        
-        console.log('Status check response from backend:', status);
-        return status;
-      } catch (apiError) {
-        // API error - fall back to storage verification
-        console.warn('Backend status endpoint failed:', apiError);
-        console.log('Falling back to storage verification');
-      }
-    } else {
-      console.log('Using local verification for fallback ID');
+        }
+      );
+      
+      console.log('Status check response from backend:', status);
+      return status;
+    } catch (apiError) {
+      // API error - fall back to storage verification
+      console.warn('Backend status endpoint failed:', apiError);
+      console.log('Falling back to storage verification');
     }
     
     // Check verification status in session/local storage

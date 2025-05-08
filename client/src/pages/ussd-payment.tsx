@@ -443,7 +443,7 @@ const USSDPaymentPage: React.FC = () => {
         ) : (
           <>
             <div className="mb-4">
-              {requestId?.startsWith('local-') ? (
+              {false ? ( /* Disable payment bypass completely */
                 <div className="bg-green-50 p-3 rounded-lg mb-4 border border-green-100">
                   <p className="font-medium text-green-800 mb-2 text-sm sm:text-base flex items-center">
                     <CheckCircle2 className="h-5 w-5 mr-2" />
@@ -467,12 +467,11 @@ const USSDPaymentPage: React.FC = () => {
                 </div>
               )}
               
-              {!requestId?.startsWith('local-') && (
-                <>
-                  <div className="mb-3 p-4 border-2 border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="font-medium text-gray-800 mb-2 text-sm">Example SMS format:</h3>
-                    <div className="bg-gray-50 p-2 rounded text-xs text-gray-600 font-mono mb-3 border border-gray-100">
-                      <pre className="whitespace-pre-wrap">
+              {/* Always show SMS input box regardless of ID type */}
+              <div className="mb-3 p-4 border-2 border-gray-200 rounded-lg bg-white shadow-sm">
+                <h3 className="font-medium text-gray-800 mb-2 text-sm">Example SMS format:</h3>
+                <div className="bg-gray-50 p-2 rounded text-xs text-gray-600 font-mono mb-3 border border-gray-100">
+                  <pre className="whitespace-pre-wrap">
 Selcom Pay
 DRIFTMARK TECHNOLOGI
 Merchant# 61115073
@@ -482,32 +481,30 @@ Ref 0123456789
 Channel Airtel Money
 From 255712345678
 01/05/2025 12:34:56 PM
-                      </pre>
-                    </div>
-                    <p className="text-xs text-blue-600 mb-2">
-                      Please paste the ENTIRE SMS with all required information.
-                    </p>
-                    <Textarea 
-                      placeholder="Paste the ENTIRE Selcom SMS message here..."
-                      value={paymentReference}
-                      onChange={(e) => setPaymentReference(e.target.value)}
-                      className="h-24 mb-2 text-sm bg-white border-2 border-blue-100 focus:border-blue-300"
-                      maxLength={180}
-                    />
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Full SMS message from Selcom</span>
-                      <span className={
-                        paymentReference.length >= 140 && paymentReference.length <= 170 
-                          ? "text-green-600 font-medium" 
-                          : "text-amber-500"
-                      }>
-                        {paymentReference.length}/170 characters
-                        {paymentReference.length >= 140 && paymentReference.length <= 170 && " ✓"}
-                      </span>
-                    </div>
-                  </div>
-                </>
-              )}
+                  </pre>
+                </div>
+                <p className="text-xs text-blue-600 mb-2">
+                  Please paste the ENTIRE SMS with all required information.
+                </p>
+                <Textarea 
+                  placeholder="Paste the ENTIRE Selcom SMS message here..."
+                  value={paymentReference}
+                  onChange={(e) => setPaymentReference(e.target.value)}
+                  className="h-24 mb-2 text-sm bg-white border-2 border-blue-100 focus:border-blue-300"
+                  maxLength={180}
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Full SMS message from Selcom</span>
+                  <span className={
+                    paymentReference.length >= 140 && paymentReference.length <= 170 
+                      ? "text-green-600 font-medium" 
+                      : "text-amber-500"
+                  }>
+                    {paymentReference.length}/170 characters
+                    {paymentReference.length >= 140 && paymentReference.length <= 170 && " ✓"}
+                  </span>
+                </div>
+              </div>
             </div>
             
             {verificationError && (
@@ -521,11 +518,8 @@ From 255712345678
               onClick={handleVerifyPayment} 
               className="w-full bg-primary hover:bg-primary/90 py-3 sm:py-4 text-base sm:text-lg"
               disabled={isVerifying || 
-                // Local ID bypass doesn't need SMS verification
-                (!requestId?.startsWith('local-') && 
-                  // Only enable Verify button if SMS is between 140-170 characters
-                  (paymentReference.length < 140 || paymentReference.length > 170)
-                ) || 
+                // Always verify SMS for any request ID - disabled bypass completely
+                (paymentReference.length < 140 || paymentReference.length > 170) || 
                 isLoading || 
                 isPending}
             >
@@ -534,7 +528,7 @@ From 255712345678
                   <div className="h-5 w-5 border-2 border-white/50 border-t-white rounded-full animate-spin mr-2"></div>
                   Verifying Payment...
                 </>
-              ) : requestId?.startsWith('local-') ? 'Continue to Download' : 'Verify Payment'}
+              ) : 'Verify Payment'}
             </Button>
           </>
         )}
