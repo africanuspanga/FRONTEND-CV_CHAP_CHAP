@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { 
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { useToast } from '@/hooks/use-toast';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { useCVRequest } from '@/contexts/cv-request-context';
 import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
 import { getAllTemplates, getTemplateById } from '@/lib/templates-registry';
-import { X, Download, Printer, Mail, CheckCircle, ArrowLeft, Edit, RefreshCw, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
-import { generatePDF, directDownloadCVAsPDF } from '@/lib/pdf-generator';
+import { X, Download, Printer, Mail, CheckCircle } from 'lucide-react';
+import { directDownloadCVAsPDF } from '@/lib/pdf-generator';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/auth-context';
-import '../styles/cvPreview.css';
+import '../styles/cv-simple-preview.css';
 
 const FinalPreview = () => {
   const { templateId } = useParams<{ templateId: string }>();
@@ -24,7 +19,6 @@ const FinalPreview = () => {
   const { toast } = useToast();
   const { formData, updateFormField } = useCVForm();
   const { isAuthenticated } = useAuth();
-  const { initiatePayment, resetRequest, paymentStatus } = useCVRequest();
   
   // State for template sidebar
   const [templateSidebarOpen, setTemplateSidebarOpen] = useState(!isMobile);
@@ -32,11 +26,8 @@ const FinalPreview = () => {
   const allTemplates = getAllTemplates();
   // Currently selected template for preview
   const [currentTemplateId, setCurrentTemplateId] = useState(templateId || formData.templateId);
-  // Track payment/download in progress
+  // Track download in progress
   const [isDownloading, setIsDownloading] = useState(false);
-  
-  // Track scale factor for mobile viewing - match screenshot 1
-  const [scaleFactor, setScaleFactor] = useState(0.75);
   
   // Get current template name
   const currentTemplateName = getTemplateById(currentTemplateId)?.name || 'Template';
@@ -44,66 +35,25 @@ const FinalPreview = () => {
   // Handle template selection
   const handleSelectTemplate = (id: string) => {
     setCurrentTemplateId(id);
-    
-    // Also update the URL to reflect the new template
     navigate(`/cv/${id}/final-preview`, { replace: true });
-    
-    // Most importantly, update the templateId in the form data
     updateFormField('templateId', id);
   };
   
-  // Direct download CV without payment
-  const handleDirectDownload = async () => {
-    setIsDownloading(true);
-    
-    try {
-      // Ensure form data has the most current template ID
-      if (currentTemplateId !== formData.templateId) {
-        updateFormField('templateId', currentTemplateId);
-      }
-      
-      // Use the direct API download that bypasses payment flow
-      await directDownloadCVAsPDF(formData, currentTemplateId);
-      
-      toast({
-        title: "Download Complete",
-        description: "Your CV has been downloaded successfully.",
-        variant: "default"
-      });
-    } catch (error) {
-      console.error("Error downloading CV:", error);
-      toast({
-        title: "Download Failed",
-        description: error instanceof Error ? error.message : "Failed to download CV",
-        variant: "destructive"
-      });
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-  
   // Handle CV download (initiate payment and redirect to payment page)
-  const handlePaymentFlow = async () => {
-    // Set downloading state to true to disable the button
+  const handleDownload = async () => {
     setIsDownloading(true);
     
     try {
-      // Ensure form data has the most current template ID
+      // Ensure form data has the current template ID
       if (currentTemplateId !== formData.templateId) {
-        console.log('Updating template ID before proceeding to payment:', currentTemplateId);
         updateFormField('templateId', currentTemplateId);
       }
       
-      // Store the selected template ID in sessionStorage
-      // This will be needed at the payment verification step
+      // Store the selected template ID for the payment page
       sessionStorage.setItem('cv_template_id', currentTemplateId);
       
-      console.log("Proceeding to USSD payment page with templateId:", currentTemplateId);
-      
-      // IMPORTANT: Go directly to the USSD payment page without initiating payment
-      // We'll handle everything on the USSD page itself
+      // Navigate to payment page
       navigate('/ussd-payment');
-      
     } catch (error) {
       console.error("Error proceeding to payment:", error);
       toast({
@@ -115,67 +65,43 @@ const FinalPreview = () => {
     }
   };
   
-  // Handle the download button click - use payment flow for production
-  const handleDownload = async () => {
-    // Use the payment flow method for normal operation
-    await handlePaymentFlow();
-    // Never call direct download here - we always want to go through payment flow
-  };
-  
-  // Handle print - disabled as requested
+  // Handle print (disabled)
   const handlePrint = () => {
-    // Do nothing - print functionality is disabled
-    return;
+    // Functionality disabled
   };
   
-  // Handle email - disabled as requested
+  // Handle email (disabled)
   const handleEmail = () => {
-    // Do nothing - email functionality is disabled
-    return;
-  };
-  
-
-  
-  // Synchronize template ID from URL params when component mounts
-  useEffect(() => {
-    // If URL has a template ID that's different from form data, update form data
-    if (templateId && templateId !== formData.templateId) {
-      console.log('Updating template ID from URL:', templateId);
-      updateFormField('templateId', templateId);
-    }
-  }, [templateId, formData.templateId, updateFormField]);
-
-  // Check if we need to redirect
-  useEffect(() => {
-    // If no template is selected, redirect to template selection
-    if (!currentTemplateId) {
-      navigate('/templates');
-    }
-  }, [currentTemplateId, navigate]);
-
-  // Go back to previous step
-  const handleBack = () => {
-    navigate(`/cv/${currentTemplateId}/additional-sections`);
-  };
-
-  // Go to template editing
-  const handleEditTemplate = () => {
-    setTemplateSidebarOpen(true);
+    // Functionality disabled
   };
   
   // Handle content update
   const handleUpdateContent = () => {
     navigate(`/cv/${currentTemplateId}/personal`);
   };
+  
+  // Sync template ID from URL params
+  useEffect(() => {
+    if (templateId && templateId !== formData.templateId) {
+      updateFormField('templateId', templateId);
+    }
+  }, [templateId, formData.templateId, updateFormField]);
+
+  // Redirect if no template selected
+  useEffect(() => {
+    if (!currentTemplateId) {
+      navigate('/templates');
+    }
+  }, [currentTemplateId, navigate]);
 
   return (
-    <div className="w-full h-screen flex flex-col bg-gray-50">
+    <div className="w-full h-screen flex flex-col bg-white">
       {/* Desktop Header */}
       {!isMobile && (
         <div className="bg-white border-b border-gray-200 py-3 px-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-              <span>Your CV Preview</span>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Your CV Preview
             </h2>
             <div className="text-sm text-gray-500">
               {currentTemplateName}
@@ -185,7 +111,6 @@ const FinalPreview = () => {
           <div className="flex space-x-3">
             <Button 
               variant="outline" 
-              className="flex items-center gap-2"
               onClick={() => setTemplateSidebarOpen(!templateSidebarOpen)}
             >
               Templates
@@ -221,14 +146,14 @@ const FinalPreview = () => {
         </div>
       )}
       
-      {/* Mobile Header - Dark navy blue matching competitor */}
+      {/* Mobile Header */}
       {isMobile && (
         <div className="bg-[#1E2F5C] text-white py-4 px-4 flex justify-center items-center">
           <h1 className="text-2xl font-bold">Finalize Resume</h1>
         </div>
       )}
       
-      {/* Mobile Actions - Two button layout like competitor's screenshot */}
+      {/* Mobile Actions */}
       {isMobile && (
         <div className="flex justify-between px-4 py-3 bg-[#1E2F5C]">
           <button 
@@ -255,7 +180,7 @@ const FinalPreview = () => {
       <div className="flex-grow flex overflow-hidden">
         {/* Template Sidebar */}
         {templateSidebarOpen && (
-          <div className={`${isMobile ? 'fixed inset-0 z-50 bg-white' : 'w-64 border-r border-gray-200 bg-white flex-shrink-0 overflow-y-auto'}`}>
+          <div className={`${isMobile ? 'fixed inset-0 z-50 bg-white' : 'templates-sidebar'}`}>
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
               <h3 className="font-medium">Templates</h3>
               <button 
@@ -266,90 +191,67 @@ const FinalPreview = () => {
               </button>
             </div>
             
-
-            
-            {/* All Templates */}
-            <div className="p-4 overflow-y-auto max-h-[calc(100vh-100px)]">
-              <h4 className="text-sm font-medium text-gray-500 mb-3">All templates</h4>
-              <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'grid grid-cols-1 gap-4'}`}>
-                {allTemplates.map((template) => (
-                  <div 
-                    key={template.id}
-                    onClick={() => {
-                      handleSelectTemplate(template.id);
-                      if (isMobile) setTemplateSidebarOpen(false);
-                    }}
-                    className={`cursor-pointer border rounded-md overflow-hidden relative ${currentTemplateId === template.id ? 'ring-2 ring-teal-500' : 'hover:border-teal-500'}`}
-                  >
-                    {/* Template Preview Image */}
-                    <div className="aspect-[210/297] bg-white relative">
-                      <img 
-                        src={template.previewImage} 
-                        alt={template.name}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      
-                      {/* Selected Indicator */}
-                      {currentTemplateId === template.id && (
-                        <div className="absolute top-1 right-1 bg-teal-500 rounded-full p-0.5">
-                          <CheckCircle className="h-4 w-4 text-white" />
-                        </div>
-                      )}
-                    </div>
+            {/* Templates List */}
+            <div className="templates-grid">
+              {allTemplates.map((template) => (
+                <div 
+                  key={template.id}
+                  onClick={() => {
+                    handleSelectTemplate(template.id);
+                    if (isMobile) setTemplateSidebarOpen(false);
+                  }}
+                  className={`cursor-pointer border rounded-md overflow-hidden relative ${currentTemplateId === template.id ? 'ring-2 ring-teal-500' : 'hover:border-teal-500'}`}
+                >
+                  {/* Template Preview Image */}
+                  <div className="aspect-[210/297] bg-white relative">
+                    <img 
+                      src={template.previewImage} 
+                      alt={template.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
                     
-                    {/* Template Name */}
-                    <div className="text-xs font-medium text-center py-1 px-2 truncate">
-                      {template.name}
-                    </div>
+                    {/* Selected Indicator */}
+                    {currentTemplateId === template.id && (
+                      <div className="absolute top-1 right-1 bg-teal-500 rounded-full p-0.5">
+                        <CheckCircle className="h-4 w-4 text-white" />
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
+                  
+                  {/* Template Name */}
+                  <div className="text-xs font-medium text-center py-1 px-2 truncate">
+                    {template.name}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
         
-        {/* CV Preview Area - Using the new scalable approach */}
-        <div className={`flex-grow flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} relative ${isMobile ? 'bg-[#f5f5f5]' : 'bg-white'}`}>
-          {/* "Scroll to view" message - blue text centered like in screenshot */}
+        {/* CV Preview Area */}
+        <div className={`flex-grow ${isMobile ? 'cv-preview-mobile' : 'p-4'}`}>
+          {/* "Scroll to view" message for mobile */}
           {isMobile && (
-            <div className="fixed top-[6.5rem] left-0 right-0 bg-white z-20 py-2 px-2 text-sm text-center text-blue-600 border-b border-gray-100 shadow-sm">
-              <div className="flex justify-center items-center gap-1">
-                <span>○ Scroll to view the full CV</span>
-              </div>
+            <div className="scroll-notice">
+              ○ Scroll to view the full CV
             </div>
           )}
           
-          {/* CV preview container using the new structure */}
-          {isMobile ? (
-            <div className="cv-preview-container">
-              <div className="cv-scaler">
-                <div className="cv-content">
-                  <DirectTemplateRenderer
-                    templateId={currentTemplateId}
-                    cvData={formData}
-                    height="auto"
-                    width="100%" 
-                    scaleFactor={1}
-                  />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="max-w-[794px] mx-auto bg-white shadow-sm border rounded">
-              <DirectTemplateRenderer
-                templateId={currentTemplateId}
-                cvData={formData}
-                height="auto"
-                width="100%" 
-                scaleFactor={1}
-              />
-            </div>
-          )}
+          {/* CV Preview */}
+          <div className={isMobile ? 'mobile-cv-container' : 'cv-preview-wrapper'}>
+            <DirectTemplateRenderer
+              templateId={currentTemplateId}
+              cvData={formData}
+              height="auto"
+              width="100%" 
+              scaleFactor={1}
+            />
+          </div>
         </div>
       </div>
       
-      {/* Mobile Action Button - Matching competitor's screenshot exactly */}
+      {/* Mobile Action Button */}
       {isMobile && (
         <div className="fixed bottom-0 left-0 right-0">
           <button 
