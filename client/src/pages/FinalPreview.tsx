@@ -220,16 +220,16 @@ const FinalPreview = () => {
         </div>
       )}
       
-      {/* Mobile Header - Dark blue header with Finalize Resume */}
+      {/* Mobile Header - Dark navy blue matching competitor */}
       {isMobile && (
-        <div className="bg-[#1A2E5E] text-white py-4 px-4 flex justify-center items-center">
+        <div className="bg-[#1E2F5C] text-white py-4 px-4 flex justify-center items-center">
           <h1 className="text-2xl font-bold">Finalize Resume</h1>
         </div>
       )}
       
-      {/* Mobile Actions - Two button layout matching screenshot 1 */}
+      {/* Mobile Actions - Two button layout like competitor's screenshot */}
       {isMobile && (
-        <div className="flex justify-between px-4 py-3 bg-[#1A2E5E]">
+        <div className="flex justify-between px-4 py-3 bg-[#1E2F5C]">
           <button 
             onClick={() => setTemplateSidebarOpen(true)}
             className="flex-1 mr-2 py-3 px-4 bg-transparent border-2 border-white rounded-full text-white font-medium"
@@ -308,9 +308,9 @@ const FinalPreview = () => {
           </div>
         )}
         
-        {/* CV Preview Area - Fixed to match provided screenshot exactly */}
-        <div className={`flex-grow flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} relative ${isMobile ? 'bg-[#1A2E5E]' : 'bg-white'}`}>
-          {/* "Scroll to view" message - positioned under the header */}
+        {/* CV Preview Area - Exactly matching competitor's screenshot */}
+        <div className={`flex-grow flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} relative ${isMobile ? 'bg-[#f0f0f0]' : 'bg-white'}`}>
+          {/* "Scroll to view" message - blue text centered like competitor */}
           {isMobile && (
             <div className="absolute top-[6.5rem] left-0 right-0 bg-white z-10 py-1 px-2 text-xs text-center text-blue-600">
               <div className="flex justify-center items-center gap-1">
@@ -318,31 +318,31 @@ const FinalPreview = () => {
               </div>
             </div>
           )}
-          {/* CV preview wrapper with proper styling for mobile */}
+          {/* CV preview container with clean scrolling - like competitor */}
           <div 
             className={`w-full print:shadow-none ${isMobile ? 'cv-preview-scroll-container' : ''}`}
             style={isMobile ? { marginTop: '8px' } : {}}
           >
-            {/* Centered A4 document with proper scaling */}
+            {/* Clean white card exactly like competitor's screenshot */}
             <div className={isMobile ? "cv-preview-container-mobile" : ""}>
               <DirectTemplateRenderer
                 templateId={currentTemplateId}
                 cvData={formData}
                 height={isMobile ? "auto" : 800 as const}
-                scaleFactor={1} // Scale handled by CSS for better control
+                scaleFactor={1} // No scale factor - pure size like competitor
               />
             </div>
           </div>
         </div>
       </div>
       
-      {/* Mobile Action Button - Following the design in screenshot 1 */}
+      {/* Mobile Action Button - Matching competitor's screenshot exactly */}
       {isMobile && (
         <div className="fixed bottom-0 left-0 right-0">
           <button 
             onClick={handleDownload}
             disabled={isDownloading}
-            className="w-full py-4 bg-[#0075FF] text-white text-lg font-semibold"
+            className="w-full py-4 bg-[#2563EB] text-white text-lg font-semibold"
           >
             {isDownloading ? 'Downloading...' : 'Download My CV'}
           </button>
