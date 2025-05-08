@@ -308,6 +308,9 @@ const WorkExperienceForm = () => {
   };
   
   const handleContinueToEducation = () => {
+    // Scroll to top before navigation
+    window.scrollTo(0, 0);
+    
     // Navigate to the education form
     navigate(`/cv/${templateId}/education`);
   };
@@ -389,7 +392,10 @@ const WorkExperienceForm = () => {
         <div className={`bg-white rounded-lg border p-4 md:p-8 w-full ${isMobile ? 'mobile-form' : ''}`}>
           {/* Back button */}
           <button
-            onClick={() => navigate(`/cv/${templateId}/personal`)}
+            onClick={() => {
+              window.scrollTo(0, 0);
+              navigate(`/cv/${templateId}/personal`);
+            }}
             className="text-primary flex items-center mb-4 md:mb-6"
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
@@ -570,7 +576,10 @@ const WorkExperienceForm = () => {
               <div className="flex justify-between mt-8">
                 <Button 
                   variant="outline" 
-                  onClick={() => navigate(`/cv/${templateId}/personal`)}
+                  onClick={() => {
+                    window.scrollTo(0, 0);
+                    navigate(`/cv/${templateId}/personal`);
+                  }}
                   className="flex items-center gap-1 px-4"
                 >
                   <ChevronLeft className="h-4 w-4" />

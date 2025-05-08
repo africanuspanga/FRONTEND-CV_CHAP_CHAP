@@ -9,6 +9,7 @@ import { AdminAuthProvider } from "@/contexts/admin-auth-context";
 import { CVRequestProvider } from "@/contexts/cv-request-context";
 import { ProtectedAdminRoute } from "@/components/admin/ProtectedAdminRoute";
 import { StorageWarningModal } from "@/components/StorageWarningModal";
+import ScrollToTop from "@/components/ScrollToTop";
 import SEO from "@/components/SEO";
 import StructuredData from "@/components/StructuredData";
 
@@ -67,6 +68,7 @@ import USSDPaymentTest from "@/pages/ussd-payment-test";
 function Router() {
   return (
     <div className="flex flex-col min-h-screen">
+      <ScrollToTop />
       <Switch>
         {/* Admin Dashboard Routes */}
         <Route path="/admin-login" component={AdminLoginPage} />

@@ -103,7 +103,10 @@ const WorkExperienceEditor: React.FC<WorkExperienceEditorProps> = ({
         {/* Fixed navigation buttons */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t flex justify-between">
           <Button
-            onClick={onBack}
+            onClick={() => {
+              window.scrollTo(0, 0);
+              onBack();
+            }}
             variant="outline"
             className="flex items-center gap-1"
           >
@@ -135,7 +138,10 @@ const WorkExperienceEditor: React.FC<WorkExperienceEditorProps> = ({
       
       <div className="bg-white rounded-lg border p-8">
         <button
-          onClick={onBack}
+          onClick={() => {
+            window.scrollTo(0, 0);
+            onBack();
+          }}
           className="text-primary flex items-center mb-6"
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
@@ -244,7 +250,10 @@ const WorkExperienceEditor: React.FC<WorkExperienceEditorProps> = ({
               <Button
                 type="button"
                 variant="outline"
-                onClick={onBack}
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  onBack();
+                }}
                 className="flex items-center"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
