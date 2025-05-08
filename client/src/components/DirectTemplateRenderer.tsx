@@ -7,12 +7,14 @@ interface DirectTemplateRendererProps {
   cvData: CVData;
   templateId: string;
   height?: number | "auto";
+  scaleFactor?: number;
 }
 
 const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
   cvData,
   templateId,
-  height = 600
+  height = 600,
+  scaleFactor = 0.65
 }) => {
   // Log the data for debugging
   console.log('Direct renderer data:', {
@@ -87,7 +89,10 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
     // Render the template using the template registry's render function with safe data
     return (
       <div className="template-container" style={containerStyle}>
-        <div className={`${height === "auto" ? "mobile-template-content" : ""}`}>
+        <div 
+          className={`${height === "auto" ? "mobile-template-content" : ""}`}
+          style={height === "auto" ? { transform: `scale(${scaleFactor})` } : {}}
+        >
           {template.render(processedData)}
         </div>
       </div>

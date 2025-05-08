@@ -361,6 +361,7 @@ const FinalPreview = () => {
               templateId={currentTemplateId}
               cvData={formData}
               height={isMobile ? "auto" : 800 as const}
+              scaleFactor={scaleFactor}
             />
           </div>
         </div>
