@@ -3,6 +3,7 @@ import { Template, useTemplates } from '@/scripts/template-loader';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { sortTemplatesByPriority } from '@/lib/template-priority';
 
 interface TemplateSelectorProps {
   onSelect: (templateId: string) => void;
@@ -47,9 +48,12 @@ export function TemplateSelector({ onSelect, selectedTemplateId }: TemplateSelec
     );
   }
 
+  // Sort templates according to priority order
+  const sortedTemplates = sortTemplatesByPriority(templates);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {templates.map((template) => (
+      {sortedTemplates.map((template) => (
         <TemplateCard
           key={template.id}
           template={template}

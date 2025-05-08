@@ -205,8 +205,9 @@ export async function uploadTemplate(
   }
 }
 
-// Default templates to use as fallback if API fails
+// Default templates to use as fallback if API fails - ordered by priority
 const defaultTemplates: Template[] = [
+  // Top priority templates (first 4 are featured on homepage)
   {
     id: 'kilimanjaro',
     name: 'Kilimanjaro Professional',
@@ -215,44 +216,102 @@ const defaultTemplates: Template[] = [
     updatedAt: new Date().toISOString()
   },
   {
-    id: 'serengeti-elegant',
-    name: 'Serengeti Elegant',
-    description: 'An elegant, minimalist design with sophisticated typography perfect for creative professionals.',
+    id: 'tanzanitePro',
+    name: 'Tanzanite Pro',
+    description: 'A premium template with sophisticated design for executives and senior professionals.',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
   {
-    id: 'safari-original',
+    id: 'safariOriginal',
     name: 'Safari Original',
     description: 'A bold, colorful template with a vibrant header that suits creative roles and industries.',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
   {
-    id: 'modern-zanzibar',
-    name: 'Modern Zanzibar',
-    description: 'A contemporary two-column layout with a calming blue color scheme ideal for technical professionals.',
+    id: 'brightDiamond',
+    name: 'Bright Diamond',
+    description: 'A clean, standout design with polished aesthetics for modern professionals.',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
+  // Secondary priority templates
   {
-    id: 'mkali-modern',
-    name: 'Mkali Modern',
-    description: 'A sleek, modern design with minimal accents and focus on readability.',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: 'street-hustler',
+    id: 'streetHustler',
     name: 'Street Hustler',
     description: 'A high-energy design with vibrant colors and street-style typography for creative fields.',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
   {
-    id: 'big-boss',
+    id: 'mwalimuOne',
+    name: 'Mwalimu One',
+    description: 'A professional template designed specifically for educators and academics.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'serengetiFlow',
+    name: 'Serengeti Flow',
+    description: 'An elegant, minimalist design with sophisticated typography perfect for creative professionals.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'mjenziWaTaifa',
+    name: 'Mjenzi Wa Taifa',
+    description: 'A structured template ideal for engineering and construction professionals.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'jijengeClassic',
+    name: 'Jijenge Classic',
+    description: 'A timeless design with classic styling suitable for all industries.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'bigBoss',
     name: 'Big Boss',
     description: 'A powerful, executive-style template that conveys authority and experience.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  // Lower priority templates
+  {
+    id: 'madiniMob',
+    name: 'Madini Mob',
+    description: 'A modern template with strong visuals ideal for the mining and resources sector.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'moonlightSonata',
+    name: 'Moonlight Sonata',
+    description: 'An elegant template with night-themed styling for creative professionals.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'kaziFasta',
+    name: 'Kazi Fasta',
+    description: 'A quick-impact template designed for speed and readability.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'smartBongo',
+    name: 'Smart Bongo',
+    description: 'An intelligent layout for technical professionals highlighting skills and achievements.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'mkaliModern',
+    name: 'Mkali Modern',
+    description: 'A sleek, modern design with minimal accents and focus on readability.',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
