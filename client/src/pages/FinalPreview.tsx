@@ -308,8 +308,8 @@ const FinalPreview = () => {
           </div>
         )}
         
-        {/* CV Preview Area - Styled to match screenshot 1 */}
-        <div className={`flex-grow overflow-auto flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} bg-white`}>
+        {/* CV Preview Area - Styled to match screenshot 1 with better mobile fit */}
+        <div className={`flex-grow flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} bg-white relative`}>
           {/* "Scroll to view" message - positioned under the header */}
           {isMobile && (
             <div className="absolute top-[6.5rem] left-0 right-0 bg-white z-10 py-1 px-2 text-xs text-center text-blue-600">
@@ -318,15 +318,25 @@ const FinalPreview = () => {
               </div>
             </div>
           )}
-          <div className="bg-white overflow-hidden max-w-screen-md w-full print:shadow-none" 
-            style={isMobile ? {minHeight: 'calc(100vh - 220px)', paddingBottom: '60px'} : {}}
+          {/* CV preview container with fixed height and scroll for mobile */}
+          <div 
+            className={`bg-white w-full print:shadow-none ${isMobile ? 'cv-preview-scroll-container' : ''}`}
+            style={isMobile ? {
+              maxHeight: 'calc(100vh - 182px)',
+              overflow: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              marginTop: '8px'
+            } : {}}
           >
-            <DirectTemplateRenderer
-              templateId={currentTemplateId}
-              cvData={formData}
-              height={isMobile ? "auto" : 800 as const}
-              scaleFactor={scaleFactor}
-            />
+            {/* Apply transform scale to the inner container only */}
+            <div className={isMobile ? "cv-preview-container-mobile" : ""}>
+              <DirectTemplateRenderer
+                templateId={currentTemplateId}
+                cvData={formData}
+                height={isMobile ? "auto" : 800 as const}
+                scaleFactor={isMobile ? 0.88 : 1}
+              />
+            </div>
           </div>
         </div>
       </div>

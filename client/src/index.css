@@ -192,9 +192,21 @@
     .mobile-template-content {
       @apply transform-gpu overflow-visible;
       transform-origin: top center;
-      min-height: 140vh;
+      min-height: auto;
       padding-bottom: 4rem;
       margin-top: 1.5rem;
+    }
+    
+    /* Specific container for mobile CV preview - fixing viewport issues */
+    .cv-preview-container-mobile {
+      @apply transform-gpu;
+      transform-origin: top center;
+      width: 100%;
+      transform: scale(0.9);
+      margin: 0 auto;
+      padding: 0.5rem 0;
+      display: flex;
+      justify-content: center;
     }
     
     /* Template container in mobile view */
@@ -207,6 +219,17 @@
   @media (max-width: 768px) {
     .cv-preview-container {
       display: none;
+    }
+    
+    /* Specific rules for CV fit on mobile */
+    .cv-preview-container-mobile {
+      transform: scale(0.85);
+      padding: 0 !important;
+    }
+    
+    /* Ensure the download button doesn't overlap with content */
+    .cv-preview-scroll-container {
+      padding-bottom: 60px !important;
     }
   }
 }
