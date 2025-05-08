@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -7,9 +7,52 @@ import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
 import { getAllTemplates, getTemplateById } from '@/lib/templates-registry';
 import { X, Download, Printer, Mail, CheckCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useDynamicScale, A4_WIDTH_PX, A4_HEIGHT_PX } from '@/hooks/use-dynamic-scale';
 
 // Add CSS styles for improved mobile experience
 import '../styles/cvPreview.css';
+
+// CV Preview Area Component with dynamic scaling
+interface CVPreviewAreaProps {
+  templateId: string;
+  formData: any;
+  isMobile: boolean;
+}
+
+const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isMobile }) => {
+  // Create ref for the container to measure
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Use dynamic scaling hook to calculate the optimal scale factor
+  const { scale } = useDynamicScale(containerRef, [templateId, isMobile]);
+  
+  console.log("Dynamic scale factor calculated:", scale);
+  
+  return (
+    <div 
+      ref={containerRef}
+      className="cv-preview-container flex-grow flex justify-center overflow-auto"
+    >
+      <div 
+        className="cv-template-container" 
+        style={{ 
+          transform: `scale(${scale})`,
+          width: `${A4_WIDTH_PX}px`,
+          height: `${A4_HEIGHT_PX}px`,
+          transformOrigin: 'top center',
+        }}
+      >
+        <DirectTemplateRenderer
+          templateId={templateId}
+          cvData={formData}
+          height="auto"
+          width="100%"
+          scaleFactor={1} // We're applying scale via container style
+        />
+      </div>
+    </div>
+  );
+};
 
 const FinalPreview = () => {
   const { templateId } = useParams<{ templateId: string }>();
@@ -166,17 +209,11 @@ const FinalPreview = () => {
         )}
         
         {/* CV Preview Area */}
-        <div className="cv-preview-container flex-grow flex justify-center">
-          <div className="cv-template-container">
-            <DirectTemplateRenderer
-              templateId={currentTemplateId}
-              cvData={formData}
-              height="auto"
-              width="100%" 
-              scaleFactor={isMobile ? 0.75 : 1}
-            />
-          </div>
-        </div>
+        <CVPreviewArea
+          templateId={currentTemplateId}
+          formData={formData}
+          isMobile={isMobile}
+        />
       </div>
       
       {/* Mobile Action Button */}

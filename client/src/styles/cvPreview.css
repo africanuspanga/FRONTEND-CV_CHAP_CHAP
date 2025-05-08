@@ -19,6 +19,10 @@
   border-radius: 6px;
   margin: 0 auto;
   padding: 1px; /* To ensure content doesn't touch the border */
+  position: relative;
+  display: flex;
+  justify-content: center;
+  transform-origin: top center;
 }
 
 .templates-sidebar {
