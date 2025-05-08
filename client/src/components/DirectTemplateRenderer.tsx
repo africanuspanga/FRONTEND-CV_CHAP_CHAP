@@ -25,12 +25,12 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
     templateId
   });
 
-  // Create a wrapper container with A4 proportions
+  // Create a wrapper container for template
   const containerStyle: React.CSSProperties = {
-    height: height === "auto" ? "100%" : `${height}px`,
+    height: height === "auto" ? "auto" : `${height}px`,
     width: width === "auto" ? "100%" : typeof width === 'number' ? `${width}px` : width,
     overflow: 'visible',
-    backgroundColor: '#ffffff',
+    backgroundColor: 'transparent',
     boxShadow: 'none',
     borderRadius: '0',
     border: 'none',
@@ -97,10 +97,6 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
       <div className="template-container" style={containerStyle}>
         <div 
           className={`${height === "auto" ? "mobile-template-content" : ""}`}
-          style={{ 
-            width: "100%", 
-            minHeight: height === "auto" ? "1123px" : "auto" // A4 height in pixels
-          }}
         >
           {template.render(processedData)}
         </div>
