@@ -6,7 +6,7 @@ import withSafeTemplateData from '@/lib/withSafeTemplateData';
 interface DirectTemplateRendererProps {
   cvData: CVData;
   templateId: string;
-  height?: number;
+  height?: number | "auto";
 }
 
 const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
@@ -23,7 +23,7 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
 
   // Create a wrapper container to maintain consistent height/scroll
   const containerStyle: React.CSSProperties = {
-    height: `${height}px`,
+    height: height === "auto" ? "100%" : `${height}px`,
     overflow: 'auto',
     backgroundColor: '#ffffff',
     boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
@@ -85,7 +85,9 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
     // Render the template using the template registry's render function with safe data
     return (
       <div className="template-container" style={containerStyle}>
-        {template.render(processedData)}
+        <div className={`${height === "auto" ? "mobile-template-content" : ""}`}>
+          {template.render(processedData)}
+        </div>
       </div>
     );
   }

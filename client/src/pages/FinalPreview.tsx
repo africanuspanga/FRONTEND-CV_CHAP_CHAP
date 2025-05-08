@@ -314,13 +314,13 @@ const FinalPreview = () => {
         
         {/* CV Preview Area */}
         <div className={`flex-grow overflow-auto flex justify-center items-start ${isMobile ? 'p-1 pt-3' : 'p-4'} bg-gray-100`}>
-          <div className="bg-white shadow-md overflow-hidden max-w-screen-md w-full aspect-[210/297] print:shadow-none" 
-            style={isMobile ? {maxHeight: 'calc(100vh - 220px)'} : {}}
+          <div className="bg-white shadow-md overflow-hidden max-w-screen-md w-full print:shadow-none" 
+            style={isMobile ? {height: 'calc(100vh - 220px)'} : {}}
           >
             <DirectTemplateRenderer
               templateId={currentTemplateId}
               cvData={formData}
-              height={isMobile ? 600 : 800}
+              height={isMobile ? "auto" : 800 as const}
             />
           </div>
         </div>

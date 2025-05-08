@@ -187,6 +187,13 @@
     .mobile-action-buttons {
       @apply fixed bottom-0 left-0 right-0 flex justify-between p-3 bg-background border-t z-50;
     }
+    
+    /* Mobile CV template scaling for better visibility */
+    .mobile-template-content {
+      @apply transform-gpu overflow-x-hidden;
+      transform: scale(0.8);
+      transform-origin: top center;
+    }
   }
   
   @media (max-width: 768px) {
