@@ -362,7 +362,7 @@ const USSDPaymentPage: React.FC = () => {
           className="flex items-center text-primary p-2 sm:p-3" 
           onClick={handleGoBack}
         >
-          <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" /> Back
+          <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" /> Rudi
         </Button>
         <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-primary">CV Chap Chap</h1>
       </div>
@@ -408,12 +408,12 @@ const USSDPaymentPage: React.FC = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                  Downloading...
+                  Inapakua...
                 </>
               ) : (
                 <>
                   <Download className="h-5 w-5" />
-                  Download Your CV
+                  Pakua CV Yako
                 </>
               )}
             </Button>
@@ -425,18 +425,18 @@ const USSDPaymentPage: React.FC = () => {
                 <Loader2 className="h-6 sm:h-8 w-6 sm:w-8 mr-2 animate-spin" />
                 <span className="font-medium text-base sm:text-lg">
                   {paymentStatus?.status === 'verifying_payment' 
-                    ? 'Verifying your payment...' 
-                    : 'Generating your CV...'}
+                    ? 'Inahakiki malipo yako...' 
+                    : 'Inatengeneza CV yako...'}
                 </span>
               </div>
-              <p className="text-sm sm:text-base text-amber-700 mb-4">This usually takes less than a minute. Please be patient.</p>
+              <p className="text-sm sm:text-base text-amber-700 mb-4">Hii inachukua chini ya dakika moja. Tafadhali subiri.</p>
               <Button
                 onClick={() => window.location.reload()}
                 variant="outline"
                 className="mx-auto flex items-center gap-2"
               >
                 <RefreshCw className="h-4 w-4" />
-                Refresh Status
+                Onyesha Hali Mpya
               </Button>
             </div>
           </div>
