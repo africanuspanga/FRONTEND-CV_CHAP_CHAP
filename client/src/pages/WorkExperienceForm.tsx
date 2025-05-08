@@ -455,7 +455,7 @@ const WorkExperienceForm = () => {
 
                 <div className="mb-6">
                   <Label htmlFor="startMonth" className="flex items-center mb-1">
-                    <Calendar className="w-4 h-4 mr-2 text-blue-500" />
+                    <Calendar className="w-4 h-4 mr-2 text-primary" />
                     START DATE <span className="text-red-500">*</span>
                   </Label>
                   <div className="grid grid-cols-2 gap-4">
@@ -491,7 +491,7 @@ const WorkExperienceForm = () => {
                 
                 <div className="mb-6">
                   <Label htmlFor="endDate" className="flex items-center mb-1">
-                    <Calendar className="w-4 h-4 mr-2 text-blue-500" />
+                    <Calendar className="w-4 h-4 mr-2 text-primary" />
                     END DATE <span className="text-red-500">*</span>
                   </Label>
                   <div className="grid grid-cols-2 gap-4">
