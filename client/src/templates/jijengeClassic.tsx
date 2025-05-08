@@ -321,12 +321,12 @@ export function JijengeClassicTemplate({
                   fontWeight: 'normal'
                 }}>[A]</span>
                 <span style={{ color: '#555' }}>
-                  {personInfo.address || 
+                  {personInfo.address || personInfo.location || 
                    (personInfo.city || personInfo.region || personInfo.country ? 
                      [personInfo.city, personInfo.region, personInfo.country]
                        .filter(Boolean)
                        .join(', ') 
-                     : personInfo.location || 'Location')}
+                     : "FAO Street")}
                 </span>
               </p>
             </section>
