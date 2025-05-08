@@ -313,7 +313,7 @@ const FinalPreview = () => {
         <div className={`flex-grow flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} relative ${isMobile ? 'bg-[#f5f5f5]' : 'bg-white'}`}>
           {/* "Scroll to view" message - blue text centered like in screenshot */}
           {isMobile && (
-            <div className="absolute top-[6.5rem] left-0 right-0 bg-white z-10 py-1 px-2 text-xs text-center text-blue-600">
+            <div className="fixed top-[6.5rem] left-0 right-0 bg-white z-20 py-2 px-2 text-sm text-center text-blue-600 border-b border-gray-100 shadow-sm">
               <div className="flex justify-center items-center gap-1">
                 <span>○ Scroll to view the full CV</span>
               </div>

@@ -27,7 +27,7 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
 
   // Create a wrapper container for template
   const containerStyle: React.CSSProperties = {
-    height: height === "auto" ? "auto" : `${height}px`,
+    height: height === "auto" ? "100%" : `${height}px`,
     width: width === "auto" ? "100%" : typeof width === 'number' ? `${width}px` : width,
     overflow: 'visible',
     backgroundColor: 'transparent',
@@ -94,12 +94,8 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
     
     // Render the template using the template registry's render function with safe data
     return (
-      <div className="template-container" style={containerStyle}>
-        <div className="cv-preview">
-          <div className={`${height === "auto" ? "mobile-template-content" : ""}`}>
-            {template.render(processedData)}
-          </div>
-        </div>
+      <div style={containerStyle}>
+        {template.render(processedData)}
       </div>
     );
   }
