@@ -18,8 +18,8 @@ const FinalPreview = () => {
   const { toast } = useToast();
   const { formData, updateFormField } = useCVForm();
   
-  // State for template sidebar
-  const [templateSidebarOpen, setTemplateSidebarOpen] = useState(!isMobile);
+  // State for template sidebar (default closed on both mobile and desktop)
+  const [templateSidebarOpen, setTemplateSidebarOpen] = useState(false);
   // Get all available templates
   const allTemplates = getAllTemplates();
   // Currently selected template for preview
