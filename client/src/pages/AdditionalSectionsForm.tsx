@@ -31,18 +31,35 @@ const AdditionalSectionsForm = () => {
     navigate(`/cv/${templateId}/references`);
   };
 
-  const SectionCard = ({ section }: { section: SectionOption }) => (
-    <div 
-      className="bg-white hover:bg-gray-50 border rounded-lg p-6 flex items-center cursor-pointer transition-colors"
-      onClick={() => navigate(section.path)}
-    >
-      <div className="mr-4 text-indigo-600">{section.icon}</div>
-      <div>
-        <h3 className="text-lg font-medium text-gray-900">{section.title}</h3>
-        <p className="text-sm text-gray-500">{section.description}</p>
+  const SectionCard = ({ section }: { section: SectionOption }) => {
+    const isDisabled = isMobile && (section.id === 'certifications' || section.id === 'accomplishments');
+    
+    return (
+      <div 
+        className={`bg-white border rounded-lg p-6 flex items-center ${
+          isDisabled 
+            ? 'opacity-70 cursor-not-allowed' 
+            : 'hover:bg-gray-50 cursor-pointer transition-colors'
+        }`}
+        onClick={() => {
+          if (!isDisabled) {
+            navigate(section.path);
+          }
+        }}
+      >
+        <div className={`mr-4 ${isDisabled ? 'text-gray-400' : 'text-indigo-600'}`}>
+          {section.icon}
+        </div>
+        <div>
+          <h3 className={`text-lg font-medium ${isDisabled ? 'text-gray-500' : 'text-gray-900'}`}>
+            {section.title}
+            {isDisabled && <span className="ml-2 text-xs text-gray-500">(Coming soon)</span>}
+          </h3>
+          <p className="text-sm text-gray-500">{section.description}</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const sectionOptions: SectionOption[] = [
     {
