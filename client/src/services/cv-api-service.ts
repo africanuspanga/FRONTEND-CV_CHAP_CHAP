@@ -425,9 +425,9 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
   user_message?: string; // User-friendly message
 }> => {
   try {
-    console.log(`Initiating USSD payment for template: ${templateId}`);
+    console.log(`Creating local payment session for template: ${templateId}`);
     
-    // Transform CV data to backend format
+    // Transform CV data to clean it for display
     const transformedData = transformCVDataForBackend(cvData);
     
     // Add template ID to the request data (not needed with preview endpoint)
@@ -438,168 +438,37 @@ export const initiateUSSDPayment = async (templateId: string, cvData: CVData): P
     // };
     
     // Store CV data in localStorage for later use
-    const storageKey = `cv_data_${Date.now()}`;
     const localStorageData = { templateId, cvData };
-    localStorage.setItem(storageKey, JSON.stringify(localStorageData));
     
-    // Make the API call to initiate payment
-    console.log('Sending payment initiation request with transformed data');
+    // Generate a local ID for this CV - no API call needed
+    const localId = `local-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     
-    // Verify the transformed data has the required fields
-    console.log('Required fields check:', { 
-      name: transformedData.name, 
-      email: transformedData.email 
-    });
+    // Store the CV data with the local ID
+    try {
+      // Store in both localStorage and sessionStorage for reliability
+      localStorage.setItem(`cv_data_${localId}`, JSON.stringify(localStorageData));
+      sessionStorage.setItem(`cv_data_${localId}`, JSON.stringify(localStorageData));
+      
+      // Also store template ID in sessionStorage for easy access during verification
+      sessionStorage.setItem('cv_template_id', templateId);
+      sessionStorage.setItem('cv_request_id', localId);
+      
+      console.log('CV data stored successfully with ID:', localId);
+    } catch (storageError) {
+      console.warn('Error storing CV data:', storageError);
+    }
     
-    // The backend expects this exact structure:
-    // Putting name and email BOTH at the top level and inside cv_data to satisfy all validation
-    const requestBody = {
-      template_id: templateId.toLowerCase(),
-      // Include these fields at the top level to pass basic validation
-      name: transformedData.name,
-      email: transformedData.email,
-      cv_data: {
-        // Include them again inside cv_data for templates that expect them there
-        name: transformedData.name,
-        email: transformedData.email,
-        phone: transformedData.phone,
-        title: transformedData.title,
-        location: transformedData.location,
-        summary: transformedData.summary,
-        experience: transformedData.experience,
-        education: transformedData.education,
-        skills: transformedData.skills,
-        languages: transformedData.languages,
-        certifications: transformedData.certifications,
-        hobbies: transformedData.hobbies,
-        references: transformedData.references
-      }
+    // Create a structured response that matches our expected format
+    // This avoids making any API calls and just sets up local storage
+    const ussdResponse = {
+      success: true,
+      request_id: localId,
+      ussd_code: '*150*50*1#', // USSD code for Selcom payment
+      reference_number: '61115073' // Merchant number for payments
     };
     
-    console.log('Using request body:', JSON.stringify(requestBody, null, 2));
-    
-    // First, get the preview JSON response to get the file_id which we'll use as our request_id
-    try {
-      const response = await fetchFromCVScreener<any>(
-        `api/preview-template/${templateId.toLowerCase()}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Prefer-JSON-Response': '1'
-          },
-          body: requestBody,
-        }
-      );
-      
-      console.log('Preview API response:', response);
-      
-      if (!response || typeof response !== 'object') {
-        console.warn('Invalid response from server, generating fallback ID');
-        
-        // Generate a local fallback ID for this request
-        const fallbackId = `local-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-        
-        // Create response with fallback ID as request_id
-        const requestId = fallbackId;
-        
-        // Store the request ID and associated CV data for later retrieval
-        localStorage.setItem(`cv_data_${requestId}`, JSON.stringify(localStorageData));
-        
-        // Create a structured response to match our API format
-        const ussdResponse = {
-          success: true,
-          request_id: requestId,
-          ussd_code: '*150*50*1#', // USSD code for Selcom payment
-          reference_number: `CV-${requestId.slice(-6)}` // Last 6 characters as reference
-        };
-        
-        console.log('Using fallback ID due to invalid response:', ussdResponse);
-        return ussdResponse;
-      }
-      
-      // Check if response contains the necessary file_id
-      if (!('file_id' in response) || !response.file_id) {
-        // Get more detailed error information for debugging
-        console.error('Response missing file_id:', JSON.stringify(response));
-        
-        // Create a more specific error message for troubleshooting
-        if (Object.keys(response).length === 0) {
-          console.error('Empty response object from server');
-          throw new Error('No data received from server. Please try again with a different template.');
-        } else {
-          // Log the specific server response structure for debugging
-          console.error('Server response data structure:', Object.keys(response).join(', '));
-          throw new Error('Invalid server response. The system is temporarily unavailable.');
-        }
-      }
-      
-      // Create response with file_id as request_id
-      const requestId = response.file_id.toString();
-      
-      // Store the request ID and associated CV data for later retrieval
-      localStorage.setItem(`cv_data_${requestId}`, JSON.stringify(localStorageData));
-      
-      // Create a structured response to match our API format
-      const ussdResponse = {
-        success: true,
-        request_id: requestId,
-        ussd_code: '*150*50*1#', // USSD code for Selcom payment
-        reference_number: `CV-${requestId.slice(-6)}` // Last 6 characters as reference
-      };
-      
-      console.log('Payment initiation successful:', ussdResponse);
-      return ussdResponse;
-    } catch (apiError) {
-      // Enhanced error logging with more context
-      console.error('API error during payment initiation:', apiError);
-      
-      // Log the complete error
-      console.error('API error details:', apiError);
-      
-      // We don't want to use local fallbacks anymore, just propagate the error
-      if (apiError instanceof Error && apiError.message.includes('file_id')) {
-        return {
-          success: false,
-          error: "Server couldn't process your request. Please try again with a different template.",
-          reference_number: `ERR-${Date.now().toString().slice(-6)}`
-        };
-      }
-      
-      // Extract detailed error information if available
-      let errorMessage = 'Failed to connect to payment server';
-      let errorDetails = {};
-      
-      if (apiError instanceof Error) {
-        errorMessage = apiError.message;
-        
-        // Try to extract additional details if they exist
-        // @ts-ignore - Check for custom details property
-        if (apiError.details && typeof apiError.details === 'object') {
-          // @ts-ignore
-          errorDetails = apiError.details;
-          console.log('Payment API error details:', errorDetails);
-        }
-        
-        // @ts-ignore - Check for status code
-        if (apiError.statusCode) {
-          // @ts-ignore
-          console.log('Payment API error status code:', apiError.statusCode);
-        }
-      }
-      
-      // Create structured error response that matches our API response type
-      return {
-        success: false,
-        error: errorMessage + ': ' + JSON.stringify(errorDetails),
-        // Include error reference for support team
-        reference_number: `ERR-${Date.now().toString().slice(-6)}`,
-        // Include a more user-friendly message based on common errors
-        user_message: errorMessage.includes('file_id') 
-          ? 'Unable to generate your CV. Please try again with a different template or contact support.'
-          : 'Payment initialization failed. Please try again or use the manual payment option.'
-      };
-    }
+    console.log('Created local payment session with ID:', localId);
+    return ussdResponse;
   } catch (error) {
     console.error('Error initiating USSD payment:', error);
     return {
