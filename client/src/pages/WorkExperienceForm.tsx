@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Briefcase, Building2, MapPin, Calendar, CheckCircle } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LiveCVPreview from '@/components/LiveCVPreview';
@@ -15,6 +15,8 @@ import WorkExperienceEditor from '@/components/WorkExperienceEditor';
 import WorkHistorySummary from '@/components/WorkHistorySummary';
 import { WorkExperience } from '@shared/schema';
 import { getWorkExperienceRecommendations } from '@/lib/openai-service';
+import MobilePreviewNote from '@/components/MobilePreviewNote';
+import '../styles/mobile-form.css';
 
 const WorkExperienceForm = () => {
   const [, navigate] = useLocation();
@@ -45,6 +47,35 @@ const WorkExperienceForm = () => {
   
   // Get the template ID from the URL
   const templateId = params.templateId;
+  
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+  const jobTitleInputRef = useRef<HTMLInputElement>(null);
+  
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add listener for window resize
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Auto-focus the first input on mobile
+  useEffect(() => {
+    if (isMobile && jobTitleInputRef.current && showJobForm) {
+      setTimeout(() => {
+        jobTitleInputRef.current?.focus();
+      }, 500);
+    }
+  }, [isMobile, showJobForm]);
   
   // Reset form fields
   const resetFormFields = () => {
@@ -337,76 +368,96 @@ const WorkExperienceForm = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
+    <div className="max-w-4xl mx-auto px-4 py-5 md:py-10">
       {/* Progress Bar */}
-      <div className="mb-8">
-        <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden">
+      <div className="mb-4 md:mb-8">
+        <div className="relative h-3 bg-gray-100 rounded-full overflow-hidden">
           <div className="absolute left-0 top-0 h-full bg-blue-500 rounded-full" style={{ width: '22%' }}></div>
         </div>
         <div className="text-right text-sm text-gray-500 mt-1">22%</div>
       </div>
 
-      <div className="bg-white rounded-lg border p-8">
-        {/* Back button */}
-        <button
-          onClick={() => navigate(`/cv/${templateId}/personal`)}
-          className="text-blue-600 flex items-center mb-6"
-        >
-          <ChevronLeft className="h-4 w-4 mr-1" />
-          Go Back
-        </button>
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Mobile Preview Notice - only visible on mobile */}
+        {isMobile && <MobilePreviewNote />}
+        
+        {/* Main Form Content */}
+        <div className={`bg-white rounded-lg border p-4 md:p-8 w-full ${isMobile ? 'mobile-form' : ''}`}>
+          {/* Back button */}
+          <button
+            onClick={() => navigate(`/cv/${templateId}/personal`)}
+            className="text-blue-600 flex items-center mb-4 md:mb-6"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Go Back
+          </button>
 
-        {showJobForm && (
-          <>
-            <h1 className="text-2xl font-bold mb-2 text-center">Tell us about your job</h1>
-            <p className="text-gray-600 mb-8 text-center">Add your work experience details below.</p>
+          {showJobForm && (
+            <>
+              <h1 className="text-2xl font-bold mb-2 text-center">Tell us about your job</h1>
+              <p className="text-gray-600 mb-8 text-center">Add your work experience details below.</p>
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-6">
-                <Label htmlFor="title">TITLE <span className="text-red-500">*</span></Label>
-                <Input
-                  id="title"
-                  placeholder="e.g. Chief Engineer"
-                  value={jobTitle}
-                  onChange={(e) => setJobTitle(e.target.value)}
-                  required
-                />
-              </div>
+              <form id="work-experience-form" onSubmit={handleSubmit}>
+                <div className="mb-6">
+                  <Label htmlFor="title" className="flex items-center">
+                    <Briefcase className="w-4 h-4 mr-2 text-blue-500" />
+                    TITLE <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="title"
+                    ref={jobTitleInputRef}
+                    placeholder="e.g. Chief Engineer"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                    required
+                    className="mt-1"
+                  />
+                </div>
 
-              <div className="mb-6">
-                <Label htmlFor="employer">EMPLOYER <span className="text-red-500">*</span></Label>
-                <Input
-                  id="employer"
-                  placeholder="e.g. Driftmark Technologies"
-                  value={employer}
-                  onChange={(e) => setEmployer(e.target.value)}
-                  required
-                />
-              </div>
+                <div className="mb-6">
+                  <Label htmlFor="employer" className="flex items-center">
+                    <Building2 className="w-4 h-4 mr-2 text-blue-500" />
+                    EMPLOYER <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="employer"
+                    placeholder="e.g. Driftmark Technologies"
+                    value={employer}
+                    onChange={(e) => setEmployer(e.target.value)}
+                    required
+                    className="mt-1"
+                  />
+                </div>
 
-              <div className="mb-6">
-                <Label htmlFor="location">LOCATION</Label>
-                <Input
-                  id="location"
-                  placeholder="e.g. Dar es Salaam, Tanzania"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  disabled={isRemote}
-                />
-              </div>
+                <div className="mb-6">
+                  <Label htmlFor="location" className="flex items-center">
+                    <MapPin className="w-4 h-4 mr-2 text-blue-500" />
+                    LOCATION
+                  </Label>
+                  <Input
+                    id="location"
+                    placeholder="e.g. Dar es Salaam, Tanzania"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    disabled={isRemote}
+                    className="mt-1"
+                  />
+                </div>
 
-              <div className="flex items-center mb-6">
-                <Checkbox 
-                  id="remote" 
-                  checked={isRemote}
-                  onCheckedChange={(checked) => setIsRemote(checked as boolean)}
-                />
-                <Label htmlFor="remote" className="ml-2 text-gray-700">Remote</Label>
-              </div>
+                <div className="flex items-center mb-6">
+                  <Checkbox 
+                    id="remote" 
+                    checked={isRemote}
+                    onCheckedChange={(checked) => setIsRemote(checked as boolean)}
+                  />
+                  <Label htmlFor="remote" className="ml-2 text-gray-700">Remote</Label>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <Label htmlFor="startMonth">START DATE <span className="text-red-500">*</span></Label>
+                <div className="mb-6">
+                  <Label htmlFor="startMonth" className="flex items-center mb-1">
+                    <Calendar className="w-4 h-4 mr-2 text-blue-500" />
+                    START DATE <span className="text-red-500">*</span>
+                  </Label>
                   <div className="grid grid-cols-2 gap-4">
                     <Select
                       value={startMonth}
@@ -438,8 +489,11 @@ const WorkExperienceForm = () => {
                   </div>
                 </div>
                 
-                <div>
-                  <Label htmlFor="endDate">END DATE <span className="text-red-500">*</span></Label>
+                <div className="mb-6">
+                  <Label htmlFor="endDate" className="flex items-center mb-1">
+                    <Calendar className="w-4 h-4 mr-2 text-blue-500" />
+                    END DATE <span className="text-red-500">*</span>
+                  </Label>
                   <div className="grid grid-cols-2 gap-4">
                     <Select 
                       disabled={currentJob}
@@ -472,61 +526,79 @@ const WorkExperienceForm = () => {
                     </Select>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center mb-8">
-                <Checkbox 
-                  id="currentlyWork" 
-                  checked={currentJob}
-                  onCheckedChange={(checked) => setCurrentJob(checked as boolean)}
-                />
-                <Label htmlFor="currentlyWork" className="ml-2 text-gray-700">I currently work here</Label>
-              </div>
+                <div className="flex items-center mb-8">
+                  <Checkbox 
+                    id="currentlyWork" 
+                    checked={currentJob}
+                    onCheckedChange={(checked) => setCurrentJob(checked as boolean)}
+                  />
+                  <Label htmlFor="currentlyWork" className="ml-2 text-gray-700 flex items-center">
+                    <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
+                    I currently work here
+                  </Label>
+                </div>
 
-              <div className="flex justify-end">
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2">
+                {!isMobile && (
+                  <div className="flex justify-end">
+                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2">
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </form>
+            </>
+          )}
+          
+          {showWorkHistory && (
+            <>
+              <WorkHistorySummary
+                workExperiences={(formData.workExperiences || []).map(job => ({
+                  ...job,
+                  id: job.id || Date.now().toString() // Ensure all jobs have an ID
+                }))}
+                onEdit={handleEditJob}
+                onDelete={handleDeleteJob}
+                onAddAnother={handleAddAnotherPosition}
+              />
+              
+              <div className="flex justify-between mt-8">
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate(`/cv/${templateId}/personal`)}
+                  className="flex items-center"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+                
+                <Button 
+                  onClick={handleContinueToEducation}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
                   Next
                 </Button>
               </div>
-            </form>
-          </>
-        )}
+            </>
+          )}
+        </div>
         
-        {showWorkHistory && (
-          <>
-            <WorkHistorySummary
-              workExperiences={(formData.workExperiences || []).map(job => ({
-                ...job,
-                id: job.id || Date.now().toString() // Ensure all jobs have an ID
-              }))}
-              onEdit={handleEditJob}
-              onDelete={handleDeleteJob}
-              onAddAnother={handleAddAnotherPosition}
-            />
-            
-            <div className="flex justify-between mt-8">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate(`/cv/${templateId}/personal`)}
-                className="flex items-center"
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Previous
-              </Button>
-              
-              <Button 
-                onClick={handleContinueToEducation}
-                className="bg-teal-600 hover:bg-teal-700 text-white"
-              >
-                Next
-              </Button>
-            </div>
-          </>
+        {/* Live CV Preview - Only visible on desktop */}
+        {!isMobile && (
+          <div className="hidden lg:block lg:w-1/2 xl:w-3/5">
+            <LiveCVPreview cvData={formData} templateId={templateId} />
+          </div>
         )}
-        
-        {/* Live CV Preview */}
-        <LiveCVPreview cvData={formData} templateId={templateId} />
       </div>
+      
+      {/* Sticky button for mobile */}
+      {isMobile && showJobForm && (
+        <div className="sticky-button-container">
+          <Button type="submit" form="work-experience-form" className="sticky-button">
+            Next
+          </Button>
+        </div>
+      )}
       
       {/* AI Recommendation Modal */}
       {isGeneratingRecommendations && (
