@@ -134,7 +134,7 @@ const AdditionalSectionsForm = () => {
           
           <Button 
             onClick={handleNext}
-            className="bg-teal-600 hover:bg-teal-700"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             Next: Preview
           </Button>
@@ -144,7 +144,7 @@ const AdditionalSectionsForm = () => {
         {!isMobile && (
           <button
             onClick={() => setShowPreview(!showPreview)}
-            className={`w-full rounded-md border border-gray-300 flex items-center justify-center gap-2 py-3 px-4 mb-8 ${showPreview ? 'bg-white text-gray-700' : 'bg-indigo-600 text-white'}`}
+            className={`w-full rounded-md border border-gray-300 flex items-center justify-center gap-2 py-3 px-4 mb-8 ${showPreview ? 'bg-white text-gray-700' : 'bg-blue-600 text-white'}`}
           >
             {showPreview ? (
               <>
