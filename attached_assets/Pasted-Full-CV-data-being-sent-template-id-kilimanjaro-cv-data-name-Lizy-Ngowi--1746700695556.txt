@@ -1,0 +1,158 @@
+Full CV data being sent: {
+  "template_id": "kilimanjaro",
+  "cv_data": {
+    "name": "Lizy Ngowi",
+    "email": "lizyngowi@gmail.com",
+    "personalInfo": {
+      "firstName": "Lizy",
+      "lastName": "Ngowi",
+      "email": "lizyngowi@gmail.com",
+      "phone": "+255765046068",
+      "professionalTitle": "Strategic Communication and Transformation Narratives Lead",
+      "address": "Dar es Salaam, Tanzania",
+      "city": "",
+      "region": "",
+      "country": "",
+      "postalCode": "",
+      "summary": "Results-driven communication specialist with 8+ years’ experience spanning digital marketing, content strategy, customer service, and brand communications across betting, electronics, telecoms, and streaming. Skilled in building audience trust, crafting narratives that drive engagement and loyalty, and using analytics for continual optimisation."
+    },
+    "workExperiences": [
+      {
+        "id": "1746695968611",
+        "jobTitle": "Social Media Specialist",
+        "company": "Calcare International Ltd (TECNO)",
+        "location": "Dar es salaam, Tanzania",
+        "startDate": "June 2016",
+        "endDate": "October 2016",
+        "current": false,
+        "description": "",
+        "achievements": [
+          "Managed social accounts; followers 58 k → 95.3 k",
+          "Trend monitoring, customer engagement, promotion articles, influencer suggestions"
+        ]
+      },
+      {
+        "id": "1746696064002",
+        "jobTitle": "Digital Marketing Specialist",
+        "company": "Samsung Tanzania",
+        "location": "Dar es salaam, Tanzania",
+        "startDate": "October 2016",
+        "endDate": "September 2020",
+        "current": false,
+        "description": "",
+        "achievements": [
+          "Managed social channels; follower growth 43 k → 113 k",
+          "Data-driven campaigns, competitor analysis, influencer partnerships, crisis comms"
+        ]
+      },
+      {
+        "id": "1746696230948",
+        "jobTitle": "Digital Marketing & Copywriter",
+        "company": "Betika Tanzania",
+        "location": "Dar es salaam, Tanzania",
+        "startDate": "September 2020",
+        "endDate": "April 2024",
+        "current": false,
+        "description": "",
+        "achievements": [
+          "Grew IG followers 3 k → 16.8 k, Facebook 5 k → 30k",
+          "Ad copy, campaign analytics, influencer collaboration, UTM tracking, weekly/monthly reports"
+        ]
+      },
+      {
+        "id": "1746696451673",
+        "jobTitle": "Showmax Kenya",
+        "company": "Digital Content Creator",
+        "location": "Dar es salaam, Tanzania",
+        "startDate": "September 2024",
+        "endDate": "Present",
+        "current": true,
+        "description": "",
+        "achievements": [
+          "Plan, create, localise & publish social content (copy, images, video abstracts).",
+          "Live content publishing for shows/events; social analytics & trend reporting"
+        ]
+      },
+      {
+        "id": "1746696550027",
+        "jobTitle": "Digital Marketing Growth Executive",
+        "company": "LEONBET Tanzania",
+        "location": "Dar es salaam, Tanzania",
+        "startDate": "May 2024",
+        "endDate": "Present",
+        "current": true,
+        "description": "",
+        "achievements": [
+          "Develop & execute growth strategies, audience segmentation, SEO-optimised content, omnichannel campaigns (Facebook, IG, X, TikTok, YouTube, Telegram, WhatsApp, LinkedIn)",
+          "Manage CRM, SMS marketing, KPIs & budgeting; collaborate cross-functionally."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "id": "1746696599795",
+        "institution": "University of Dar es Salaam (UDSM)",
+        "degree": "Bachelor of Arts",
+        "field": "B.A. in Journalism",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "",
+        "endDate": "June 2016"
+      }
+    ],
+    "skills": [
+      {
+        "id": "1",
+        "name": "Content Strategy",
+        "level": 4
+      },
+      {
+        "id": "2",
+        "name": "Social Media Analytics",
+        "level": 5
+      },
+      {
+        "id": "3",
+        "name": "SEO Optimization",
+        "level": 4
+      },
+      {
+        "id": "4",
+        "name": "Graphic Design",
+        "level": 5
+      },
+      {
+        "id": "5",
+        "name": "Community Engagement",
+        "level": 4
+      }
+    ],
+    "languages": [
+      {
+        "id": "1746696640995",
+        "name": "Swahili",
+        "level": "Bilingual"
+      },
+      {
+        "id": "1746696646143",
+        "name": "English",
+        "level": "Bilingual"
+      }
+    ],
+    "references": [
+      {
+        "id": "1746696751968",
+        "name": "Tumaini Maligana",
+        "relationship": "Former Manager",
+        "email": "t.maligana@alphadigital.co.tz",
+        "phone": "+255758981188"
+      },
+      {
+        "id": "1746696804680",
+        "name": "Silma Swaibu",
+        "relationship": "Mentor",
+        "email": "silmaswaib@gmail.com",
+        "phone": "+255764150078"
+      }
+    ]
+  }
+}

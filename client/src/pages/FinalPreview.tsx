@@ -92,8 +92,8 @@ const FinalPreview = () => {
       
       console.log("Proceeding to USSD payment page with templateId:", currentTemplateId);
       
-      // Navigate directly to the USSD payment page
-      // No need to call initiatePayment API - we'll handle everything on the USSD page
+      // IMPORTANT: Go directly to the USSD payment page without initiating payment
+      // We'll handle everything on the USSD page itself
       navigate('/ussd-payment');
       
     } catch (error) {
