@@ -269,9 +269,9 @@ const FinalPreview = () => {
 
             
             {/* All Templates */}
-            <div className="p-4 overflow-y-auto" style={isMobile ? {maxHeight: 'calc(100vh - 130px)'} : {}}>
+            <div className="p-4 overflow-y-auto max-h-[calc(100vh-100px)]">
               <h4 className="text-sm font-medium text-gray-500 mb-3">All templates</h4>
-              <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'space-y-4'}`}>
+              <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'grid grid-cols-1 gap-4'}`}>
                 {allTemplates.map((template) => (
                   <div 
                     key={template.id}
@@ -336,16 +336,14 @@ const FinalPreview = () => {
               </div>
             </div>
           ) : (
-            <div className="max-w-[900px] mx-auto">
-              <div className="border shadow-sm rounded bg-white">
-                <DirectTemplateRenderer
-                  templateId={currentTemplateId}
-                  cvData={formData}
-                  height="auto"
-                  width="100%" 
-                  scaleFactor={1}
-                />
-              </div>
+            <div className="max-w-[794px] mx-auto bg-white shadow-sm border rounded">
+              <DirectTemplateRenderer
+                templateId={currentTemplateId}
+                cvData={formData}
+                height="auto"
+                width="100%" 
+                scaleFactor={1}
+              />
             </div>
           )}
         </div>
