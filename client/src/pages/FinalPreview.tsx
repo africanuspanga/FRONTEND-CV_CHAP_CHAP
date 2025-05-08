@@ -8,6 +8,9 @@ import { getAllTemplates, getTemplateById } from '@/lib/templates-registry';
 import { X, Download, Printer, Mail, CheckCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+// Add CSS styles for improved mobile experience
+import '../styles/cvPreview.css';
+
 const FinalPreview = () => {
   const { templateId } = useParams<{ templateId: string }>();
   const [, navigate] = useLocation();
@@ -28,7 +31,7 @@ const FinalPreview = () => {
   const currentTemplateName = getTemplateById(currentTemplateId)?.name || 'Template';
   
   // Handle template selection
-  const handleSelectTemplate = (id) => {
+  const handleSelectTemplate = (id: string) => {
     setCurrentTemplateId(id);
     navigate(`/cv/${id}/final-preview`, { replace: true });
     updateFormField('templateId', id);
@@ -92,7 +95,7 @@ const FinalPreview = () => {
       <div className="flex-grow flex overflow-hidden">
         {/* Template Sidebar */}
         {templateSidebarOpen && (
-          <div className={isMobile ? 'fixed inset-0 z-50 bg-white' : 'w-64 bg-white border-r'}>
+          <div className={isMobile ? 'fixed inset-0 z-50 bg-white' : 'templates-sidebar'}>
             <div className="p-4 border-b flex justify-between items-center">
               <h3 className="font-medium">Templates</h3>
               <button onClick={() => setTemplateSidebarOpen(false)}>
@@ -100,40 +103,39 @@ const FinalPreview = () => {
               </button>
             </div>
             
-            <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 100px)' }}>
-              <div className="p-4">
-                <h4 className="text-sm font-medium text-gray-500 mb-3">All templates</h4>
-                <div className={isMobile ? 'grid grid-cols-2 gap-3' : 'grid grid-cols-1 gap-4'}>
-                  {allTemplates.map((template) => (
-                    <div 
-                      key={template.id}
-                      onClick={() => {
-                        handleSelectTemplate(template.id);
-                        if (isMobile) setTemplateSidebarOpen(false);
-                      }}
-                      className="cursor-pointer border rounded-md overflow-hidden relative"
-                    >
-                      <div className="aspect-[210/297] bg-white">
-                        <img 
-                          src={template.previewImage} 
-                          alt={template.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="text-xs font-medium text-center py-1 px-2 truncate">
-                        {template.name}
-                      </div>
+            <div className="templates-list">
+              <h4 className="text-sm font-medium text-gray-500 mb-3">All templates</h4>
+              <div className={isMobile ? 'grid grid-cols-2 gap-3' : 'grid grid-cols-1 gap-4'}>
+                {allTemplates.map((template) => (
+                  <div 
+                    key={template.id}
+                    onClick={() => {
+                      handleSelectTemplate(template.id);
+                      if (isMobile) setTemplateSidebarOpen(false);
+                    }}
+                    className={`cursor-pointer border rounded-md overflow-hidden relative ${currentTemplateId === template.id ? 'ring-2 ring-teal-500' : 'hover:border-teal-500'}`}
+                  >
+                    <div className="aspect-[210/297] bg-white">
+                      <img 
+                        src={template.previewImage} 
+                        alt={template.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                  ))}
-                </div>
+                    <div className="text-xs font-medium text-center py-1 px-2 truncate">
+                      {template.name}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         )}
         
         {/* CV Preview Area */}
-        <div className="flex-grow p-4 flex justify-center">
-          <div className="max-w-[794px] w-full bg-white shadow-sm border rounded-sm">
+        <div className="cv-preview-container flex-grow flex justify-center">
+          {isMobile && <div className="scroll-notice">○ Scroll to view the full CV</div>}
+          <div className="cv-template-container">
             <DirectTemplateRenderer
               templateId={currentTemplateId}
               cvData={formData}
