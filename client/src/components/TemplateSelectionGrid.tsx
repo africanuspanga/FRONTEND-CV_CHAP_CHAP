@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAllTemplatesWithMetadata as getAllTemplates, TemplateWithMetadata } from '@/lib/templates-registry';
 import { getTemplatesByCategory } from '@/lib/simple-template-registry';
+import { sortTemplatesByPriority } from '@/lib/template-priority';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import TemplatePreviewImage from './TemplatePreviewImage';
@@ -17,7 +18,7 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
   filterCategory
 }) => {
   // Get templates from either filtered category or all templates
-  const templates = filterCategory 
+  const unsortedTemplates = filterCategory 
     ? getTemplatesByCategory(filterCategory).map(template => ({
         ...template,
         description: 'Professional CV template with clean design.',
@@ -30,6 +31,9 @@ const TemplateSelectionGrid: React.FC<TemplateSelectionGridProps> = ({
         category: 'Modern',
         popularity: template.isPopular ? 5 : 4
       }));
+  
+  // Apply priority sorting to the templates
+  const templates = sortTemplatesByPriority(unsortedTemplates);
 
   const renderStarRating = (rating: number) => {
     return (

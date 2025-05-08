@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCVForm } from '@/contexts/cv-form-context';
 import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
 import { getAllTemplates, getTemplateById } from '@/lib/templates-registry';
+import { sortTemplatesByPriority } from '@/lib/template-priority';
 import { X, Download, Printer, Mail, CheckCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDynamicScale, A4_WIDTH_PX, A4_HEIGHT_PX } from '@/hooks/use-dynamic-scale';
@@ -63,8 +64,8 @@ const FinalPreview = () => {
   
   // State for template sidebar (default closed on both mobile and desktop)
   const [templateSidebarOpen, setTemplateSidebarOpen] = useState(false);
-  // Get all available templates
-  const allTemplates = getAllTemplates();
+  // Get all available templates with priority ordering
+  const allTemplates = sortTemplatesByPriority(getAllTemplates());
   // Currently selected template for preview
   const [currentTemplateId, setCurrentTemplateId] = useState(templateId || formData.templateId);
   // Track download in progress

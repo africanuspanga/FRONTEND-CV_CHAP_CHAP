@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { templateImages } from '@/lib/template-images';
+import { homePageFeaturedTemplates } from '@/lib/template-priority';
 // Import the hero image
 import heroWomanImage from '../assets/hero-woman.png';
 
@@ -90,31 +91,6 @@ const Home = () => {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {/* Moonlight Sonata */}
-          <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="relative aspect-[3/4] w-full overflow-hidden">
-              <img 
-                src={templateImages.moonlightSonata} 
-                alt="Moonlight Sonata CV Template" 
-                className="absolute inset-0 w-full h-full object-contain z-10"
-              />
-              {/* Hover Overlay with Select Button */}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center z-20">
-                <Button 
-                  variant="secondary"
-                  asChild
-                  className="bg-white hover:bg-gray-100 text-gray-900 text-base font-medium"
-                  size="lg"
-                >
-                  <Link href="/templates">Select Template</Link>
-                </Button>
-              </div>
-            </div>
-            <div className="p-3 text-center border-t">
-              <h3 className="font-semibold text-lg text-gray-900">Moonlight Sonata</h3>
-            </div>
-          </div>
-          
           {/* Kilimanjaro */}
           <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
             <div className="relative aspect-[3/4] w-full overflow-hidden">
@@ -140,6 +116,56 @@ const Home = () => {
             </div>
           </div>
           
+          {/* Tanzanite Pro */}
+          <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="relative aspect-[3/4] w-full overflow-hidden">
+              <img 
+                src={templateImages.tanzanitePro} 
+                alt="Tanzanite Pro CV Template" 
+                className="absolute inset-0 w-full h-full object-contain z-10"
+              />
+              {/* Hover Overlay with Select Button */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center z-20">
+                <Button 
+                  variant="secondary"
+                  asChild
+                  className="bg-white hover:bg-gray-100 text-gray-900 text-base font-medium"
+                  size="lg"
+                >
+                  <Link href="/templates">Select Template</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="p-3 text-center border-t">
+              <h3 className="font-semibold text-lg text-gray-900">Tanzanite Pro</h3>
+            </div>
+          </div>
+          
+          {/* Safari Original */}
+          <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="relative aspect-[3/4] w-full overflow-hidden">
+              <img 
+                src={templateImages.safariOriginal} 
+                alt="Safari Original CV Template" 
+                className="absolute inset-0 w-full h-full object-contain z-10"
+              />
+              {/* Hover Overlay with Select Button */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center z-20">
+                <Button 
+                  variant="secondary"
+                  asChild
+                  className="bg-white hover:bg-gray-100 text-gray-900 text-base font-medium"
+                  size="lg"
+                >
+                  <Link href="/templates">Select Template</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="p-3 text-center border-t">
+              <h3 className="font-semibold text-lg text-gray-900">Safari Original</h3>
+            </div>
+          </div>
+          
           {/* Bright Diamond */}
           <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
             <div className="relative aspect-[3/4] w-full overflow-hidden">
@@ -162,31 +188,6 @@ const Home = () => {
             </div>
             <div className="p-3 text-center border-t">
               <h3 className="font-semibold text-lg text-gray-900">Bright Diamond</h3>
-            </div>
-          </div>
-          
-          {/* Mjenzi wa Taifa */}
-          <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="relative aspect-[3/4] w-full overflow-hidden">
-              <img 
-                src={templateImages.mjenziWaTaifa} 
-                alt="Mjenzi wa Taifa CV Template" 
-                className="absolute inset-0 w-full h-full object-contain z-10"
-              />
-              {/* Hover Overlay with Select Button */}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center z-20">
-                <Button 
-                  variant="secondary"
-                  asChild
-                  className="bg-white hover:bg-gray-100 text-gray-900 text-base font-medium"
-                  size="lg"
-                >
-                  <Link href="/templates">Select Template</Link>
-                </Button>
-              </div>
-            </div>
-            <div className="p-3 text-center border-t">
-              <h3 className="font-semibold text-lg text-gray-900">Mjenzi wa Taifa</h3>
             </div>
           </div>
         </div>
