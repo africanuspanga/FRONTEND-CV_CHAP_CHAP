@@ -188,11 +188,11 @@
       @apply fixed bottom-0 left-0 right-0 flex justify-between p-3 bg-background border-t z-50;
     }
     
-    /* Mobile CV template scaling for better visibility - matching screenshot 1 */
+    /* Mobile CV template scaling for perfect A4 scaling */
     .mobile-template-content {
-      @apply transform-gpu overflow-visible;
-      transform-origin: top center;
-      min-height: auto;
+      @apply overflow-visible;
+      width: 100%;
+      min-height: 1123px; /* A4 height */
       padding-bottom: 4rem;
       margin-top: 1.5rem;
     }
@@ -218,29 +218,32 @@
       background-color: white;
     }
     
-    /* Full white background container for CV - filling entire viewport */
+    /* CV wrapper with clean white background */
     .cv-preview-scroll-container {
       max-height: calc(100vh - 135px);
       overflow-y: auto;
-      padding: 0;
+      padding: 10px;
       background-color: white;
       padding-bottom: 60px !important;
       -webkit-overflow-scrolling: touch;
-      display: block;
+      display: flex;
+      justify-content: center;
       width: 100%;
+      overflow-x: hidden;
     }
     
-    /* Full-sized CV taking entire white space */
+    /* CV scale container - like PDF viewer */
     .cv-preview-container-mobile {
-      width: 100%;
-      max-width: 100%;
-      margin: 0 auto;
-      background-color: white; 
+      transform: scale(0.55);
+      transform-origin: top center;
+      width: 794px; /* A4 width */
+      min-height: 1123px; /* A4 height */
+      margin: 0 auto 20px;
+      background-color: white;
       padding: 0;
       border: none;
-      box-shadow: none;
-      transform: none;
-      height: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 4px;
     }
   }
 }

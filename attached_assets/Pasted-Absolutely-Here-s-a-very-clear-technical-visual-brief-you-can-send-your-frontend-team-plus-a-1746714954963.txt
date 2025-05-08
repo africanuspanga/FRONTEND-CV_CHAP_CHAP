@@ -1,0 +1,109 @@
+Absolutely. Here's a **very clear technical + visual brief** you can send your frontend team, plus an idea to **achieve full-page mobile display** that feels like a polished CV viewer.
+
+---
+
+### 📄 Fix CV Preview Rendering on Mobile – Final Request
+
+Hey team,
+
+The issue is still not fully solved.
+
+### 🎯 Our Goal:
+
+We want the **entire CV (full A4 design)** to be shown as a **scaled-down, single-page preview on mobile screens**, just like a real paper inside a phone.
+
+> ✅ Think of how Google Docs or PDF viewers show the full page in your phone — that’s the experience we want.
+
+---
+
+### 🔍 What’s Wrong Now (from screenshot):
+
+* Only part of the CV is shown (cropped).
+* The right-side columns are **cut off** (multicolumn templates broken).
+* It feels like you're zoomed-in to the top-left corner — **not seeing the CV as a whole**.
+
+---
+
+### ✅ What We Actually Want:
+
+**1. Shrink the entire CV (including margins and layout) into a smaller scale** that fits within the screen **horizontally**, without horizontal scrolling.
+
+**2. Show white space around it**, like a full document on a table.
+
+**3. Allow smooth vertical scroll if needed — but horizontally everything fits.**
+
+---
+
+### 💡 How To Achieve It (CSS Approach):
+
+#### 🔹 Wrap the CV in a scaling container:
+
+```html
+<div class="cv-wrapper">
+  <div class="cv-scale-container">
+    <iframe src="/cv-template.html" class="cv-preview" />
+  </div>
+</div>
+```
+
+#### 🔹 Style it (responsive scaling):
+
+```css
+@media (max-width: 768px) {
+  .cv-wrapper {
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
+    padding: 10px;
+  }
+
+  .cv-scale-container {
+    transform: scale(0.65);  /* try 0.6–0.7 for best fit */
+    transform-origin: top center;
+    width: 100%; /* don’t allow overflow */
+  }
+
+  .cv-preview {
+    width: 794px;  /* original A4 width in px */
+    height: 1123px; /* original A4 height in px */
+    border: none;
+  }
+}
+```
+
+> 🔁 *If using components instead of iframe, apply `.cv-preview` styles directly to the main rendered component container.*
+
+---
+
+### ✅ Result:
+
+* CV shows in full, centered, like a **shrunken A4 document**.
+* Scroll down to view — but **no horizontal scroll**.
+* Works beautifully for **multi-column layouts** (like Lizy Ngowi’s).
+
+---
+
+### 📦 Bonus: Add CV page border (optional)
+
+To make it more realistic:
+
+```css
+.cv-preview {
+  background: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  border-radius: 6px;
+}
+```
+
+---
+
+### ✅ Summary for Devs:
+
+* Shrink the full CV (not crop it).
+* Fit the whole layout inside screen width.
+* Center it, scale it, and scroll only vertically.
+* Don’t touch the inner CV content styles — just wrap and scale.
+
+---
+
+Let me know if you want this in **Tailwind CSS**, React component form, or need me to inspect the live site. Want the HTML/CSS ready-made?
