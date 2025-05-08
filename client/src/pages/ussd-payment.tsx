@@ -470,10 +470,10 @@ const USSDPaymentPage: React.FC = () => {
               {/* Always show SMS input box regardless of ID type */}
               <div className="mb-3 p-4 border-2 border-gray-200 rounded-lg bg-white shadow-sm">
                 <p className="text-xs text-blue-600 mb-2">
-                  Tafadhali Copy na Paste message ya malipo kutoka SELCOM kama ilivo
+                  Nakili - Copy & Paste
                 </p>
                 <Textarea 
-                  placeholder="Nakili na bandika ujumbe wote wa SMS kutoka Selcom hapa..."
+                  placeholder="Copy & Paste ujumbe wote wa SMS kutoka SELCOM hapa..."
                   value={paymentReference}
                   onChange={(e) => setPaymentReference(e.target.value)}
                   className="h-24 mb-2 text-sm bg-white border-2 border-blue-100 focus:border-blue-300"
