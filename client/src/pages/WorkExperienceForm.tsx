@@ -592,11 +592,17 @@ const WorkExperienceForm = () => {
       </div>
       
       {/* Sticky button for mobile */}
-      {isMobile && showJobForm && (
+      {isMobile && (
         <div className="sticky-button-container">
-          <Button type="submit" form="work-experience-form" className="sticky-button">
-            Next
-          </Button>
+          {showJobForm ? (
+            <Button type="submit" form="work-experience-form" className="sticky-button">
+              Next
+            </Button>
+          ) : (
+            <Button onClick={handleAddAnotherPosition} className="sticky-button">
+              Add Another Position
+            </Button>
+          )}
         </div>
       )}
       
