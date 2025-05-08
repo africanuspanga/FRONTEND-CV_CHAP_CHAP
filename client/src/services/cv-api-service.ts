@@ -613,7 +613,7 @@ export const checkPaymentStatus = async (requestId: string): Promise<CVRequestSt
     
     // All IDs are treated equally now - no special local fallback handling
     
-    // Try to get payment status from the backend API first for all IDs
+    // Try to get payment status from the backend API first
     try {
       // Try to call the CV status endpoint through our proxy
       const status = await fetchFromCVScreener<CVRequestStatus>(
