@@ -1,5 +1,28 @@
 /* CV Preview Styles for proper mobile scaling */
 
+/* Templates sidebar improvements */
+.templates-sidebar {
+  width: 300px;
+  max-height: calc(100vh - 70px);
+  overflow-y: auto;
+  border-right: 1px solid #e5e7eb;
+}
+
+.templates-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .templates-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+/* Original CV preview styles */
 .cv-preview-container {
   display: flex;
   justify-content: center;
@@ -54,5 +77,15 @@
   
   .cv-content {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Desktop CV wrapper - fixed width */
+  .desktop-cv-wrapper {
+    max-width: 794px;
+    margin: 0 auto;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 }
