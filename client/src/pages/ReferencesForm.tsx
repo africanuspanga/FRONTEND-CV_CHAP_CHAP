@@ -17,7 +17,8 @@ const ReferencesForm = () => {
 
   // State for reference information
   const [name, setName] = useState('');
-  const [relationship, setRelationship] = useState('');
+  const [position, setPosition] = useState('');
+  const [company, setCompany] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [references, setReferences] = useState<Reference[]>(
@@ -38,17 +39,19 @@ const ReferencesForm = () => {
 
   // Navigate to next step
   const handleNext = () => {
+    // For mobile users, skip the final-preview page and go directly to additional sections
     navigate(`/cv/${templateId}/additional-sections`);
   };
 
   // Add a reference
   const handleAddReference = () => {
-    if (!name || !relationship) return;
+    if (!name) return;
 
     const newReference: Reference = {
       id: Date.now().toString(),
       name,
-      relationship,
+      position,
+      company,
       email,
       phone
     };
@@ -57,7 +60,8 @@ const ReferencesForm = () => {
     
     // Reset form
     setName('');
-    setRelationship('');
+    setPosition('');
+    setCompany('');
     setEmail('');
     setPhone('');
   };
@@ -96,8 +100,8 @@ const ReferencesForm = () => {
               >
                 <div>
                   <div className="font-medium">{ref.name}</div>
-                  <div className="text-sm text-gray-500">{ref.relationship}</div>
-                  <div className="text-sm text-gray-500">{ref.email} | {ref.phone}</div>
+                  <div className="text-sm text-gray-500">{ref.position}{ref.company ? `, ${ref.company}` : ''}</div>
+                  <div className="text-sm text-gray-500">{ref.email}{ref.phone ? ` | ${ref.phone}` : ''}</div>
                 </div>
                 <Button
                   variant="ghost"
@@ -125,16 +129,24 @@ const ReferencesForm = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Relationship</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
               <Input
-                value={relationship}
-                onChange={(e) => setRelationship(e.target.value)}
-                placeholder="e.g. Former Manager"
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+                placeholder="e.g. Project Manager"
               />
-              <div className="text-xs text-gray-500 mt-1">Suggested: Former Manager, Colleague, etc.</div>
+              <div className="text-xs text-gray-500 mt-1">Their role or job title</div>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+              <Input
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="Company Name"
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <Input
@@ -144,21 +156,22 @@ const ReferencesForm = () => {
                 placeholder="email@example.com"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-              <Input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+1 (555) 123-4567"
-              />
-            </div>
+          </div>
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <Input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+1 (555) 123-4567"
+              className="max-w-md"
+            />
           </div>
           <div className="flex justify-end">
             <Button
               onClick={handleAddReference}
               className="bg-blue-600 hover:bg-blue-700 text-white"
-              disabled={!name || !relationship}
+              disabled={!name}
             >
               Add Reference
             </Button>
