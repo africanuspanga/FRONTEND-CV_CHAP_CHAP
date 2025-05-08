@@ -315,12 +315,16 @@ const WorkExperienceForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check if we have job title and employer - use placeholders if not
+    const title = jobTitle || "Job Title";
+    const company = employer || "Company";
+    
     // Start generating recommendations
     setIsGeneratingRecommendations(true);
     
     // Use the WorkExperienceBulletGenerator component indirectly by
     // calling the OpenAI API directly here
-    getWorkExperienceRecommendations(jobTitle, employer)
+    getWorkExperienceRecommendations(title, company)
       .then(recommendations => {
         console.log('Received AI recommendations:', recommendations);
         setAIRecommendations(recommendations);
@@ -332,7 +336,7 @@ const WorkExperienceForm = () => {
         setIsGeneratingRecommendations(false);
         // Fallback to a minimal set of professional bullet points if AI fails
         const fallbackRecommendations = [
-          `Led important initiatives as ${jobTitle} at ${employer}.`,
+          `Led important initiatives as ${title} at ${company}.`,
           `Worked with teams to achieve company objectives.`,
           `Managed various projects and responsibilities.`
         ];
@@ -591,22 +595,16 @@ const WorkExperienceForm = () => {
         )}
       </div>
       
-      {/* Sticky button for mobile */}
+      {/* Sticky button for mobile - always visible */}
       {isMobile && (
         <div className="sticky-button-container">
-          {showJobForm ? (
-            <Button 
-              type="button" 
-              className="sticky-button"
-              onClick={handleSubmit}
-            >
-              Next
-            </Button>
-          ) : (
-            <Button onClick={handleAddAnotherPosition} className="sticky-button">
-              Add Another Position
-            </Button>
-          )}
+          <Button 
+            type="button" 
+            className="sticky-button"
+            onClick={handleSubmit}
+          >
+            Next
+          </Button>
         </div>
       )}
       
