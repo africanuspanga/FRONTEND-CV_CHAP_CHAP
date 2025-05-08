@@ -83,12 +83,40 @@ const FinalPreview = () => {
             </Button>
             <Button variant="outline"><Mail className="h-4 w-4" /><span>Email</span></Button>
             <Button variant="outline"><Printer className="h-4 w-4" /><span>Print</span></Button>
-            <Button onClick={handleDownload} className="bg-teal-600 text-white">
+            <Button onClick={handleDownload} className="bg-blue-600 hover:bg-blue-700 text-white">
               <Download className="h-4 w-4" />
               <span>{isDownloading ? 'Downloading...' : 'Download'}</span>
             </Button>
           </div>
         </div>
+      )}
+      
+      {/* Mobile Header & Actions */}
+      {isMobile && (
+        <>
+          <div className="mobile-header">
+            Finalize Resume
+          </div>
+          <div className="mobile-actions">
+            <button 
+              className="mobile-action-button"
+              onClick={() => setTemplateSidebarOpen(true)}
+            >
+              Change Template
+            </button>
+            <button 
+              className="mobile-action-button"
+              onClick={handleUpdateContent}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 4H4V20H20V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M20 4L9 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M15 4H20V9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Edit Resume
+            </button>
+          </div>
+        </>
       )}
       
       {/* Main Content Area */}
@@ -113,7 +141,7 @@ const FinalPreview = () => {
                       handleSelectTemplate(template.id);
                       if (isMobile) setTemplateSidebarOpen(false);
                     }}
-                    className={`cursor-pointer border rounded-md overflow-hidden relative ${currentTemplateId === template.id ? 'ring-2 ring-teal-500' : 'hover:border-teal-500'}`}
+                    className={`cursor-pointer border rounded-md overflow-hidden relative ${currentTemplateId === template.id ? 'ring-2 ring-blue-600' : 'hover:border-blue-500'}`}
                   >
                     <div className="aspect-[210/297] bg-white">
                       <img 
@@ -125,6 +153,11 @@ const FinalPreview = () => {
                     <div className="text-xs font-medium text-center py-1 px-2 truncate">
                       {template.name}
                     </div>
+                    {currentTemplateId === template.id && (
+                      <div className="absolute top-1 right-1 bg-blue-600 text-white rounded-full p-1">
+                        <CheckCircle className="h-3 w-3" />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -140,7 +173,7 @@ const FinalPreview = () => {
               cvData={formData}
               height="auto"
               width="100%" 
-              scaleFactor={1}
+              scaleFactor={isMobile ? 0.75 : 1}
             />
           </div>
         </div>
@@ -154,7 +187,7 @@ const FinalPreview = () => {
           className="mobile-download-button"
         >
           <Download className="h-5 w-5" />
-          {isDownloading ? 'Processing...' : 'Download My CV'}
+          {isDownloading ? 'Processing...' : 'Download Now'}
         </button>
       )}
     </div>
