@@ -17,11 +17,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import EducationSummary from '@/components/EducationSummary';
 // UniversitySelect import removed
 import { Education } from '@shared/schema';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 const EducationForm = () => {
   const [, navigate] = useLocation();
   const params = useParams<{ templateId: string }>();
   const { formData, updateFormField, addItemToArray, removeItemFromArray } = useCVForm();
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   // Generate degree options
   const degreeOptions = [
