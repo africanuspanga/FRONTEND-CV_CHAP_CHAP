@@ -244,19 +244,7 @@
       margin: 0;
     }
     
-    /* CV paper with perfect scaling */
-    .cv-preview {
-      width: 794px; /* A4 width */
-      height: 1123px; /* A4 height */
-      background-color: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-      border: 1px solid #eee;
-      border-radius: 2px;
-      overflow: visible;
-      transform: scale(0.38); /* Perfect scale for mobile */
-      transform-origin: top center;
-      margin: 0;
-    }
+    /* CV styles are now in cvPreview.css */
     
     /* Template container to match the CV-preview */
     .template-container {

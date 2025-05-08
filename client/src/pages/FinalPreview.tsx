@@ -15,6 +15,7 @@ import { X, Download, Printer, Mail, CheckCircle, ArrowLeft, Edit, RefreshCw, Ch
 import { generatePDF, directDownloadCVAsPDF } from '@/lib/pdf-generator';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/auth-context';
+import '../styles/cvPreview.css';
 
 const FinalPreview = () => {
   const { templateId } = useParams<{ templateId: string }>();
@@ -308,8 +309,8 @@ const FinalPreview = () => {
           </div>
         )}
         
-        {/* CV Preview Area - Exactly matching competitor's screenshot */}
-        <div className={`flex-grow flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} relative bg-white`}>
+        {/* CV Preview Area - Using the new scalable approach */}
+        <div className={`flex-grow flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} relative ${isMobile ? 'bg-[#f5f5f5]' : 'bg-white'}`}>
           {/* "Scroll to view" message - blue text centered like in screenshot */}
           {isMobile && (
             <div className="absolute top-[6.5rem] left-0 right-0 bg-white z-10 py-1 px-2 text-xs text-center text-blue-600">
@@ -318,19 +319,24 @@ const FinalPreview = () => {
               </div>
             </div>
           )}
-          {/* CV preview container - full width */}
-          <div 
-            className={`w-full print:shadow-none ${isMobile ? 'cv-preview-scroll-container' : ''}`}
-            style={isMobile ? { 
-              marginTop: '0',
-              paddingTop: '0',
-              paddingBottom: '60px',
-              backgroundColor: 'white',
-              width: '100%'
-            } : {}}
-          >
-            {/* A4 CV preview scaled down to fit in viewport */}
-            <div className={isMobile ? "cv-preview-container-mobile" : ""}>
+          
+          {/* CV preview container using the new structure */}
+          {isMobile ? (
+            <div className="cv-preview-container">
+              <div className="cv-scaler">
+                <div className="cv-content">
+                  <DirectTemplateRenderer
+                    templateId={currentTemplateId}
+                    cvData={formData}
+                    height="auto"
+                    width="100%" 
+                    scaleFactor={1}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full print:shadow-none">
               <DirectTemplateRenderer
                 templateId={currentTemplateId}
                 cvData={formData}
@@ -339,7 +345,7 @@ const FinalPreview = () => {
                 scaleFactor={1}
               />
             </div>
-          </div>
+          )}
         </div>
       </div>
       

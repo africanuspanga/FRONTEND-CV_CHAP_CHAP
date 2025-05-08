@@ -1,0 +1,98 @@
+Perfect — since it’s a React app, let me give you a **copy-paste ready solution** that will:
+
+✅ Display the **entire CV properly scaled on mobile**
+✅ Prevent cropping, horizontal scrolling, or layout breaking
+✅ Require **zero changes inside the CV template** itself
+
+---
+
+## ✅ Step-by-Step React Fix (Final Preview)
+
+### 1. **Wrap the CV in a scaling container**
+
+In your `ResumePreview.tsx` or similar file, wrap your existing CV template with this:
+
+```jsx
+import React from "react";
+import "./cvPreview.css"; // <- optional for cleaner CSS separation
+
+export default function ResumePreview() {
+  return (
+    <div className="cv-preview-container">
+      <div className="cv-scaler">
+        <div className="cv-content">
+          {/* Your full CV component goes here */}
+          {/* For example: <SelectedTemplate data={userCVData} /> */}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### 2. **Add this CSS (Tailwind or plain CSS)**
+
+If you're using Tailwind (recommended):
+
+```jsx
+// tailwind.config.js (optional, if scale-[0.65] isn’t supported)
+theme: {
+  extend: {
+    scale: {
+      65: '0.65',
+      68: '0.68',
+    },
+  },
+}
+```
+
+Then apply this in a global CSS or `cvPreview.css`:
+
+```css
+.cv-preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1rem;
+  background-color: #1f2937; /* dark bg */
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.cv-scaler {
+  transform: scale(0.68);
+  transform-origin: top center;
+  max-width: 794px;
+  width: 794px;
+  display: flex;
+  justify-content: center;
+}
+
+.cv-content {
+  background: white;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+}
+```
+
+> ⚠️ **IMPORTANT**: Do *not* set `width: 100%` inside the inner CV component. Let the parent `.cv-scaler` control width.
+
+---
+
+### 3. 💡 Optional improvements
+
+* Add `overflow-y-auto` to `.cv-preview-container` to scroll if content is long.
+* Add a **print button** that prints the `.cv-content` only.
+* Use `useMediaQuery` (like `react-responsive`) to apply different scaling on tablets vs mobile.
+
+---
+
+### ✅ Done!
+
+This **mimics how Google Docs or resume builders** show previews on mobile: clean, centered, scaled, and scrollable. No part gets cut off, and no zooming or horizontal scroll is needed.
+
+Want me to convert this into a working GitHub repo or CodeSandbox demo for your devs to clone?
