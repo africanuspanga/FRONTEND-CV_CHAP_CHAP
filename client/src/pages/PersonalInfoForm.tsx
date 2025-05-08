@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { ChevronLeft } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
+import MobilePreviewNote from '@/components/MobilePreviewNote';
 
 const PersonalInfoForm = () => {
   const [, navigate] = useLocation();
@@ -144,8 +145,9 @@ const PersonalInfoForm = () => {
           </div>
         </form>
         
-        {/* Live CV Preview */}
+        {/* Live CV Preview for desktop / Mobile note for mobile */}
         <LiveCVPreview cvData={formData} templateId={templateId} />
+        <MobilePreviewNote />
       </div>
     </div>
   );

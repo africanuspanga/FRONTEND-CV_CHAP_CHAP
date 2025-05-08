@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Eye } from 'lucide-react';
 import { ClientSideTemplateRenderer } from './ClientSideTemplateRenderer';
@@ -13,6 +13,23 @@ interface LiveCVPreviewProps {
 
 const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Check if the device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add listener for window resize
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Debug form data to see what's being passed to the template
   React.useEffect(() => {
@@ -22,6 +39,11 @@ const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => 
   const togglePreview = () => {
     setIsPreviewOpen(!isPreviewOpen);
   };
+  
+  // Don't render anything on mobile
+  if (isMobile) {
+    return null;
+  }
   
   return (
     <div className="mt-8 border-t pt-6">
