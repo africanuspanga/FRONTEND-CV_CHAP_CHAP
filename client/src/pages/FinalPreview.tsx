@@ -310,7 +310,7 @@ const FinalPreview = () => {
         
         {/* CV Preview Area - Exactly matching competitor's screenshot */}
         <div className={`flex-grow flex justify-center items-start ${isMobile ? 'px-0 pt-0 pb-16' : 'p-4'} relative ${isMobile ? 'bg-[#f0f0f0]' : 'bg-white'}`}>
-          {/* "Scroll to view" message - blue text centered like competitor */}
+          {/* "Scroll to view" message - blue text centered like in screenshot */}
           {isMobile && (
             <div className="absolute top-[6.5rem] left-0 right-0 bg-white z-10 py-1 px-2 text-xs text-center text-blue-600">
               <div className="flex justify-center items-center gap-1">
@@ -318,18 +318,22 @@ const FinalPreview = () => {
               </div>
             </div>
           )}
-          {/* CV preview container with clean scrolling - like competitor */}
+          {/* CV preview container - shrunk to fit entire CV on screen */}
           <div 
             className={`w-full print:shadow-none ${isMobile ? 'cv-preview-scroll-container' : ''}`}
-            style={isMobile ? { marginTop: '8px' } : {}}
+            style={isMobile ? { 
+              marginTop: '8px',
+              paddingTop: '20px',
+              paddingBottom: '80px'
+            } : {}}
           >
-            {/* Clean white card exactly like competitor's screenshot */}
+            {/* A4 CV preview scaled down to fit in viewport */}
             <div className={isMobile ? "cv-preview-container-mobile" : ""}>
               <DirectTemplateRenderer
                 templateId={currentTemplateId}
                 cvData={formData}
                 height={isMobile ? "auto" : 800 as const}
-                scaleFactor={1} // No scale factor - pure size like competitor
+                scaleFactor={1} // Scale handled by CSS for better control
               />
             </div>
           </div>
