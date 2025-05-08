@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useToast } from '@/hooks/use-toast';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { useCVRequest } from '@/contexts/cv-request-context';
 import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
 import { getAllTemplates, getTemplateById } from '@/lib/templates-registry';
-import { X, Download, Printer, Mail, CheckCircle, ArrowLeft, Edit, RefreshCw, ChevronRight } from 'lucide-react';
+import { X, Download, Printer, Mail, CheckCircle, ArrowLeft, Edit, RefreshCw, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
 import { generatePDF, directDownloadCVAsPDF } from '@/lib/pdf-generator';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/auth-context';
@@ -28,7 +33,9 @@ const FinalPreview = () => {
   const [currentTemplateId, setCurrentTemplateId] = useState(templateId || formData.templateId);
   // Track payment/download in progress
   const [isDownloading, setIsDownloading] = useState(false);
-
+  
+  // Track scale factor for mobile viewing
+  const [scaleFactor, setScaleFactor] = useState(0.65);
   
   // Get current template name
   const currentTemplateName = getTemplateById(currentTemplateId)?.name || 'Template';
@@ -245,12 +252,36 @@ const FinalPreview = () => {
             Swap Template
           </button>
           
-          <button 
-            className="py-3 flex flex-col items-center text-sm text-blue-600 font-medium"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
-            <span className="mt-1">Size</span>
-          </button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="py-3 flex flex-col items-center text-sm text-blue-600 font-medium">
+                <ZoomIn className="h-4 w-4 mb-1" />
+                <span className="mt-1">Size</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-60 p-3">
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium">Adjust Size</h3>
+                <div className="flex items-center justify-between">
+                  <button 
+                    onClick={() => setScaleFactor(prev => Math.max(0.4, prev - 0.1))}
+                    className="p-2 bg-gray-100 rounded-md hover:bg-gray-200"
+                  >
+                    <ZoomOut className="h-4 w-4" />
+                  </button>
+                  <div className="text-xs px-2">
+                    {Math.round(scaleFactor * 100)}%
+                  </div>
+                  <button 
+                    onClick={() => setScaleFactor(prev => Math.min(1.0, prev + 0.1))}
+                    className="p-2 bg-gray-100 rounded-md hover:bg-gray-200"
+                  >
+                    <ZoomIn className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       )}
       
@@ -313,9 +344,18 @@ const FinalPreview = () => {
         )}
         
         {/* CV Preview Area */}
-        <div className={`flex-grow overflow-auto flex justify-center items-start ${isMobile ? 'p-1 pt-3' : 'p-4'} bg-gray-100`}>
+        <div className={`flex-grow overflow-auto flex justify-center items-start ${isMobile ? 'p-1 pt-2' : 'p-4'} bg-gray-100`}>
+          {/* Mobile-friendly message for scaling instructions */}
+          {isMobile && (
+            <div className="absolute top-[6.5rem] left-0 right-0 bg-blue-50 z-10 py-1 px-2 text-xs text-center text-blue-700 border-y border-blue-100">
+              <div className="flex justify-center items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                <span>Scroll to view the full CV</span>
+              </div>
+            </div>
+          )}
           <div className="bg-white shadow-md overflow-hidden max-w-screen-md w-full print:shadow-none" 
-            style={isMobile ? {height: 'calc(100vh - 220px)'} : {}}
+            style={isMobile ? {minHeight: 'calc(100vh - 220px)'} : {}}
           >
             <DirectTemplateRenderer
               templateId={currentTemplateId}

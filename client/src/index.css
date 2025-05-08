@@ -190,9 +190,16 @@
     
     /* Mobile CV template scaling for better visibility */
     .mobile-template-content {
-      @apply transform-gpu overflow-x-hidden;
-      transform: scale(0.8);
+      @apply transform-gpu overflow-visible;
       transform-origin: top center;
+      min-height: 140vh;
+      padding-bottom: 2rem;
+    }
+    
+    /* Template container in mobile view */
+    .template-container {
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
     }
   }
   

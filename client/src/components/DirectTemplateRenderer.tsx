@@ -28,6 +28,8 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
     backgroundColor: '#ffffff',
     boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
     borderRadius: '4px',
+    touchAction: 'pan-y', // Allow vertical panning on mobile
+    WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
   };
 
   // Get the template from the registry
