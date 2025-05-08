@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ChevronLeft, Plus, Bold, Italic, Underline, List, Sparkles } from 'lucide-react';
+import { ChevronLeft, Plus, Bold, Italic, Underline, List, X } from 'lucide-react';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { Slider } from '@/components/ui/slider';
 import { LightbulbIcon } from 'lucide-react';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 interface Skill {
   id: string;
@@ -19,6 +20,7 @@ const SkillsEditor = () => {
   const params = useParams<{ templateId: string }>();
   const { formData, updateFormField } = useCVForm();
   const templateId = params.templateId;
+  const isMobile = useMediaQuery("(max-width: 768px)");
   
   // Skills state (initialize from form data or defaults)
   const [skills, setSkills] = useState<Skill[]>(
@@ -70,6 +72,12 @@ const SkillsEditor = () => {
     }
   };
   
+  // Remove a skill
+  const handleRemoveSkill = (skillId: string) => {
+    const updatedSkills = skills.filter(skill => skill.id !== skillId);
+    setSkills(updatedSkills);
+  };
+  
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,142 +105,108 @@ const SkillsEditor = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
+    <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Progress Bar */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden">
           <div className="absolute left-0 top-0 h-full bg-blue-500 rounded-full" style={{ width: '44%' }}></div>
         </div>
         <div className="text-right text-sm text-gray-500 mt-1">44%</div>
       </div>
 
-      <div className="bg-white rounded-lg border p-8">
+      <div className="bg-white rounded-lg border p-4 md:p-8">
         {/* Back button */}
         <button
           onClick={handlePrevious}
-          className="text-blue-600 flex items-center mb-6"
+          className="text-blue-600 flex items-center mb-4"
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
           Go Back
         </button>
 
-        <h1 className="text-2xl font-bold mb-2 text-indigo-950">What skills would you like to highlight?</h1>
+        <h1 className="text-xl md:text-2xl font-bold mb-2 text-indigo-950">What skills would you like to highlight?</h1>
         <p className="text-gray-600 mb-4">
-          Choose from our pre-written examples below or write your own.
+          Add your skills and rate your proficiency level.
         </p>
         
-        <div className="flex justify-between">
-          <div className="w-full">
-            <div className="flex justify-between">
-              <Button
-                variant="outline"
-                className="text-sm px-4 py-1 h-8 border-blue-200 text-blue-700 bg-blue-50"
-              >
-                <LightbulbIcon className="h-3.5 w-3.5 mr-1.5" />
-                Tips
-              </Button>
-            </div>
+        <div className="mb-4">
+          <Button
+            variant="outline"
+            className="text-sm px-4 py-1 h-8 border-blue-200 text-blue-700 bg-blue-50"
+          >
+            <LightbulbIcon className="h-3.5 w-3.5 mr-1.5" />
+            Tips
+          </Button>
+        </div>
 
-            <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-              {/* Left side - Search & Editor */}
-              <div className="lg:col-span-5">
-                <h2 className="font-bold uppercase text-gray-700 mb-2">SEARCH BY JOB TITLE FOR PRE-WRITTEN EXAMPLES</h2>
-                <div className="flex gap-2 mb-6">
-                  <Input
-                    placeholder="Software Engineer"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="flex-grow"
-                  />
-                  <Button className="bg-blue-100 text-blue-700 hover:bg-blue-200">
-                    Search
-                  </Button>
-                </div>
-              </div>
-
-              {/* Right side - Text Editor & Skill Rating */}
-              <div className="lg:col-span-7">
-                <div className="mb-4">
-                  <h2 className="font-bold mb-2">Text Editor</h2>
-                  <div className="flex gap-2 mb-2">
-                    <Button variant="outline" size="sm" className="p-1 h-8 w-8">
-                      <Bold className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" className="p-1 h-8 w-8">
-                      <Italic className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" className="p-1 h-8 w-8">
-                      <Underline className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" className="p-1 h-8 w-8">
-                      <List className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <div className="border rounded-md p-4 min-h-[200px] mb-4">
-                    <ul className="list-disc pl-5 space-y-2">
-                      {skills.map((skill, index) => (
-                        <li key={skill.id} className="text-blue-900">
-                          <div className="flex flex-col mb-2">
-                            <div className="font-medium">{index + 1}. {skill.name}</div>
-                            <div className="text-sm text-blue-600 mt-1">{getSkillLevelText(skill.level)}</div>
-                            <div className="flex items-center mt-1 mb-2">
-                              <span className="text-xs w-16">Beginner</span>
-                              <Slider
-                                value={[skill.level]}
-                                min={1}
-                                max={5}
-                                step={1}
-                                onValueChange={(value) => handleLevelChange(index, value)}
-                                className="mx-2 flex-grow"
-                              />
-                              <span className="text-xs w-10">Expert</span>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="flex items-center mb-1">
-                    <div className="text-sm mr-4">Skills: {skills.length}</div>
-                    <div className="flex-grow bg-blue-100 h-2 rounded-full">
-                      <div 
-                        className="bg-blue-500 h-full rounded-full" 
-                        style={{ width: `${Math.min(100, (skills.length / 10) * 100)}%` }}
-                      ></div>
-                    </div>
-                    <div className="ml-2 text-gray-500 text-lg">?</div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Add a custom skill"
-                      value={newSkill}
-                      onChange={(e) => setNewSkill(e.target.value)}
-                      className="flex-grow"
-                    />
-                    <Button 
-                      onClick={handleAddSkill}
-                      disabled={!newSkill.trim()}
-                      className="bg-blue-500 hover:bg-blue-600 text-white"
+        <div className="mb-4">
+          <h2 className="font-medium mb-2">Your Skills</h2>
+          <div className="border rounded-md p-4 min-h-[200px] mb-4">
+            <ul className="space-y-4">
+              {skills.map((skill, index) => (
+                <li key={skill.id} className="border-b pb-4 last:border-b-0 last:pb-0">
+                  <div className="flex items-start justify-between mb-1">
+                    <div className="font-medium text-blue-900">{index + 1}. {skill.name}</div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveSkill(skill.id)}
+                      className="h-6 w-6 p-0 text-gray-500 hover:text-red-600"
                     >
-                      Add
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
-                  
-                  <div className="flex justify-end mt-4">
-                    <Button className="bg-blue-600 text-white flex items-center gap-2 hover:bg-blue-700">
-                      <Sparkles className="h-4 w-4" /> Enhance with AI
-                    </Button>
+                  <div className="text-sm text-blue-600 mb-1">{getSkillLevelText(skill.level)}</div>
+                  <div className="flex items-center">
+                    <span className="text-xs md:w-16 w-12">Beginner</span>
+                    <Slider
+                      value={[skill.level]}
+                      min={1}
+                      max={5}
+                      step={1}
+                      onValueChange={(value) => handleLevelChange(index, value)}
+                      className="mx-2 flex-grow"
+                    />
+                    <span className="text-xs md:w-10 w-8">Expert</span>
                   </div>
-                </div>
-              </div>
+                </li>
+              ))}
+              {skills.length === 0 && (
+                <li className="text-gray-500 text-center py-4">
+                  No skills added yet. Add your first skill below.
+                </li>
+              )}
+            </ul>
+          </div>
+
+          <div className="flex items-center mb-4">
+            <div className="text-sm mr-4">Skills: {skills.length}</div>
+            <div className="flex-grow bg-blue-100 h-2 rounded-full">
+              <div 
+                className="bg-blue-500 h-full rounded-full" 
+                style={{ width: `${Math.min(100, (skills.length / 10) * 100)}%` }}
+              ></div>
             </div>
+          </div>
+
+          <div className="flex gap-2 mb-6">
+            <Input
+              placeholder="Add a skill"
+              value={newSkill}
+              onChange={(e) => setNewSkill(e.target.value)}
+              className="flex-grow"
+            />
+            <Button 
+              onClick={handleAddSkill}
+              disabled={!newSkill.trim()}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Add
+            </Button>
           </div>
         </div>
 
-        <div className="flex justify-between mt-8">
+        <div className="flex justify-between mt-6">
           <Button
             variant="outline"
             onClick={handlePrevious}
@@ -244,14 +218,14 @@ const SkillsEditor = () => {
 
           <Button
             onClick={handleSubmit}
-            className="bg-teal-600 hover:bg-teal-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             Next
           </Button>
         </div>
 
-        {/* Live CV Preview */}
-        <LiveCVPreview cvData={formData} templateId={templateId} />
+        {/* Live CV Preview - hidden on mobile */}
+        {!isMobile && <LiveCVPreview cvData={formData} templateId={templateId} />}
       </div>
     </div>
   );
