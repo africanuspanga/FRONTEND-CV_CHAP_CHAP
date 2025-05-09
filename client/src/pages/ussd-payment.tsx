@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'wouter';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Download, CheckCircle2, XCircle, Loader2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Download, CheckCircle2, XCircle, Loader2, RefreshCw, Phone, Copy, Smartphone } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { useCVRequest } from '@/contexts/cv-request-context';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
+import ReactConfetti from 'react-confetti';
 
 const USSDPaymentPage: React.FC = () => {
   // State for SMS input and verification
@@ -18,6 +19,26 @@ const USSDPaymentPage: React.FC = () => {
   const [isPaymentVerified, setIsPaymentVerified] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  
+  // Window dimensions for confetti
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 800,
+    height: typeof window !== 'undefined' ? window.innerHeight : 600
+  });
+  
+  // Update window dimensions on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // Navigation and context
   const [, navigate] = useLocation();
@@ -235,7 +256,7 @@ const USSDPaymentPage: React.FC = () => {
       }
       
       if (!templateId) {
-        throw new Error('Could not determine template ID. Please try again from the CV preview page.');
+        throw new Error('Tafadhali copy na kupaste ujumbe kamili wa SMS ya malipo kutoka Selcom.');
       }
       
       console.log(`Using template ID for verification: ${templateId}`);
@@ -245,7 +266,7 @@ const USSDPaymentPage: React.FC = () => {
       
       // Check character count (140-170 characters)
       if (sms.length < 140 || sms.length > 170) {
-        throw new Error('SMS length should be between 140-170 characters. Please paste the entire SMS from Selcom.');
+        throw new Error('Tafadhali copy na kupaste ujumbe kamili wa SMS ya malipo kutoka Selcom.');
       }
       
       // Define required patterns to check
@@ -277,7 +298,7 @@ const USSDPaymentPage: React.FC = () => {
       
       // If any elements are missing, show error
       if (missingElements.length > 0) {
-        throw new Error(`Ujumbe wako haujatimiza mahitaji. Tafadhali nakili na bandika ujumbe kamili wa SMS kutoka Selcom.`);
+        throw new Error('Tafadhali copy na kupaste ujumbe kamili wa SMS ya malipo kutoka Selcom.');
       }
       
       // 3. Clean and prepare the CV data with the same cleaning logic as handleDownload
@@ -342,9 +363,15 @@ const USSDPaymentPage: React.FC = () => {
         console.warn('Failed to store verification details:', storageError);
       }
       
-      // 4. Set status to verified to show the download button
+      // 4. Set status to verified to show the download button and show confetti
       setIsPaymentVerified(true);
       setIsPending(false);
+      setShowConfetti(true);
+      
+      // Hide confetti after 5 seconds
+      setTimeout(() => {
+        setShowConfetti(false);
+      }, 5000);
       
     } catch (error) {
       console.error('Verification error:', error);
@@ -356,6 +383,18 @@ const USSDPaymentPage: React.FC = () => {
 
   return (
     <div className="container mx-auto py-3 sm:py-5 px-2 sm:px-4 max-w-lg">
+      {/* Confetti effect when payment is verified */}
+      {showConfetti && (
+        <ReactConfetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+          recycle={false}
+          numberOfPieces={300}
+          gravity={0.15}
+          colors={['#034694', '#1E88E5', '#2E7D32', '#FFD700', '#FF5722']}
+        />
+      )}
+      
       <div className="flex items-center justify-between mb-4">
         <Button 
           variant="ghost" 
