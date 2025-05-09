@@ -143,21 +143,10 @@ const FinalPreview = () => {
           </div>
           <div className="mobile-actions">
             <button 
-              className="mobile-action-button"
+              className="mobile-action-button w-full"
               onClick={() => setTemplateSidebarOpen(true)}
             >
               Change Template
-            </button>
-            <button 
-              className="mobile-action-button"
-              onClick={handleUpdateContent}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 4H4V20H20V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M20 4L9 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M15 4H20V9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Edit Resume
             </button>
           </div>
         </>
