@@ -14,19 +14,12 @@ import { getInitials } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Autocomplete } from '@/components/ui/autocomplete';
 import { tanzanianRegionsOptions } from '@/lib/location-data';
-import { commonJobTitles } from '@/lib/job-titles-data';
 
-// Extend the schema with additional client-side validation and fields
-// Note: These additional fields aren't in the base personalInfoSchema 
-// but are used in the form for UI convenience
+// Extend the schema with client-side validation
 const formSchema = personalInfoSchema.extend({
-  // Additional UI-specific fields
-  location: z.string().optional(),
-  website: z.string().url().optional().or(z.string()),
-  linkedin: z.string().url().optional().or(z.string()),
+  // Add any additional client-side validation if needed
 });
 
-// Use the extended FormValues type
 type FormValues = z.infer<typeof formSchema>;
 
 const PersonalInfoStep: React.FC = () => {
@@ -35,23 +28,15 @@ const PersonalInfoStep: React.FC = () => {
   
   // Get default values from context
   const defaultValues: FormValues = {
-    // Base fields from personalInfoSchema
     firstName: formData.personalInfo.firstName || '',
     lastName: formData.personalInfo.lastName || '',
     email: formData.personalInfo.email || '',
     phone: formData.personalInfo.phone || '',
-    professionalTitle: formData.personalInfo.professionalTitle || '',
-    address: formData.personalInfo.address || '',
-    city: formData.personalInfo.city || '',
-    region: formData.personalInfo.region || '',
-    country: formData.personalInfo.country || '',
-    postalCode: formData.personalInfo.postalCode || '',
-    summary: formData.personalInfo.summary || '',
-    
-    // Additional UI fields that we added to the extended schema
-    location: formData.personalInfo.address || '', // Use address as the location value
-    website: '', // Not stored in personalInfo
-    linkedin: '', // Not stored in personalInfo
+    jobTitle: formData.personalInfo.jobTitle || '',
+    location: formData.personalInfo.location || '',
+    website: formData.personalInfo.website || '',
+    linkedin: formData.personalInfo.linkedin || '',
+    profilePicture: formData.personalInfo.profilePicture || '',
   };
 
   // Initialize form
@@ -73,21 +58,10 @@ const PersonalInfoStep: React.FC = () => {
     form.setValue(field, value);
     
     // Update the global state for preview
-    // Map special fields to their corresponding fields in personalInfo
-    const updatedPersonalInfo = { ...formData.personalInfo };
-    
-    if (field === 'location') {
-      // For location field, we'll update the address field
-      updatedPersonalInfo.address = value;
-    } else if (field === 'website' || field === 'linkedin') {
-      // These fields are UI-only and not in the base schema
-      // We could store them in a separate object if needed
-      console.log(`Setting ${field} to ${value} (UI field only)`);
-    } else {
-      // For standard fields that match the schema, update directly
-      updatedPersonalInfo[field as keyof typeof updatedPersonalInfo] = value;
-    }
-    
+    const updatedPersonalInfo = { 
+      ...formData.personalInfo, 
+      [field]: value 
+    };
     updateFormField('personalInfo', updatedPersonalInfo);
   };
 
@@ -98,15 +72,17 @@ const PersonalInfoStep: React.FC = () => {
         <div className="form-field-group space-y-4">
           <div className="profile-photo-section flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-5 sm:mb-6 mt-2 sm:mt-0">
             <Avatar className="h-16 w-16 sm:h-18 sm:w-18 touch-area-avatar">
+              <AvatarImage src={formData.personalInfo.profilePicture || ''} alt="Profile" />
               <AvatarFallback className="bg-primary text-white">
                 {getInitials(formData.personalInfo.firstName, formData.personalInfo.lastName)}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-medium text-base sm:text-sm">Profile Preview</h3>
+              <h3 className="font-medium text-base sm:text-sm">Profile Photo</h3>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Your initials will be shown if no photo is available
+                Upload a professional photo (optional)
               </p>
+              {/* Photo upload functionality would go here */}
             </div>
           </div>
 
@@ -156,21 +132,18 @@ const PersonalInfoStep: React.FC = () => {
 
           <FormField
             control={form.control}
-            name="professionalTitle"
+            name="jobTitle"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-base sm:text-sm">Professional Title</FormLabel>
                 <FormControl>
-                  <Autocomplete
-                    options={commonJobTitles}
-                    value={field.value}
-                    onChange={(value) => handleFieldChange('professionalTitle', value)}
-                    placeholder="Start typing a job title, e.g. Software Engineer"
-                    emptyMessage="No job titles found"
-                    inputClassName="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
-                    popoverWidth="w-full max-w-[300px] md:max-w-none"
-                    maxDisplayItems={5}
-                    minimumInputLength={2}
+                  <Input 
+                    placeholder="e.g. Senior Software Engineer" 
+                    {...field}
+                    onChange={(e) => handleFieldChange('jobTitle', e.target.value)}
+                    className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
+                    autoCapitalize="words"
+                    inputMode="text"
                   />
                 </FormControl>
                 <FormDescription className="text-xs sm:text-sm">

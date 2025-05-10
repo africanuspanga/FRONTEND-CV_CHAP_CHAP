@@ -5,14 +5,12 @@ import { FileText, ChevronRight, CheckCircle2, Edit3, Sparkles } from 'lucide-re
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
 import ReactConfetti from 'react-confetti';
-import { useCVData } from '@/hooks/useCVData';
 
 const CVSteps: React.FC = () => {
   const [, navigate] = useLocation();
   const [isMobile, setIsMobile] = useState(false);
   const [windowDimensions, setWindowDimensions] = useState({ width: 0, height: 0 });
   const [showConfetti, setShowConfetti] = useState(false);
-  const { resetCVData } = useCVData();
   
   // Check if device is mobile and set window dimensions
   useEffect(() => {
@@ -35,13 +33,6 @@ const CVSteps: React.FC = () => {
   }, []);
 
   const handleNextClick = () => {
-    // Reset all form data before starting a new CV
-    resetCVData();
-    
-    // Also clear any form data saved in localStorage by the CV form context
-    localStorage.removeItem('cv-form-data');
-    localStorage.removeItem('cv-form-step');
-    
     // Show confetti
     setShowConfetti(true);
     

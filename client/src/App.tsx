@@ -116,7 +116,7 @@ function Router() {
                 <Route path="/" component={Home} />
                 <Route path="/cv-steps" component={CVSteps} />
                 <Route path="/templates" component={TemplateSelection} />
-                {/* /create/method route removed - CVSteps is now the main entry point */}
+                <Route path="/create/method" component={CreationMethod} />
                 <Route path="/cv/:templateId/personal" component={PersonalInfoForm} />
                 <Route path="/cv/:templateId/work" component={WorkExperienceForm} />
                 <Route path="/cv/:templateId/education" component={EducationForm} />
