@@ -22,17 +22,12 @@ const Contact: React.FC = () => {
           <div className="flex flex-col items-center p-8 text-center">
             {/* Flag and Country */}
             <div className="mb-6 flex flex-col items-center">
-              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border border-gray-200 flex items-center justify-center">
-                <svg viewBox="0 0 640 480" className="w-full h-full">
-                  <g fillRule="evenodd" strokeWidth="1pt">
-                    <path fill="#09f" d="M0 0h640v480H0z"/>
-                    <path fill="#090" d="M0 0h640v320H0z"/>
-                    <path d="M0 0h640v240H0z"/>
-                    <path fill="#ff0" d="M0 0h640v160H0z"/>
-                    <path d="M640 0H0v480l640-480z" fill="#000"/>
-                    <path d="M0 0l640 480H0V0z" fill="#ff0"/>
-                  </g>
-                </svg>
+              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border border-gray-200">
+                <img 
+                  src="/attached_assets/flag-round-250.png" 
+                  alt="Tanzania Flag" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="bg-primary/10 text-primary font-bold py-2 px-8 rounded-full text-xl">
                 TANZANIA
