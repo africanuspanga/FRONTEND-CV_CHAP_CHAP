@@ -12,6 +12,7 @@ import { StorageWarningModal } from "@/components/StorageWarningModal";
 import ScrollToTop from "@/components/ScrollToTop";
 import SEO from "@/components/SEO";
 import StructuredData from "@/components/StructuredData";
+import FaviconUpdater from "@/components/FaviconUpdater";
 
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -168,6 +169,7 @@ function App() {
                 <StructuredData type="website" />
                 <StructuredData type="organization" />
                 <StructuredData type="webApplication" />
+                <FaviconUpdater />
                 
                 <Router />
                 <Toaster />

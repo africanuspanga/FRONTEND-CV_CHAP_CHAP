@@ -11,6 +11,25 @@
     <!-- Favicon -->
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="icon" href="/favicon.ico">
+    <!-- Inline favicon with base64 encoding -->
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAIGNIUk0AAHomAACAhAAA+gAAAIDo
+AAB1MAAA6mAAADqYAAAXcJy6UTwAAAD2UExURQAAADE0YDE0YDE0YDE0YDE0YDE0YDE0YDE0YDE0
+YDE0YDE0YDE0YDE0YDE0YDE0YDE0YDE0YDE0YDE0YDE0YDE0YDE0YDE0YDE0YDE0YFZYfFZYfFZY
+fFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZY
+fFZYfFZYfFZYfFZYfFZYfFZYfFZYfDE0YDE0YFZYfFZYfFZYfFZYfFZYfFZYfFZYfFZYfDE0YFdZ
+fFdZfFdZfFZYfFZYfFZYfFZYfFZYfFdZfFdZfFdZfFdZfDE0YDE0YDE0YFZYfFZYfFZYfFZYfFZY
+fDE0YDE0YDE0YDE0YDE0YP///4WVyH0AAABJdFJOUwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAJRIOFwkoHiEfNEJvcG5DMC4rJiwtJjFJRkwjBgUEAgEBAgMCAgACyZ4niwAA
+AAFiS0dEYdUPQjIAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfoChcVEiKT/zQhAAABQElE
+QVQ4y92S206DQBCGBxALtDWIOBF2F5E10EMprVFbrdXW9P1fySyIbdrLXtj/6mNmvl+TmQX4b2Oz
+uXyB/iyWK2YD3NJqXajAZltwMK2hCWxLXrfXVo/FDnYafRCYOq7n+57rMA1CiF2+Vzs4SNzPGMc0
+PN6xwvtFAqfnPDIBrOiCEoIiOLu8qlXAeRyqQbkYhjlXghK4voGTZgUkF1FRXrZaSgbcILpFwm0W
+jVTBXRwOiih5qBRBHPdbFGfZQwVqeuyR5ycn3lQlzx5HFMXtzhFVvEj1CnmRxp1Dw3FWVqtZHHaN
+5RrwFI/MJ1RmePz80mEAjV9fSVkOoInidzJEADpfyW3xMy+QH/1Z/x0m2IzLFQMAA4MJBqAa9T73
+xeAGxfizE3xfBZbU/L94BmoQm1tvMiawp5rl/PgDJwTUzLk9qLoAAAAldEVYdGRhdGU6Y3JlYXRl
+ADAyMy0xMC0yNFQwMjoxNzo1NiswMTowMIJ3o3YAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjMtMTAt
+MjRUMDI6MTc6NTYrMDE6MDD7Khv2AAAAKHRFWHRkYXRlOnRpbWVzdGFtcAAyMDIzLTEwLTI0VDAy
+OjE4OjM0KzAxOjAwPUr6NQAAAABJRU5ErkJggg==" type="image/png">
     <!-- Fallbacks -->
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -40,5 +59,14 @@
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+    <!-- Script to dynamically add favicon -->
+    <script>
+      // Add favicon dynamically
+      const link = document.createElement('link');
+      link.rel = 'icon';
+      link.type = 'image/x-icon';
+      link.href = '/simple-favicon.ico';
+      document.head.appendChild(link);
+    </script>
   </body>
 </html>
