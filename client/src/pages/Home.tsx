@@ -364,12 +364,25 @@ const Home = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 bg-primary rounded-lg text-white text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Create Your Professional CV?</h2>
-        <p className="max-w-2xl mx-auto mb-8">Join thousands of job seekers who have successfully created standout CVs with our platform</p>
-        <Button asChild size="lg" variant="secondary" className="bg-white text-primary hover:bg-gray-100">
-          <Link href="/create/method">Create Your CV Now</Link>
-        </Button>
+      <section className="py-16 bg-gradient-to-r from-blue-800 to-blue-700 rounded-xl shadow-lg text-white text-center relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-40 h-40 bg-blue-600/20 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-60 h-60 bg-blue-600/20 rounded-full translate-x-1/3 translate-y-1/3"></div>
+        <div className="absolute top-1/2 right-10 w-20 h-20 bg-blue-500/10 rounded-full -translate-y-1/2"></div>
+        
+        <div className="relative z-10">
+          <h2 className="text-3xl font-bold mb-4 text-white">Ready to Create Your Professional CV?</h2>
+          <p className="max-w-2xl mx-auto mb-8 text-blue-100">
+            Join thousands of job seekers who have successfully created standout CVs with our platform
+          </p>
+          <div className="relative inline-block">
+            <div className="absolute inset-0 bg-white/20 rounded-lg blur-md transform -rotate-1"></div>
+            <div className="absolute inset-0 bg-white/20 rounded-lg blur-md transform rotate-1"></div>
+            <Button asChild size="lg" className="relative z-10 bg-white font-semibold text-blue-800 hover:bg-blue-50 border-2 border-white/80 shadow-md px-8 py-6">
+              <Link href="/create/method">Create Your CV Now</Link>
+            </Button>
+          </div>
+        </div>
       </section>
     </div>
   );
