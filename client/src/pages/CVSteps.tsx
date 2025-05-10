@@ -144,54 +144,14 @@ const CVSteps: React.FC = () => {
             <div className="absolute -top-3 -left-3 w-full h-full bg-blue-50 rounded-lg transform rotate-2 shadow-md"></div>
             <div className="absolute -top-1.5 -left-1.5 w-full h-full bg-blue-100 rounded-lg transform -rotate-1 shadow-md"></div>
             
-            {/* Main CV view */}
-            <div className="w-72 md:w-96 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden relative z-10">
-              <div className="h-6 bg-primary w-full"></div>
-              
-              <div className="bg-white p-4">
-                <div className="flex">
-                  <div className="w-1/3 text-gray-600 pr-4 text-sm">
-                    <div className="mb-2">[P] (123) 456-7891</div>
-                    <div className="mb-2">[E] nellysmith@email.com</div>
-                    <div className="mb-2">[A] 47 W 13th St, New York</div>
-                    <div className="mb-2">[L] linkedin.com/in/nelly</div>
-                    <div className="mb-6">[ID] A25687458</div>
-                    
-                    <h3 className="font-bold mb-2 text-gray-800">PROFILE</h3>
-                    <p className="text-xs leading-tight mb-6">Senior Graphic Design Specialist with 6+ years of experience managing design processes, from conceptualization to delivery.</p>
-                    
-                    <h3 className="font-bold mb-2 text-gray-800">SKILLS</h3>
-                    <div className="flex flex-wrap gap-1 mb-2">
-                      <span className="bg-gray-200 px-2 py-0.5 text-xs rounded">InDesign</span>
-                      <span className="bg-gray-200 px-2 py-0.5 text-xs rounded">Illustrator</span>
-                      <span className="bg-gray-200 px-2 py-0.5 text-xs rounded">Photoshop</span>
-                    </div>
-                  </div>
-                  
-                  <div className="w-2/3 pl-4 border-l">
-                    <h1 className="text-xl font-bold mb-1">NELLY SMITH</h1>
-                    <p className="text-sm text-gray-600 mb-4">Senior Graphic Design Specialist</p>
-                    
-                    <h3 className="font-bold border-b border-gray-300 pb-1 mb-2 text-gray-800">PROFESSIONAL EXPERIENCE</h3>
-                    <h4 className="font-bold text-sm">Senior Graphic Design Specialist</h4>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span>Experion</span>
-                      <span className="text-right">Jan 20XX - Present<br/>New York, NY</span>
-                    </div>
-                    <ul className="list-disc list-inside text-xs space-y-1 mb-3">
-                      <li>Lead in the design, development, and implementation of graphic layouts</li>
-                      <li>Delegate tasks to the design team members</li>
-                    </ul>
-                    
-                    <h3 className="font-bold border-b border-gray-300 pb-1 mb-2 text-gray-800">EDUCATION</h3>
-                    <h4 className="font-bold text-sm">Bachelor Of Fine Arts In Graphic Design</h4>
-                    <div className="flex justify-between text-xs">
-                      <span>School of Visual Arts</span>
-                      <span className="text-right">May 20XX<br/>New York, NY</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {/* Main CV view using the exact image */}
+            <div className="relative z-10 rounded-lg overflow-hidden shadow-lg">
+              <img 
+                src="/assets/nelly-cv-template.png" 
+                alt="Professional CV Template" 
+                className="w-auto max-w-full object-contain rounded-lg border border-gray-200"
+                style={{ maxHeight: '480px' }}
+              />
               
               {/* "Before" dot indicators */}
               <div className="absolute top-1/4 -left-2.5 w-5 h-5 rounded-full bg-red-500 shadow-md z-20 flex items-center justify-center text-white text-xs font-bold">
