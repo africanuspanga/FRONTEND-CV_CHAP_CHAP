@@ -165,17 +165,22 @@ const PersonalInfoForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4">
             <div className="form-field-group">
               <Label htmlFor="address">Location</Label>
-              <div className="input-icon-wrapper">
-                <MapPin className="input-icon h-4 w-4" />
-                <Input
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <AutocompleteInput
                   id="address"
-                  value={formData.personalInfo.address || ''}
-                  onChange={(e) => updateFormField('personalInfo', {
+                  name="address"
+                  options={tanzanianRegionsOptions}
+                  value={formData.personalInfo.address ? 
+                    tanzanianRegionsOptions.find(option => option.label === formData.personalInfo.address) || null : 
+                    null
+                  }
+                  onChange={(option) => updateFormField('personalInfo', {
                     ...formData.personalInfo,
-                    address: e.target.value
+                    address: option ? option.label : ''
                   })}
-                  placeholder="Dar es Salaam, Tanzania"
-                  className="pl-9"
+                  placeholder="Select or type your location"
+                  className="w-full"
                 />
               </div>
             </div>
