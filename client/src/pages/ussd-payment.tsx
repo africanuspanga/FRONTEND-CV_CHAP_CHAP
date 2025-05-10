@@ -401,22 +401,22 @@ const USSDPaymentPage: React.FC = () => {
           className="flex items-center text-primary p-2" 
           onClick={handleGoBack}
         >
-          <ArrowLeft className="h-4 w-4 mr-1" /> Rudi
+          <ArrowLeft className="h-5 w-5 mr-1" /> Rudi
         </Button>
-        <h1 className="text-lg sm:text-xl font-bold text-primary">CV Chap Chap</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-primary">CV Chap Chap</h1>
       </div>
       
-      <div className="bg-white rounded-lg shadow-md p-4">
-        <h2 className="text-lg sm:text-xl font-bold mb-3 text-center text-primary">LIPA KWA: DRIFTMARK TECHNOLOGIES LIMITED</h2>
+      <div className="bg-white rounded-lg shadow-md p-5">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center text-primary">LIPA KWA: DRIFTMARK TECHNOLOGIES LIMITED</h2>
         
-        <p className="text-center mb-4 text-sm sm:text-base">
+        <p className="text-center mb-5 text-base sm:text-lg">
           Tafadhali kamilisha malipo ili kupakua CV yako
         </p>
         
-        <div className="p-3 mb-4 mx-auto bg-gray-50 rounded-md">
-          <ol className="list-decimal space-y-2 text-sm sm:text-base font-medium pl-5">
-            <li className="pb-2 border-b border-gray-200">BONYEZA <span className="font-bold text-primary">*150*50*1#</span></li>
-            <li className="pb-2 border-b border-gray-200">WEKA <span className="font-bold text-primary">61115073</span></li>
+        <div className="p-4 mb-5 mx-auto bg-gray-50 rounded-md border border-gray-200">
+          <ol className="list-decimal space-y-3 text-base sm:text-lg font-medium pl-6">
+            <li className="pb-3 border-b border-gray-200">BONYEZA <span className="font-bold text-primary">*150*50*1#</span></li>
+            <li className="pb-3 border-b border-gray-200">WEKA <span className="font-bold text-primary">61115073</span></li>
             <li>LIPA TZS <span className="font-bold text-primary">5,000</span></li>
           </ol>
         </div>
@@ -493,11 +493,11 @@ const USSDPaymentPage: React.FC = () => {
                   </p>
                 </div>
               ) : (
-                <div className="bg-blue-50 p-3 rounded-lg mb-3 border border-blue-100">
-                  <p className="font-medium text-blue-800 mb-1 text-xs sm:text-sm">
+                <div className="bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
+                  <p className="font-medium text-blue-800 mb-2 text-base sm:text-lg">
                     Baada ya kulipa, fuata hatua hizi:
                   </p>
-                  <ol className="list-decimal pl-4 text-xs sm:text-sm text-blue-700 space-y-1">
+                  <ol className="list-decimal pl-5 text-base text-blue-700 space-y-2">
                     <li>Subiri SMS kutoka <span className="font-bold">Selcom</span></li>
                     <li>Nakili <span className="font-bold">ujumbe wote wa SMS</span> kutoka Selcom</li>
                     <li>Bandika ujumbe huo hapo chini</li>
@@ -507,23 +507,23 @@ const USSDPaymentPage: React.FC = () => {
               )}
               
               {/* Always show SMS input box regardless of ID type */}
-              <div className="mb-3 p-3 border border-gray-200 rounded-lg bg-white shadow-sm">
-                <p className="text-xs text-blue-600 mb-1">
+              <div className="mb-4 p-4 border border-gray-300 rounded-md bg-white shadow-sm">
+                <p className="text-base text-blue-600 mb-2 font-medium">
                   Nakili - Copy & Paste
                 </p>
                 <Textarea 
                   placeholder="Copy & Paste ujumbe wote wa SMS kutoka SELCOM hapa..."
                   value={paymentReference}
                   onChange={(e) => setPaymentReference(e.target.value)}
-                  className="h-20 mb-1 text-sm bg-white border border-blue-100 focus:border-blue-300"
+                  className="h-24 mb-2 text-base bg-white border-2 border-blue-200 focus:border-blue-500 rounded-sm"
                   maxLength={180}
                 />
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>Ujumbe kamili kutoka Selcom</span>
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span className="font-medium">Ujumbe kamili kutoka Selcom</span>
                   <span className={
                     paymentReference.length >= 140 && paymentReference.length <= 170 
-                      ? "text-green-600 font-medium" 
-                      : "text-amber-500"
+                      ? "text-green-600 font-semibold" 
+                      : "text-amber-500 font-medium"
                   }>
                     {paymentReference.length}/170 herufi
                     {paymentReference.length >= 140 && paymentReference.length <= 170 && " ✓"}
@@ -533,15 +533,15 @@ const USSDPaymentPage: React.FC = () => {
             </div>
             
             {verificationError && (
-              <Alert variant="destructive" className="mb-4">
-                <XCircle className="h-4 w-4 mr-2" />
-                <AlertDescription>{verificationError}</AlertDescription>
+              <Alert variant="destructive" className="mb-5 p-4 border-2">
+                <XCircle className="h-5 w-5 mr-2" />
+                <AlertDescription className="text-base font-medium">{verificationError}</AlertDescription>
               </Alert>
             )}
             
             <Button 
               onClick={handleVerifyPayment} 
-              className="w-full bg-primary hover:bg-primary/90 py-2 text-sm sm:text-base"
+              className="w-full bg-primary hover:bg-primary/90 py-6 text-lg font-semibold rounded-md"
               disabled={isVerifying || 
                 // Always verify SMS for any request ID - disabled bypass completely
                 (paymentReference.length < 140 || paymentReference.length > 170) || 
