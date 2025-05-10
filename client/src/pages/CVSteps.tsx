@@ -201,16 +201,29 @@ const CVSteps: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            {/* CV Example with floating controls */}
+            {/* CV Preview Box */}
             <div className="relative z-10 mt-8">
-              {/* CV Image (placeholder - will be replaced by the actual CV in production) */}
-              <div className="relative bg-white p-4 rounded-lg border border-blue-200 shadow-lg">
-                <img 
-                  src="/assets/nelly-cv-template.png" 
-                  alt="Professional CV Template" 
-                  className="w-full h-auto rounded shadow-sm border border-gray-100"
-                  style={{ maxHeight: '380px' }}
-                />
+              {/* Simple box with before/after */}
+              <div className="relative bg-white rounded-xl border border-blue-100 shadow-lg p-4 flex flex-col items-center justify-center" style={{ width: '320px', height: '160px' }}>
+                <div className="w-full flex justify-between mb-2">
+                  <span className="text-red-500 font-medium">Before</span>
+                  <span className="text-green-500 font-medium">After</span>
+                </div>
+                
+                <div className="flex items-center justify-center w-full h-full">
+                  <div className="text-gray-400 flex items-center">
+                    <div className="w-8 h-8 mr-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <line x1="10" y1="9" x2="8" y2="9"></line>
+                      </svg>
+                    </div>
+                    <div>Professional CV Template</div>
+                  </div>
+                </div>
               </div>
               
               {/* Controls overlay */}
@@ -236,10 +249,6 @@ const CVSteps: React.FC = () => {
                 </div>
               </div>
             </div>
-            
-            {/* Before/After labels */}
-            <div className="absolute top-8 left-4 text-xs font-semibold text-red-500 z-20">Before</div>
-            <div className="absolute top-8 right-4 text-xs font-semibold text-green-500 z-20">After</div>
             
             {/* Floating decorative elements */}
             <motion.div 
