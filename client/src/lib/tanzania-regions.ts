@@ -1,5 +1,5 @@
 // Tanzania regions for autocomplete
-export const tanzanianRegionsOptions = [
+export const tanzaniaRegions = [
   { value: 'arusha', label: 'Arusha, Tanzania' },
   { value: 'dar-es-salaam', label: 'Dar es Salaam, Tanzania' },
   { value: 'dodoma', label: 'Dodoma, Tanzania' },
@@ -31,5 +31,5 @@ export const tanzanianRegionsOptions = [
   { value: 'unguja-north', label: 'Unguja North, Tanzania' },
   { value: 'unguja-south', label: 'Unguja South, Tanzania' },
   { value: 'zanzibar-urban', label: 'Zanzibar Urban, Tanzania' },
-  { value: 'zanzibar-west', label: 'Zanzibar West, Tanzania' },
+  { value: 'zanzibar-west', label: 'Zanzibar West, Tanzania' }
 ];

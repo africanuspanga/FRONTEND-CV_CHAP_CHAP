@@ -7,6 +7,8 @@ import { ChevronLeft, User, Mail, Phone, MapPin, Briefcase } from 'lucide-react'
 import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import MobilePreviewNote from '@/components/MobilePreviewNote';
+import AutocompleteInput from '@/components/AutocompleteInput';
+import { tanzanianRegionsOptions } from '@/lib/location-data';
 import '../styles/mobile-form.css';
 
 const PersonalInfoForm = () => {
