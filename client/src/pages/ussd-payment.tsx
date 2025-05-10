@@ -431,50 +431,50 @@ const USSDPaymentPage: React.FC = () => {
 
         {/* Payment completed - show download button */}
         {isPaymentVerified ? (
-          <div className="mb-3 sm:mb-4 text-center">
-            <div className="bg-green-50 border border-green-100 rounded-lg p-3 mb-3 sm:mb-4">
-              <div className="flex items-center justify-center mb-1 sm:mb-2 text-green-600">
-                <CheckCircle2 className="h-5 w-5 mr-1 sm:mr-2" />
-                <span className="font-medium text-sm sm:text-base">Malipo Yamethibitishwa</span>
+          <div className="mb-4 sm:mb-5 text-center">
+            <div className="bg-green-50 border-2 border-green-200 rounded-lg p-5 mb-4 sm:mb-5 shadow-sm">
+              <div className="flex items-center justify-center mb-2 sm:mb-3 text-green-600">
+                <CheckCircle2 className="h-8 w-8 mr-2 sm:mr-3" />
+                <span className="font-bold text-lg sm:text-xl">Malipo Yamethibitishwa!</span>
               </div>
-              <p className="text-xs sm:text-sm text-green-700">CV yako imetengenezwa kwa mafanikio!</p>
+              <p className="text-base text-green-700 font-medium">CV yako imetengenezwa kwa mafanikio!</p>
             </div>
             <Button
               onClick={handleDownload}
-              className="bg-primary hover:bg-primary/90 mx-auto flex items-center gap-1 py-2 text-sm sm:text-base w-full"
+              className="bg-primary hover:bg-primary/90 mx-auto flex items-center justify-center gap-2 py-6 text-lg font-semibold rounded-md w-full"
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-1" />
-                  Inapakua...
+                  <div className="h-5 w-5 border-2 border-white/50 border-t-white rounded-full animate-spin mr-2"></div>
+                  <span className="text-lg">Inapakua...</span>
                 </>
               ) : (
                 <>
-                  <Download className="h-4 w-4" />
-                  Pakua CV Yako
+                  <Download className="h-6 w-6" />
+                  <span className="text-lg">Pakua CV Yako</span>
                 </>
               )}
             </Button>
           </div>
         ) : isPending ? (
-          <div className="mb-3 text-center">
-            <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 mb-3">
-              <div className="flex items-center justify-center mb-1 sm:mb-2 text-amber-600">
-                <Loader2 className="h-5 w-5 mr-1 animate-spin" />
-                <span className="font-medium text-sm sm:text-base">
+          <div className="mb-4 text-center">
+            <div className="bg-amber-50 border-2 border-amber-200 rounded-lg p-4 mb-4 shadow-sm">
+              <div className="flex items-center justify-center mb-2 sm:mb-3 text-amber-600">
+                <Loader2 className="h-7 w-7 mr-2 animate-spin" />
+                <span className="font-bold text-base sm:text-lg">
                   {paymentStatus?.status === 'verifying_payment' 
                     ? 'Inahakiki malipo yako...' 
                     : 'Inatengeneza CV yako...'}
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-amber-700 mb-3">Hii inachukua chini ya dakika moja. Tafadhali subiri.</p>
+              <p className="text-sm sm:text-base text-amber-700 mb-4 font-medium">Hii inachukua chini ya dakika moja. Tafadhali subiri.</p>
               <Button
                 onClick={() => window.location.reload()}
                 variant="outline"
-                className="mx-auto flex items-center gap-1 text-xs"
+                className="mx-auto flex items-center gap-2 text-sm py-3 px-4 border-2"
               >
-                <RefreshCw className="h-3 w-3" />
+                <RefreshCw className="h-4 w-4" />
                 Onyesha Hali Mpya
               </Button>
             </div>
@@ -550,10 +550,10 @@ const USSDPaymentPage: React.FC = () => {
             >
               {isVerifying ? (
                 <>
-                  <div className="h-4 w-4 border-2 border-white/50 border-t-white rounded-full animate-spin mr-2"></div>
-                  Inahakiki Malipo...
+                  <div className="h-5 w-5 border-2 border-white/50 border-t-white rounded-full animate-spin mr-3"></div>
+                  <span className="text-lg">Inahakiki Malipo...</span>
                 </>
-              ) : 'Hakiki Malipo'}
+              ) : <span className="text-lg font-medium flex items-center"><CheckCircle2 className="h-5 w-5 mr-2" /> Hakiki Malipo</span>}
             </Button>
           </>
         )}
