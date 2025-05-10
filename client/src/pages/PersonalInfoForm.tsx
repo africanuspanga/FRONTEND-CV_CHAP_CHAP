@@ -158,9 +158,7 @@ const PersonalInfoForm = () => {
             </div>
             <div className="form-field-group">
               <Label htmlFor="professionalTitle">Professional Title</Label>
-              <IconInput
-                icon={Briefcase}
-                id="professionalTitle"
+              <ProfessionalTitleInput
                 value={formData.personalInfo.professionalTitle || ''}
                 onChange={(value) => updateFormField('personalInfo', {
                   ...formData.personalInfo,
