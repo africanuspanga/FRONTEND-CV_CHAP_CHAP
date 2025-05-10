@@ -7,6 +7,7 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import MobilePreviewNote from '@/components/MobilePreviewNote';
 import LocationInput from '@/components/LocationInput';
+import JobTitleInput from '@/components/JobTitleInput';
 import IconInput from '@/components/IconInput';
 import '../styles/mobile-form.css';
 
@@ -157,15 +158,13 @@ const PersonalInfoForm = () => {
             </div>
             <div className="form-field-group">
               <Label htmlFor="professionalTitle">Professional Title</Label>
-              <IconInput
-                icon={Briefcase}
-                id="professionalTitle"
+              <JobTitleInput
                 value={formData.personalInfo.professionalTitle || ''}
                 onChange={(value) => updateFormField('personalInfo', {
                   ...formData.personalInfo,
                   professionalTitle: value
                 })}
-                placeholder="Software Engineer"
+                placeholder="Start typing your job title..."
                 className="w-full"
               />
             </div>
