@@ -199,27 +199,18 @@ const CVSteps: React.FC = () => {
         <div className="md:w-1/2 flex justify-center">
           <div className="relative flex flex-col items-center">
             {/* Woman with coffee image */}
-            <div className="relative mt-8 mb-6">
+            <div className="relative mt-8">
               <div className="relative rounded-xl border border-gray-100 shadow-md overflow-hidden">
                 <img 
                   src={womanWithCoffeeImage} 
                   alt="Professional woman with coffee" 
-                  className="w-[320px] h-auto object-contain"
+                  className="w-[420px] h-auto object-contain"
                 />
               </div>
             </div>
             
-            {/* CV Steps graphic */}
-            <div className="relative rounded-xl overflow-hidden mt-4">
-              <img 
-                src={cvStepsGraphicImage} 
-                alt="CV steps process" 
-                className="w-[380px] h-auto object-contain"
-              />
-            </div>
-            
             {/* Controls overlay - bottom bar */}
-            <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-md py-1.5 px-3 flex items-center space-x-2 z-20">
+            <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-md py-1.5 px-3 flex items-center space-x-2 z-20">
               <motion.div 
                 animate={{ scale: [1, 1.1, 1] }} 
                 transition={{ repeat: Infinity, duration: 2.5 }}
