@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { Phone, Mail, Clock, MapPin } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
+import flagImage from '@assets/flag-round-250.png';
 
 const Contact: React.FC = () => {
   return (
@@ -24,7 +25,7 @@ const Contact: React.FC = () => {
             <div className="mb-6 flex flex-col items-center">
               <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border border-gray-200">
                 <img 
-                  src="/images/flag-round-250.png" 
+                  src={flagImage} 
                   alt="Tanzania Flag" 
                   className="w-full h-full object-cover"
                 />
