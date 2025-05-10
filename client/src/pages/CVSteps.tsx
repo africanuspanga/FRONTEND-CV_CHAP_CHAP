@@ -32,13 +32,13 @@ const CVSteps: React.FC = () => {
     <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col md:flex-row items-center md:items-start justify-between">
       <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8">
         <h1 className="text-3xl md:text-5xl font-bold mb-4">
-          <span className="text-primary">Just three</span> <br />
-          <span className="text-blue-600">easy</span> <span className="text-primary">steps</span>
+          <span className="text-blue-800">Just three</span> <br />
+          <span className="text-primary">easy</span> <span className="text-blue-800">steps</span>
         </h1>
         
         <div className="mt-12 space-y-8">
           <div className="flex items-start">
-            <div className="w-10 h-10 flex-shrink-0 rounded-full bg-amber-200 flex items-center justify-center text-amber-800 font-bold mr-4">
+            <div className="w-10 h-10 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4">
               1
             </div>
             <div>
@@ -48,7 +48,7 @@ const CVSteps: React.FC = () => {
           </div>
           
           <div className="flex items-start">
-            <div className="w-10 h-10 flex-shrink-0 rounded-full bg-amber-200 flex items-center justify-center text-amber-800 font-bold mr-4">
+            <div className="w-10 h-10 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4">
               2
             </div>
             <div>
@@ -58,7 +58,7 @@ const CVSteps: React.FC = () => {
           </div>
           
           <div className="flex items-start">
-            <div className="w-10 h-10 flex-shrink-0 rounded-full bg-amber-200 flex items-center justify-center text-amber-800 font-bold mr-4">
+            <div className="w-10 h-10 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4">
               3
             </div>
             <div>
@@ -70,7 +70,7 @@ const CVSteps: React.FC = () => {
         
         <Button 
           onClick={handleNextClick}
-          className="w-full md:w-auto mt-8 bg-blue-600 hover:bg-blue-700 text-white py-3 px-8 rounded-full text-lg"
+          className="w-full md:w-auto mt-8 bg-primary hover:bg-blue-900 text-white py-3 px-8 rounded-full text-lg"
         >
           Next
         </Button>

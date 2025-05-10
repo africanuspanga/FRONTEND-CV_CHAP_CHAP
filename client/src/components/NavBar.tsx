@@ -40,8 +40,8 @@ const NavBar: React.FC = () => {
       localStorage.removeItem('cv-form-data');
       localStorage.removeItem('cv-form-step');
       
-      // Navigate to the home page or creation method page
-      navigate('/create/method');
+      // Navigate to the CV steps page
+      navigate('/cv-steps');
     }
   };
 
