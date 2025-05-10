@@ -16,13 +16,14 @@ import { Autocomplete } from '@/components/ui/autocomplete';
 import { tanzanianRegionsOptions } from '@/lib/location-data';
 import { commonJobTitles } from '@/lib/job-titles-data';
 
-// Extend the schema with client-side validation and additional fields
+// Extend the schema with additional client-side validation and fields
+// Note: These additional fields aren't in the base personalInfoSchema 
+// but are used in the form for UI convenience
 const formSchema = personalInfoSchema.extend({
-  // These fields are not in the base schema but used in this form
+  // Additional UI-specific fields
   location: z.string().optional(),
-  website: z.string().url().optional(),
-  linkedin: z.string().url().optional(),
-  profilePicture: z.string().optional(),
+  website: z.string().url().optional().or(z.string()),
+  linkedin: z.string().url().optional().or(z.string()),
 });
 
 // Use the extended FormValues type
@@ -34,6 +35,7 @@ const PersonalInfoStep: React.FC = () => {
   
   // Get default values from context
   const defaultValues: FormValues = {
+    // Base fields from personalInfoSchema
     firstName: formData.personalInfo.firstName || '',
     lastName: formData.personalInfo.lastName || '',
     email: formData.personalInfo.email || '',
@@ -45,6 +47,11 @@ const PersonalInfoStep: React.FC = () => {
     country: formData.personalInfo.country || '',
     postalCode: formData.personalInfo.postalCode || '',
     summary: formData.personalInfo.summary || '',
+    
+    // Additional UI fields that we added to the extended schema
+    location: formData.personalInfo.address || '', // Use address as the location value
+    website: '', // Not stored in personalInfo
+    linkedin: '', // Not stored in personalInfo
   };
 
   // Initialize form
@@ -66,10 +73,21 @@ const PersonalInfoStep: React.FC = () => {
     form.setValue(field, value);
     
     // Update the global state for preview
-    const updatedPersonalInfo = { 
-      ...formData.personalInfo, 
-      [field]: value 
-    };
+    // Map special fields to their corresponding fields in personalInfo
+    const updatedPersonalInfo = { ...formData.personalInfo };
+    
+    if (field === 'location') {
+      // For location field, we'll update the address field
+      updatedPersonalInfo.address = value;
+    } else if (field === 'website' || field === 'linkedin') {
+      // These fields are UI-only and not in the base schema
+      // We could store them in a separate object if needed
+      console.log(`Setting ${field} to ${value} (UI field only)`);
+    } else {
+      // For standard fields that match the schema, update directly
+      updatedPersonalInfo[field as keyof typeof updatedPersonalInfo] = value;
+    }
+    
     updateFormField('personalInfo', updatedPersonalInfo);
   };
 
@@ -80,17 +98,15 @@ const PersonalInfoStep: React.FC = () => {
         <div className="form-field-group space-y-4">
           <div className="profile-photo-section flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-5 sm:mb-6 mt-2 sm:mt-0">
             <Avatar className="h-16 w-16 sm:h-18 sm:w-18 touch-area-avatar">
-              <AvatarImage src={formData.personalInfo.profilePicture || ''} alt="Profile" />
               <AvatarFallback className="bg-primary text-white">
                 {getInitials(formData.personalInfo.firstName, formData.personalInfo.lastName)}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-medium text-base sm:text-sm">Profile Photo</h3>
+              <h3 className="font-medium text-base sm:text-sm">Profile Preview</h3>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Upload a professional photo (optional)
+                Your initials will be shown if no photo is available
               </p>
-              {/* Photo upload functionality would go here */}
             </div>
           </div>
 
