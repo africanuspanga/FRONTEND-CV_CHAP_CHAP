@@ -1,15 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { FileText, ChevronRight, CheckCircle2, Edit3, Sparkles } from 'lucide-react';
+import { Link } from 'wouter';
+import { motion } from 'framer-motion';
+import ReactConfetti from 'react-confetti';
 import { useCVData } from '@/hooks/useCVData';
-import { FileText, Upload } from 'lucide-react';
 
 const CVSteps: React.FC = () => {
   const [, navigate] = useLocation();
+  const [isMobile, setIsMobile] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState({ width: 0, height: 0 });
+  const [showConfetti, setShowConfetti] = useState(false);
   const { resetCVData } = useCVData();
+  
+  // Check if device is mobile and set window dimensions
+  useEffect(() => {
+    const checkMobileAndDimensions = () => {
+      setIsMobile(window.innerWidth <= 768);
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+    
+    // Initial check
+    checkMobileAndDimensions();
+    
+    // Add listener for window resize
+    window.addEventListener('resize', checkMobileAndDimensions);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobileAndDimensions);
+  }, []);
 
-  const handleCreateNew = () => {
+  const handleNextClick = () => {
     // Reset all form data before starting a new CV
     resetCVData();
     
@@ -17,75 +42,251 @@ const CVSteps: React.FC = () => {
     localStorage.removeItem('cv-form-data');
     localStorage.removeItem('cv-form-step');
     
-    // Direct users to template selection first
-    navigate('/templates');
+    // Show confetti
+    setShowConfetti(true);
+    
+    // Hide confetti after 2.5 seconds and navigate
+    setTimeout(() => {
+      setShowConfetti(false);
+      navigate('/templates');
+    }, 2500);
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl">
-      <div className="text-center mb-12">
-        <h1 className="text-3xl font-bold text-darkText mb-4">How would you like to create your CV?</h1>
-        <p className="text-lightText">Choose an option to get started with your professional CV</p>
+    <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col md:flex-row items-center md:items-start justify-between relative">
+      {showConfetti && (
+        <ReactConfetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+          recycle={false}
+          numberOfPieces={isMobile ? 100 : 200}
+          colors={['#034694', '#4D6FFF', '#E5EAFF', '#90CAF9', '#FFC107']}
+        />
+      )}
+      
+      <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8">
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-3xl md:text-5xl font-bold mb-4 text-center md:text-left"
+        >
+          <span className="text-blue-800">Just three</span> {!isMobile && <br />}
+          <span className="text-primary">easy</span> <span className="text-blue-800">steps</span>
+        </motion.h1>
+        
+        <div className="mt-8 md:mt-12 space-y-6 md:space-y-8">
+          {isMobile ? (
+            // Mobile view with enhanced styling
+            <>
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="bg-blue-50 rounded-xl p-4 shadow-sm relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full -mr-10 -mt-10 z-0"></div>
+                <div className="flex items-center relative z-10">
+                  <motion.div 
+                    whileHover={{ scale: 1.05 }}
+                    className="w-12 h-12 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4 shadow-md border border-blue-200"
+                  >
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                  </motion.div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-primary mb-1">Select</h3>
+                    <p className="text-gray-700">a template from our library of professional designs</p>
+                  </div>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="bg-blue-50 rounded-xl p-4 shadow-sm relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full -mr-10 -mt-10 z-0"></div>
+                <div className="flex items-center relative z-10">
+                  <motion.div 
+                    whileHover={{ scale: 1.05 }}
+                    className="w-12 h-12 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4 shadow-md border border-blue-200"
+                  >
+                    <Edit3 className="h-5 w-5 text-primary" />
+                  </motion.div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-primary mb-1">Build</h3>
+                    <p className="text-gray-700">your CV with our industry-specific bullet points</p>
+                  </div>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+                className="bg-blue-50 rounded-xl p-4 shadow-sm relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full -mr-10 -mt-10 z-0"></div>
+                <div className="flex items-center relative z-10">
+                  <motion.div 
+                    whileHover={{ scale: 1.05 }}
+                    className="w-12 h-12 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4 shadow-md border border-blue-200"
+                  >
+                    <Sparkles className="h-5 w-5 text-primary" />
+                  </motion.div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-primary mb-1">Customize</h3>
+                    <p className="text-gray-700">the details and wrap it up. You're ready to send!</p>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          ) : (
+            // Desktop view
+            <>
+              <motion.div className="flex items-center">
+                <div className="w-12 h-12 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4 shadow-md border border-blue-200">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-primary mb-1">Select</h3>
+                  <p className="text-gray-700">a template from our library of professional designs</p>
+                </div>
+              </motion.div>
+              
+              <motion.div className="flex items-center">
+                <div className="w-12 h-12 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4 shadow-md border border-blue-200">
+                  <Edit3 className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-primary mb-1">Build</h3>
+                  <p className="text-gray-700">your CV with our industry-specific bullet points</p>
+                </div>
+              </motion.div>
+              
+              <motion.div className="flex items-center">
+                <div className="w-12 h-12 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4 shadow-md border border-blue-200">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-primary mb-1">Customize</h3>
+                  <p className="text-gray-700">the details and wrap it up. You're ready to send!</p>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="mt-8"
+        >
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Button 
+              onClick={handleNextClick}
+              className="w-full md:w-auto bg-primary hover:bg-blue-900 text-white py-3 px-8 rounded-full text-lg shadow-md"
+            >
+              Next
+            </Button>
+          </motion.div>
+          
+          <p className="text-sm text-blue-800 font-medium mt-4 text-center md:text-left">
+            You're just 3 steps away from a world-class CV that will help you land the job of your dreams!
+          </p>
+        </motion.div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card className="shadow-md hover:shadow-lg transition-shadow">
-          <CardContent className="p-8 flex flex-col items-center text-center">
-            <div className="w-24 h-24 bg-secondary rounded-full flex items-center justify-center mb-6">
-              <FileText className="h-12 w-12 text-primary" />
-            </div>
-            <h2 className="text-2xl font-bold text-darkText mb-4">Create a New CV</h2>
-            <p className="text-lightText mb-8">
-              Start from scratch with our step-by-step guided process to create a professional CV.
-            </p>
-            <Button 
-              size="lg" 
-              className="w-full py-6" 
-              onClick={handleCreateNew}
-            >
-              Create New CV
-            </Button>
-          </CardContent>
-        </Card>
-        
-        <Card className="shadow-md hover:shadow-lg transition-shadow">
-          <CardContent className="p-8 flex flex-col items-center text-center">
-            <div className="w-24 h-24 bg-secondary rounded-full flex items-center justify-center mb-6">
-              <Upload className="h-12 w-12 text-primary opacity-60" />
-            </div>
-            <h2 className="text-2xl font-bold text-darkText mb-4">Upload Existing CV</h2>
-            <p className="text-lightText mb-8">
-              Upload your current CV and we'll extract the information to enhance it.
-            </p>
-            <div className="relative">
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="w-full py-6 opacity-70 cursor-not-allowed"
-                disabled={true}
-              >
-                Upload CV
-              </Button>
-              <div className="absolute top-full left-0 w-full text-center mt-2">
-                <span className="text-xs text-orange-600 font-medium">Coming soon</span>
+      {!isMobile && (
+        <div className="md:w-1/2 flex justify-center">
+          <div className="relative">
+            {/* CV skeleton layout */}
+            <div className="relative mt-8">
+              {/* Main white container */}
+              <div className="relative w-[320px] bg-white rounded-xl border border-gray-100 shadow-md p-4 flex flex-col space-y-4">
+                {/* CV Sections - Skeleton UI */}
+                <div className="w-28 h-7 rounded-md bg-blue-600"></div>
+                <div className="w-full h-5 rounded-md bg-gray-200"></div>
+                <div className="w-4/5 h-5 rounded-md bg-gray-200"></div>
+                
+                <div className="w-28 h-7 rounded-md bg-blue-600"></div>
+                <div className="w-full h-5 rounded-md bg-gray-200"></div>
+                <div className="w-3/4 h-5 rounded-md bg-gray-200"></div>
+                <div className="w-5/6 h-5 rounded-md bg-gray-200"></div>
+                
+                <div className="w-28 h-7 rounded-md bg-blue-600"></div>
+                <div className="w-full h-5 rounded-md bg-gray-200"></div>
+                <div className="w-4/5 h-5 rounded-md bg-gray-200"></div>
+                <div className="w-11/12 h-5 rounded-md bg-gray-200"></div>
+              </div>
+              
+              {/* Controls overlay - bottom bar */}
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-md py-1.5 px-3 flex items-center space-x-2 z-20">
+                <motion.div 
+                  animate={{ scale: [1, 1.1, 1] }} 
+                  transition={{ repeat: Infinity, duration: 2.5 }}
+                  className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white"
+                >
+                  <ChevronRight size={15} />
+                </motion.div>
+                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <FileText size={12} />
+                </div>
+                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                </div>
+                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <span className="text-xs">👍</span>
+                </div>
+                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <span className="text-xs">🖼️</span>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <div className="mt-12 text-center">
-        <p className="text-sm text-lightText mb-2">
-          Already have a template in mind?
-        </p>
-        <Button 
-          variant="link" 
-          className="text-primary"
-          onClick={() => navigate('/templates')}
-        >
-          Browse all CV templates
-        </Button>
-      </div>
+            
+            {/* Floating elements */}
+            <motion.div 
+              animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+              className="absolute -top-12 -right-10 text-5xl"
+            >
+              🚀
+            </motion.div>
+            
+            <motion.div 
+              animate={{ y: [0, 8, 0], rotate: [0, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", delay: 0.5 }}
+              className="absolute -bottom-8 -left-12 text-4xl"
+            >
+              💼
+            </motion.div>
+            
+            <motion.div 
+              animate={{ y: [0, 5, 0], scale: [1, 1.05, 1] }}
+              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 1 }}
+              className="absolute top-1/3 -right-8 text-3xl"
+            >
+              📝
+            </motion.div>
+            
+            <motion.div 
+              animate={{ y: [0, -7, 0], opacity: [0.8, 1, 0.8] }}
+              transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut", delay: 1.5 }}
+              className="absolute bottom-1/3 -left-14 text-4xl"
+            >
+              💫
+            </motion.div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
