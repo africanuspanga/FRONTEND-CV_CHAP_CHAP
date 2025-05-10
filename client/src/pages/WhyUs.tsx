@@ -7,17 +7,17 @@ const WhyUs: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Why CV Chap Chap is Your Ultimate Partner for Career Success | CV Chap Chap</title>
+        <title>Fast CV Writing and Job Support | CV Chap Chap Africa</title>
         <meta 
           name="description" 
-          content="Discover why CV Chap Chap is the best solution for CV writing, kutengeneza CV, barua ya maombi ya kazi creation, and job application success in East Africa. Professional templates, expert guidance, and local understanding for your career journey."
+          content="Need expert CV writing or a winning application letter? CV Chap Chap offers the best CV creation, samples, formats (mfano wa cv, barua ya kuomba kazi) & job search support in 2025. Get your dream job faster!"
         />
         <meta 
           name="keywords" 
           content="cv format, cv template, mfano wa cv, jinsi ya kuandika cv, kutengeneza CV, barua ya kuomba kazi, mfano wa barua ya kuomba kazi, CV writing, job search, how to write a cv"
         />
-        <meta property="og:title" content="Why CV Chap Chap is Your Ultimate Partner for Career Success" />
-        <meta property="og:description" content="Expert CV writing services in East Africa providing professional cv templates, guides on jinsi ya kuandika cv, and barua ya maombi ya kazi that get results." />
+        <meta property="og:title" content="Fast CV Writing and Job Support | CV Chap Chap Africa" />
+        <meta property="og:description" content="Need expert CV writing or a winning application letter? CV Chap Chap offers the best CV creation, samples, formats (mfano wa cv, barua ya kuomba kazi) & job search support in 2025." />
         <meta property="og:type" content="article" />
         <link rel="canonical" href="https://cvchapchap.com/why-us" />
       </Helmet>

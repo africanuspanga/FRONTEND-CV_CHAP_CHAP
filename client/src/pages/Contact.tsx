@@ -8,11 +8,18 @@ const Contact: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Contact Us | CV Chap Chap</title>
+        <title>Contact CV Chap Chap | Expert CV & Job Application Support in Tanzania</title>
         <meta 
           name="description" 
-          content="Get in touch with CV Chap Chap for any inquiries about our CV writing and job application services. We're available Monday to Saturday, 9AM to 5PM EAT."
+          content="Need CV writing or job application help? Contact CV Chap Chap in Tanzania for professional guidance. WhatsApp, call or email us for fast service on CVs, application letters, and career advice."
         />
+        <meta 
+          name="keywords" 
+          content="CV help Tanzania, contact CV writer, professional CV services, Dar es Salaam CV services, job application help Tanzania, CV writing contact, mawasiliano CV, msaada wa CV"
+        />
+        <meta property="og:title" content="Contact CV Chap Chap | Expert CV & Job Application Support in Tanzania" />
+        <meta property="og:description" content="Need CV writing or job application help? Contact CV Chap Chap in Tanzania for professional guidance. Available via WhatsApp, phone or email." />
+        <meta property="og:type" content="website" />
         <link rel="canonical" href="https://cvchapchap.com/contact" />
       </Helmet>
 

@@ -49,41 +49,44 @@ const Home = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 bg-neutral rounded-lg my-16">
+      <section className="py-16 bg-gradient-to-br from-blue-50 to-neutral rounded-xl my-16 shadow-md">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-darkText mb-4">How It Works</h2>
-          <p className="text-lightText max-w-2xl mx-auto">Create your professional CV in three simple steps</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">How It Works</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg">Create your professional CV in three simple steps</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <Card className="bg-white border-none shadow-md">
-            <CardContent className="pt-6">
-              <div className="rounded-full bg-primary w-12 h-12 flex items-center justify-center text-white font-bold text-xl mb-4 mx-auto">1</div>
-              <h3 className="text-xl font-semibold text-center mb-2">Select Template</h3>
-              <p className="text-center text-lightText">Choose from our professional CV templates designed to impress employers.</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto px-4">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:translate-y-[-8px] hover:shadow-xl border border-blue-100">
+            <div className="p-6">
+              <div className="w-16 h-16 rounded-full bg-blue-800 flex items-center justify-center text-white font-bold text-2xl mb-6 mx-auto shadow-md">1</div>
+              <h3 className="text-xl font-semibold text-center mb-3 text-blue-800">Select Template</h3>
+              <p className="text-center text-gray-600">Choose from our professional CV templates designed to impress employers.</p>
+            </div>
+            <div className="bg-blue-50 h-2"></div>
+          </div>
           
-          <Card className="bg-white border-none shadow-md">
-            <CardContent className="pt-6">
-              <div className="rounded-full bg-primary w-12 h-12 flex items-center justify-center text-white font-bold text-xl mb-4 mx-auto">2</div>
-              <h3 className="text-xl font-semibold text-center mb-2">Fill Details</h3>
-              <p className="text-center text-lightText">Enter your information using our guided step-by-step form process.</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:translate-y-[-8px] hover:shadow-xl border border-blue-100">
+            <div className="p-6">
+              <div className="w-16 h-16 rounded-full bg-blue-800 flex items-center justify-center text-white font-bold text-2xl mb-6 mx-auto shadow-md">2</div>
+              <h3 className="text-xl font-semibold text-center mb-3 text-blue-800">Fill Details</h3>
+              <p className="text-center text-gray-600">Enter your information using our guided step-by-step form process.</p>
+            </div>
+            <div className="bg-blue-50 h-2"></div>
+          </div>
           
-          <Card className="bg-white border-none shadow-md">
-            <CardContent className="pt-6">
-              <div className="rounded-full bg-primary w-12 h-12 flex items-center justify-center text-white font-bold text-xl mb-4 mx-auto">3</div>
-              <h3 className="text-xl font-semibold text-center mb-2">Download CV</h3>
-              <p className="text-center text-lightText">Get your professionally formatted CV ready to send to employers.</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:translate-y-[-8px] hover:shadow-xl border border-blue-100">
+            <div className="p-6">
+              <div className="w-16 h-16 rounded-full bg-blue-800 flex items-center justify-center text-white font-bold text-2xl mb-6 mx-auto shadow-md">3</div>
+              <h3 className="text-xl font-semibold text-center mb-3 text-blue-800">Download CV</h3>
+              <p className="text-center text-gray-600">Get your professionally formatted CV ready to send to employers.</p>
+            </div>
+            <div className="bg-blue-50 h-2"></div>
+          </div>
         </div>
         
         <div className="text-center mt-12">
-          <Button asChild size="lg">
-            <Link href="/create/method">Get Started</Link>
+          <Button asChild size="lg" className="bg-blue-800 hover:bg-blue-700 text-white px-10 py-6 text-lg shadow-lg">
+            <Link href="/create/method">Create My CV</Link>
           </Button>
         </div>
       </section>
