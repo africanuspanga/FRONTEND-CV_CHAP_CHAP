@@ -27,7 +27,7 @@ const Home = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg" className="px-8">
-                <Link href="/create/method">Build New CV</Link>
+                <Link href="/cv-steps">Build New CV</Link>
               </Button>
               <Button asChild variant="outline" size="lg">
                 <Link href="/templates">Browse Templates</Link>

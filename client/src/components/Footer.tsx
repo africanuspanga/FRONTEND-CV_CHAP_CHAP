@@ -32,7 +32,7 @@ const Footer: React.FC = () => {
                 <Link href="/templates" className="text-lightText hover:text-primary">Templates</Link>
               </li>
               <li>
-                <Link href="/create/method" className="text-lightText hover:text-primary">Create CV</Link>
+                <Link href="/cv-steps" className="text-lightText hover:text-primary">Create CV</Link>
               </li>
               <li>
                 <Link href="/about" className="text-lightText hover:text-primary">About Us</Link>
