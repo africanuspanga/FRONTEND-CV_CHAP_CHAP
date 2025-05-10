@@ -196,59 +196,54 @@ const CVSteps: React.FC = () => {
       {!isMobile && (
         <div className="md:w-1/2 flex justify-center">
           <div className="relative">
-            {/* Exact mock of the screenshot - super simple version */}
+            {/* CV skeleton layout */}
             <div className="relative mt-8">
               {/* Main white container */}
-              <div className="relative w-[600px] h-[400px] bg-white rounded-3xl border border-gray-100 shadow-sm p-10 flex flex-col items-center">
-                {/* Before/After Labels */}
-                <div className="w-full flex justify-between mb-16">
-                  <div className="text-3xl font-medium text-red-400">Before</div>
-                  <div className="text-3xl font-medium text-green-500">After</div>
-                </div>
+              <div className="relative w-[400px] bg-white rounded-xl border border-gray-100 shadow-md p-6 flex flex-col space-y-6">
+                {/* CV Sections - Skeleton UI */}
+                <div className="w-32 h-8 rounded-md bg-blue-600"></div>
+                <div className="w-full h-6 rounded-md bg-gray-200"></div>
+                <div className="w-4/5 h-6 rounded-md bg-gray-200"></div>
                 
-                {/* Document Icon */}
-                <div className="mb-6">
-                  <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M45 22.5H37.5V15" stroke="#BBBBBB" strokeWidth="2"/>
-                    <path d="M37.5 15L15 15C13.6193 15 12.5 16.1193 12.5 17.5V42.5C12.5 43.8807 13.6193 45 15 45H45C46.3807 45 47.5 43.8807 47.5 42.5V25C47.5 19.4772 42.0228 15 37.5 15Z" stroke="#BBBBBB" strokeWidth="2"/>
+                <div className="w-32 h-8 rounded-md bg-blue-600"></div>
+                <div className="w-full h-6 rounded-md bg-gray-200"></div>
+                <div className="w-3/4 h-6 rounded-md bg-gray-200"></div>
+                <div className="w-5/6 h-6 rounded-md bg-gray-200"></div>
+                
+                <div className="w-40 h-8 rounded-md bg-blue-600"></div>
+                <div className="w-full h-6 rounded-md bg-gray-200"></div>
+                <div className="w-4/5 h-6 rounded-md bg-gray-200"></div>
+                <div className="w-11/12 h-6 rounded-md bg-gray-200"></div>
+                
+                <div className="w-28 h-8 rounded-md bg-blue-600"></div>
+                <div className="w-3/4 h-6 rounded-md bg-gray-200"></div>
+              </div>
+              
+              {/* Controls overlay - bottom bar */}
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-md py-2 px-4 flex items-center space-x-3 z-20">
+                <motion.div 
+                  animate={{ scale: [1, 1.1, 1] }} 
+                  transition={{ repeat: Infinity, duration: 2.5 }}
+                  className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white"
+                >
+                  <ChevronRight size={18} />
+                </motion.div>
+                <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <FileText size={14} />
+                </div>
+                <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                   </svg>
                 </div>
-                
-                {/* Text */}
-                <div className="text-2xl text-gray-500 font-normal">Professional CV Template</div>
-                
-                {/* Controls Bar */}
-                <div className="absolute -bottom-12 bg-white rounded-full shadow-md py-4 px-6 flex items-center space-x-4">
-                  <div className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-white">
-                    <ChevronRight size={24} />
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                    <FileText size={20} />
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                    </svg>
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                    <span className="text-xl">👍</span>
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                    <span className="text-xl">🖼️</span>
-                  </div>
+                <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <span className="text-sm">👍</span>
+                </div>
+                <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <span className="text-sm">🖼️</span>
                 </div>
               </div>
-            </div>
-            
-            {/* Briefcase on the left */}
-            <div className="absolute -left-12 bottom-48 text-5xl">
-              💼
-            </div>
-            
-            {/* Rocket on the right */}
-            <div className="absolute -right-8 -top-2 text-5xl">
-              🚀
             </div>
           </div>
         </div>
