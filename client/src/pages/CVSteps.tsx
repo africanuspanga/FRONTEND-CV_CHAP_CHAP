@@ -5,7 +5,8 @@ import { FileText, ChevronRight, CheckCircle2, Edit3, Sparkles } from 'lucide-re
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
 import ReactConfetti from 'react-confetti';
-import cvSkeletonImage from '../assets/cv-steps/cv-skeleton.png';
+import womanWithCoffeeImage from '../assets/cv-steps/woman-with-coffee.png';
+import cvStepsGraphicImage from '../assets/cv-steps/cv-steps-graphic.png';
 
 const CVSteps: React.FC = () => {
   const [, navigate] = useLocation();
@@ -196,42 +197,50 @@ const CVSteps: React.FC = () => {
       
       {!isMobile && (
         <div className="md:w-1/2 flex justify-center">
-          <div className="relative">
-            {/* CV skeleton layout */}
-            <div className="relative mt-8">
-              {/* CV Skeleton Image */}
+          <div className="relative flex flex-col items-center">
+            {/* Woman with coffee image */}
+            <div className="relative mt-8 mb-6">
               <div className="relative rounded-xl border border-gray-100 shadow-md overflow-hidden">
                 <img 
-                  src={cvSkeletonImage} 
-                  alt="CV skeleton" 
+                  src={womanWithCoffeeImage} 
+                  alt="Professional woman with coffee" 
                   className="w-[320px] h-auto object-contain"
                 />
               </div>
-              
-              {/* Controls overlay - bottom bar */}
-              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-md py-1.5 px-3 flex items-center space-x-2 z-20">
-                <motion.div 
-                  animate={{ scale: [1, 1.1, 1] }} 
-                  transition={{ repeat: Infinity, duration: 2.5 }}
-                  className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white"
-                >
-                  <ChevronRight size={15} />
-                </motion.div>
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                  <FileText size={12} />
-                </div>
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                  </svg>
-                </div>
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                  <span className="text-xs">👍</span>
-                </div>
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                  <span className="text-xs">🖼️</span>
-                </div>
+            </div>
+            
+            {/* CV Steps graphic */}
+            <div className="relative rounded-xl overflow-hidden mt-4">
+              <img 
+                src={cvStepsGraphicImage} 
+                alt="CV steps process" 
+                className="w-[380px] h-auto object-contain"
+              />
+            </div>
+            
+            {/* Controls overlay - bottom bar */}
+            <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-md py-1.5 px-3 flex items-center space-x-2 z-20">
+              <motion.div 
+                animate={{ scale: [1, 1.1, 1] }} 
+                transition={{ repeat: Infinity, duration: 2.5 }}
+                className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white"
+              >
+                <ChevronRight size={15} />
+              </motion.div>
+              <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <FileText size={12} />
+              </div>
+              <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+              </div>
+              <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <span className="text-xs">👍</span>
+              </div>
+              <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <span className="text-xs">🖼️</span>
               </div>
             </div>
             
