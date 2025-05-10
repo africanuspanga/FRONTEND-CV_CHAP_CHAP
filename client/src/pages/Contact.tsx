@@ -24,7 +24,7 @@ const Contact: React.FC = () => {
             <div className="mb-6 flex flex-col items-center">
               <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border border-gray-200">
                 <img 
-                  src="/attached_assets/flag-round-250.png" 
+                  src="/images/flag-round-250.png" 
                   alt="Tanzania Flag" 
                   className="w-full h-full object-cover"
                 />
