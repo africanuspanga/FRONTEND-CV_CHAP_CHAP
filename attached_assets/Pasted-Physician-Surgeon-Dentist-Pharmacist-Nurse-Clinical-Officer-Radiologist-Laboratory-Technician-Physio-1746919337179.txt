@@ -1,0 +1,300 @@
+Physician
+Surgeon
+Dentist
+Pharmacist
+Nurse
+Clinical Officer
+Radiologist
+Laboratory Technician
+Physiotherapist
+Optometrist
+Nutritionist
+Midwife
+Anesthesiologist
+Psychiatrist
+Pediatrician
+Dermatologist
+Gynecologist
+Medical Laboratory Scientist
+Public Health Officer
+Health Records Officer
+Occupational Therapist
+Medical Imaging Technologist
+Biomedical Engineer
+Epidemiologist
+Medical Social Worker
+Community Health Worker
+Emergency Medical Technician (EMT)
+Medical Researcher
+Health Information Manager
+Medical Transcriptionist
+Civil Engineer
+Mechanical Engineer
+Electrical Engineer
+Chemical Engineer
+Structural Engineer
+Environmental Engineer
+Petroleum Engineer
+Mining Engineer
+Agricultural Engineer
+Water Resources Engineer
+Geotechnical Engineer
+Industrial Engineer
+Mechatronics Engineer
+Telecommunications Engineer
+Automotive Engineer
+Marine Engineer
+Aerospace Engineer
+HVAC Engineer
+Instrumentation Engineer
+Project Engineer
+Quality Assurance Engineer
+Safety Engineer
+Maintenance Engineer
+Robotics Engineer
+Renewable Energy Engineer
+Surveyor
+Quantity Surveyor
+CAD Technician
+Engineering Technician
+Technical Drawing Specialist
+Software Developer
+Web Developer
+Mobile App Developer
+Data Analyst
+Data Scientist
+Cybersecurity Specialist
+Network Administrator
+Systems Analyst
+IT Support Specialist
+Database Administrator
+Cloud Engineer
+DevOps Engineer
+AI/Machine Learning Engineer
+IT Project Manager
+UX/UI Designer
+Front-End Developer
+Back-End Developer
+Full Stack Developer
+IT Auditor
+Business Intelligence Analyst
+IT Consultant
+Blockchain Developer
+Game Developer
+IT Trainer
+SEO Specialist
+Digital Marketing Analyst
+Social Media Manager
+E-commerce Specialist
+Technical Writer
+Web Designer
+Accountant
+Auditor
+Financial Analyst
+Investment Analyst
+Tax Consultant
+Budget Analyst
+Risk Manager
+Compliance Officer
+Credit Analyst
+Loan Officer
+Financial Planner
+Actuary
+Treasury Analyst
+Payroll Specialist
+Cost Accountant
+Management Accountant
+Internal Auditor
+External Auditor
+Forensic Accountant
+Finance Manager
+Chief Financial Officer (CFO)
+Accounts Payable Clerk
+Accounts Receivable Clerk
+Bookkeeper
+Billing Specialist
+Financial Controller
+Banking Officer
+Microfinance Officer
+Insurance Underwriter
+Claims Adjuster
+Lecturer
+University Professor
+Secondary School Teacher
+Primary School Teacher
+Early Childhood Educator
+Special Education Teacher
+Curriculum Developer
+Education Administrator
+School Counselor
+Academic Advisor
+Librarian
+Instructional Designer
+Education Consultant
+Vocational Trainer
+E-learning Specialist
+Language Instructor
+Mathematics Teacher
+Science Teacher
+History Teacher
+Geography Teacher
+Physical Education Teacher
+Art Teacher
+Music Teacher
+Computer Science Teacher
+Technical Education Instructor
+Adult Education Instructor
+Research Assistant
+Teaching Assistant
+Examination Officer
+Education Policy Analyst
+Agronomist
+Agricultural Extension Officer
+Soil Scientist
+Horticulturist
+Animal Scientist
+Veterinarian
+Farm Manager
+Agricultural Economist
+Irrigation Engineer
+Fisheries Officer
+Forestry Officer
+Environmental Scientist
+Conservation Officer
+Wildlife Biologist
+Ecologist
+Environmental Health Officer
+Climate Change Analyst
+Natural Resources Manager
+Sustainable Agriculture Specialist
+Pest Control Specialist
+Agricultural Technician
+Livestock Officer
+Aquaculture Specialist
+Agroforestry Specialist
+Agricultural Researcher
+Crop Production Specialist
+Soil Conservationist
+Agricultural Inspector
+Agricultural Sales Representative
+Agricultural Policy Analyst
+Business Analyst
+Marketing Manager
+Sales Manager
+Human Resources Manager
+Operations Manager
+Project Manager
+Supply Chain Manager
+Procurement Officer
+Logistics Coordinator
+Customer Service Manager
+Business Development Manager
+Product Manager
+Brand Manager
+Public Relations Officer
+Event Planner
+Entrepreneur
+Management Consultant
+Office Administrator
+Executive Assistant
+Receptionist
+Administrative Officer
+Personal Assistant
+Chief Executive Officer (CEO)
+Chief Operating Officer (COO)
+Training and Development Manager
+Recruitment Specialist
+Compensation and Benefits Manager
+Organizational Development Specialist
+Corporate Strategy Analyst
+Franchise Manager
+Lawyer
+Judge
+Magistrate
+Legal Advisor
+Prosecutor
+Public Defender
+Legal Secretary
+Paralegal
+Court Clerk
+Compliance Manager
+Contract Manager
+Corporate Counsel
+Human Rights Officer
+Legal Researcher
+Notary Public
+Intellectual Property Lawyer
+Environmental Lawyer
+Tax Lawyer
+Immigration Lawyer
+Labor Relations Specialist
+Legal Consultant
+Policy Analyst
+Legislative Assistant
+Government Relations Officer
+Regulatory Affairs Specialist
+Journalist
+News Anchor
+Radio Presenter
+Television Producer
+Film Director
+Screenwriter
+Photographer
+Videographer
+Graphic Designer
+Animator
+Illustrator
+Art Director
+Copywriter
+Editor
+Public Relations Specialist
+Social Media Influencer
+Content Creator
+Blogger
+Podcaster
+Voice-over Artist
+Musician
+Actor
+Dancer
+Choreographer
+Fashion Designer
+Interior Designer
+Event Coordinator
+Advertising Executive
+Media Planner
+Brand Strategist
+Hotel Manager
+Front Office Manager
+Housekeeping Supervisor
+Chef
+Pastry Chef
+Restaurant Manager
+Food and Beverage Manager
+Tour Guide
+Travel Agent
+Event Manager
+Concierge
+Reservation Agent
+Cruise Ship Staff
+Bartender
+Waiter/Waitress
+Sommelier
+Spa Therapist
+Resort Manager
+Guest Relations Officer
+Hospitality Trainer
+Logistics Manager
+Supply Chain Analyst
+Transport Manager
+Fleet Manager
+Warehouse Manager
+Inventory Controller
+Freight Forwarder
+Customs Officer
+Import/Export Coordinator
+Shipping Clerk
+Delivery Driver
+Truck Driver
+Airline Pilot
+Air Traffic Controller
+Railway Operations Manager

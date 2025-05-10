@@ -14,6 +14,7 @@ import { getInitials } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Autocomplete } from '@/components/ui/autocomplete';
 import { tanzanianRegionsOptions } from '@/lib/location-data';
+import { jobTitles } from '@/lib/job-titles-data';
 
 // Extend the schema with client-side validation
 const formSchema = personalInfoSchema.extend({
@@ -32,11 +33,13 @@ const PersonalInfoStep: React.FC = () => {
     lastName: formData.personalInfo.lastName || '',
     email: formData.personalInfo.email || '',
     phone: formData.personalInfo.phone || '',
-    jobTitle: formData.personalInfo.jobTitle || '',
-    location: formData.personalInfo.location || '',
-    website: formData.personalInfo.website || '',
-    linkedin: formData.personalInfo.linkedin || '',
-    profilePicture: formData.personalInfo.profilePicture || '',
+    professionalTitle: formData.personalInfo.professionalTitle || '',
+    address: formData.personalInfo.address || '',
+    city: formData.personalInfo.city || '',
+    region: formData.personalInfo.region || '',
+    country: formData.personalInfo.country || '',
+    postalCode: formData.personalInfo.postalCode || '',
+    summary: formData.personalInfo.summary || '',
   };
 
   // Initialize form
@@ -132,18 +135,21 @@ const PersonalInfoStep: React.FC = () => {
 
           <FormField
             control={form.control}
-            name="jobTitle"
+            name="professionalTitle"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-base sm:text-sm">Professional Title</FormLabel>
                 <FormControl>
-                  <Input 
-                    placeholder="e.g. Senior Software Engineer" 
-                    {...field}
-                    onChange={(e) => handleFieldChange('jobTitle', e.target.value)}
-                    className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
-                    autoCapitalize="words"
-                    inputMode="text"
+                  <Autocomplete
+                    options={jobTitles.map(title => ({ label: title, value: title }))}
+                    value={field.value}
+                    onChange={(value) => handleFieldChange('professionalTitle', value)}
+                    placeholder="Start typing your job title..."
+                    emptyMessage="No job titles found"
+                    inputClassName="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
+                    popoverWidth="w-full max-w-[300px] md:max-w-none"
+                    maxDisplayItems={5}
+                    minimumInputLength={2}
                   />
                 </FormControl>
                 <FormDescription className="text-xs sm:text-sm">
@@ -210,7 +216,7 @@ const PersonalInfoStep: React.FC = () => {
 
             <FormField
               control={form.control}
-              name="location"
+              name="address"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-base sm:text-sm">Location <span className="text-red-500">*</span></FormLabel>
@@ -218,7 +224,7 @@ const PersonalInfoStep: React.FC = () => {
                     <Autocomplete
                       options={tanzanianRegionsOptions}
                       value={field.value}
-                      onChange={(value) => handleFieldChange('location', value)}
+                      onChange={(value) => handleFieldChange('address', value)}
                       placeholder="Start typing a region, e.g. Dar es Salaam"
                       emptyMessage="No regions found"
                       inputClassName="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"

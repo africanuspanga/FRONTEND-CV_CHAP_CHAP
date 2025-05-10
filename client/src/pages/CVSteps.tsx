@@ -239,7 +239,7 @@ const CVSteps: React.FC = () => {
             <motion.div 
               animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
               transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-              className="absolute -top-12 -right-10 text-5xl"
+              className="absolute -top-12 right-12 text-5xl"
             >
               🚀
             </motion.div>
