@@ -7,6 +7,7 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import MobilePreviewNote from '@/components/MobilePreviewNote';
 import LocationInput from '@/components/LocationInput';
+import ProfessionalTitleInput from '@/components/ProfessionalTitleInput';
 import IconInput from '@/components/IconInput';
 import '../styles/mobile-form.css';
 
