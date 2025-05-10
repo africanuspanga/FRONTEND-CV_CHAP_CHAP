@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ChevronLeft, User, Mail, Phone, Briefcase } from 'lucide-react';
+import { ChevronLeft, User, Mail, Phone, Briefcase, MapPin } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import MobilePreviewNote from '@/components/MobilePreviewNote';
 import LocationInput from '@/components/LocationInput';
+import IconInput from '@/components/IconInput';
 import '../styles/mobile-form.css';
 
 const PersonalInfoForm = () => {
@@ -31,7 +31,6 @@ const PersonalInfoForm = () => {
   };
 
   const [isMobile, setIsMobile] = useState(false);
-  const firstNameInputRef = useRef<HTMLInputElement>(null);
   
   // Check if device is mobile
   useEffect(() => {
@@ -48,15 +47,6 @@ const PersonalInfoForm = () => {
     // Cleanup
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
-  // Auto-focus the first input on mobile
-  useEffect(() => {
-    if (isMobile && firstNameInputRef.current) {
-      setTimeout(() => {
-        firstNameInputRef.current?.focus();
-      }, 500);
-    }
-  }, [isMobile]);
   
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -86,78 +76,69 @@ const PersonalInfoForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="form-field-group">
               <Label htmlFor="firstName">First Name</Label>
-              <div className="input-icon-wrapper">
-                <User className="input-icon h-4 w-4" />
-                <Input
-                  ref={firstNameInputRef}
-                  id="firstName"
-                  value={formData.personalInfo.firstName || ''}
-                  onChange={(e) => updateFormField('personalInfo', {
-                    ...formData.personalInfo,
-                    firstName: e.target.value
-                  })}
-                  placeholder="John"
-                  required
-                  className="pl-9"
-                />
-              </div>
+              <IconInput
+                icon={User}
+                id="firstName"
+                value={formData.personalInfo.firstName || ''}
+                onChange={(value) => updateFormField('personalInfo', {
+                  ...formData.personalInfo,
+                  firstName: value
+                })}
+                placeholder="Noela"
+                required
+                className="w-full"
+              />
             </div>
             <div className="form-field-group">
               <Label htmlFor="lastName">Last Name</Label>
-              <div className="input-icon-wrapper">
-                <User className="input-icon h-4 w-4" />
-                <Input
-                  id="lastName"
-                  value={formData.personalInfo.lastName || ''}
-                  onChange={(e) => updateFormField('personalInfo', {
-                    ...formData.personalInfo,
-                    lastName: e.target.value
-                  })}
-                  placeholder="Kimaro"
-                  required
-                  className="pl-9"
-                />
-              </div>
+              <IconInput
+                icon={User}
+                id="lastName"
+                value={formData.personalInfo.lastName || ''}
+                onChange={(value) => updateFormField('personalInfo', {
+                  ...formData.personalInfo,
+                  lastName: value
+                })}
+                placeholder="Bwemero"
+                required
+                className="w-full"
+              />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4">
             <div className="form-field-group">
               <Label htmlFor="email">Email</Label>
-              <div className="input-icon-wrapper">
-                <Mail className="input-icon h-4 w-4" />
-                <Input
-                  id="email"
-                  type="email"
-                  inputMode="email"
-                  value={formData.personalInfo.email || ''}
-                  onChange={(e) => updateFormField('personalInfo', {
-                    ...formData.personalInfo,
-                    email: e.target.value
-                  })}
-                  placeholder="you@example.com"
-                  required
-                  className="pl-9"
-                />
-              </div>
+              <IconInput
+                icon={Mail}
+                id="email"
+                type="email"
+                inputMode="email"
+                value={formData.personalInfo.email || ''}
+                onChange={(value) => updateFormField('personalInfo', {
+                  ...formData.personalInfo,
+                  email: value
+                })}
+                placeholder="you@example.com"
+                required
+                className="w-full"
+              />
             </div>
             <div className="form-field-group">
               <Label htmlFor="phone">Phone</Label>
-              <div className="input-icon-wrapper">
-                <Phone className="input-icon h-4 w-4" />
-                <Input
-                  id="phone"
-                  type="tel"
-                  inputMode="tel"
-                  value={formData.personalInfo.phone || ''}
-                  onChange={(e) => updateFormField('personalInfo', {
-                    ...formData.personalInfo,
-                    phone: e.target.value
-                  })}
-                  placeholder="+255782345168"
-                  className="pl-9"
-                />
-              </div>
+              <IconInput
+                icon={Phone}
+                id="phone"
+                type="tel"
+                inputMode="tel"
+                value={formData.personalInfo.phone || ''}
+                onChange={(value) => updateFormField('personalInfo', {
+                  ...formData.personalInfo,
+                  phone: value
+                })}
+                placeholder="+255782345168"
+                className="w-full"
+              />
             </div>
           </div>
 
@@ -176,19 +157,17 @@ const PersonalInfoForm = () => {
             </div>
             <div className="form-field-group">
               <Label htmlFor="professionalTitle">Professional Title</Label>
-              <div className="input-icon-wrapper">
-                <Briefcase className="input-icon h-4 w-4" />
-                <Input
-                  id="professionalTitle"
-                  value={formData.personalInfo.professionalTitle || ''}
-                  onChange={(e) => updateFormField('personalInfo', {
-                    ...formData.personalInfo,
-                    professionalTitle: e.target.value
-                  })}
-                  placeholder="Software Engineer"
-                  className="pl-9"
-                />
-              </div>
+              <IconInput
+                icon={Briefcase}
+                id="professionalTitle"
+                value={formData.personalInfo.professionalTitle || ''}
+                onChange={(value) => updateFormField('personalInfo', {
+                  ...formData.personalInfo,
+                  professionalTitle: value
+                })}
+                placeholder="Software Engineer"
+                className="w-full"
+              />
             </div>
           </div>
 
