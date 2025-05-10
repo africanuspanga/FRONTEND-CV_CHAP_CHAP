@@ -23,6 +23,7 @@ const NavBar: React.FC = () => {
     { path: '/', label: 'Home' },
     { path: '/templates', label: 'Templates' },
     { path: '/create/method', label: 'Create CV' },
+    { path: '/why-us', label: 'Why Us' },
     { path: '/about', label: 'About' },
   ];
 

@@ -36,6 +36,7 @@ import FinalPreview from "@/pages/FinalPreview";
 import PaymentPage from "@/pages/payment-page";
 import USSDPaymentPage from "@/pages/ussd-payment";
 import About from "@/pages/About";
+import WhyUs from "@/pages/WhyUs";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import WebsitesPortfoliosForm from "@/pages/WebsitesPortfoliosForm";
@@ -129,6 +130,7 @@ function Router() {
                 <Route path="/cv/:templateId/hobbies" component={HobbiesForm} />
                 <Route path="/create/:step?" component={CreateCV} />
                 <Route path="/about" component={About} />
+                <Route path="/why-us" component={WhyUs} />
                 <Route path="/login" component={Login} />
                 <Route path="/register" component={Register} />
                 <Route path="/test-pages" component={TestPagesIndex} />
