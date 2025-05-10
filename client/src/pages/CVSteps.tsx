@@ -201,67 +201,64 @@ const CVSteps: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            {/* CV Preview Box */}
+            {/* Exactly match the screenshot */}
             <div className="relative z-10 mt-8">
-              {/* Simple box with before/after */}
-              <div className="relative bg-white rounded-xl border border-blue-100 shadow-lg p-4 flex flex-col items-center justify-center" style={{ width: '320px', height: '160px' }}>
-                <div className="w-full flex justify-between mb-2">
-                  <span className="text-red-500 font-medium">Before</span>
-                  <span className="text-green-500 font-medium">After</span>
+              {/* Box with before/after as shown in screenshot */}
+              <div className="relative bg-white rounded-3xl border border-gray-200 shadow-lg p-8 flex flex-col items-center justify-center" style={{ width: '400px', height: '240px' }}>
+                <div className="w-full flex justify-between mb-12">
+                  <span className="text-red-500 font-medium text-xl">Before</span>
+                  <span className="text-green-500 font-medium text-xl">After</span>
                 </div>
                 
-                <div className="flex items-center justify-center w-full h-full">
-                  <div className="text-gray-400 flex items-center">
-                    <div className="w-8 h-8 mr-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <line x1="10" y1="9" x2="8" y2="9"></line>
+                <div className="flex flex-col items-center justify-center w-full">
+                  <div className="text-gray-400 flex flex-col items-center space-y-4">
+                    <div className="w-12 h-12">
+                      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M40 16L32 8H12C10.9 8 10 8.9 10 10V38C10 39.1 10.9 40 12 40H36C37.1 40 38 39.1 38 38V18H38.58C39.36 18 40 17.36 40 16.58V16Z" stroke="#A0A0A0" strokeWidth="2" fill="#F5F5F5"/>
+                        <path d="M32 8V16H40" stroke="#A0A0A0" strokeWidth="2"/>
                       </svg>
                     </div>
-                    <div>Professional CV Template</div>
+                    <div className="text-gray-500 text-xl">Professional CV Template</div>
                   </div>
                 </div>
               </div>
               
-              {/* Controls overlay */}
-              <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 rounded-full py-2 px-4 flex items-center space-x-3 shadow-md z-20">
+              {/* Controls overlay - exact from screenshot */}
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 rounded-full py-3 px-6 flex items-center space-x-4 shadow-lg z-20">
                 <motion.div 
                   animate={{ scale: [1, 1.1, 1] }} 
                   transition={{ repeat: Infinity, duration: 2 }}
-                  className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white"
+                  className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white"
                 >
-                  <ChevronRight size={18} />
+                  <ChevronRight size={20} />
                 </motion.div>
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                  <FileText size={14} />
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                  <FileText size={16} />
                 </div>
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                  <span className="text-xs">🔗</span>
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                  <span className="text-lg">🔗</span>
                 </div>
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                  <span className="text-xs">👍</span>
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                  <span className="text-lg">👍</span>
                 </div>
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                  <span className="text-xs">🖼️</span>
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                  <span className="text-lg">🖼️</span>
                 </div>
               </div>
             </div>
             
-            {/* Floating decorative elements */}
+            {/* Floating decorative elements - match screenshot positions */}
             <motion.div 
               animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
               transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-              className="absolute -top-8 -right-4 text-4xl"
+              className="absolute -top-12 -right-10 text-5xl"
             >
               🚀
             </motion.div>
             <motion.div 
               animate={{ y: [0, 10, 0], rotate: [0, -5, 0] }}
               transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", delay: 1 }}
-              className="absolute -bottom-4 -left-4 text-4xl"
+              className="absolute -bottom-4 -left-16 text-5xl"
             >
               💼
             </motion.div>
