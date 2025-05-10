@@ -559,11 +559,14 @@ const USSDPaymentPage: React.FC = () => {
         )}
       </div>
       
-      <div className="mt-3 sm:mt-4 bg-white p-3 rounded-lg shadow-sm">
-        <p className="text-xs sm:text-sm text-gray-600 text-center mb-2">Unahitaji msaada kwa malipo yako?</p>
-        <p className="text-center text-blue-600 font-medium text-sm">
-          +255 682 152 148
-        </p>
+      <div className="mt-6 sm:mt-8 bg-white p-5 rounded-lg shadow-md border border-gray-200">
+        <p className="text-base sm:text-lg text-gray-700 text-center mb-3 font-medium">Unahitaji msaada kwa malipo yako?</p>
+        <div className="flex items-center justify-center gap-2 text-primary">
+          <Phone className="h-5 w-5" />
+          <p className="text-center font-bold text-lg">
+            +255 682 152 148
+          </p>
+        </div>
       </div>
     </div>
   );
