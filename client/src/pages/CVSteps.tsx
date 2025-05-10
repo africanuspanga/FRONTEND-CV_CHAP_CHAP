@@ -199,52 +199,82 @@ const CVSteps: React.FC = () => {
             {/* CV skeleton layout */}
             <div className="relative mt-8">
               {/* Main white container */}
-              <div className="relative w-[400px] bg-white rounded-xl border border-gray-100 shadow-md p-6 flex flex-col space-y-6">
+              <div className="relative w-[320px] bg-white rounded-xl border border-gray-100 shadow-md p-4 flex flex-col space-y-4">
                 {/* CV Sections - Skeleton UI */}
-                <div className="w-32 h-8 rounded-md bg-blue-600"></div>
-                <div className="w-full h-6 rounded-md bg-gray-200"></div>
-                <div className="w-4/5 h-6 rounded-md bg-gray-200"></div>
+                <div className="w-28 h-7 rounded-md bg-blue-600"></div>
+                <div className="w-full h-5 rounded-md bg-gray-200"></div>
+                <div className="w-4/5 h-5 rounded-md bg-gray-200"></div>
                 
-                <div className="w-32 h-8 rounded-md bg-blue-600"></div>
-                <div className="w-full h-6 rounded-md bg-gray-200"></div>
-                <div className="w-3/4 h-6 rounded-md bg-gray-200"></div>
-                <div className="w-5/6 h-6 rounded-md bg-gray-200"></div>
+                <div className="w-28 h-7 rounded-md bg-blue-600"></div>
+                <div className="w-full h-5 rounded-md bg-gray-200"></div>
+                <div className="w-3/4 h-5 rounded-md bg-gray-200"></div>
+                <div className="w-5/6 h-5 rounded-md bg-gray-200"></div>
                 
-                <div className="w-40 h-8 rounded-md bg-blue-600"></div>
-                <div className="w-full h-6 rounded-md bg-gray-200"></div>
-                <div className="w-4/5 h-6 rounded-md bg-gray-200"></div>
-                <div className="w-11/12 h-6 rounded-md bg-gray-200"></div>
-                
-                <div className="w-28 h-8 rounded-md bg-blue-600"></div>
-                <div className="w-3/4 h-6 rounded-md bg-gray-200"></div>
+                <div className="w-28 h-7 rounded-md bg-blue-600"></div>
+                <div className="w-full h-5 rounded-md bg-gray-200"></div>
+                <div className="w-4/5 h-5 rounded-md bg-gray-200"></div>
+                <div className="w-11/12 h-5 rounded-md bg-gray-200"></div>
               </div>
               
               {/* Controls overlay - bottom bar */}
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-md py-2 px-4 flex items-center space-x-3 z-20">
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-md py-1.5 px-3 flex items-center space-x-2 z-20">
                 <motion.div 
                   animate={{ scale: [1, 1.1, 1] }} 
                   transition={{ repeat: Infinity, duration: 2.5 }}
-                  className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white"
+                  className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white"
                 >
-                  <ChevronRight size={18} />
+                  <ChevronRight size={15} />
                 </motion.div>
-                <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                  <FileText size={14} />
+                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <FileText size={12} />
                 </div>
-                <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                   </svg>
                 </div>
-                <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                  <span className="text-sm">👍</span>
+                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <span className="text-xs">👍</span>
                 </div>
-                <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                  <span className="text-sm">🖼️</span>
+                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <span className="text-xs">🖼️</span>
                 </div>
               </div>
             </div>
+            
+            {/* Floating elements */}
+            <motion.div 
+              animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+              className="absolute -top-12 -right-10 text-5xl"
+            >
+              🚀
+            </motion.div>
+            
+            <motion.div 
+              animate={{ y: [0, 8, 0], rotate: [0, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", delay: 0.5 }}
+              className="absolute -bottom-8 -left-12 text-4xl"
+            >
+              💼
+            </motion.div>
+            
+            <motion.div 
+              animate={{ y: [0, 5, 0], scale: [1, 1.05, 1] }}
+              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 1 }}
+              className="absolute top-1/3 -right-8 text-3xl"
+            >
+              📝
+            </motion.div>
+            
+            <motion.div 
+              animate={{ y: [0, -7, 0], opacity: [0.8, 1, 0.8] }}
+              transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut", delay: 1.5 }}
+              className="absolute bottom-1/3 -left-14 text-4xl"
+            >
+              💫
+            </motion.div>
           </div>
         </div>
       )}
