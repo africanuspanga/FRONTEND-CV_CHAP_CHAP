@@ -6,6 +6,11 @@ import { templateImages } from '@/lib/template-images';
 import { homePageFeaturedTemplates } from '@/lib/template-priority';
 // Import the hero image
 import heroWomanImage from '../assets/hero-woman.png';
+// Import company logos
+import vodacomLogo from '../assets/company-logos/vodacom.png';
+import tccLogo from '../assets/company-logos/tcc.webp';
+import nmbLogo from '../assets/company-logos/nmb.png';
+import jubileeLogo from '../assets/company-logos/jubilee.png';
 
 const Home = () => {
   return (
@@ -307,6 +312,53 @@ const Home = () => {
             <div className="inline-block bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
               <span className="text-gray-700">Join <span className="font-semibold text-primary">5,000+</span> satisfied users who created standout CVs with us</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Companies Hiring Our Customers */}
+      <section className="py-16 my-16 bg-white rounded-2xl shadow-sm border border-gray-100">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Customers Have Been Hired At</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            CVs created with CV Chap Chap have helped candidates secure positions at these leading companies
+          </p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto px-4">
+          {/* Vodacom */}
+          <div className="bg-white rounded-lg p-4 flex items-center justify-center h-24 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <img 
+              src={vodacomLogo} 
+              alt="Vodacom" 
+              className="max-h-12 max-w-full object-contain"
+            />
+          </div>
+          
+          {/* NMB */}
+          <div className="bg-white rounded-lg p-4 flex items-center justify-center h-24 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <img 
+              src={nmbLogo} 
+              alt="NMB Bank" 
+              className="max-h-12 max-w-full object-contain"
+            />
+          </div>
+          
+          {/* TCC */}
+          <div className="bg-white rounded-lg p-4 flex items-center justify-center h-24 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <img 
+              src={tccLogo} 
+              alt="Tanzania Communications Commission" 
+              className="max-h-12 max-w-full object-contain"
+            />
+          </div>
+          
+          {/* Jubilee */}
+          <div className="bg-white rounded-lg p-4 flex items-center justify-center h-24 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <img 
+              src={jubileeLogo} 
+              alt="Jubilee Insurance" 
+              className="max-h-12 max-w-full object-contain"
+            />
           </div>
         </div>
       </section>
