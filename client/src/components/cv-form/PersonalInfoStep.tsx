@@ -14,6 +14,7 @@ import { getInitials } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Autocomplete } from '@/components/ui/autocomplete';
 import { tanzanianRegionsOptions } from '@/lib/location-data';
+import { commonJobTitles } from '@/lib/job-titles-data';
 
 // Extend the schema with client-side validation
 const formSchema = personalInfoSchema.extend({
@@ -137,13 +138,16 @@ const PersonalInfoStep: React.FC = () => {
               <FormItem>
                 <FormLabel className="text-base sm:text-sm">Professional Title</FormLabel>
                 <FormControl>
-                  <Input 
-                    placeholder="e.g. Senior Software Engineer" 
-                    {...field}
-                    onChange={(e) => handleFieldChange('jobTitle', e.target.value)}
-                    className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
-                    autoCapitalize="words"
-                    inputMode="text"
+                  <Autocomplete
+                    options={commonJobTitles}
+                    value={field.value}
+                    onChange={(value) => handleFieldChange('jobTitle', value)}
+                    placeholder="Start typing a job title, e.g. Software Engineer"
+                    emptyMessage="No job titles found"
+                    inputClassName="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
+                    popoverWidth="w-full max-w-[300px] md:max-w-none"
+                    maxDisplayItems={5}
+                    minimumInputLength={2}
                   />
                 </FormControl>
                 <FormDescription className="text-xs sm:text-sm">
