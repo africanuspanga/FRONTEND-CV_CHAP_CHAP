@@ -134,8 +134,20 @@ const CVSteps: React.FC = () => {
       
       {!isMobile && (
         <div className="md:w-1/2 flex justify-center">
-          <div className="relative">
-            <div className="w-72 md:w-96 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="relative"
+          >
+            {/* Paper layers effect in the background */}
+            <div className="absolute -top-3 -left-3 w-full h-full bg-blue-50 rounded-lg transform rotate-2 shadow-md"></div>
+            <div className="absolute -top-1.5 -left-1.5 w-full h-full bg-blue-100 rounded-lg transform -rotate-1 shadow-md"></div>
+            
+            {/* Main CV view */}
+            <div className="w-72 md:w-96 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden relative z-10">
+              <div className="h-6 bg-primary w-full"></div>
+              
               <div className="bg-white p-4">
                 <div className="flex">
                   <div className="w-1/3 text-gray-600 pr-4 text-sm">
@@ -180,13 +192,53 @@ const CVSteps: React.FC = () => {
                   </div>
                 </div>
               </div>
+              
+              {/* "Before" dot indicators */}
+              <div className="absolute top-1/4 -left-2.5 w-5 h-5 rounded-full bg-red-500 shadow-md z-20 flex items-center justify-center text-white text-xs font-bold">
+                <motion.div 
+                  animate={{ scale: [1, 1.2, 1] }} 
+                  transition={{ repeat: Infinity, duration: 2 }}
+                >
+                  !
+                </motion.div>
+              </div>
+              <div className="absolute top-2/3 -left-2.5 w-5 h-5 rounded-full bg-red-500 shadow-md z-20 flex items-center justify-center text-white text-xs font-bold">
+                <motion.div 
+                  animate={{ scale: [1, 1.2, 1] }} 
+                  transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}
+                >
+                  !
+                </motion.div>
+              </div>
+              
+              {/* "After" checkmarks */}
+              <div className="absolute top-1/4 -right-2.5 w-5 h-5 rounded-full bg-green-500 shadow-md z-20 flex items-center justify-center text-white text-xs font-bold">
+                <motion.div 
+                  animate={{ scale: [1, 1.2, 1] }} 
+                  transition={{ repeat: Infinity, duration: 2, delay: 1 }}
+                >
+                  ✓
+                </motion.div>
+              </div>
+              <div className="absolute top-2/3 -right-2.5 w-5 h-5 rounded-full bg-green-500 shadow-md z-20 flex items-center justify-center text-white text-xs font-bold">
+                <motion.div 
+                  animate={{ scale: [1, 1.2, 1] }} 
+                  transition={{ repeat: Infinity, duration: 2, delay: 1.5 }}
+                >
+                  ✓
+                </motion.div>
+              </div>
             </div>
             
             {/* Controls overlay */}
-            <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 rounded-full py-2 px-4 flex items-center space-x-3 shadow-md">
-              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+            <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 rounded-full py-2 px-4 flex items-center space-x-3 shadow-md z-20">
+              <motion.div 
+                animate={{ scale: [1, 1.1, 1] }} 
+                transition={{ repeat: Infinity, duration: 2 }}
+                className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white"
+              >
                 <ChevronRight size={18} />
-              </div>
+              </motion.div>
               <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
                 <FileText size={14} />
               </div>
@@ -200,7 +252,27 @@ const CVSteps: React.FC = () => {
                 <span className="text-xs">🖼️</span>
               </div>
             </div>
-          </div>
+            
+            {/* Before/After labels */}
+            <div className="absolute -left-16 top-1/4 text-xs font-semibold text-red-500">Before</div>
+            <div className="absolute -right-16 top-1/4 text-xs font-semibold text-green-500">After</div>
+            
+            {/* Floating decorative elements */}
+            <motion.div 
+              animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+              className="absolute -top-8 -right-4 text-4xl"
+            >
+              🚀
+            </motion.div>
+            <motion.div 
+              animate={{ y: [0, 10, 0], rotate: [0, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", delay: 1 }}
+              className="absolute -bottom-8 -left-4 text-4xl"
+            >
+              💼
+            </motion.div>
+          </motion.div>
         </div>
       )}
     </div>
