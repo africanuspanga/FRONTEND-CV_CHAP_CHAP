@@ -5,6 +5,7 @@ import { FileText, ChevronRight, CheckCircle2, Edit3, Sparkles } from 'lucide-re
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
 import ReactConfetti from 'react-confetti';
+import cvSkeletonImage from '../assets/cv-steps/cv-skeleton.png';
 
 const CVSteps: React.FC = () => {
   const [, navigate] = useLocation();
@@ -198,22 +199,13 @@ const CVSteps: React.FC = () => {
           <div className="relative">
             {/* CV skeleton layout */}
             <div className="relative mt-8">
-              {/* Main white container */}
-              <div className="relative w-[320px] bg-white rounded-xl border border-gray-100 shadow-md p-4 flex flex-col space-y-4">
-                {/* CV Sections - Skeleton UI */}
-                <div className="w-28 h-7 rounded-md bg-blue-600"></div>
-                <div className="w-full h-5 rounded-md bg-gray-200"></div>
-                <div className="w-4/5 h-5 rounded-md bg-gray-200"></div>
-                
-                <div className="w-28 h-7 rounded-md bg-blue-600"></div>
-                <div className="w-full h-5 rounded-md bg-gray-200"></div>
-                <div className="w-3/4 h-5 rounded-md bg-gray-200"></div>
-                <div className="w-5/6 h-5 rounded-md bg-gray-200"></div>
-                
-                <div className="w-28 h-7 rounded-md bg-blue-600"></div>
-                <div className="w-full h-5 rounded-md bg-gray-200"></div>
-                <div className="w-4/5 h-5 rounded-md bg-gray-200"></div>
-                <div className="w-11/12 h-5 rounded-md bg-gray-200"></div>
+              {/* CV Skeleton Image */}
+              <div className="relative rounded-xl border border-gray-100 shadow-md overflow-hidden">
+                <img 
+                  src={cvSkeletonImage} 
+                  alt="CV skeleton" 
+                  className="w-[320px] h-auto object-contain"
+                />
               </div>
               
               {/* Controls overlay - bottom bar */}
