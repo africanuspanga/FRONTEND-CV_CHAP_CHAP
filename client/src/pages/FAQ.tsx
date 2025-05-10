@@ -174,7 +174,7 @@ const FAQ: React.FC = () => {
             <div className="bg-white rounded-xl p-5 shadow-sm sticky top-20">
               <h2 className="font-bold text-gray-900 mb-4">FAQ Categories</h2>
               <ul className="space-y-2">
-                {categories.map((category, index) => (
+                {uniqueCategories.map((category: string, index: number) => (
                   <li key={index}>
                     <a 
                       href={`#${category.toLowerCase().replace(/\s+/g, '-')}`}
