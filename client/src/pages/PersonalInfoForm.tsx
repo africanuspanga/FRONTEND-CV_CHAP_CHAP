@@ -3,12 +3,11 @@ import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ChevronLeft, User, Mail, Phone, MapPin, Briefcase } from 'lucide-react';
+import { ChevronLeft, User, Mail, Phone, Briefcase } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import MobilePreviewNote from '@/components/MobilePreviewNote';
-import AutocompleteInput from '@/components/AutocompleteInput';
-import { tanzanianRegionsOptions } from '@/lib/location-data';
+import LocationInput from '@/components/LocationInput';
 import '../styles/mobile-form.css';
 
 const PersonalInfoForm = () => {
@@ -165,24 +164,15 @@ const PersonalInfoForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4">
             <div className="form-field-group">
               <Label htmlFor="address">Location</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                <AutocompleteInput
-                  id="address"
-                  name="address"
-                  options={tanzanianRegionsOptions}
-                  value={formData.personalInfo.address ? 
-                    tanzanianRegionsOptions.find(option => option.label === formData.personalInfo.address) || null : 
-                    null
-                  }
-                  onChange={(option) => updateFormField('personalInfo', {
-                    ...formData.personalInfo,
-                    address: option ? option.label : ''
-                  })}
-                  placeholder="Select or type your location"
-                  className="w-full"
-                />
-              </div>
+              <LocationInput
+                value={formData.personalInfo.address || ''}
+                onChange={(value) => updateFormField('personalInfo', {
+                  ...formData.personalInfo,
+                  address: value
+                })}
+                placeholder="Dar es Salaam, Tanzania"
+                className="w-full"
+              />
             </div>
             <div className="form-field-group">
               <Label htmlFor="professionalTitle">Professional Title</Label>
