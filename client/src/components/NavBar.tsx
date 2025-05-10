@@ -25,6 +25,7 @@ const NavBar: React.FC = () => {
     { path: '/create/method', label: 'Create CV' },
     { path: '/why-us', label: 'Why Us' },
     { path: '/about', label: 'About' },
+    { path: '/contact', label: 'Contact' },
   ];
 
   const isActive = (path: string) => location === path;
