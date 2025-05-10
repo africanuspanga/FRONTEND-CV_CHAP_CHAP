@@ -22,7 +22,7 @@ const NavBar: React.FC = () => {
   const routes = [
     { path: '/', label: 'Home' },
     { path: '/templates', label: 'Templates' },
-    { path: '/create/method', label: 'Create CV' },
+    { path: '/cv-steps', label: 'Create CV' },
     { path: '/why-us', label: 'Why Us' },
     { path: '/about', label: 'About' },
     { path: '/contact', label: 'Contact' },

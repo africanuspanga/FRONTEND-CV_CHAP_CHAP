@@ -86,7 +86,7 @@ const Home = () => {
         
         <div className="text-center mt-12">
           <Button asChild size="lg" className="bg-blue-800 hover:bg-blue-700 text-white px-10 py-6 text-lg shadow-lg">
-            <Link href="/create/method">Create My CV</Link>
+            <Link href="/cv-steps">Create My CV</Link>
           </Button>
         </div>
       </section>
@@ -382,7 +382,7 @@ const Home = () => {
             <div className="absolute inset-0 bg-white/20 rounded-lg blur-md transform -rotate-1"></div>
             <div className="absolute inset-0 bg-white/20 rounded-lg blur-md transform rotate-1"></div>
             <Button asChild size="lg" className="relative z-10 bg-white font-semibold text-blue-800 hover:bg-blue-50 border-2 border-white/80 shadow-md px-8 py-6">
-              <Link href="/create/method">Create Your CV Now</Link>
+              <Link href="/cv-steps">Create Your CV Now</Link>
             </Button>
           </div>
         </div>

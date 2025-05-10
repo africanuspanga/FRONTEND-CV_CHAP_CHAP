@@ -47,6 +47,7 @@ import CertificationsForm from "@/pages/CertificationsForm";
 import AccomplishmentsForm from "@/pages/AccomplishmentsForm";
 import HobbiesForm from "@/pages/HobbiesForm";
 import TemplateGallery from "@/pages/template-gallery";
+import CVSteps from "@/pages/CVSteps";
 import NotFound from "@/pages/not-found";
 
 // Admin pages
@@ -113,6 +114,7 @@ function Router() {
             <div className="flex-grow">
               <Switch>
                 <Route path="/" component={Home} />
+                <Route path="/cv-steps" component={CVSteps} />
                 <Route path="/templates" component={TemplateSelection} />
                 <Route path="/create/method" component={CreationMethod} />
                 <Route path="/cv/:templateId/personal" component={PersonalInfoForm} />
