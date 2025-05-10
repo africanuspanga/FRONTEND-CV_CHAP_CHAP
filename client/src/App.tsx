@@ -39,6 +39,7 @@ import USSDPaymentPage from "@/pages/ussd-payment";
 import About from "@/pages/About";
 import WhyUs from "@/pages/WhyUs";
 import Contact from "@/pages/Contact";
+import FAQ from "@/pages/FAQ";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import WebsitesPortfoliosForm from "@/pages/WebsitesPortfoliosForm";
@@ -134,6 +135,7 @@ function Router() {
                 <Route path="/about" component={About} />
                 <Route path="/why-us" component={WhyUs} />
                 <Route path="/contact" component={Contact} />
+                <Route path="/faq" component={FAQ} />
                 <Route path="/login" component={Login} />
                 <Route path="/register" component={Register} />
                 <Route path="/test-pages" component={TestPagesIndex} />
