@@ -268,7 +268,7 @@ const FAQ: React.FC = () => {
               <Link href="/contact">Contact Us</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/create/method">Start Creating Your CV</Link>
+              <Link href="/cv-steps">Start Creating Your CV</Link>
             </Button>
           </div>
         </div>

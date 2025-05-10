@@ -281,7 +281,7 @@ const WhyUs: React.FC = () => {
                 <Link href="/templates">Browse Our Templates</Link>
               </Button>
               <Button asChild className="bg-transparent border-2 border-white hover:bg-white/10">
-                <Link href="/create/method">Create Your CV Now</Link>
+                <Link href="/cv-steps">Create Your CV Now</Link>
               </Button>
             </div>
           </div>
