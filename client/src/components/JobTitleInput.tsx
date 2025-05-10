@@ -18,7 +18,7 @@ interface JobTitleInputProps {
 const JobTitleInput: React.FC<JobTitleInputProps> = ({
   value,
   onChange,
-  placeholder = "Software Engineer",
+  placeholder = "Type your job title",
   className = "",
 }) => {
   const [inputValue, setInputValue] = useState(value);

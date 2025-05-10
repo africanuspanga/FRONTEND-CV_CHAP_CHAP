@@ -4,58 +4,36 @@ import { Button } from '@/components/ui/button';
 import { FileText, ChevronRight, CheckCircle2, Edit3, Sparkles } from 'lucide-react';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
-import ReactConfetti from 'react-confetti';
 import womanWithCoffeeImage from '../assets/cv-steps/woman-with-coffee.png';
 import cvStepsGraphicImage from '../assets/cv-steps/cv-steps-graphic.png';
 
 const CVSteps: React.FC = () => {
   const [, navigate] = useLocation();
   const [isMobile, setIsMobile] = useState(false);
-  const [windowDimensions, setWindowDimensions] = useState({ width: 0, height: 0 });
-  const [showConfetti, setShowConfetti] = useState(false);
   
-  // Check if device is mobile and set window dimensions
+  // Check if device is mobile
   useEffect(() => {
-    const checkMobileAndDimensions = () => {
+    const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
-      setWindowDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
     };
     
     // Initial check
-    checkMobileAndDimensions();
+    checkMobile();
     
     // Add listener for window resize
-    window.addEventListener('resize', checkMobileAndDimensions);
+    window.addEventListener('resize', checkMobile);
     
     // Cleanup
-    return () => window.removeEventListener('resize', checkMobileAndDimensions);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const handleNextClick = () => {
-    // Show confetti
-    setShowConfetti(true);
-    
-    // Hide confetti after 2.5 seconds and navigate
-    setTimeout(() => {
-      setShowConfetti(false);
-      navigate('/templates');
-    }, 2500);
+    // Navigate to templates page
+    navigate('/templates');
   };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col md:flex-row items-center md:items-start justify-between relative">
-      {showConfetti && (
-        <ReactConfetti
-          width={windowDimensions.width}
-          height={windowDimensions.height}
-          recycle={false}
-          numberOfPieces={isMobile ? 100 : 200}
-          colors={['#034694', '#4D6FFF', '#E5EAFF', '#90CAF9', '#FFC107']}
-        />
-      )}
       
       <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8">
         <motion.h1 

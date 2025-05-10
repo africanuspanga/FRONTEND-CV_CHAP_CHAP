@@ -164,7 +164,7 @@ const PersonalInfoForm = () => {
                   ...formData.personalInfo,
                   professionalTitle: value
                 })}
-                placeholder="Start typing your job title..."
+                placeholder="Type your job title"
                 className="w-full"
               />
             </div>
