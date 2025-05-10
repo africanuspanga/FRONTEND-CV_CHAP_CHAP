@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import {
   Accordion,
@@ -7,6 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Link } from 'wouter';
 
 interface FAQItem {
@@ -16,6 +17,8 @@ interface FAQItem {
 }
 
 const FAQ: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  
   const faqItems: FAQItem[] = [
     {
       question: "What services does CV Chap Chap offer?",
@@ -104,9 +107,21 @@ const FAQ: React.FC = () => {
     }
   ];
 
+  // Filter FAQs based on search query
+  const filteredFaqItems = useMemo(() => {
+    if (!searchQuery) return faqItems;
+    
+    const query = searchQuery.toLowerCase();
+    return faqItems.filter(item => 
+      item.question.toLowerCase().includes(query) || 
+      item.answer.toLowerCase().includes(query) ||
+      item.category.toLowerCase().includes(query)
+    );
+  }, [faqItems, searchQuery]);
+  
   // Extract unique categories
   const uniqueCategories: string[] = [];
-  faqItems.forEach(item => {
+  filteredFaqItems.forEach(item => {
     if (!uniqueCategories.includes(item.category)) {
       uniqueCategories.push(item.category);
     }
@@ -115,7 +130,7 @@ const FAQ: React.FC = () => {
   // Group FAQs by category
   const faqsByCategory = uniqueCategories.map(category => ({
     category,
-    items: faqItems.filter(item => item.category === category)
+    items: filteredFaqItems.filter(item => item.category === category)
   }));
 
   return (
@@ -146,7 +161,7 @@ const FAQ: React.FC = () => {
           </p>
         </div>
 
-        {/* Search Bar (Decorative) */}
+        {/* Search Bar (Functional) */}
         <div className="max-w-2xl mx-auto mb-12 relative">
           <div className="flex items-center p-2 bg-white rounded-lg border border-gray-200 shadow-sm">
             <div className="bg-primary/10 p-2 rounded-md mr-2">
@@ -157,10 +172,22 @@ const FAQ: React.FC = () => {
             <input 
               type="text" 
               className="flex-grow p-2 focus:outline-none" 
-              placeholder="Search FAQs (decorative, does not function)"
-              readOnly
-              aria-label="Search FAQs (decorative)"
+              placeholder="Search FAQs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search FAQs"
             />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="p-2 text-gray-400 hover:text-gray-600"
+                aria-label="Clear search"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
           </div>
           <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-white px-4 py-1 rounded-full text-xs text-gray-500 border border-gray-100 shadow-sm">
             Ask us anything about CV creation
@@ -190,28 +217,43 @@ const FAQ: React.FC = () => {
 
           {/* FAQ Accordion */}
           <div className="md:col-span-9">
-            {faqsByCategory.map((categoryGroup, categoryIndex) => (
-              <div key={categoryIndex} id={categoryGroup.category.toLowerCase().replace(/\s+/g, '-')} className="mb-10">
-                <h2 className="text-2xl font-bold text-primary mb-5 flex items-center">
-                  <span className="inline-block w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center mr-3 text-sm">
-                    {categoryIndex + 1}
-                  </span>
-                  {categoryGroup.category} Questions
-                </h2>
-                <Accordion type="single" collapsible className="bg-white rounded-xl shadow-sm overflow-hidden">
-                  {categoryGroup.items.map((item, index) => (
-                    <AccordionItem key={index} value={`item-${categoryIndex}-${index}`} className="border-b last:border-b-0 px-1">
-                      <AccordionTrigger className="hover:bg-primary/5 text-left py-5 px-4 text-gray-800 font-medium text-lg">
-                        {item.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="px-5 pb-5 pt-0 text-gray-700 leading-relaxed">
-                        {item.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+            {faqsByCategory.length > 0 ? (
+              faqsByCategory.map((categoryGroup, categoryIndex) => (
+                <div key={categoryIndex} id={categoryGroup.category.toLowerCase().replace(/\s+/g, '-')} className="mb-10">
+                  <h2 className="text-2xl font-bold text-primary mb-5 flex items-center">
+                    <span className="inline-block w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center mr-3 text-sm">
+                      {categoryIndex + 1}
+                    </span>
+                    {categoryGroup.category} Questions
+                  </h2>
+                  <Accordion type="single" collapsible className="bg-white rounded-xl shadow-sm overflow-hidden">
+                    {categoryGroup.items.map((item, index) => (
+                      <AccordionItem key={index} value={`item-${categoryIndex}-${index}`} className="border-b last:border-b-0 px-1">
+                        <AccordionTrigger className="hover:bg-primary/5 text-left py-5 px-4 text-gray-800 font-medium text-lg">
+                          {item.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="px-5 pb-5 pt-0 text-gray-700 leading-relaxed">
+                          {item.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-12 bg-white rounded-xl shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m0 16v1m-8-8h1m15 0h1m-9-9l1 1m-1 7l1 1m-7-3l1-1m7 1l-1-1" />
+                </svg>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">No matches found</h3>
+                <p className="text-gray-500 max-w-md mx-auto mb-6">
+                  We couldn't find any FAQs matching your search query. Try using different keywords or check out our common categories.
+                </p>
+                <Button onClick={() => setSearchQuery('')} variant="outline">
+                  Clear Search
+                </Button>
               </div>
-            ))}
+            )}
           </div>
         </div>
 
