@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { templateImages } from '@/lib/template-images';
 import { homePageFeaturedTemplates } from '@/lib/template-priority';
 // Import the hero image
-import heroWomanImage from '../assets/hero-woman.png';
+import heroWomanImage from '../assets/professional-woman.png';
 // Import company logos
 import vodacomLogo from '../assets/company-logos/vodacom.png';
 import tccLogo from '../assets/company-logos/tcc.webp';
