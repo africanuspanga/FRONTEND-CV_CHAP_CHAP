@@ -195,74 +195,62 @@ const CVSteps: React.FC = () => {
       
       {!isMobile && (
         <div className="md:w-1/2 flex justify-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative"
-          >
-            {/* Exactly match the screenshot */}
-            <div className="relative z-10 mt-8">
-              {/* Box with before/after as shown in screenshot */}
-              <div className="relative bg-white rounded-3xl border border-gray-200 shadow-lg p-8 flex flex-col items-center justify-center" style={{ width: '400px', height: '240px' }}>
-                <div className="w-full flex justify-between mb-12">
-                  <span className="text-red-500 font-medium text-xl">Before</span>
-                  <span className="text-green-500 font-medium text-xl">After</span>
+          <div className="relative">
+            {/* Exact mock of the screenshot - super simple version */}
+            <div className="relative mt-8">
+              {/* Main white container */}
+              <div className="relative w-[600px] h-[400px] bg-white rounded-3xl border border-gray-100 shadow-sm p-10 flex flex-col items-center">
+                {/* Before/After Labels */}
+                <div className="w-full flex justify-between mb-16">
+                  <div className="text-3xl font-medium text-red-400">Before</div>
+                  <div className="text-3xl font-medium text-green-500">After</div>
                 </div>
                 
-                <div className="flex flex-col items-center justify-center w-full">
-                  <div className="text-gray-400 flex flex-col items-center space-y-4">
-                    <div className="w-12 h-12">
-                      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M40 16L32 8H12C10.9 8 10 8.9 10 10V38C10 39.1 10.9 40 12 40H36C37.1 40 38 39.1 38 38V18H38.58C39.36 18 40 17.36 40 16.58V16Z" stroke="#A0A0A0" strokeWidth="2" fill="#F5F5F5"/>
-                        <path d="M32 8V16H40" stroke="#A0A0A0" strokeWidth="2"/>
-                      </svg>
-                    </div>
-                    <div className="text-gray-500 text-xl">Professional CV Template</div>
+                {/* Document Icon */}
+                <div className="mb-6">
+                  <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M45 22.5H37.5V15" stroke="#BBBBBB" strokeWidth="2"/>
+                    <path d="M37.5 15L15 15C13.6193 15 12.5 16.1193 12.5 17.5V42.5C12.5 43.8807 13.6193 45 15 45H45C46.3807 45 47.5 43.8807 47.5 42.5V25C47.5 19.4772 42.0228 15 37.5 15Z" stroke="#BBBBBB" strokeWidth="2"/>
+                  </svg>
+                </div>
+                
+                {/* Text */}
+                <div className="text-2xl text-gray-500 font-normal">Professional CV Template</div>
+                
+                {/* Controls Bar */}
+                <div className="absolute -bottom-12 bg-white rounded-full shadow-md py-4 px-6 flex items-center space-x-4">
+                  <div className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                    <ChevronRight size={24} />
                   </div>
-                </div>
-              </div>
-              
-              {/* Controls overlay - exact from screenshot */}
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 rounded-full py-3 px-6 flex items-center space-x-4 shadow-lg z-20">
-                <motion.div 
-                  animate={{ scale: [1, 1.1, 1] }} 
-                  transition={{ repeat: Infinity, duration: 2 }}
-                  className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white"
-                >
-                  <ChevronRight size={20} />
-                </motion.div>
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                  <FileText size={16} />
-                </div>
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                  <span className="text-lg">🔗</span>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                  <span className="text-lg">👍</span>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                  <span className="text-lg">🖼️</span>
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                    <FileText size={20} />
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                    <span className="text-xl">👍</span>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                    <span className="text-xl">🖼️</span>
+                  </div>
                 </div>
               </div>
             </div>
             
-            {/* Floating decorative elements - match screenshot positions */}
-            <motion.div 
-              animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
-              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-              className="absolute -top-12 -right-10 text-5xl"
-            >
-              🚀
-            </motion.div>
-            <motion.div 
-              animate={{ y: [0, 10, 0], rotate: [0, -5, 0] }}
-              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", delay: 1 }}
-              className="absolute -bottom-4 -left-16 text-5xl"
-            >
+            {/* Briefcase on the left */}
+            <div className="absolute -left-12 bottom-48 text-5xl">
               💼
-            </motion.div>
-          </motion.div>
+            </div>
+            
+            {/* Rocket on the right */}
+            <div className="absolute -right-8 -top-2 text-5xl">
+              🚀
+            </div>
+          </div>
         </div>
       )}
     </div>
