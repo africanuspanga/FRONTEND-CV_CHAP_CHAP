@@ -276,48 +276,50 @@ const EducationForm = () => {
                   </div>
                 </div>
 
-                {/* Simplified Education Extras Section */}
-                <div className="mb-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <div className="border border-gray-200 rounded-md p-4 bg-white">
-                      <Label htmlFor="gpa" className="block mb-2 font-medium">
-                        GPA (Optional)
-                      </Label>
-                      <Input
-                        id="gpa"
-                        value={gpaValue}
-                        onChange={(e) => setGpaValue(e.target.value)}
-                        placeholder="4.6"
-                        className="w-full"
-                      />
+                {/* Simplified Education Extras Section - Only show on desktop */}
+                {!isMobile && (
+                  <div className="mb-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                      <div className="border border-gray-200 rounded-md p-4 bg-white">
+                        <Label htmlFor="gpa" className="block mb-2 font-medium">
+                          GPA (Optional)
+                        </Label>
+                        <Input
+                          id="gpa"
+                          value={gpaValue}
+                          onChange={(e) => setGpaValue(e.target.value)}
+                          placeholder="4.6"
+                          className="w-full"
+                        />
+                      </div>
+                      
+                      <div className="border border-gray-200 rounded-md p-4 bg-white">
+                        <Label htmlFor="honors" className="block mb-2 font-medium">
+                          Honors (Optional)
+                        </Label>
+                        <Input
+                          id="honors"
+                          value={honorsValue}
+                          onChange={(e) => setHonorsValue(e.target.value)}
+                          placeholder="First Class Honors"
+                          className="w-full"
+                        />
+                      </div>
                     </div>
                     
                     <div className="border border-gray-200 rounded-md p-4 bg-white">
-                      <Label htmlFor="honors" className="block mb-2 font-medium">
-                        Honors (Optional)
+                      <Label htmlFor="educationDescription" className="block mb-2 font-medium">
+                        EDUCATION DESCRIPTION (Optional)
                       </Label>
-                      <Input
-                        id="honors"
-                        value={honorsValue}
-                        onChange={(e) => setHonorsValue(e.target.value)}
-                        placeholder="First Class Honors"
-                        className="w-full"
-                      />
+                      <textarea
+                        id="educationDescription"
+                        rows={6}
+                        className="w-full p-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Add any relevant coursework, projects, or achievements related to your education."
+                      ></textarea>
                     </div>
                   </div>
-                  
-                  <div className="border border-gray-200 rounded-md p-4 bg-white">
-                    <Label htmlFor="educationDescription" className="block mb-2 font-medium">
-                      EDUCATION DESCRIPTION (Optional)
-                    </Label>
-                    <textarea
-                      id="educationDescription"
-                      rows={6}
-                      className="w-full p-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Add any relevant coursework, projects, or achievements related to your education."
-                    ></textarea>
-                  </div>
-                </div>
+                )}
 
                 <div className="flex justify-end mt-8">
                   <Button 
