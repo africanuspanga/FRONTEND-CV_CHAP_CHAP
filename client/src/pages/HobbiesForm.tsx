@@ -14,7 +14,9 @@ const MAX_HOBBIES = 3;
 const HobbiesForm = () => {
   const [, navigate] = useLocation();
   const { formData, updateFormField } = useCVForm();
-  const templateId = formData.templateId;
+  // Get templateId from formData, fallback to a default if not available
+  // This helps when accessing the page directly with an invalid URL like /cv//hobbies
+  const templateId = formData.templateId || 'kilimanjaro';
   
   // Initialize with existing data or 3 empty hobbies
   const [hobbies, setHobbies] = useState<Hobby[]>(() => {

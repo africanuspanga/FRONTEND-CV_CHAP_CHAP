@@ -1,62 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Main Pages -->
   <url>
-    <loc>https://cvchapchap.com/</loc>
-    <lastmod>2025-05-10</lastmod>
+    <loc>https://cvchapchap.replit.app/</loc>
+    <lastmod>2025-05-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.com/templates</loc>
-    <lastmod>2025-05-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://cvchapchap.com/create/method</loc>
-    <lastmod>2025-05-10</lastmod>
+    <loc>https://cvchapchap.replit.app/cv/select-template</loc>
+    <lastmod>2025-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.com/about</loc>
-    <lastmod>2025-05-10</lastmod>
+    <loc>https://cvchapchap.replit.app/cv/personal-info</loc>
+    <lastmod>2025-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.com/why-us</loc>
-    <lastmod>2025-05-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://cvchapchap.com/contact</loc>
-    <lastmod>2025-05-10</lastmod>
+    <loc>https://cvchapchap.replit.app/cv/work-experience</loc>
+    <lastmod>2025-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.com/login</loc>
-    <lastmod>2025-05-10</lastmod>
+    <loc>https://cvchapchap.replit.app/cv/education</loc>
+    <lastmod>2025-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cvchapchap.replit.app/cv/skills</loc>
+    <lastmod>2025-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cvchapchap.replit.app/faq</loc>
+    <lastmod>2025-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.com/register</loc>
-    <lastmod>2025-05-10</lastmod>
+    <loc>https://cvchapchap.replit.app/about</loc>
+    <lastmod>2025-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-  <url>
-    <loc>https://cvchapchap.com/template-gallery</loc>
-    <lastmod>2025-05-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Template-specific pages are not included as they are dynamic based on templateId -->
-  
-  <!-- Don't include admin pages or test pages in the sitemap as they shouldn't be crawled -->
 </urlset>
