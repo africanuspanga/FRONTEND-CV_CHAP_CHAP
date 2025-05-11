@@ -201,12 +201,37 @@ const EducationForm = () => {
   };
 
   const handleContinueToSkills = () => {
-    // Navigate to skills form using utility for smooth scroll reset
-    navigateWithScrollReset(navigate, `/cv/${templateId}/skills`);
+    // Show confetti animation first
+    setShowConfetti(true);
+    
+    // Add a small delay before navigation to allow confetti to display
+    // This shouldn't impact user experience noticeably
+    setTimeout(() => {
+      // Navigate to skills form using utility for smooth scroll reset
+      navigateWithScrollReset(navigate, `/cv/${templateId}/skills`);
+    }, 300); // Short delay for confetti to appear before navigation
   };
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
+      {/* Confetti effect - only rendered when showConfetti is true */}
+      {showConfetti && (
+        <ReactConfetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.3}
+          colors={['#1E40AF', '#3B82F6', '#60A5FA', '#93C5FD', '#DBEAFE']}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 999,
+            pointerEvents: 'none' // Make sure it doesn't block UI interaction
+          }}
+        />
+      )}
       <div className="flex-1 px-4 py-8 lg:px-8 xl:px-12">
         <div className="max-w-3xl mx-auto">
           {/* Heading removed as requested */}
