@@ -155,9 +155,8 @@ const EducationForm = () => {
   };
 
   const handleContinueToSkills = () => {
-    // Navigate to skills form
-    window.scrollTo(0, 0);
-    navigate(`/cv/${templateId}/skills`);
+    // Navigate to skills form using utility for smooth scroll reset
+    navigateWithScrollReset(navigate, `/cv/${templateId}/skills`);
   };
 
   return (
@@ -446,7 +445,7 @@ const EducationForm = () => {
               <div className="flex justify-between mt-8">
                 <Button 
                   variant="outline" 
-                  onClick={() => navigate(`/cv/${templateId}/work`)}
+                  onClick={() => navigateWithScrollReset(navigate, `/cv/${templateId}/work`)}
                   className="flex items-center"
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />

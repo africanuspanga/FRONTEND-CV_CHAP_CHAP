@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, Layers } from 'lucide-react';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import { useCVForm } from '@/contexts/cv-form-context';
+import { navigateWithScrollReset } from '@/lib/navigation-utils';
 
 const SkillsIntro = () => {
   const [, navigate] = useLocation();
@@ -12,15 +13,15 @@ const SkillsIntro = () => {
   const templateId = params.templateId;
 
   const handleAddSkills = () => {
-    navigate(`/cv/${templateId}/skills-recommendations`);
+    navigateWithScrollReset(navigate, `/cv/${templateId}/skills-recommendations`);
   };
 
   const handlePrevious = () => {
-    navigate(`/cv/${templateId}/education`);
+    navigateWithScrollReset(navigate, `/cv/${templateId}/education`);
   };
 
   const handleNext = () => {
-    navigate(`/cv/${templateId}/languages`);
+    navigateWithScrollReset(navigate, `/cv/${templateId}/languages`);
   };
 
   return (
