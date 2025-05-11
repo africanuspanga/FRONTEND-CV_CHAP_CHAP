@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { PenLine, ChevronDown, PlusCircle } from 'lucide-react';
+import { PenLine, ChevronDown, PlusCircle, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export interface WorkExperience {
   id: string;
@@ -28,6 +38,8 @@ const WorkHistorySummary: React.FC<WorkHistorySummaryProps> = ({
   onAddAnother
 }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
   
   // Check if device is mobile
   useEffect(() => {
@@ -44,6 +56,21 @@ const WorkHistorySummary: React.FC<WorkHistorySummaryProps> = ({
     // Clean up
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+  
+  // Handle opening delete confirmation dialog
+  const handleDeleteClick = (index: number) => {
+    setDeletingIndex(index);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  // Handle confirmation of deletion
+  const handleConfirmDelete = () => {
+    if (deletingIndex !== null) {
+      onDelete(deletingIndex);
+      setIsDeleteDialogOpen(false);
+      setDeletingIndex(null);
+    }
+  };
 
   return (
     <div className="my-4">
@@ -87,9 +114,20 @@ const WorkHistorySummary: React.FC<WorkHistorySummaryProps> = ({
                       </p>
                     </div>
                   </div>
-                  <div>
-                    <button onClick={() => onEdit(index)} className="text-amber-500">
+                  <div className="flex space-x-2">
+                    <button 
+                      onClick={() => onEdit(index)} 
+                      className="text-amber-500 p-1 hover:bg-amber-50 rounded"
+                      aria-label="Edit job"
+                    >
                       <PenLine className="h-4 w-4" />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteClick(index)} 
+                      className="text-red-500 p-1 hover:bg-red-50 rounded"
+                      aria-label="Delete job"
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
@@ -129,6 +167,28 @@ const WorkHistorySummary: React.FC<WorkHistorySummaryProps> = ({
           </Button>
         </div>
       </div>
+      
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this work experience?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the work experience 
+              entry and remove it from your CV.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
