@@ -85,6 +85,16 @@ const CertificationsForm = () => {
         )}
 
         <h1 className="text-3xl font-bold text-gray-900 mb-6">What certifications do you have?</h1>
+        
+        {(!templateId || templateId === 'kilimanjaro') && (
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+            <h3 className="font-medium text-blue-800 mb-1">Note</h3>
+            <p className="text-blue-700 text-sm">
+              It looks like you accessed this page directly. For the best experience, 
+              we recommend starting from the template selection page to create your CV properly.
+            </p>
+          </div>
+        )}
 
         <div className="max-w-xl mx-auto mb-8">
           <h3 className="uppercase text-sm font-medium text-gray-500 mb-4 text-center">
