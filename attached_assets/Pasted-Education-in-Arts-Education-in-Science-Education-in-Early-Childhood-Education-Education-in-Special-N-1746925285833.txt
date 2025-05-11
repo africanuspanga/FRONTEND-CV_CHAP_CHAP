@@ -1,0 +1,150 @@
+Education in Arts
+Education in Science
+Education in Early Childhood Education
+Education in Special Needs Education
+Education in Adult and Distance Learning
+Education in Educational Policy and Management
+Education in Teacher Education
+Education in Physical Education and Sports
+Education in Guidance and Counseling
+Education in Curriculum and Instruction
+Education in Vocational Studies
+Education in Language Education
+Education in Mathematics Education
+Education in Science Education
+Education in Social Studies Education
+
+
+Civil Engineering
+Mechanical Engineering
+Electrical Engineering
+Electronics and Communication Engineering
+Computer Engineering
+Information Systems and Network Engineering
+Mechatronics Engineering
+Industrial Engineering
+Biomedical Engineering
+Software Engineering
+Telecommunication Engineering
+Environmental Engineering
+Petroleum Engineering
+Mining Engineering
+Agricultural Engineering
+Medicine
+Pharmacy
+Nursing
+Medical Laboratory Sciences
+Radiography
+Physiotherapy
+Occupational Therapy
+Public Health
+Environmental Health
+Clinical Medicine
+Dental Surgery
+Optometry
+Nutrition and Dietetics
+Health Records and Information Management
+Biomedical Sciences
+Accounting
+Finance
+Marketing
+Human Resource Management
+Procurement and Supply Chain Management
+Entrepreneurship
+International Business
+Insurance and Risk Management
+Banking and Finance
+Project Management
+Logistics and Transport Management
+Cooperative Management
+Agribusiness Management
+Tourism and Hospitality Management
+Law Enforcement
+Criminology
+Forensic Science
+Security Studies
+International Law
+Human Rights Law
+Environmental Law
+Commercial Law
+Constitutional Law
+Administrative Law
+Labor Law
+Tax Law
+Intellectual Property Law
+Family Law
+Agriculture General
+Horticulture
+Crop Production and Management
+Agronomy
+Animal Science
+Aquaculture
+Range Management
+Applied Agricultural Extension
+Family and Consumer Sciences
+Human Nutrition
+Forestry
+Wildlife Management
+Wood Technologies and Value Addition
+Tourism Management
+Agricultural Economics and Agribusiness
+Sociology
+Social Work
+Psychology
+Political Science
+International Relations
+Public Administration
+Development Studies
+Anthropology
+History
+Geography
+Economics
+Philosophy
+Linguistics
+Literature
+Religious Studies
+Computer Science
+Information Technology
+Software Engineering
+Data Science
+Cyber Security
+Artificial Intelligence
+Information Systems
+Multimedia and Animation
+Game Development
+Web Development
+Mobile Application Development
+Network Engineering
+Cloud Computing
+Internet of Things (IoT)
+Blockchain Technology
+Journalism
+Mass Communication
+Public Relations
+Advertising
+Film and Television
+Media Studies
+Communication Studies
+Digital Media
+Broadcasting
+Photography
+Graphic Design
+Animation
+Scriptwriting
+Sound Engineering
+Media Management
+Mathematics
+Statistics
+Physics
+Chemistry
+Biology
+Microbiology
+Biochemistry
+Biotechnology
+Environmental Science
+Geology
+Meteorology
+Oceanography
+Astronomy
+Zoology
+Botany

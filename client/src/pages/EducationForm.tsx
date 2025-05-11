@@ -20,6 +20,7 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import { navigateWithScrollReset } from '@/lib/navigation-utils';
 import LocationInput from '@/components/LocationInput';
 import UniversityInput from '@/components/UniversityInput';
+import FieldOfStudyInput from '@/components/FieldOfStudyInput';
 
 const EducationForm = () => {
   const [, navigate] = useLocation();

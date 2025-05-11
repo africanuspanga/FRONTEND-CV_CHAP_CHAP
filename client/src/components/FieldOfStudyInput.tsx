@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { tanzaniaUniversities } from '@/lib/tanzania-universities-data';
+import { fieldsOfStudy } from '@/lib/field-of-study-data';
 
 // Create an array of options in the format expected by the autocomplete
-const universityOptions = tanzaniaUniversities.map(university => ({
-  label: university,
-  value: university
+const fieldOptions = fieldsOfStudy.map(field => ({
+  label: field,
+  value: field
 }));
 
-interface UniversityInputProps {
+interface FieldOfStudyInputProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -15,16 +15,16 @@ interface UniversityInputProps {
   disabled?: boolean;
 }
 
-const UniversityInput: React.FC<UniversityInputProps> = ({
+const FieldOfStudyInput: React.FC<FieldOfStudyInputProps> = ({
   value,
   onChange,
-  placeholder = "University of Dar es Salaam",
+  placeholder = "Type field of study",
   className = "",
   disabled = false
 }) => {
   const [inputValue, setInputValue] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
-  const [filteredOptions, setFilteredOptions] = useState(universityOptions);
+  const [filteredOptions, setFilteredOptions] = useState(fieldOptions);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   // Update input value when prop changes
@@ -41,7 +41,7 @@ const UniversityInput: React.FC<UniversityInputProps> = ({
     if (newValue.length >= 2) {
       setIsOpen(true);
       setFilteredOptions(
-        universityOptions.filter(option => 
+        fieldOptions.filter(option => 
           option.label.toLowerCase().includes(newValue.toLowerCase())
         )
       );
@@ -104,4 +104,4 @@ const UniversityInput: React.FC<UniversityInputProps> = ({
   );
 };
 
-export default UniversityInput;
+export default FieldOfStudyInput;
