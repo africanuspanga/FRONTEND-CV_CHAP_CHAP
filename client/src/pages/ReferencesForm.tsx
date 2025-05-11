@@ -70,9 +70,9 @@ const ReferencesForm = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
+    <div className="max-w-4xl mx-auto px-4 py-6 md:py-10">
       {/* Progress Bar */}
-      <div className="mb-8">
+      <div className="mb-6 md:mb-8">
         <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden">
           <div 
             className="absolute left-0 top-0 h-full bg-blue-500 rounded-full" 
@@ -82,24 +82,24 @@ const ReferencesForm = () => {
         <div className="text-right text-sm text-gray-500 mt-1">78%</div>
       </div>
 
-      <div className="bg-white rounded-lg border p-8">
-        <h1 className="text-2xl font-bold mb-3 text-indigo-950">References</h1>
-        <p className="text-gray-600 mb-8">
+      <div className={`bg-white rounded-lg border ${isMobile ? 'p-5' : 'p-8'}`}>
+        <h1 className="text-2xl font-bold mb-2 md:mb-3 text-indigo-950">References</h1>
+        <p className={`text-gray-600 ${isMobile ? 'mb-6' : 'mb-8'} text-sm md:text-base`}>
           Add professional references who can vouch for your skills and experience.
         </p>
 
         {/* References list */}
         {references.length > 0 && (
-          <div className="mb-8 space-y-4">
+          <div className={`${isMobile ? 'mb-6' : 'mb-8'} space-y-3 md:space-y-4`}>
             {references.map(ref => (
               <div 
                 key={ref.id} 
-                className="border rounded-lg p-4 flex justify-between items-center"
+                className="border rounded-lg p-3 md:p-4 flex justify-between items-center bg-blue-50/50"
               >
                 <div>
-                  <div className="font-medium">{ref.name}</div>
-                  <div className="text-sm text-gray-500">{ref.position}</div>
-                  <div className="text-sm text-gray-500">{ref.email}{ref.phone ? ` | ${ref.phone}` : ''}</div>
+                  <div className="font-medium text-blue-800">{ref.name}</div>
+                  <div className="text-xs md:text-sm text-gray-600">{ref.position}</div>
+                  <div className="text-xs md:text-sm text-gray-600">{ref.email}{ref.phone ? ` | ${ref.phone}` : ''}</div>
                 </div>
                 <Button
                   variant="ghost"
@@ -115,51 +115,55 @@ const ReferencesForm = () => {
         )}
 
         {/* Add reference form */}
-        <div className="border rounded-lg p-6 mb-8">
-          <h2 className="font-semibold mb-4">Add Reference</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className={`border rounded-lg ${isMobile ? 'p-4' : 'p-6'} ${isMobile ? 'mb-6' : 'mb-8'} bg-white shadow-sm`}>
+          <h2 className={`font-semibold ${isMobile ? 'mb-3' : 'mb-4'} text-blue-800`}>Add Reference</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">Full Name</label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Full Name"
+                className="h-9 md:h-10 text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Relationship</label>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">Relationship</label>
               <Input
                 value={relationship}
                 onChange={(e) => setRelationship(e.target.value)}
                 placeholder="e.g. Manager, Colleague"
+                className="h-9 md:h-10 text-sm"
               />
               <div className="text-xs text-gray-500 mt-1">How you know this person</div>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">Email</label>
               <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="email@example.com"
+                className="h-9 md:h-10 text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">Phone</label>
               <Input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+255 7XX XXX XXX"
+                className="h-9 md:h-10 text-sm"
               />
             </div>
           </div>
           <div className="flex justify-end">
             <Button
               onClick={handleAddReference}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white h-9 md:h-10 text-sm"
               disabled={!name}
             >
               Add Reference
@@ -167,11 +171,11 @@ const ReferencesForm = () => {
           </div>
         </div>
 
-        <div className="flex justify-between mt-8">
+        <div className={`flex justify-between ${isMobile ? 'mt-6' : 'mt-8'} ${isMobile ? 'sticky bottom-4' : ''}`}>
           <Button
             variant="outline"
             onClick={handlePrevious}
-            className="flex items-center"
+            className="flex items-center h-10 text-sm shadow-sm"
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
             Previous
@@ -179,7 +183,7 @@ const ReferencesForm = () => {
 
           <Button
             onClick={handleNext}
-            className="bg-teal-600 hover:bg-teal-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white h-10 text-sm font-medium shadow-sm"
           >
             Next
           </Button>
