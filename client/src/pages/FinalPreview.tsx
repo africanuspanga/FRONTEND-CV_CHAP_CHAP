@@ -182,7 +182,7 @@ const FinalPreview = () => {
   };
   
   return (
-    <div className="w-full h-screen flex flex-col bg-[#f5f5f5]">
+    <div className={`${isMobile ? 'h-screen w-screen p-0 m-0 overflow-hidden' : 'w-full h-screen flex flex-col bg-[#f5f5f5]'}`}>
       {/* Desktop Header */}
       {!isMobile && (
         <div className="bg-white border-b py-3 px-4 flex justify-between items-center">
