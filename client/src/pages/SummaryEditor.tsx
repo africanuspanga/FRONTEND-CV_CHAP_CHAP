@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, SearchIcon, RefreshCw, BoldIcon, ItalicIcon, UnderlineIcon, ListIcon, CheckCircle, XCircle } from 'lucide-react';
+import { ChevronLeft, RefreshCw, BoldIcon, ItalicIcon, UnderlineIcon, ListIcon, CheckCircle, XCircle } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import { Input } from '@/components/ui/input';
