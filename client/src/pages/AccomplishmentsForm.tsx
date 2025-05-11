@@ -153,65 +153,9 @@ const AccomplishmentsForm = () => {
 
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Tell us about your accomplishments</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div className="space-y-6">
-            <div>
-              <h3 className="uppercase text-sm font-medium text-gray-500 mb-2">
-                SEARCH BY JOB TITLE FOR PRE-WRITTEN EXAMPLES
-              </h3>
-              <div className="flex mb-4">
-                <Input
-                  type="text"
-                  placeholder="Software Engineer"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="rounded-r-none"
-                />
-                <Button 
-                  type="button"
-                  variant="secondary"
-                  className="rounded-l-none bg-blue-100 hover:bg-blue-200 text-blue-700"
-                  onClick={handleSearch}
-                >
-                  Search
-                </Button>
-              </div>
-
-              {searchResults.length > 0 && (
-                <div className="border rounded-md">
-                  <div className="p-3 bg-gray-50 border-b">
-                    <h4 className="text-sm font-medium text-gray-700">
-                      Showing results for {searchQuery || 'common accomplishments'}
-                    </h4>
-                  </div>
-                  
-                  <div className="divide-y">
-                    {searchResults.map((example, idx) => (
-                      <div key={idx} className="p-4 hover:bg-gray-50">
-                        <div className="flex">
-                          <div className="flex-shrink-0">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 rounded-full bg-blue-500 text-white hover:bg-blue-600"
-                              onClick={() => handleAddExample(example)}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          <p className="ml-3 text-sm text-gray-700">{example}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
+        <div className="max-w-xl mx-auto mb-8">
           <div>
-            <h3 className="uppercase text-sm font-medium text-gray-500 mb-2">
+            <h3 className="uppercase text-sm font-medium text-gray-500 mb-2 text-center">
               WRITE ABOUT YOUR ACCOMPLISHMENTS HERE
             </h3>
             

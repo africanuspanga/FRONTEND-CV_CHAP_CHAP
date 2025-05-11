@@ -165,11 +165,11 @@ const AdditionalSectionsForm = () => {
               <h3 className="text-xl font-medium text-gray-900">Live Preview</h3>
               <p className="text-gray-500 text-sm">This preview updates in real-time as you fill in your information.</p>
             </div>
-            <div className="border border-gray-200 rounded-md bg-white p-4">
+            <div className="border border-gray-200 rounded-md bg-white p-4 overflow-auto" style={{ maxHeight: '700px' }}>
               <DirectTemplateRenderer
                 templateId={templateId}
                 cvData={formData}
-                height={700}
+                height="auto"
               />
             </div>
           </div>
