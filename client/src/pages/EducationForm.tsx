@@ -188,7 +188,7 @@ const EducationForm = () => {
                   <UniversityInput
                     value={institution}
                     onChange={(value) => setInstitution(value)}
-                    placeholder="Start typing university name..."
+                    placeholder="University of Dar es Salaam"
                     className="w-full"
                   />
                 </div>
@@ -200,7 +200,7 @@ const EducationForm = () => {
                   <LocationInput
                     value={schoolLocation}
                     onChange={(value) => setSchoolLocation(value)}
-                    placeholder="Start typing location name..."
+                    placeholder="Dar es Salaam, Tanzania"
                     className="w-full"
                   />
                 </div>
@@ -228,10 +228,9 @@ const EducationForm = () => {
                     <Label htmlFor="field" className="block mb-2 font-medium">
                       Field of Study
                     </Label>
-                    <Input
-                      id="field"
+                    <FieldOfStudyInput
                       value={field}
-                      onChange={(e) => setField(e.target.value)}
+                      onChange={setField}
                       placeholder="e.g. Computer Science"
                       className="w-full"
                     />
