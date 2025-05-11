@@ -141,7 +141,7 @@ const SkillsRecommendations = () => {
             <p className="text-gray-600 mb-6">{error}</p>
             <Button
               onClick={() => navigate(`/cv/${templateId}/skills-editor`)}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-primary hover:bg-blue-600 text-white"
             >
               Continue with manual skills
             </Button>
@@ -178,13 +178,13 @@ const SkillsRecommendations = () => {
             <div className="grid grid-cols-2 gap-4 mt-8">
               <Button 
                 variant="outline" 
-                className="py-6 bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100"
+                className="py-6 bg-blue-50 text-primary border-primary/30 hover:bg-blue-100"
                 onClick={addCustomSkills}
               >
                 I'll add my own
               </Button>
               <Button 
-                className="py-6 bg-teal-600 hover:bg-teal-700 text-white"
+                className="py-6 bg-primary hover:bg-blue-600 text-white"
                 onClick={addRecommendedSkills}
               >
                 Add these skills
@@ -205,7 +205,7 @@ const SkillsRecommendations = () => {
 
           <Button
             onClick={addRecommendedSkills}
-            className="bg-teal-600 hover:bg-teal-700 text-white"
+            className="bg-primary hover:bg-blue-600 text-white"
             disabled={isLoading}
           >
             Next
