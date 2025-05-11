@@ -6,7 +6,7 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
 import { getAllTemplates, getTemplateById } from '@/lib/templates-registry';
 import { sortTemplatesByPriority } from '@/lib/template-priority';
-import { X, Download, Printer, Mail, CheckCircle, Edit } from 'lucide-react';
+import { X, Download, Printer, Mail, CheckCircle, Edit, Loader2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDynamicScale, A4_WIDTH_PX, A4_HEIGHT_PX } from '@/hooks/use-dynamic-scale';
 
@@ -18,9 +18,17 @@ interface CVPreviewAreaProps {
   templateId: string;
   formData: any;
   isMobile: boolean;
+  onDownload: () => void;
+  isDownloading: boolean;
 }
 
-const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isMobile }) => {
+const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ 
+  templateId, 
+  formData, 
+  isMobile, 
+  onDownload, 
+  isDownloading 
+}) => {
   // Create ref for the container to measure
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -66,9 +74,9 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
             Preview
           </div>
         </div>
-
+        
         <div className="download-button">
-          <button onClick={handleDownload} disabled={isDownloading}>
+          <button onClick={onDownload} disabled={isDownloading}>
             {isDownloading ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
@@ -284,20 +292,12 @@ const FinalPreview = () => {
           templateId={currentTemplateId}
           formData={formData}
           isMobile={isMobile}
+          onDownload={handleDownload}
+          isDownloading={isDownloading}
         />
       </div>
       
-      {/* Mobile Action Button */}
-      {isMobile && (
-        <button 
-          onClick={handleDownload}
-          disabled={isDownloading}
-          className="mobile-download-button fixed bottom-6 left-6 right-6 z-50 py-4 bg-[#3850a2] text-white font-semibold flex items-center justify-center gap-2 rounded-full shadow-lg text-lg"
-        >
-          <Download className="h-5 w-5" />
-          {isDownloading ? 'Processing...' : 'Download Now'}
-        </button>
-      )}
+      {/* We're using the download button in the CVPreviewArea component now */}
     </div>
   );
 };
