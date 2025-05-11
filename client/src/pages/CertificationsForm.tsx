@@ -21,7 +21,7 @@ const CertificationsForm = () => {
       : [{ name: '', issuer: '', date: '', url: '', id: crypto.randomUUID() }]
   );
 
-  const [searchQuery, setSearchQuery] = useState('');
+  // State management for certifications only
 
   const handleInputChange = (index: number, field: keyof Certification, value: string) => {
     const updatedCertifications = [...certifications];
@@ -72,39 +72,10 @@ const CertificationsForm = () => {
 
         <h1 className="text-3xl font-bold text-gray-900 mb-6">What certifications do you have?</h1>
 
-        <div className="mb-8">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="w-full md:w-2/3">
-              <h3 className="uppercase text-sm font-medium text-gray-500 mb-2">
-                SEARCH BY JOB TITLE FOR PRE-WRITTEN EXAMPLES
-              </h3>
-              <div className="flex">
-                <Input
-                  type="text"
-                  placeholder="Sales Manager"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="rounded-r-none"
-                />
-                <Button 
-                  type="button"
-                  variant="secondary"
-                  className="rounded-l-none bg-blue-100 hover:bg-blue-200 text-blue-700"
-                >
-                  Search
-                </Button>
-              </div>
-            </div>
-            
-            <div className="w-full md:w-1/3">
-              <h3 className="uppercase text-sm font-medium text-gray-500 mb-2">
-                ADD YOUR CERTIFICATIONS HERE
-              </h3>
-              <div className="h-40 bg-blue-100 rounded-md p-4 flex items-center justify-center text-center text-blue-700">
-                <p>Add your certifications here.</p>
-              </div>
-            </div>
-          </div>
+        <div className="max-w-xl mx-auto mb-8">
+          <h3 className="uppercase text-sm font-medium text-gray-500 mb-4 text-center">
+            ADD YOUR CERTIFICATIONS HERE
+          </h3>
 
           {certifications.map((certification, index) => (
             <div key={index} className="bg-white rounded-md border p-6 mb-4">
