@@ -138,6 +138,10 @@ export const educationSchema = z.object({
   endDate: z.string().optional(),
   current: z.boolean().optional(),
   description: z.string().optional(),
+  graduationMonth: z.string().optional(),
+  graduationYear: z.string().optional(),
+  gpa: z.string().optional(),
+  honors: z.string().optional(),
 });
 
 export const skillSchema = z.object({

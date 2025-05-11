@@ -275,167 +275,48 @@ const EducationForm = () => {
                   </div>
                 </div>
 
-                {!isMobile && (
-                  <div className="mb-6">
-                    <div className="flex justify-between">
-                      <Label htmlFor="additionalCourses" className="font-semibold text-indigo-900">
-                        ADD ANY ADDITIONAL COURSEWORK YOU'RE PROUD TO SHOWCASE
+                {/* Simplified Education Extras Section */}
+                <div className="mb-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div className="border border-gray-200 rounded-md p-4 bg-white">
+                      <Label htmlFor="gpa" className="block mb-2 font-medium">
+                        GPA (Optional)
                       </Label>
-                      <div className="text-sm text-blue-600 mb-2 cursor-pointer">
-                        Look here for sample CV references
-                      </div>
+                      <Input
+                        id="gpa"
+                        value={gpaValue}
+                        onChange={(e) => setGpaValue(e.target.value)}
+                        placeholder="4.6"
+                        className="w-full"
+                      />
                     </div>
                     
-                    <div className="bg-amber-50 p-4 rounded-md border border-amber-100 mb-6 mt-2">
-                      <div className="flex gap-2">
-                        <LightbulbIcon className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                        <p className="text-amber-800 text-sm">
-                          Not enough work experience? This section can help you stand out. If your bachelor's degree is in-progress,
-                          you may include international schooling, educational achievements or any other certification that corresponds
-                          to the job you want.
-                        </p>
-                      </div>
+                    <div className="border border-gray-200 rounded-md p-4 bg-white">
+                      <Label htmlFor="honors" className="block mb-2 font-medium">
+                        Honors (Optional)
+                      </Label>
+                      <Input
+                        id="honors"
+                        value={honorsValue}
+                        onChange={(e) => setHonorsValue(e.target.value)}
+                        placeholder="First Class Honors"
+                        className="w-full"
+                      />
                     </div>
                   </div>
-                )}
-                
-                {!isMobile && (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-3">Educational Achievements</h3>
-                      <p className="text-gray-600 mb-4">Would you like to include any honors or achievements?</p>
-                      
-                      <div className="grid grid-cols-2 gap-4 mb-4">
-                        {!showGpaInput ? (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="flex items-center justify-center py-6 bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
-                            onClick={() => setShowGpaInput(true)}
-                          >
-                            <PlusCircle className="h-4 w-4 mr-2" />
-                            GPA
-                          </Button>
-                        ) : (
-                          <div className="border border-gray-200 rounded-md p-4 bg-white">
-                            <Label htmlFor="gpa" className="block mb-2 text-sm font-medium">GPA Value</Label>
-                            <div className="flex gap-2">
-                              <Input
-                                id="gpa"
-                                value={gpaValue}
-                                onChange={(e) => setGpaValue(e.target.value)}
-                                placeholder="e.g. 3.8"
-                                className="flex-grow"
-                              />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  setShowGpaInput(false);
-                                  setGpaValue('');
-                                }}
-                                className="h-9 w-9"
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {!showHonorsInput ? (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="flex items-center justify-center py-6 bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
-                            onClick={() => setShowHonorsInput(true)}
-                          >
-                            <PlusCircle className="h-4 w-4 mr-2" />
-                            Honors
-                          </Button>
-                        ) : (
-                          <div className="border border-gray-200 rounded-md p-4 bg-white">
-                            <Label htmlFor="honors" className="block mb-2 text-sm font-medium">Honors</Label>
-                            <div className="flex gap-2">
-                              <Input
-                                id="honors"
-                                value={honorsValue}
-                                onChange={(e) => setHonorsValue(e.target.value)}
-                                placeholder="e.g. Cum Laude"
-                                className="flex-grow"
-                              />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  setShowHonorsInput(false);
-                                  setHonorsValue('');
-                                }}
-                                className="h-9 w-9"
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="mb-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="flex items-center justify-center py-6 w-full bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
-                          onClick={() => {}}
-                        >
-                          <PlusCircle className="h-4 w-4 mr-2" />
-                          International Grade to GPA Equivalent
-                        </Button>
-                      </div>
-                      
-                      <div className="mb-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="flex items-center justify-center py-6 w-full bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
-                          onClick={() => {}}
-                        >
-                          <PlusCircle className="h-4 w-4 mr-2" />
-                          Achievement Tests
-                        </Button>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="flex items-center justify-center py-6 bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
-                          onClick={() => {}}
-                        >
-                          <PlusCircle className="h-4 w-4 mr-2" />
-                          Min Average
-                        </Button>
-                        
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="flex items-center justify-center py-6 bg-white text-blue-700 border-gray-200 hover:bg-gray-50"
-                          onClick={() => {}}
-                        >
-                          <PlusCircle className="h-4 w-4 mr-2" />
-                          Dean's List
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="font-semibold text-lg mb-3">EDUCATION DESCRIPTION</h3>
-                      <div className="bg-white p-6 rounded-md min-h-[200px] border border-gray-200">
-                        {/* Empty education description field */}
-                      </div>
-                    </div>
+                  
+                  <div className="border border-gray-200 rounded-md p-4 bg-white">
+                    <Label htmlFor="educationDescription" className="block mb-2 font-medium">
+                      EDUCATION DESCRIPTION (Optional)
+                    </Label>
+                    <textarea
+                      id="educationDescription"
+                      rows={6}
+                      className="w-full p-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Add any relevant coursework, projects, or achievements related to your education."
+                    ></textarea>
                   </div>
-                )}
+                </div>
 
                 <div className="flex justify-end mt-8">
                   <Button 
