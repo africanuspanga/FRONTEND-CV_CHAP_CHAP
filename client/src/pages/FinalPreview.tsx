@@ -34,22 +34,25 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
       ref={containerRef}
       className="cv-preview-container flex-grow flex justify-center overflow-auto"
     >
-      <div 
-        className="cv-template-container" 
-        style={{ 
-          transform: `scale(${scale})`,
-          width: `${A4_WIDTH_PX}px`,
-          height: `${A4_HEIGHT_PX}px`,
-          transformOrigin: 'top center',
-        }}
-      >
-        <DirectTemplateRenderer
-          templateId={templateId}
-          cvData={formData}
-          height="auto"
-          width="100%"
-          scaleFactor={1} // We're applying scale via container style
-        />
+      <div className="cv-container-wrapper py-4">
+        <div 
+          className="cv-template-container" 
+          style={{ 
+            transform: `scale(${scale})`,
+            width: `${A4_WIDTH_PX}px`,
+            height: `${A4_HEIGHT_PX}px`,
+            transformOrigin: 'top center',
+            margin: '0 auto',
+          }}
+        >
+          <DirectTemplateRenderer
+            templateId={templateId}
+            cvData={formData}
+            height="auto"
+            width="100%"
+            scaleFactor={1} // We're applying scale via container style
+          />
+        </div>
       </div>
     </div>
   );
