@@ -74,7 +74,13 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
     const processedData = {
       ...cvData,
       // Add cleaned data
-      personalInfo: cleanedPersonalInfo,
+      personalInfo: {
+        ...cleanedPersonalInfo,
+        // Ensure location is available for templates that use it instead of address
+        location: cleanedPersonalInfo.address || '',
+        // Map professionalTitle to jobTitle for templates that use jobTitle
+        jobTitle: cleanedPersonalInfo.professionalTitle || '',
+      },
       workExperiences: cleanedWorkExperiences,
       education: cleanedEducation,
       // Set name correctly
