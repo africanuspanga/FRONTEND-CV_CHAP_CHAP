@@ -30,8 +30,6 @@ const SummaryEditor = () => {
 
   // State - use the summary from personalInfo object
   const [summary, setSummary] = useState(formData.personalInfo?.summary || defaultSummary);
-  const [jobSearchTerm, setJobSearchTerm] = useState('');
-  const [isSearchingExamples, setIsSearchingExamples] = useState(false);
   const [isEnhancing, setIsEnhancing] = useState(false);
 
   // Update the summary in the form data (in personalInfo object)
@@ -116,14 +114,7 @@ const SummaryEditor = () => {
     }
   };
 
-  // Handle search for examples
-  const handleSearchExamples = () => {
-    setIsSearchingExamples(true);
-    // Simulate search delay
-    setTimeout(() => {
-      setIsSearchingExamples(false);
-    }, 1500);
-  };
+
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
@@ -168,38 +159,9 @@ const SummaryEditor = () => {
           </p>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left column - search for examples - hidden on mobile */}
-          {!isMobile && (
-            <div>
-              <h3 className="font-semibold text-indigo-900 uppercase mb-4">
-                SEARCH BY JOB TITLE FOR PRE-WRITTEN EXAMPLES
-              </h3>
-              <div className="flex gap-2 mb-8">
-                <Input
-                  value={jobSearchTerm}
-                  onChange={(e) => setJobSearchTerm(e.target.value)}
-                  placeholder="Sales Manager"
-                  className="flex-grow"
-                />
-                <Button
-                  onClick={handleSearchExamples}
-                  disabled={isSearchingExamples}
-                  className="bg-blue-100 text-blue-700 hover:bg-blue-200 px-6"
-                >
-                  {isSearchingExamples ? (
-                    <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
-                  ) : (
-                    <SearchIcon className="h-4 w-4 mr-1" />
-                  )}
-                  Search
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Summary input section - full width on mobile */}
-          <div className={isMobile ? "w-full" : ""}>
+        <div className="grid grid-cols-1 gap-6">
+          {/* Summary input section */}
+          <div className="w-full">
             {!isMobile && (
               <>
                 <div className="flex items-center gap-2 mb-4">
