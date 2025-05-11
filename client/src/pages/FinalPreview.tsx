@@ -94,7 +94,7 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
     );
   }
   
-  // For desktop, render the full CV with proper scaling
+  // For desktop, render the actual live CV preview
   return (
     <div 
       ref={containerRef}
@@ -112,6 +112,10 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
             backgroundColor: 'white',
             position: 'relative',
             zIndex: 1,
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            border: '1px solid #eee',
+            borderRadius: '4px',
+            overflow: 'hidden'
           }}
         >
           <DirectTemplateRenderer
