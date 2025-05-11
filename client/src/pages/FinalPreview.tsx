@@ -207,33 +207,7 @@ const FinalPreview = () => {
         </div>
       )}
       
-      {/* Mobile Header & Actions */}
-      {isMobile && (
-        <>
-          <div className="mobile-header fixed top-0 left-0 right-0 z-50 p-4 bg-[#1a2e5c] text-white text-center font-semibold text-xl">
-            Finalize Resume
-          </div>
-          
-          <div className="mobile-actions pt-16 pb-3 px-4">
-            <div className="flex gap-4 justify-between">
-              <button 
-                className="mobile-action-button flex-1 py-3 px-4 bg-white text-[#1a2e5c] rounded-full border border-[#1a2e5c] font-medium flex items-center justify-center"
-                onClick={() => setTemplateSidebarOpen(true)}
-              >
-                Change Template
-              </button>
-              
-              <button 
-                className="mobile-action-button flex-1 py-3 px-4 bg-white text-[#1a2e5c] rounded-full border border-[#1a2e5c] font-medium flex items-center justify-center"
-                onClick={handleUpdateContent}
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Resume
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      {/* Mobile Header & Actions now handled in CVPreviewArea */}
       
       {/* Main Content Area */}
       <div className="flex-grow flex overflow-hidden bg-[#f5f5f5]">
