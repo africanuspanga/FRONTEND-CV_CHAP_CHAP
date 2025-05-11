@@ -49,13 +49,10 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
     return (
       <div className="mobile-cv-wrapper" ref={containerRef}>
         <div className="mobile-cv-header">
-          <h2>Finalize Resume</h2>
+          <h2>Your CV is Ready</h2>
           <div className="action-buttons">
             <button onClick={() => window.location.href = '/cv/select-template'}>
               Change Template
-            </button>
-            <button onClick={() => window.location.href = '/cv/personal-info'}>
-              <Edit size={16} /> Edit Resume
             </button>
           </div>
         </div>
