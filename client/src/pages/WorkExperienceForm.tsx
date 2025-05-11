@@ -18,6 +18,7 @@ import { getWorkExperienceRecommendations } from '@/lib/openai-service';
 import MobilePreviewNote from '@/components/MobilePreviewNote';
 import JobTitleInput from '@/components/JobTitleInput';
 import LocationInput from '@/components/LocationInput';
+import { navigateWithScrollReset } from '@/lib/navigation-utils';
 import '../styles/mobile-form.css';
 
 const WorkExperienceForm = () => {
@@ -310,11 +311,8 @@ const WorkExperienceForm = () => {
   };
   
   const handleContinueToEducation = () => {
-    // Scroll to top before navigation
-    window.scrollTo(0, 0);
-    
-    // Navigate to the education form
-    navigate(`/cv/${templateId}/education`);
+    // Use the utility function for consistent navigation with scroll reset
+    navigateWithScrollReset(navigate, `/cv/${templateId}/education`);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -395,8 +393,7 @@ const WorkExperienceForm = () => {
           {/* Back button */}
           <button
             onClick={() => {
-              window.scrollTo(0, 0);
-              navigate(`/cv/${templateId}/personal`);
+              navigateWithScrollReset(navigate, `/cv/${templateId}/personal`);
             }}
             className="text-primary flex items-center mb-4 md:mb-6"
           >
@@ -575,8 +572,7 @@ const WorkExperienceForm = () => {
                 <Button 
                   variant="outline" 
                   onClick={() => {
-                    window.scrollTo(0, 0);
-                    navigate(`/cv/${templateId}/personal`);
+                    navigateWithScrollReset(navigate, `/cv/${templateId}/personal`);
                   }}
                   className="flex items-center gap-1 px-4"
                 >

@@ -17,6 +17,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import EducationSummary from '@/components/EducationSummary';
 import { Education } from '@shared/schema';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import { navigateWithScrollReset } from '@/lib/navigation-utils';
 
 const EducationForm = () => {
   const [, navigate] = useLocation();
