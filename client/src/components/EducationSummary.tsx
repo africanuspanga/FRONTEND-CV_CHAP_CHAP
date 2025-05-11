@@ -6,8 +6,8 @@ import { Education } from '@shared/schema';
 
 interface EducationSummaryProps {
   educations: Education[];
-  onEdit: (index: number) => void;
-  onDelete: (index: number) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
   onAddAnother: () => void;
 }
 
@@ -70,10 +70,10 @@ const EducationSummary: React.FC<EducationSummaryProps> = ({
                 </div>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => onEdit(index)} className="text-amber-500">
+                <button onClick={() => onEdit(education.id)} className="text-amber-500">
                   <Pencil className="h-4 w-4" />
                 </button>
-                <button onClick={() => onDelete(index)} className="text-gray-400">
+                <button onClick={() => onDelete(education.id)} className="text-gray-400">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
