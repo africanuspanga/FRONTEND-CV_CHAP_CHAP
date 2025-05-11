@@ -201,7 +201,7 @@ const SkillsEditor = () => {
               disabled={!newSkill.trim()}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              Add
+              Add Skills
             </Button>
           </div>
         </div>

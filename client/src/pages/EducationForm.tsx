@@ -203,35 +203,57 @@ const EducationForm = () => {
   const handleContinueToSkills = () => {
     // Show confetti animation first
     setShowConfetti(true);
+    console.log('Showing confetti, current state:', showConfetti);
     
     // Add a small delay before navigation to allow confetti to display
     // This shouldn't impact user experience noticeably
     setTimeout(() => {
+      console.log('Navigation timeout triggered, confetti state:', showConfetti);
       // Navigate to skills form using utility for smooth scroll reset
       navigateWithScrollReset(navigate, `/cv/${templateId}/skills`);
-    }, 300); // Short delay for confetti to appear before navigation
+    }, 1000); // Longer delay for debugging to ensure confetti appears
   };
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
-      {/* Confetti effect - only rendered when showConfetti is true */}
+      {/* Confetti effect - always rendered when debug mode is on */}
       {showConfetti && (
         <ReactConfetti
           width={windowDimensions.width}
           height={windowDimensions.height}
           recycle={false}
-          numberOfPieces={200}
+          numberOfPieces={300}
           gravity={0.3}
           colors={['#1E40AF', '#3B82F6', '#60A5FA', '#93C5FD', '#DBEAFE']}
           style={{
             position: 'fixed',
             top: 0,
             left: 0,
-            zIndex: 999,
+            zIndex: 9999,
             pointerEvents: 'none' // Make sure it doesn't block UI interaction
           }}
         />
       )}
+      {/* Debug button to manually trigger confetti */}
+      <button 
+        onClick={() => {
+          console.log('Debug button clicked');
+          setShowConfetti(true);
+          setTimeout(() => setShowConfetti(false), 3000);
+        }}
+        style={{
+          position: 'fixed',
+          bottom: '10px',
+          right: '10px',
+          zIndex: 9999,
+          background: '#ddd',
+          padding: '5px',
+          fontSize: '10px',
+          display: 'none' // Hidden in production
+        }}
+      >
+        Debug Confetti
+      </button>
       <div className="flex-1 px-4 py-8 lg:px-8 xl:px-12">
         <div className="max-w-3xl mx-auto">
           {/* Heading removed as requested */}
