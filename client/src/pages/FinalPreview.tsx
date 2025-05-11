@@ -29,24 +29,26 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
   
   console.log("Dynamic scale factor calculated:", scale);
   
-  // Ensure we're using a hardcoded scale factor for guaranteed full view
-  const displayScale = isMobile ? 0.3 : 0.55;
-
+  // Use a more reliable scale factor based on device
+  const displayScale = isMobile ? 0.25 : 0.55;
+  
   return (
     <div 
       ref={containerRef}
       className="cv-preview-container"
     >
       <div className="cv-container-wrapper">
-        {/* Fixed size container with proper scaling */}
         <div 
           className="cv-template-container"
           style={{ 
             transform: `scale(${displayScale})`,
             width: `${A4_WIDTH_PX}px`,
-            height: `${A4_HEIGHT_PX}px`,
+            minHeight: `${A4_HEIGHT_PX}px`,
             transformOrigin: 'center center',
             margin: '0 auto',
+            backgroundColor: 'white', // Ensure we have a white background
+            position: 'relative',
+            zIndex: 1, // Ensure the content is visible
           }}
         >
           <DirectTemplateRenderer
@@ -145,12 +147,12 @@ const FinalPreview = () => {
       {/* Mobile Header & Actions */}
       {isMobile && (
         <>
-          <div className="mobile-header">
+          <div className="mobile-header fixed top-0 left-0 right-0 z-50 p-4 bg-blue-900 text-white text-center font-semibold">
             Finalize Resume
           </div>
-          <div className="mobile-actions">
+          <div className="mobile-actions pt-14 pb-2 px-4 bg-white">
             <button 
-              className="mobile-action-button w-full"
+              className="mobile-action-button w-full py-2 px-4 bg-blue-50 text-blue-900 rounded-md border border-blue-200"
               onClick={() => setTemplateSidebarOpen(true)}
             >
               Change Template
@@ -218,7 +220,7 @@ const FinalPreview = () => {
         <button 
           onClick={handleDownload}
           disabled={isDownloading}
-          className="mobile-download-button"
+          className="mobile-download-button fixed bottom-0 left-0 right-0 z-50 py-4 bg-blue-700 text-white font-semibold flex items-center justify-center gap-2"
         >
           <Download className="h-5 w-5" />
           {isDownloading ? 'Processing...' : 'Download Now'}
