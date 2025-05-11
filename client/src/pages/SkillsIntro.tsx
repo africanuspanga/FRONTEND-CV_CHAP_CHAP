@@ -64,7 +64,7 @@ const SkillsIntro = () => {
           <div className="flex justify-center mt-12">
             <Button
               onClick={handleAddSkills}
-              className="px-8 py-6 h-auto bg-teal-600 hover:bg-teal-700 text-white"
+              className="px-8 py-6 h-auto bg-blue-600 hover:bg-blue-700 text-white"
             >
               Add Skills
             </Button>
