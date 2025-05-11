@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronLeft, Briefcase, Building2, MapPin, Calendar, CheckCircle } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
+import ReactConfetti from 'react-confetti';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LiveCVPreview from '@/components/LiveCVPreview';
 import WorkExperienceBulletGenerator from '@/components/WorkExperienceBulletGenerator';
@@ -45,6 +46,13 @@ const WorkExperienceForm = () => {
   const [showEditor, setShowEditor] = useState(false);
   const [aiRecommendations, setAIRecommendations] = useState<string[]>([]);
   
+  // Confetti states
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0
+  });
+  
   // Editing state
   const [editingJobIndex, setEditingJobIndex] = useState<number | null>(null);
   
@@ -55,20 +63,24 @@ const WorkExperienceForm = () => {
   const [isMobile, setIsMobile] = useState(false);
   const jobTitleInputRef = useRef<HTMLInputElement>(null);
   
-  // Check if device is mobile
+  // Check if device is mobile and update window dimensions for confetti
   useEffect(() => {
-    const checkMobile = () => {
+    const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
     };
     
     // Initial check
-    checkMobile();
+    handleResize();
     
     // Add listener for window resize
-    window.addEventListener('resize', checkMobile);
+    window.addEventListener('resize', handleResize);
     
     // Cleanup
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
   
   // Auto-focus the first input on mobile
@@ -311,8 +323,16 @@ const WorkExperienceForm = () => {
   };
   
   const handleContinueToEducation = () => {
-    // Use the utility function for consistent navigation with scroll reset
-    navigateWithScrollReset(navigate, `/cv/${templateId}/education`);
+    // Show confetti first before navigating
+    setShowConfetti(true);
+    console.log('Showing confetti before navigating to education page');
+    
+    // Add a small delay before navigation to allow confetti to display
+    // This shouldn't impact user experience noticeably since confetti is lightweight
+    setTimeout(() => {
+      // Navigate to education page using utility for smooth scroll reset
+      navigateWithScrollReset(navigate, `/cv/${templateId}/education`);
+    }, 800); // 800ms delay to show some confetti without making the app feel slow
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -376,6 +396,26 @@ const WorkExperienceForm = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-5 md:py-10">
+      {/* Confetti effect - only visible when triggered */}
+      {showConfetti && (
+        <ReactConfetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+          recycle={false}
+          numberOfPieces={400}
+          gravity={0.2}
+          initialVelocityY={10}
+          colors={['#1E40AF', '#3B82F6', '#60A5FA', '#93C5FD', '#DBEAFE', '#0D9488', '#14B8A6', '#2DD4BF']}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 9999,
+            pointerEvents: 'none' // Make sure it doesn't block UI interaction
+          }}
+        />
+      )}
+      
       {/* Progress Bar */}
       <div className="mb-4 md:mb-8">
         <div className="relative h-3 bg-gray-100 rounded-full overflow-hidden">
