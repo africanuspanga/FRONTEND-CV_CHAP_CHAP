@@ -90,6 +90,7 @@ const EducationForm = () => {
       degree,
       field,
       location: schoolLocation,
+      startDate: `${gradMonth} ${gradYear}`,  // Using graduation date as start date
       graduationMonth: gradMonth,
       graduationYear: gradYear,
       gpa: gpaValue || undefined,
@@ -176,7 +177,7 @@ const EducationForm = () => {
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
       <div className="flex-1 px-4 py-8 lg:px-8 xl:px-12">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">Education Details</h1>
+          {/* Heading removed as requested */}
           
           {showEducationForm && (
             <>

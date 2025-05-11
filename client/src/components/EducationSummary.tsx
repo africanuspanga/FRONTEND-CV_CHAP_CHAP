@@ -47,15 +47,25 @@ const EducationSummary: React.FC<EducationSummaryProps> = ({
                   <p className="text-gray-600 text-sm mt-1">
                     {education.institution}
                   </p>
-                  {education.location && (
-                    <p className="text-gray-600 text-sm mt-1">
-                      {education.location} {education.graduationMonth && education.graduationYear ? `| ${education.graduationMonth} ${education.graduationYear}` : ''}
-                    </p>
-                  )}
-                  {education.gpa && (
-                    <ul className="mt-2 list-disc ml-5">
-                      <li className="text-gray-600">GPA {education.gpa}</li>
-                    </ul>
+                  <p className="text-gray-600 text-sm mt-1">
+                    {education.location} 
+                    {education.graduationMonth && education.graduationYear 
+                      ? ` | ${education.graduationMonth} ${education.graduationYear}` 
+                      : education.endDate 
+                        ? ` | ${education.endDate}` 
+                        : ''}
+                  </p>
+                  
+                  {/* Show GPA and honors if available */}
+                  {(education.gpa || education.honors) && (
+                    <div className="mt-2 text-gray-600">
+                      {education.gpa && (
+                        <span className="mr-3">GPA: {education.gpa}</span>
+                      )}
+                      {education.honors && (
+                        <span>{education.honors}</span>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
