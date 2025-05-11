@@ -171,13 +171,7 @@ const WorkExperienceEditor: React.FC<WorkExperienceEditorProps> = ({
               </span>
             </div>
             
-            <div className="mt-4">
-              <h4 className="text-sm text-gray-500 mb-2">Related Job Titles</h4>
-              <div className="space-y-1">
-                <p className="text-primary cursor-pointer text-sm">• Similar Job 1</p>
-                <p className="text-primary cursor-pointer text-sm">• Similar Job 2</p>
-              </div>
-            </div>
+
             
             <div className="mt-6 border rounded-md overflow-hidden">
               <h4 className="bg-gray-100 p-3 border-b text-sm">Showing results for {jobTitle}</h4>
@@ -209,13 +203,7 @@ const WorkExperienceEditor: React.FC<WorkExperienceEditorProps> = ({
             </div>
             
             <div className="bg-blue-50 p-4 rounded-md mb-6 relative">
-              <button 
-                className="absolute top-2 right-2 bg-white text-primary text-xs font-medium px-2 py-1 rounded flex items-center"
-                onClick={enhanceWithAI}
-              >
-                <Sparkles className="h-3 w-3 mr-1" />
-                Enhance with AI
-              </button>
+
               
               <div className="space-y-2 mt-4">
                 {achievements.map((achievement, index) => (
