@@ -42,22 +42,15 @@ export function useDynamicScale(
 
       let newScale;
       
+      // For final preview page, we need a much more aggressive scaling to ensure the CV fits completely
+      // Fixed scale approach for predictable results
       if (isMobile) {
-        // On mobile, prioritize fitting the width to make content readable
-        // but still respect height constraints with a minimum scale
-        newScale = Math.min(
-          // Don't go below 0.35x scale to ensure it fits
-          Math.max(0.35, scaleX), 
-          // Don't make it bigger than what fits vertically
-          scaleY
-        );
-        
-        // Add extra safety margin on mobile (15%)
-        newScale = newScale * 0.85;
+        // On mobile, use a fixed scale that guarantees visibility
+        newScale = Math.min(0.3, Math.min(scaleX, scaleY));
       } else {
-        // On desktop, use standard fit algorithm with more safety margin
-        // Use 0.85 (15% margin) to ensure the entire CV fits on screen
-        newScale = Math.min(scaleX, scaleY) * 0.85;
+        // For desktop, ensure the CV fits by using 70% scaling (30% safety margin)
+        // This ensures we can see the whole document without scrolling
+        newScale = Math.min(0.65, Math.min(scaleX, scaleY));
       }
 
       console.log("Scale calculation:", { 

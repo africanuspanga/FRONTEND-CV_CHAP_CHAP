@@ -29,19 +29,23 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
   
   console.log("Dynamic scale factor calculated:", scale);
   
+  // Ensure we're using a hardcoded scale factor for guaranteed full view
+  const displayScale = isMobile ? 0.3 : 0.55;
+
   return (
     <div 
       ref={containerRef}
-      className="cv-preview-container flex-grow flex justify-center overflow-auto"
+      className="cv-preview-container"
     >
-      <div className="cv-container-wrapper py-4">
+      <div className="cv-container-wrapper">
+        {/* Fixed size container with proper scaling */}
         <div 
-          className="cv-template-container" 
+          className="cv-template-container"
           style={{ 
-            transform: `scale(${scale})`,
+            transform: `scale(${displayScale})`,
             width: `${A4_WIDTH_PX}px`,
             height: `${A4_HEIGHT_PX}px`,
-            transformOrigin: 'top center',
+            transformOrigin: 'center center',
             margin: '0 auto',
           }}
         >
