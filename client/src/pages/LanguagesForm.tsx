@@ -204,7 +204,7 @@ const LanguagesForm = () => {
               </div>
               <Button 
                 onClick={addCustomLanguage} 
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-primary hover:bg-blue-600 text-white"
               >
                 Add
               </Button>
@@ -248,7 +248,7 @@ const LanguagesForm = () => {
 
           <Button
             onClick={handleNext}
-            className="bg-teal-600 hover:bg-teal-700 text-white"
+            className="bg-primary hover:bg-blue-600 text-white"
           >
             Next
           </Button>
