@@ -42,11 +42,14 @@ const EducationSummary: React.FC<EducationSummaryProps> = ({
                 </div>
                 <div>
                   <h3 className="text-blue-700 font-medium">
-                    {education.degree} {education.fieldOfStudy ? `- ${education.fieldOfStudy}` : ''}
+                    {education.degree} {education.field ? `in ${education.field}` : ''}
                   </h3>
+                  <p className="text-gray-600 text-sm mt-1">
+                    {education.institution}
+                  </p>
                   {education.location && (
                     <p className="text-gray-600 text-sm mt-1">
-                      {education.location} {education.endDate && `| ${education.endDate}`}
+                      {education.location} {education.graduationMonth && education.graduationYear ? `| ${education.graduationMonth} ${education.graduationYear}` : ''}
                     </p>
                   )}
                   {education.gpa && (
