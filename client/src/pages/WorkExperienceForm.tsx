@@ -16,6 +16,8 @@ import WorkHistorySummary from '@/components/WorkHistorySummary';
 import { WorkExperience } from '@shared/schema';
 import { getWorkExperienceRecommendations } from '@/lib/openai-service';
 import MobilePreviewNote from '@/components/MobilePreviewNote';
+import JobTitleInput from '@/components/JobTitleInput';
+import LocationInput from '@/components/LocationInput';
 import '../styles/mobile-form.css';
 
 const WorkExperienceForm = () => {
@@ -413,13 +415,10 @@ const WorkExperienceForm = () => {
                     <Briefcase className="w-4 h-4 mr-2 text-primary" />
                     TITLE <span className="text-red-500">*</span>
                   </Label>
-                  <Input
-                    id="title"
-                    ref={jobTitleInputRef}
-                    placeholder="e.g. Chief Engineer"
+                  <JobTitleInput
                     value={jobTitle}
-                    onChange={(e) => setJobTitle(e.target.value)}
-                    required
+                    onChange={(value) => setJobTitle(value)}
+                    placeholder="Type your job title"
                     className="mt-1"
                   />
                 </div>
@@ -444,13 +443,12 @@ const WorkExperienceForm = () => {
                     <MapPin className="w-4 h-4 mr-2 text-primary" />
                     LOCATION
                   </Label>
-                  <Input
-                    id="location"
-                    placeholder="e.g. Dar es Salaam, Tanzania"
+                  <LocationInput
                     value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    disabled={isRemote}
+                    onChange={(value) => setLocation(value)}
+                    placeholder="Dar es Salaam, Tanzania"
                     className="mt-1"
+                    disabled={isRemote}
                   />
                 </div>
 

@@ -7,6 +7,7 @@ interface LocationInputProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 const LocationInput: React.FC<LocationInputProps> = ({
@@ -14,6 +15,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
   onChange,
   placeholder = "Dar es Salaam, Tanzania",
   className = "",
+  disabled = false,
 }) => {
   const [inputValue, setInputValue] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +29,9 @@ const LocationInput: React.FC<LocationInputProps> = ({
 
   // Filter options when input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Don't respond if disabled
+    if (disabled) return;
+    
     const newValue = e.target.value;
     setInputValue(newValue);
     
@@ -72,9 +77,10 @@ const LocationInput: React.FC<LocationInputProps> = ({
           type="text"
           value={inputValue}
           onChange={handleInputChange}
-          onFocus={() => inputValue.length >= 2 && setIsOpen(true)}
+          onFocus={() => !disabled && inputValue.length >= 2 && setIsOpen(true)}
           placeholder={placeholder}
-          className="w-full h-10 pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          disabled={disabled}
+          className={`w-full h-10 pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
         />
       </div>
       
