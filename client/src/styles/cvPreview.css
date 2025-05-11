@@ -53,42 +53,103 @@
   padding: 1rem;
 }
 
-/* Mobile styles */
+/* Mobile styles for new design */
 @media (max-width: 768px) {
-  .cv-preview-container {
+  .cv-preview-mobile-container {
     padding: 0;
     margin: 0;
+    padding-top: 0.5rem;
     padding-bottom: 5rem; /* Space for the bottom button */
-    height: calc(100vh - 110px); /* Account for mobile header */
-    overflow: auto; /* Changed from overflow-y for better handling */
-    background-color: #f5f5f5;
+    height: calc(100vh - 165px); /* Account for mobile header and actions */
+    overflow: auto;
+    background-color: #f0f2f8;
     display: flex;
-    align-items: flex-start; /* Start from top to ensure visibility */
-    justify-content: center;
-  }
-  
-  .cv-container-wrapper {
-    width: 100%;
-    padding: 1rem 0 4rem 0; /* Add extra padding at bottom */
-    display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
   }
   
-  .cv-template-container {
-    width: 100% !important; /* Force width */
-    max-width: none !important; /* Override max-width */
-    border-radius: 4px;
-    background-color: white !important;
-    border: 1px solid #e0e0e0;
+  .mobile-cv-preview {
+    background-color: white;
+    width: 90%;
+    max-width: 360px;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    position: relative;
+    padding: 1.5rem;
     margin: 0 auto;
-    transform-origin: top center !important; /* Force origin from top on mobile */
-    transform: scale(0.25) !important; /* Force a smaller scale */
+    margin-top: 1rem;
+    overflow: hidden;
+    min-height: 70vh;
+  }
+  
+  .mobile-cv-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .mobile-cv-initials {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #1a2e5c;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto 1rem auto;
+  }
+  
+  .mobile-cv-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .mobile-cv-title {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+  
+  .mobile-cv-contact {
+    font-size: 0.85rem;
+    color: #777;
+    margin-bottom: 0.25rem;
+  }
+  
+  .mobile-cv-location {
+    font-size: 0.85rem;
+    color: #777;
+  }
+  
+  .mobile-cv-watermark {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 3rem;
+    color: rgba(0, 0, 0, 0.05);
+    transform: rotate(-45deg);
+    font-weight: bold;
+    pointer-events: none;
+  }
+  
+  .mobile-cv-paper-effect {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.03) 100%);
   }
 
   /* Mobile header with actions */
   .mobile-header {
-    background-color: #18305b; /* Dark navy blue */
+    background-color: #1a2e5c; /* Dark navy blue */
     color: white;
     padding: 1rem;
     text-align: center;
@@ -112,9 +173,9 @@
     border-radius: 50px;
     font-weight: 500;
     font-size: 0.9rem;
-    border: 1px solid #18305b;
+    border: 1px solid #1a2e5c;
     background-color: white;
-    color: #18305b;
+    color: #1a2e5c;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -126,7 +187,7 @@
     position: absolute;
     top: 4px;
     right: 4px;
-    background-color: #034694; /* Chelsea Blue */
+    background-color: #1a2e5c;
     color: white;
     border-radius: 9999px;
     padding: 2px;
@@ -137,17 +198,15 @@
   .mobile-download-button {
     position: fixed;
     bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 85%;
-    max-width: 400px;
+    left: 6px;
+    right: 6px;
     padding: 0.85rem;
-    background-color: #4169e1; /* Royal Blue */
+    background-color: #3850a2;
     color: white;
     font-size: 1rem;
     font-weight: 600;
     border-radius: 50px;
-    box-shadow: 0 4px 16px rgba(3, 70, 148, 0.3);
+    box-shadow: 0 4px 16px rgba(56, 80, 162, 0.3);
     text-align: center;
     z-index: 50;
     display: flex;
@@ -159,7 +218,11 @@
   }
   
   .mobile-download-button:active {
-    transform: translateX(-50%) translateY(2px);
-    box-shadow: 0 2px 8px rgba(3, 70, 148, 0.3);
+    transform: translateY(2px);
+    box-shadow: 0 2px 8px rgba(56, 80, 162, 0.3);
+  }
+  
+  .mobile-download-button:disabled {
+    background-color: #8c98c9;
   }
 }

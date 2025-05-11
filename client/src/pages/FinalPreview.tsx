@@ -6,7 +6,7 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
 import { getAllTemplates, getTemplateById } from '@/lib/templates-registry';
 import { sortTemplatesByPriority } from '@/lib/template-priority';
-import { X, Download, Printer, Mail, CheckCircle } from 'lucide-react';
+import { X, Download, Printer, Mail, CheckCircle, Edit } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDynamicScale, A4_WIDTH_PX, A4_HEIGHT_PX } from '@/hooks/use-dynamic-scale';
 
@@ -29,9 +29,43 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
   
   console.log("Dynamic scale factor calculated:", scale);
   
-  // Use a more reliable scale factor based on device
-  const displayScale = isMobile ? 0.25 : 0.55;
+  // Set a fixed scale factor for desktop
+  const displayScale = isMobile ? 0.5 : 0.55;
   
+  if (isMobile) {
+    // For mobile, render a simplified CV preview with a card-like appearance
+    const { personalInfo = {} } = formData;
+    const { firstName = "", lastName = "", email = "", phone = "", professionalTitle = "", address = "" } = personalInfo;
+    
+    return (
+      <div 
+        ref={containerRef}
+        className="cv-preview-mobile-container"
+      >
+        <div className="mobile-cv-preview">
+          <div className="mobile-cv-header">
+            <div className="mobile-cv-initials">
+              {firstName?.[0] || ""}{lastName?.[0] || ""}
+            </div>
+            <h2 className="mobile-cv-name">{firstName} {lastName}</h2>
+            <p className="mobile-cv-title">{professionalTitle}</p>
+            <p className="mobile-cv-contact">{email} | {phone}</p>
+            <p className="mobile-cv-location">{address}</p>
+          </div>
+          
+          {/* Display a simplified preview - this is just to show something on mobile */}
+          <div className="mobile-cv-watermark">
+            Preview
+          </div>
+          
+          {/* Make the preview look like a paper document */}
+          <div className="mobile-cv-paper-effect"></div>
+        </div>
+      </div>
+    );
+  }
+  
+  // For desktop, render the full CV with proper scaling
   return (
     <div 
       ref={containerRef}
@@ -46,9 +80,9 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
             minHeight: `${A4_HEIGHT_PX}px`,
             transformOrigin: 'center center',
             margin: '0 auto',
-            backgroundColor: 'white', // Ensure we have a white background
+            backgroundColor: 'white',
             position: 'relative',
-            zIndex: 1, // Ensure the content is visible
+            zIndex: 1,
           }}
         >
           <DirectTemplateRenderer
@@ -56,7 +90,7 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
             cvData={formData}
             height="auto"
             width="100%"
-            scaleFactor={1} // We're applying scale via container style
+            scaleFactor={1}
           />
         </div>
       </div>
@@ -147,16 +181,27 @@ const FinalPreview = () => {
       {/* Mobile Header & Actions */}
       {isMobile && (
         <>
-          <div className="mobile-header fixed top-0 left-0 right-0 z-50 p-4 bg-blue-900 text-white text-center font-semibold">
+          <div className="mobile-header fixed top-0 left-0 right-0 z-50 p-4 bg-[#1a2e5c] text-white text-center font-semibold text-xl">
             Finalize Resume
           </div>
-          <div className="mobile-actions pt-14 pb-2 px-4 bg-white">
-            <button 
-              className="mobile-action-button w-full py-2 px-4 bg-blue-50 text-blue-900 rounded-md border border-blue-200"
-              onClick={() => setTemplateSidebarOpen(true)}
-            >
-              Change Template
-            </button>
+          
+          <div className="mobile-actions pt-16 pb-3 px-4">
+            <div className="flex gap-4 justify-between">
+              <button 
+                className="mobile-action-button flex-1 py-3 px-4 bg-white text-[#1a2e5c] rounded-full border border-[#1a2e5c] font-medium flex items-center justify-center"
+                onClick={() => setTemplateSidebarOpen(true)}
+              >
+                Change Template
+              </button>
+              
+              <button 
+                className="mobile-action-button flex-1 py-3 px-4 bg-white text-[#1a2e5c] rounded-full border border-[#1a2e5c] font-medium flex items-center justify-center"
+                onClick={handleUpdateContent}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Resume
+              </button>
+            </div>
           </div>
         </>
       )}
@@ -165,17 +210,19 @@ const FinalPreview = () => {
       <div className="flex-grow flex overflow-hidden bg-[#f5f5f5]">
         {/* Template Sidebar */}
         {templateSidebarOpen && (
-          <div className={isMobile ? 'fixed inset-0 z-50 bg-white' : 'templates-sidebar'}>
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="font-medium">Templates</h3>
-              <button onClick={() => setTemplateSidebarOpen(false)}>
-                <X className="h-4 w-4" />
+          <div className={isMobile ? 'fixed inset-0 z-50 bg-[#f0f2f8]' : 'templates-sidebar'}>
+            <div className="p-4 bg-[#1a2e5c] text-white flex justify-between items-center">
+              <h3 className="font-semibold text-lg">Change Template</h3>
+              <button 
+                onClick={() => setTemplateSidebarOpen(false)}
+                className="bg-white/20 rounded-full p-1"
+              >
+                <X className="h-5 w-5 text-white" />
               </button>
             </div>
             
-            <div className="templates-list">
-              <h4 className="text-sm font-medium text-gray-500 mb-3">All templates</h4>
-              <div className={isMobile ? 'grid grid-cols-2 gap-3' : 'grid grid-cols-1 gap-4'}>
+            <div className="templates-list p-4">
+              <div className={isMobile ? 'grid grid-cols-2 gap-4' : 'grid grid-cols-1 gap-4'}>
                 {allTemplates.map((template) => (
                   <div 
                     key={template.id}
@@ -183,7 +230,11 @@ const FinalPreview = () => {
                       handleSelectTemplate(template.id);
                       if (isMobile) setTemplateSidebarOpen(false);
                     }}
-                    className={`cursor-pointer border rounded-md overflow-hidden relative ${currentTemplateId === template.id ? 'ring-2 ring-blue-600' : 'hover:border-blue-500'}`}
+                    className={`cursor-pointer overflow-hidden relative bg-white rounded-lg shadow-sm transition-all ${
+                      currentTemplateId === template.id 
+                        ? 'ring-2 ring-[#3850a2] scale-[1.02]' 
+                        : 'hover:scale-[1.01]'
+                    }`}
                   >
                     <div className="aspect-[210/297] bg-white">
                       <img 
@@ -192,12 +243,12 @@ const FinalPreview = () => {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="text-xs font-medium text-center py-1 px-2 truncate">
+                    <div className="text-sm font-medium text-center py-2 px-2 truncate border-t">
                       {template.name}
                     </div>
                     {currentTemplateId === template.id && (
-                      <div className="absolute top-1 right-1 bg-blue-600 text-white rounded-full p-1">
-                        <CheckCircle className="h-3 w-3" />
+                      <div className="absolute top-2 right-2 bg-[#3850a2] text-white rounded-full p-1">
+                        <CheckCircle className="h-4 w-4" />
                       </div>
                     )}
                   </div>
@@ -220,7 +271,7 @@ const FinalPreview = () => {
         <button 
           onClick={handleDownload}
           disabled={isDownloading}
-          className="mobile-download-button fixed bottom-0 left-0 right-0 z-50 py-4 bg-blue-700 text-white font-semibold flex items-center justify-center gap-2"
+          className="mobile-download-button fixed bottom-6 left-6 right-6 z-50 py-4 bg-[#3850a2] text-white font-semibold flex items-center justify-center gap-2 rounded-full shadow-lg text-lg"
         >
           <Download className="h-5 w-5" />
           {isDownloading ? 'Processing...' : 'Download Now'}
