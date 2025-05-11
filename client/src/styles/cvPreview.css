@@ -72,57 +72,25 @@
     background-color: white;
     width: 90%;
     max-width: 360px;
-    border-radius: 8px;
+    border-radius: 15px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     position: relative;
-    padding: 1.5rem;
     margin: 0 auto;
-    margin-top: 1rem;
+    margin-top: 3rem;
     overflow: hidden;
-    min-height: 70vh;
+    height: 500px;
+    padding: 0;
   }
   
-  .mobile-cv-header {
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-  
-  .mobile-cv-initials {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #1a2e5c;
-    color: white;
+  .mobile-cv-content {
+    position: relative;
+    overflow: hidden;
+    transform-origin: top center;
+    padding-top: 15px;
     display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 0 auto 1rem auto;
-  }
-  
-  .mobile-cv-name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 0.5rem;
-  }
-  
-  .mobile-cv-title {
-    font-size: 1rem;
-    color: #666;
-    margin-bottom: 0.5rem;
-  }
-  
-  .mobile-cv-contact {
-    font-size: 0.85rem;
-    color: #777;
-    margin-bottom: 0.25rem;
-  }
-  
-  .mobile-cv-location {
-    font-size: 0.85rem;
-    color: #777;
+    align-items: flex-start;
+    height: 100%;
   }
   
   .mobile-cv-watermark {

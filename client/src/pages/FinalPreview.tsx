@@ -33,9 +33,10 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
   const displayScale = isMobile ? 0.5 : 0.55;
   
   if (isMobile) {
-    // For mobile, render a simplified CV preview with a card-like appearance
     const { personalInfo = {} } = formData;
-    const { firstName = "", lastName = "", email = "", phone = "", professionalTitle = "", address = "" } = personalInfo;
+    const { firstName = "", lastName = "" } = personalInfo;
+    // Extract initials for avatar
+    const initials = `${firstName?.[0] || ""}${lastName?.[0] || ""}`;
     
     return (
       <div 
@@ -43,22 +44,45 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
         className="cv-preview-mobile-container"
       >
         <div className="mobile-cv-preview">
-          <div className="mobile-cv-header">
-            <div className="mobile-cv-initials">
-              {firstName?.[0] || ""}{lastName?.[0] || ""}
-            </div>
-            <h2 className="mobile-cv-name">{firstName} {lastName}</h2>
-            <p className="mobile-cv-title">{professionalTitle}</p>
-            <p className="mobile-cv-contact">{email} | {phone}</p>
-            <p className="mobile-cv-location">{address}</p>
+          {/* Top Avatar */}
+          <div style={{ 
+            position: 'absolute', 
+            top: '-30px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            backgroundColor: '#1a2e5c',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            zIndex: 10,
+            border: '2px solid white'
+          }}>
+            {initials}
           </div>
           
-          {/* Display a simplified preview - this is just to show something on mobile */}
+          {/* Actual CV template */}
+          <div className="mobile-cv-content">
+            <DirectTemplateRenderer
+              templateId={templateId}
+              cvData={formData}
+              height="auto"
+              width={A4_WIDTH_PX}
+              scaleFactor={0.35}
+            />
+          </div>
+          
+          {/* Watermark overlay */}
           <div className="mobile-cv-watermark">
             Preview
           </div>
           
-          {/* Make the preview look like a paper document */}
+          {/* Shadow effect at bottom */}
           <div className="mobile-cv-paper-effect"></div>
         </div>
       </div>
