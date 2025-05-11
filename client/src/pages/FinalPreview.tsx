@@ -43,8 +43,64 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
         ref={containerRef}
         className="cv-preview-mobile-container"
       >
+        {/* Page Title */}
+        <h1 style={{
+          color: 'white',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: '1.75rem',
+          marginBottom: '1rem',
+          marginTop: '-0.5rem',
+          padding: '0.5rem'
+        }}>
+          Finalize Resume
+        </h1>
+        
+        {/* Action Buttons */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          width: '90%',
+          maxWidth: '360px',
+          margin: '0 auto 1.5rem auto',
+          gap: '1rem'
+        }}>
+          <button
+            onClick={() => window.location.href = '/cv/select-template'}
+            style={{
+              flex: 1,
+              padding: '0.75rem',
+              borderRadius: '50px',
+              border: '2px solid white',
+              background: 'transparent',
+              color: 'white',
+              fontWeight: '500'
+            }}
+          >
+            Change Template
+          </button>
+          <button
+            onClick={() => window.location.href = '/cv/personal-info'}
+            style={{
+              flex: 1,
+              padding: '0.75rem',
+              borderRadius: '50px',
+              border: '2px solid white',
+              background: 'transparent',
+              color: 'white',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            <Edit size={16} /> Edit Resume
+          </button>
+        </div>
+        
         <div className="mobile-cv-preview">
-          {/* Top Avatar */}
+          {/* Circle with initials on top */}
           <div style={{ 
             position: 'absolute', 
             top: '-30px',
@@ -53,27 +109,27 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
             width: '60px',
             height: '60px',
             borderRadius: '50%',
-            backgroundColor: '#1a2e5c',
-            color: 'white',
+            backgroundColor: 'white',
+            border: '1px solid #ddd',
+            color: '#333',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '1.5rem',
             fontWeight: 'bold',
             zIndex: 10,
-            border: '2px solid white'
           }}>
             {initials}
           </div>
           
-          {/* Actual CV template */}
+          {/* Actual CV template with proper scaling */}
           <div className="mobile-cv-content">
             <DirectTemplateRenderer
               templateId={templateId}
               cvData={formData}
-              height="auto"
+              height={A4_HEIGHT_PX}
               width={A4_WIDTH_PX}
-              scaleFactor={0.35}
+              scaleFactor={1} // We handle scaling with CSS transform
             />
           </div>
           
@@ -81,9 +137,6 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
           <div className="mobile-cv-watermark">
             Preview
           </div>
-          
-          {/* Shadow effect at bottom */}
-          <div className="mobile-cv-paper-effect"></div>
         </div>
       </div>
     );
