@@ -6,6 +6,8 @@ import crypto from 'crypto';
 import { openaiProxyHandler } from './openai-proxy';
 import { registerTemplateAPI } from './template-api';
 import { cvScreenerProxyHandler } from './cv-screener-proxy';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 // In-memory storage for CV requests
 interface CVRequest {
@@ -28,18 +30,26 @@ export function registerRoutes(app: Express): Server {
   registerTemplateAPI(app);
 
   // Serve sitemap.xml with the correct content type
-  app.get("/sitemap.xml", (req, res) => {
-    const fs = require('fs');
-    const path = require('path');
-    
-    // Path to sitemap.xml in the public directory
-    const sitemapPath = path.join(import.meta.dirname, '../public/sitemap.xml');
-    
-    // Set the correct content type for XML
-    res.setHeader('Content-Type', 'application/xml');
-    
-    // Stream the file to the response
-    fs.createReadStream(sitemapPath).pipe(res);
+  app.get("/sitemap.xml", async (req, res) => {
+    try {
+      // Path to sitemap.xml in the public directory
+      const sitemapPath = path.join(import.meta.dirname, '../public/sitemap.xml');
+      
+      // Read the file content
+      const sitemapContent = await fs.readFile(sitemapPath, 'utf-8');
+      
+      // Set the correct content type for XML and disable caching
+      res.setHeader('Content-Type', 'application/xml');
+      res.setHeader('Cache-Control', 'no-cache, no-store');
+      
+      // Send the file content
+      res.send(sitemapContent);
+      
+      console.log('Served sitemap.xml with Content-Type: application/xml');
+    } catch (error) {
+      console.error('Error serving sitemap.xml:', error);
+      res.status(500).json({ error: 'Could not serve sitemap.xml' });
+    }
   });
 
   // API key status endpoint
