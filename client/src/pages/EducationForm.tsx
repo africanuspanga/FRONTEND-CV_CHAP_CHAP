@@ -38,6 +38,16 @@ const EducationForm = () => {
     'PhD'
   ];
   
+  // Generate month options
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
+  // Generate year options
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
+  
   // State for education entry
   const [institution, setInstitution] = useState('');
   const [degree, setDegree] = useState(degreeOptions[0]);
@@ -232,26 +242,36 @@ const EducationForm = () => {
                     <Label htmlFor="gradMonth" className="block mb-2 font-medium">
                       Graduation Month
                     </Label>
-                    <Input
-                      id="gradMonth"
-                      value={gradMonth}
-                      onChange={(e) => setGradMonth(e.target.value)}
-                      placeholder="e.g. May"
-                      className="w-full"
-                    />
+                    <Select value={gradMonth} onValueChange={setGradMonth}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select month" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {months.map((month) => (
+                          <SelectItem key={month} value={month}>
+                            {month}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   
                   <div>
                     <Label htmlFor="gradYear" className="block mb-2 font-medium">
                       Graduation Year
                     </Label>
-                    <Input
-                      id="gradYear"
-                      value={gradYear}
-                      onChange={(e) => setGradYear(e.target.value)}
-                      placeholder="e.g. 2020"
-                      className="w-full"
-                    />
+                    <Select value={gradYear} onValueChange={setGradYear}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {years.map((year) => (
+                          <SelectItem key={year} value={year.toString()}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
