@@ -29,6 +29,8 @@ export function registerRoutes(app: Express): Server {
   // Register template API
   registerTemplateAPI(app);
 
+  // Special handling for sitemap and robots.txt validation
+  
   // Serve sitemap.xml with the correct content type
   app.get("/sitemap.xml", async (req, res) => {
     try {
@@ -50,6 +52,50 @@ export function registerRoutes(app: Express): Server {
       console.error('Error serving sitemap.xml:', error);
       res.status(500).json({ error: 'Could not serve sitemap.xml' });
     }
+  });
+  
+  // Serve robots.txt with the correct content type
+  app.get("/robots.txt", async (req, res) => {
+    try {
+      // Path to robots.txt in the public directory
+      const robotsPath = path.join(import.meta.dirname, '../public/robots.txt');
+      
+      // Read the file content
+      const robotsContent = await fs.readFile(robotsPath, 'utf-8');
+      
+      // Set the correct content type and disable caching
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Cache-Control', 'no-cache, no-store');
+      
+      // Send the file content
+      res.send(robotsContent);
+      
+      console.log('Served robots.txt with Content-Type: text/plain');
+    } catch (error) {
+      console.error('Error serving robots.txt:', error);
+      res.status(500).json({ error: 'Could not serve robots.txt' });
+    }
+  });
+  
+  // Handle Google sitemap validation requests for other URLs
+  app.use((req, res, next) => {
+    const userAgent = req.get('User-Agent') || '';
+    // Check if it's a request from Google's sitemap validation
+    if (userAgent.includes('Google-Site-Verification') || 
+        userAgent.includes('Googlebot') || 
+        req.query.hasOwnProperty('sitemap')) {
+      
+      // If it's accessing a specific URL for sitemap validation, handle it properly
+      if (req.path !== '/sitemap.xml' && req.path !== '/robots.txt' && req.method === 'GET') {
+        console.log(`Detected sitemap validation request for ${req.path} - responding with proper content type`);
+        
+        // Send a proper response that won't confuse Google's validation
+        if (req.get('Accept')?.includes('application/xml')) {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        }
+      }
+    }
+    next();
   });
 
   // API key status endpoint
