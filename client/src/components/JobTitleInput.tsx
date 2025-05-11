@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Briefcase } from 'lucide-react';
 import { jobTitles } from '@/lib/job-titles-data';
 
 // Create an array of options in the format expected by the autocomplete
@@ -73,14 +72,13 @@ const JobTitleInput: React.FC<JobTitleInputProps> = ({
   return (
     <div className={`relative ${className}`} ref={wrapperRef}>
       <div className="relative">
-        <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
         <input
           type="text"
           value={inputValue}
           onChange={handleInputChange}
           onFocus={() => inputValue.length >= 2 && setIsOpen(true)}
           placeholder={placeholder}
-          className="w-full h-10 pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
       

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapPin } from 'lucide-react';
 import { tanzanianRegionsOptions } from '@/lib/location-data';
 
 interface LocationInputProps {
@@ -72,7 +71,6 @@ const LocationInput: React.FC<LocationInputProps> = ({
   return (
     <div className={`relative ${className}`} ref={wrapperRef}>
       <div className="relative">
-        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
         <input
           type="text"
           value={inputValue}
@@ -80,7 +78,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
           onFocus={() => !disabled && inputValue.length >= 2 && setIsOpen(true)}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full h-10 pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+          className={`w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
         />
       </div>
       
