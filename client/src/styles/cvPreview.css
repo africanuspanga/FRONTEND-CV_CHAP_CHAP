@@ -55,45 +55,75 @@
 
 /* Mobile styles for new design */
 @media (max-width: 768px) {
-  .cv-preview-mobile-container {
-    padding: 0;
-    margin: 0;
-    padding-top: 0.5rem;
-    padding-bottom: 5rem; /* Space for the bottom button */
-    height: calc(100vh - 165px); /* Account for mobile header and actions */
-    overflow: auto;
-    background-color: #1a2e5c; /* Dark navy background from screenshot */
+  .mobile-cv-wrapper {
+    max-width: 420px;
+    margin: 0 auto;
+    background: #0b1b4d;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .mobile-cv-header {
+    width: 100%;
+    padding: 1.5rem 1rem;
+    text-align: center;
+  }
+
+  .mobile-cv-header h2 {
+    font-size: 1.75rem;
+    font-weight: bold;
+    margin-bottom: 1.25rem;
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0 1rem;
+  }
+
+  .action-buttons button {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 999px;
+    background: transparent;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 2px solid white;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 0.5rem;
   }
-  
-  .mobile-cv-preview {
-    background-color: white;
+
+  .mobile-cv-card {
     width: 90%;
-    max-width: 360px;
-    aspect-ratio: 794 / 1123; /* A4 width to height ratio */
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    aspect-ratio: 794 / 1123;
+    background: white;
     position: relative;
-    margin: 0 auto;
-    margin-top: 1.5rem;
     overflow: hidden;
-    padding: 0;
+    margin: 1rem 0;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
-  
-  .mobile-cv-content {
+
+  .scaled-preview {
     transform: scale(0.35);
-    transform-origin: top center;
-    width: 794px; /* Actual A4 width */
-    height: 1123px; /* Actual A4 height */
+    transform-origin: top left;
+    width: 794px;
+    height: 1123px;
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    margin: 0 auto;
   }
-  
+
   .mobile-cv-watermark {
     position: absolute;
     top: 50%;
@@ -106,95 +136,25 @@
     font-weight: bold;
     pointer-events: none;
   }
-  
-  .mobile-cv-paper-effect {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 8px;
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.03) 100%);
-  }
 
-  /* Mobile header with actions */
-  .mobile-header {
-    background-color: #1a2e5c; /* Dark navy blue */
-    color: white;
-    padding: 1rem;
-    text-align: center;
-    font-weight: 600;
-    font-size: 1.2rem;
-  }
-
-  /* Mobile action buttons */
-  .mobile-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 0.75rem;
-    border-bottom: 1px solid #e0e0e0;
-    background-color: white;
-  }
-
-  .mobile-action-button {
-    flex: 1;
-    padding: 0.75rem;
-    border-radius: 50px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    border: 1px solid #1a2e5c;
-    background-color: white;
-    color: #1a2e5c;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  /* Selected template indicator in mobile view */
-  .template-selected {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    background-color: #1a2e5c;
-    color: white;
-    border-radius: 9999px;
-    padding: 2px;
-    font-size: 0.75rem;
-  }
-  
-  /* Floating download button */
-  .mobile-download-button {
-    position: fixed;
-    bottom: 20px;
-    left: 6px;
-    right: 6px;
+  .download-button {
+    margin-top: auto;
+    margin-bottom: 1.5rem;
     width: 90%;
-    max-width: 360px;
-    margin: 0 auto;
-    padding: 0.85rem;
-    background-color: #3850a2;
+  }
+
+  .download-button button {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 999px;
+    background-color: #3b50d1;
     color: white;
-    font-size: 1rem;
     font-weight: 600;
-    border-radius: 50px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    z-index: 50;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 0.5rem;
     border: none;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  
-  .mobile-download-button:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .mobile-download-button:disabled {
-    background-color: #8c98c9;
+    font-size: 1rem;
   }
 }

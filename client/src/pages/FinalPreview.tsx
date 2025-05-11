@@ -39,104 +39,48 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ templateId, formData, isM
     const initials = `${firstName?.[0] || ""}${lastName?.[0] || ""}`;
     
     return (
-      <div 
-        ref={containerRef}
-        className="cv-preview-mobile-container"
-      >
-        {/* Page Title */}
-        <h1 style={{
-          color: 'white',
-          textAlign: 'center',
-          fontWeight: 'bold',
-          fontSize: '1.75rem',
-          marginBottom: '1rem',
-          marginTop: '-0.5rem',
-          padding: '0.5rem'
-        }}>
-          Finalize Resume
-        </h1>
-        
-        {/* Action Buttons */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          width: '90%',
-          maxWidth: '360px',
-          margin: '0 auto 1.5rem auto',
-          gap: '1rem'
-        }}>
-          <button
-            onClick={() => window.location.href = '/cv/select-template'}
-            style={{
-              flex: 1,
-              padding: '0.75rem',
-              borderRadius: '50px',
-              border: '2px solid white',
-              background: 'transparent',
-              color: 'white',
-              fontWeight: '500'
-            }}
-          >
-            Change Template
-          </button>
-          <button
-            onClick={() => window.location.href = '/cv/personal-info'}
-            style={{
-              flex: 1,
-              padding: '0.75rem',
-              borderRadius: '50px',
-              border: '2px solid white',
-              background: 'transparent',
-              color: 'white',
-              fontWeight: '500',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem'
-            }}
-          >
-            <Edit size={16} /> Edit Resume
-          </button>
-        </div>
-        
-        <div className="mobile-cv-preview">
-          {/* Circle with initials on top */}
-          <div style={{ 
-            position: 'absolute', 
-            top: '-30px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '60px',
-            height: '60px',
-            borderRadius: '50%',
-            backgroundColor: 'white',
-            border: '1px solid #ddd',
-            color: '#333',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            zIndex: 10,
-          }}>
-            {initials}
+      <div className="mobile-cv-wrapper" ref={containerRef}>
+        <div className="mobile-cv-header">
+          <h2>Finalize Resume</h2>
+          <div className="action-buttons">
+            <button onClick={() => window.location.href = '/cv/select-template'}>
+              Change Template
+            </button>
+            <button onClick={() => window.location.href = '/cv/personal-info'}>
+              <Edit size={16} /> Edit Resume
+            </button>
           </div>
-          
-          {/* Actual CV template with proper scaling */}
-          <div className="mobile-cv-content">
+        </div>
+
+        <div className="mobile-cv-card">
+          <div className="scaled-preview">
             <DirectTemplateRenderer
               templateId={templateId}
               cvData={formData}
-              height={A4_HEIGHT_PX}
               width={A4_WIDTH_PX}
-              scaleFactor={1} // We handle scaling with CSS transform
+              height={A4_HEIGHT_PX}
+              scaleFactor={1} // No internal scaling, we scale with CSS
             />
           </div>
-          
-          {/* Watermark overlay */}
           <div className="mobile-cv-watermark">
             Preview
           </div>
+        </div>
+
+        <div className="download-button">
+          <button onClick={handleDownload} disabled={isDownloading}>
+            {isDownloading ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Download className="h-5 w-5" />
+                Download Now
+              </>
+            )}
+          </button>
         </div>
       </div>
     );

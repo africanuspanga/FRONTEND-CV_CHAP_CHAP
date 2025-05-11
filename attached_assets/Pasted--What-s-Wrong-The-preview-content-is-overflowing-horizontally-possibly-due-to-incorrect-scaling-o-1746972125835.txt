@@ -1,0 +1,103 @@
+❌ What’s Wrong:
+The preview content is overflowing horizontally, possibly due to incorrect scaling or container width mismatch.
+
+The buttons (Change Template, Edit Resume) are duplicated or wrongly positioned — looks like the layout is rendering twice.
+
+The inner CV content (DirectTemplateRenderer) is probably using full A4 dimensions without proper scaling or containment.
+
+Transform scaling or absolute positioning is not constrained correctly on mobile.
+
+✅ Fix It — Correct Structure & CSS
+✔ Recommended JSX Layout:
+tsx
+Copy
+Edit
+<div className="mobile-cv-wrapper">
+  <div className="mobile-cv-header">
+    <h2>Finalize Resume</h2>
+    <div className="action-buttons">
+      <button>Change Template</button>
+      <button>Edit Resume</button>
+    </div>
+  </div>
+
+  <div className="mobile-cv-card">
+    <div className="scaled-preview">
+      <DirectTemplateRenderer
+        templateId={templateId}
+        cvData={formData}
+        width="794px"
+        height="1123px"
+        scaleFactor={1}
+      />
+    </div>
+  </div>
+
+  <div className="download-button">
+    <button>Download Now</button>
+  </div>
+</div>
+✔ Correct CSS:
+css
+Copy
+Edit
+.mobile-cv-wrapper {
+  max-width: 420px;
+  margin: 0 auto;
+  background: #0b1b4d;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mobile-cv-header {
+  padding: 1rem;
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.mobile-cv-card {
+  width: 100%;
+  aspect-ratio: 794 / 1123;
+  background: white;
+  position: relative;
+  overflow: hidden;
+  margin: 1rem 0;
+  border-radius: 10px;
+}
+
+.scaled-preview {
+  transform: scale(0.35);
+  transform-origin: top left;
+  width: 794px;
+  height: 1123px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.download-button {
+  margin-bottom: 1rem;
+  width: 90%;
+}
+
+.download-button button {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 999px;
+  background-color: #3b50d1;
+  color: white;
+  font-weight: bold;
+}
+🛠️ What You Should Ask Your Devs:
+"Refactor the preview container to strictly scale the full A4 template into a fixed mobile card using transform: scale(0.35) inside an absolutely positioned .scaled-preview wrapper, within a constrained .mobile-cv-card. Ensure no duplicated DOM elements or overflow glitches occur."
+
