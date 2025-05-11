@@ -201,30 +201,37 @@ const EducationForm = () => {
   };
 
   const handleContinueToSkills = () => {
-    // Show confetti animation first
-    setShowConfetti(true);
-    console.log('Showing confetti, current state:', showConfetti);
+    // Directly set window dimensions to ensure confetti has correct size
+    setWindowDimensions({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
     
-    // Add a small delay before navigation to allow confetti to display
-    // This shouldn't impact user experience noticeably
+    // Show confetti animation first with state update callback to ensure it runs
+    setShowConfetti(true);
+    console.log('Trying to show confetti');
+    
+    // Add a longer delay before navigation to allow confetti to display
     setTimeout(() => {
-      console.log('Navigation timeout triggered, confetti state:', showConfetti);
+      console.log('Navigation timeout triggered, confetti should be visible');
       // Navigate to skills form using utility for smooth scroll reset
       navigateWithScrollReset(navigate, `/cv/${templateId}/skills`);
-    }, 1000); // Longer delay for debugging to ensure confetti appears
+    }, 2000); // 2 second delay for confetti to be clearly visible
   };
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
-      {/* Confetti effect - always rendered when debug mode is on */}
+      {/* Confetti effect - always rendered when triggered */}
       {showConfetti && (
         <ReactConfetti
           width={windowDimensions.width}
           height={windowDimensions.height}
           recycle={false}
-          numberOfPieces={300}
-          gravity={0.3}
-          colors={['#1E40AF', '#3B82F6', '#60A5FA', '#93C5FD', '#DBEAFE']}
+          numberOfPieces={500}
+          gravity={0.2}
+          initialVelocityY={10}
+          tweenDuration={5000}
+          colors={['#1E40AF', '#3B82F6', '#60A5FA', '#93C5FD', '#DBEAFE', '#0D9488', '#14B8A6', '#2DD4BF']}
           style={{
             position: 'fixed',
             top: 0,

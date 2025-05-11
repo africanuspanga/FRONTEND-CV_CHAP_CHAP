@@ -178,7 +178,7 @@ const SkillsRecommendations = () => {
             <div className="grid grid-cols-2 gap-4 mt-8">
               <Button 
                 variant="outline" 
-                className="py-6 bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200"
+                className="py-6 bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100"
                 onClick={addCustomSkills}
               >
                 I'll add my own
