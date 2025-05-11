@@ -69,7 +69,7 @@ const SummaryIntro = () => {
         <div className="flex justify-center mt-8">
           <Button
             onClick={handleAddSummary}
-            className="bg-teal-600 hover:bg-teal-700 text-white px-10 py-6 text-lg"
+            className="bg-primary hover:bg-blue-600 text-white px-10 py-6 text-lg"
           >
             Add Summary
           </Button>
@@ -87,7 +87,7 @@ const SummaryIntro = () => {
 
           <Button
             onClick={handleNext}
-            className="bg-blue-100 text-blue-800 border border-blue-300 hover:bg-blue-200"
+            className="bg-primary hover:bg-blue-600 text-white"
           >
             Next
           </Button>
