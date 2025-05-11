@@ -27,7 +27,7 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
 
   // Create a wrapper container for template
   const containerStyle: React.CSSProperties = {
-    height: height === "auto" ? "100%" : `${height}px`,
+    height: height === "auto" ? "auto" : `${height}px`,
     width: width === "auto" ? "100%" : typeof width === 'number' ? `${width}px` : width,
     overflow: 'visible',
     backgroundColor: 'transparent',

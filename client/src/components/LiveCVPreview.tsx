@@ -63,7 +63,7 @@ const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => 
           <h3 className="text-lg font-semibold mb-3">Live Preview</h3>
           <p className="text-sm text-gray-500 mb-4">This preview updates in real-time as you fill in your information.</p>
           
-          <div className="bg-white border rounded-md overflow-hidden" style={{ height: '600px' }}>
+          <div className="bg-white border rounded-md overflow-auto" style={{ height: '600px' }}>
             <ErrorBoundary
               fallback={
                 <div className="flex flex-col items-center justify-center h-full p-6 text-center">
@@ -80,7 +80,7 @@ const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => 
               <DirectTemplateRenderer 
                 templateId={templateId} 
                 cvData={cvData} 
-                height={600}
+                height="auto"
               />
             </ErrorBoundary>
           </div>
