@@ -193,15 +193,24 @@ const FinalPreview = () => {
           
           <div className="flex space-x-3">
             <Button 
-              className="bg-gradient-to-r from-blue-600 to-blue-800 text-white hover:from-blue-700 hover:to-blue-900 transition-all" 
+              className="bg-gradient-to-r from-blue-600 to-blue-800 text-white hover:from-blue-700 hover:to-blue-900 transition-all text-sm px-4 py-1 h-9 rounded-full shadow-sm" 
               onClick={() => setTemplateSidebarOpen(!templateSidebarOpen)}
             >
-              Change Template
+              <span className="flex items-center gap-1">Change Template</span>
             </Button>
-            <Button variant="outline"><Mail className="h-4 w-4" /><span>Email</span></Button>
-            <Button variant="outline"><Printer className="h-4 w-4" /><span>Print</span></Button>
-            <Button onClick={handleDownload} className="bg-blue-600 hover:bg-blue-700 text-white">
-              <Download className="h-4 w-4" />
+            <Button variant="outline" className="text-sm px-4 py-1 h-9 rounded-full shadow-sm">
+              <Mail className="h-4 w-4 mr-1" />
+              <span>Email</span>
+            </Button>
+            <Button variant="outline" className="text-sm px-4 py-1 h-9 rounded-full shadow-sm">
+              <Printer className="h-4 w-4 mr-1" />
+              <span>Print</span>
+            </Button>
+            <Button 
+              onClick={handleDownload} 
+              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-1 h-9 rounded-full shadow-sm"
+            >
+              <Download className="h-4 w-4 mr-1" />
               <span>{isDownloading ? 'Downloading...' : 'Download'}</span>
             </Button>
           </div>
