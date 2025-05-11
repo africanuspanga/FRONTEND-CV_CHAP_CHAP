@@ -1,6 +1,6 @@
 /* === Basic Reset & Font === */
 body {
-    font-family: 'Open Sans', sans-serif; /* Using Open Sans as declared in HTML */
+    font-family: 'Open Sans', sans-serif; /* Using Open Sans as a base */
     margin: 0;
     padding: 20px;
     background-color: #f4f4f4; /* Light grey background for the page */
@@ -13,6 +13,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
+    font-family: 'Lato', sans-serif; /* Lato for headings as it's often bolder */
     font-weight: 700;
     color: #111; /* Dark color for headings */
 }
@@ -40,48 +41,49 @@ strong {
     max-width: 900px; /* Standard resume width */
     margin: 20px auto;
     background-color: #ffffff; /* White paper background */
-    padding: 40px;
+    padding: 30px 40px; /* Adjust padding */
     box-sizing: border-box;
-    border-top: 5px solid #3A4D6D; /* Dark blue top border */
+    border-top: 6px solid #6F7D9C; /* Dark blue/grey top border */
 }
 
-/* === CV Header (Full Width) === */
-.cv-header {
-    text-align: left; /* Align name to the left */
-    margin-bottom: 10px;
-}
-.cv-header h1 {
-    font-size: 2.8em;
-    color: #3A4D6D; /* Dark blue name */
-    margin-bottom: 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700; /* Bold name */
-}
-/* Profession title is hidden in this design but kept for consistency */
-.cv-header h2 {
-    display: none;
-}
-
-/* === Contact Info Bar === */
-.contact-bar {
-    text-align: left;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #e0e0e0; /* Light grey separator line */
+/* === Top Contact Info Bar === */
+.contact-bar-top {
+    text-align: center; /* Center contact info */
+    margin-bottom: 20px;
+    padding-bottom: 10px;
     font-size: 0.9em;
     color: #555; /* Grey text for contact */
     display: flex;
     flex-wrap: wrap; /* Allow wrapping */
+    justify-content: center; /* Center items */
     gap: 5px 10px; /* Row and column gap */
 }
-.contact-bar span,
-.contact-bar a {
+.contact-bar-top span,
+.contact-bar-top a {
     white-space: nowrap;
 }
-.contact-bar .separator {
-    color: #ccc; /* Lighter color for separator */
+.contact-bar-top .separator {
+    color: #aaa; /* Lighter color for separator */
     margin: 0 5px;
+}
+
+
+/* === CV Header (Full Width) === */
+.cv-header {
+    text-align: center; /* Center name */
+    margin-bottom: 25px;
+}
+.cv-header h1 {
+    font-size: 2.6em;
+    color: #333; /* Dark grey name */
+    margin-bottom: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 900; /* Extra bold name */
+}
+/* Profession title is hidden in this design */
+.cv-header h2 {
+    display: none;
 }
 
 /* === Main Grid Layout === */
@@ -93,72 +95,77 @@ strong {
 
 .grid-section {
     display: grid;
-    grid-template-columns: 200px 1fr; /* Narrow left column for titles, wider for content */
-    gap: 25px; /* Gap between title and content column */
+    /* Adjust column widths: title column narrower, content column wider */
+    grid-template-columns: 180px 1fr; /* Example: 180px for title, rest for content */
+    gap: 30px; /* Gap between title and content column */
     align-items: start; /* Align items to the top of their grid area */
+    padding-bottom: 15px; /* Space below each section */
+    border-bottom: 1px solid #eee; /* Light separator between sections */
 }
+.grid-section:last-of-type {
+    border-bottom: none; /* No border for the very last section */
+    padding-bottom: 0;
+}
+/* Remove border for hidden sections too if they are last */
+#portfolioSection.grid-section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
 
 .section-title-column {
     /* Styles for the left column containing section titles */
 }
 .section-title-column h3 {
-    font-size: 0.95em;
-    color: #3A4D6D; /* Dark blue section titles */
+    font-size: 0.9em;
+    color: #6F7D9C; /* Dark blue/grey section titles */
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 700;
-    padding: 8px 10px; /* Padding around title */
-    border: 1px solid #3A4D6D; /* Border around title */
-    text-align: center; /* Center text within the bordered box */
     margin-bottom: 0; /* Remove bottom margin as gap is handled by grid */
-    writing-mode: horizontal-tb; /* Ensure text is horizontal */
-    display: inline-block; /* Fit content */
-    min-width: 150px; /* Ensure a minimum width for the title box */
+    padding-top: 2px; /* Align text with first line of content */
+    text-align: left; /* Align title to the left */
 }
 
 .section-content-column {
     /* Styles for the right column containing section content */
-    padding-top: 5px; /* Align content slightly below title box top */
 }
-.section-content-column p {
+.section-content-column p { /* Summary paragraph */
     font-size: 0.95em;
     color: #444;
     line-height: 1.7;
-    margin-bottom: 0; /* Remove default p margin */
+    margin-bottom: 0;
 }
 
 /* Skills Section (Multi-column within content) */
 .skills-columns {
-    columns: 2; /* Create two columns */
-    -webkit-columns: 2;
-    -moz-columns: 2;
-    column-gap: 30px;
+    columns: 3; /* Create three columns */
+    -webkit-columns: 3;
+    -moz-columns: 3;
+    column-gap: 20px; /* Adjust gap */
 }
 .skills-columns li {
     font-size: 0.95em;
     color: #444;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     padding-left: 15px; /* Indentation for bullet */
     position: relative;
     break-inside: avoid-column;
 }
 .skills-columns li::before {
     content: '•';
-    color: #555; /* Bullet color */
+    color: #6F7D9C; /* Match title color for bullets */
     position: absolute;
     left: 0;
     top: 0.1em;
     font-size: 1em;
 }
 
-/* Work History/Experience & Education Entries */
-.experience ul, .education ul, .certifications-list {
-    margin: 0;
+/* Work History/Experience Entries */
+#experienceList > li { /* Space between entries */
+    margin-bottom: 15px;
 }
-#experienceList > li, #educationList > li { /* Space between entries */
-    margin-bottom: 20px;
-}
-#experienceList > li:last-child, #educationList > li:last-child {
+#experienceList > li:last-child {
     margin-bottom: 0;
 }
 
@@ -166,21 +173,21 @@ strong {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 5px;
+    margin-bottom: 3px; /* Reduced margin */
     flex-wrap: wrap;
 }
-.job-title-company {
-    flex-grow: 1;
-}
-.job-title-company strong { /* Job Title */
-    font-size: 1.05em;
+.job-title { /* For job title */
+    font-size: 1em;
     color: #222;
-    display: inline; /* Keep on same line as company */
+    display: block; /* Ensure it's on its own line if needed */
+    margin-bottom: 2px;
 }
-.job-title-company span { /* Company & Location */
-    font-size: 1.05em; /* Match job title size */
+.company-location { /* For company and location */
+    font-size: 0.95em;
     color: #444;
-    display: inline;
+    display: block;
+    margin-bottom: 5px; /* Space below company/location line */
+    font-style: italic;
 }
 
 .date-range {
@@ -188,25 +195,25 @@ strong {
     text-align: right;
     font-size: 0.9em;
     color: #555;
-    font-style: italic; /* Italic date */
+    font-weight: 700; /* Bold date */
     padding-left: 15px;
 }
 
 .details-list {
     list-style: none;
-    padding-left: 10px; /* Slight indent for details list */
-    margin-top: 5px;
+    padding-left: 0; /* No extra indent for the list itself */
+    margin-top: 0px;
 }
 .details-list li {
     font-size: 0.95em;
     color: #444;
-    margin-bottom: 5px;
-    padding-left: 15px;
+    margin-bottom: 4px;
+    padding-left: 15px; /* Indentation for bullet */
     position: relative;
 }
 .details-list li::before {
     content: '•';
-    color: #555;
+    color: #6F7D9C; /* Match title color for bullets */
     position: absolute;
     left: 0;
     top: 0.1em;
@@ -222,22 +229,24 @@ strong {
     font-size: 0.95em;
     color: #444;
     line-height: 1.4;
+    margin-bottom: 2px;
 }
-.education-entry span strong {
+.education-entry span strong { /* Degree/Field */
     color: #222;
+    font-weight: 700;
 }
 
-/* Certifications List */
-.certifications-list li {
+/* Licenses List */
+.licenses-list li {
     font-size: 0.95em;
     color: #444;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     padding-left: 15px;
     position: relative;
 }
-.certifications-list li::before {
+.licenses-list li::before {
     content: '•';
-    color: #555;
+    color: #6F7D9C; /* Match title color for bullets */
     position: absolute;
     left: 0;
     top: 0.1em;
@@ -257,8 +266,7 @@ strong {
 #referencesSection .section-title-column h3,
 #hobbiesSection .section-title-column h3,
 #portfolioSection .section-title-column h3 {
-    border-color: #999;
-    color: #999;
+    color: #999; /* Lighter color for hidden section titles if shown */
 }
 
 
@@ -271,33 +279,30 @@ strong {
 @media (max-width: 768px) {
     .cv-container {
         padding: 25px;
+        border-top-width: 4px; /* Slightly thinner border */
     }
     .cv-header h1 { font-size: 2.2em; }
 
-    .contact-bar {
+    .contact-bar-top {
         justify-content: flex-start;
         text-align: left;
     }
-    .contact-bar .separator { display: none; }
+    .contact-bar-top .separator { display: none; }
 
     .grid-section {
         grid-template-columns: 1fr; /* Stack title and content */
         gap: 10px; /* Reduce gap */
+        padding-bottom: 10px;
     }
     .section-title-column {
-        margin-bottom: 5px; /* Space below title when stacked */
+        margin-bottom: 5px;
     }
     .section-title-column h3 {
-        display: block; /* Full width for title */
-        text-align: left; /* Align title left */
-        min-width: 0; /* Reset min-width */
-    }
-    .section-content-column {
-        padding-top: 0; /* Reset padding */
+        padding-top: 0; /* Remove top padding when stacked */
     }
 
     .skills-columns {
-        columns: 1; /* Single column for skills */
+        columns: 2; /* Reduce to 2 columns for skills on tablet */
     }
 
     .entry-header {
@@ -308,5 +313,10 @@ strong {
         text-align: left;
         padding-left: 0;
         margin-top: 3px;
+    }
+}
+@media (max-width: 576px) {
+    .skills-columns {
+        columns: 1; /* Single column for skills on mobile */
     }
 }
