@@ -27,6 +27,21 @@ export function registerRoutes(app: Express): Server {
   // Register template API
   registerTemplateAPI(app);
 
+  // Serve sitemap.xml with the correct content type
+  app.get("/sitemap.xml", (req, res) => {
+    const fs = require('fs');
+    const path = require('path');
+    
+    // Path to sitemap.xml in the public directory
+    const sitemapPath = path.join(import.meta.dirname, '../public/sitemap.xml');
+    
+    // Set the correct content type for XML
+    res.setHeader('Content-Type', 'application/xml');
+    
+    // Stream the file to the response
+    fs.createReadStream(sitemapPath).pipe(res);
+  });
+
   // API key status endpoint
   app.get("/api/keys/status", (req, res) => {
     res.status(200).json({
