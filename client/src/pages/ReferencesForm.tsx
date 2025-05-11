@@ -17,8 +17,7 @@ const ReferencesForm = () => {
 
   // State for reference information
   const [name, setName] = useState('');
-  const [position, setPosition] = useState('');
-  const [company, setCompany] = useState('');
+  const [relationship, setRelationship] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [references, setReferences] = useState<Reference[]>(
@@ -50,8 +49,8 @@ const ReferencesForm = () => {
     const newReference: Reference = {
       id: Date.now().toString(),
       name,
-      position,
-      company,
+      position: relationship, // We'll use position field to store relationship
+      company: '', // Setting an empty string as we're not using company
       email,
       phone
     };
@@ -60,8 +59,7 @@ const ReferencesForm = () => {
     
     // Reset form
     setName('');
-    setPosition('');
-    setCompany('');
+    setRelationship('');
     setEmail('');
     setPhone('');
   };
@@ -100,7 +98,7 @@ const ReferencesForm = () => {
               >
                 <div>
                   <div className="font-medium">{ref.name}</div>
-                  <div className="text-sm text-gray-500">{ref.position}{ref.company ? `, ${ref.company}` : ''}</div>
+                  <div className="text-sm text-gray-500">{ref.position}</div>
                   <div className="text-sm text-gray-500">{ref.email}{ref.phone ? ` | ${ref.phone}` : ''}</div>
                 </div>
                 <Button
@@ -121,7 +119,7 @@ const ReferencesForm = () => {
           <h2 className="font-semibold mb-4">Add Reference</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -129,24 +127,16 @@ const ReferencesForm = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Relationship</label>
               <Input
-                value={position}
-                onChange={(e) => setPosition(e.target.value)}
-                placeholder="e.g. Project Manager"
+                value={relationship}
+                onChange={(e) => setRelationship(e.target.value)}
+                placeholder="e.g. Manager, Colleague"
               />
-              <div className="text-xs text-gray-500 mt-1">Their role or job title</div>
+              <div className="text-xs text-gray-500 mt-1">How you know this person</div>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
-              <Input
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                placeholder="Company Name"
-              />
-            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <Input
@@ -156,16 +146,15 @@ const ReferencesForm = () => {
                 placeholder="email@example.com"
               />
             </div>
-          </div>
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-            <Input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+1 (555) 123-4567"
-              className="max-w-md"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <Input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+255 7XX XXX XXX"
+              />
+            </div>
           </div>
           <div className="flex justify-end">
             <Button
