@@ -18,6 +18,8 @@ import EducationSummary from '@/components/EducationSummary';
 import { Education } from '@shared/schema';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { navigateWithScrollReset } from '@/lib/navigation-utils';
+import LocationInput from '@/components/LocationInput';
+import UniversityInput from '@/components/UniversityInput';
 
 const EducationForm = () => {
   const [, navigate] = useLocation();
@@ -172,13 +174,11 @@ const EducationForm = () => {
                   <Label htmlFor="institution" className="block mb-2 font-medium">
                     School or University*
                   </Label>
-                  <Input
-                    id="institution"
+                  <UniversityInput
                     value={institution}
-                    onChange={(e) => setInstitution(e.target.value)}
-                    placeholder="e.g. University of Dar es Salaam"
+                    onChange={(value) => setInstitution(value)}
+                    placeholder="Start typing university name..."
                     className="w-full"
-                    required
                   />
                 </div>
                 
@@ -186,11 +186,10 @@ const EducationForm = () => {
                   <Label htmlFor="schoolLocation" className="block mb-2 font-medium">
                     School Location
                   </Label>
-                  <Input
-                    id="schoolLocation"
+                  <LocationInput
                     value={schoolLocation}
-                    onChange={(e) => setSchoolLocation(e.target.value)}
-                    placeholder="e.g. Dar es Salaam, Tanzania"
+                    onChange={(value) => setSchoolLocation(value)}
+                    placeholder="Start typing location name..."
                     className="w-full"
                   />
                 </div>
