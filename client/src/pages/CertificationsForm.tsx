@@ -12,7 +12,9 @@ import { Certification } from '@shared/schema';
 const CertificationsForm = () => {
   const [, navigate] = useLocation();
   const { formData, updateFormField } = useCVForm();
-  const templateId = formData.templateId;
+  // Get templateId from formData, fallback to a default if not available
+  // This helps when accessing the page directly with an invalid URL like /cv//certifications
+  const templateId = formData.templateId || 'kilimanjaro';
   
   // Initialize with existing data or empty certification
   const [certifications, setCertifications] = useState<Certification[]>(
@@ -50,8 +52,13 @@ const CertificationsForm = () => {
     const filteredCertifications = certifications.filter(cert => cert.name.trim() !== '');
     updateFormField('certifications', filteredCertifications);
     
-    // Navigate back to additional sections
-    navigate(`/cv/${templateId}/additional-sections`);
+    // Navigate back to appropriate page based on whether we have a templateId
+    if (templateId && templateId !== 'kilimanjaro') {
+      navigate(`/cv/${templateId}/additional-sections`);
+    } else {
+      // If we don't have a valid templateId, go to template selection
+      navigate('/templates');
+    }
   };
 
   return (
@@ -65,10 +72,17 @@ const CertificationsForm = () => {
       </Helmet>
 
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <Link href={`/cv/${templateId}/additional-sections`} className="flex items-center text-indigo-600 mb-6">
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          <span>Go Back</span>
-        </Link>
+        {templateId && templateId !== 'kilimanjaro' ? (
+          <Link href={`/cv/${templateId}/additional-sections`} className="flex items-center text-indigo-600 mb-6">
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            <span>Go Back to Additional Sections</span>
+          </Link>
+        ) : (
+          <Link href="/templates" className="flex items-center text-indigo-600 mb-6">
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            <span>Go Back to Templates</span>
+          </Link>
+        )}
 
         <h1 className="text-3xl font-bold text-gray-900 mb-6">What certifications do you have?</h1>
 

@@ -51,8 +51,13 @@ const HobbiesForm = () => {
     const filteredHobbies = hobbies.filter(hobby => hobby.name.trim() !== '');
     updateFormField('hobbies', filteredHobbies);
     
-    // Navigate back to additional sections
-    navigate(`/cv/${templateId}/additional-sections`);
+    // Navigate back to appropriate page based on whether we have a templateId
+    if (templateId && templateId !== 'kilimanjaro') {
+      navigate(`/cv/${templateId}/additional-sections`);
+    } else {
+      // If we don't have a valid templateId, go to template selection
+      navigate('/templates');
+    }
   };
 
   return (
@@ -66,15 +71,32 @@ const HobbiesForm = () => {
       </Helmet>
 
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <Link href={`/cv/${templateId}/additional-sections`} className="flex items-center text-indigo-600 mb-6">
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          <span>Go Back</span>
-        </Link>
+        {templateId && templateId !== 'kilimanjaro' ? (
+          <Link href={`/cv/${templateId}/additional-sections`} className="flex items-center text-indigo-600 mb-6">
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            <span>Go Back to Additional Sections</span>
+          </Link>
+        ) : (
+          <Link href="/templates" className="flex items-center text-indigo-600 mb-6">
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            <span>Go Back to Templates</span>
+          </Link>
+        )}
 
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Tell us about your Hobbies</h1>
         <p className="text-gray-600 mb-8">
           Showcase your Hobbies to an employer
         </p>
+        
+        {(!templateId || templateId === 'kilimanjaro') && (
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+            <h3 className="font-medium text-blue-800 mb-1">Note</h3>
+            <p className="text-blue-700 text-sm">
+              It looks like you accessed this page directly. For the best experience, 
+              we recommend starting from the template selection page to create your CV properly.
+            </p>
+          </div>
+        )}
 
         <div className="space-y-6 mb-8">
           {hobbies.map((hobby, index) => (

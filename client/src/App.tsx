@@ -137,11 +137,18 @@ function Router() {
                 <Route path="/cv/:templateId/references" component={ReferencesForm} />
                 <Route path="/cv/:templateId/additional-sections" component={AdditionalSectionsForm} />
                 <Route path="/cv/:templateId/websites-portfolios" component={WebsitesPortfoliosForm} />
+                {/* Handle all path variations including direct access URLs */}
                 <Route path="/cv/:templateId/certifications" component={CertificationsForm} />
+                <Route path="/cv/certifications" component={CertificationsForm} />
+                <Route path="/cv//certifications" component={CertificationsForm} />
+                
                 <Route path="/cv/:templateId/accomplishments" component={AccomplishmentsForm} />
-                {/* Handle both normal and erroneous double-slash paths */}
+                <Route path="/cv/accomplishments" component={AccomplishmentsForm} />
+                <Route path="/cv//accomplishments" component={AccomplishmentsForm} />
+                
                 <Route path="/cv/:templateId/hobbies" component={HobbiesForm} />
                 <Route path="/cv//hobbies" component={HobbiesForm} />
+                <Route path="/cv/hobbies" component={HobbiesForm} />
                 <Route path="/create/:step?" component={CreateCV} />
                 <Route path="/about" component={About} />
                 <Route path="/why-us" component={WhyUs} />
