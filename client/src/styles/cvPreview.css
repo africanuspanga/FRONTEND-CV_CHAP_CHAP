@@ -7,17 +7,26 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center; /* Center vertically */
-  height: calc(100vh - 60px); /* Use full height */
+  align-items: flex-start; /* Align to top instead of center */
+  height: calc(100vh - 60px);
+  overflow-y: scroll; /* Always show scroll to ensure access to full content */
+  scrollbar-width: thin; /* For Firefox */
+}
+
+.cv-preview-container::-webkit-scrollbar {
+  width: 8px; /* For Chrome, Safari, and Opera */
+}
+
+.cv-preview-container::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 4px;
 }
 
 .cv-container-wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;
   width: 100%;
-  height: 100%;
-  padding-bottom: 1rem; /* Add padding at bottom for better visual balance */
+  padding: 1.5rem 0; /* Add padding for better spacing */
 }
 
 .cv-template-container {
@@ -92,15 +101,25 @@
     flex: 1;
     padding: 0.75rem;
     border-radius: 999px;
-    background: transparent;
-    color: white;
     font-size: 1rem;
     font-weight: 500;
-    border: 2px solid white;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    /* First button (Change Template) gets gradient styling */
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Second button (Edit Resume) */
+  .action-buttons button:last-child {
+    background: white;
+    color: #1e3a8a;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
   .mobile-cv-card {
@@ -116,12 +135,13 @@
 
   .scaled-preview {
     transform: scale(0.35);
-    transform-origin: top left;
+    transform-origin: top center; /* Changed from top left to top center for better centering */
     width: 794px;
     height: 1123px;
     position: absolute;
     top: 0;
-    left: 0;
+    left: 50%; /* Center the template */
+    margin-left: -397px; /* Half of the width to center properly */
   }
 
   .mobile-cv-watermark {

@@ -107,7 +107,7 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
             transform: `scale(${displayScale})`,
             width: `${A4_WIDTH_PX}px`,
             minHeight: `${A4_HEIGHT_PX}px`,
-            transformOrigin: 'center center',
+            transformOrigin: 'top center', // Changed from 'center center' to 'top center' to show top of template
             margin: '0 auto',
             backgroundColor: 'white',
             position: 'relative',
@@ -196,10 +196,10 @@ const FinalPreview = () => {
           
           <div className="flex space-x-3">
             <Button 
-              variant="outline" 
+              className="bg-gradient-to-r from-blue-600 to-blue-800 text-white hover:from-blue-700 hover:to-blue-900 transition-all" 
               onClick={() => setTemplateSidebarOpen(!templateSidebarOpen)}
             >
-              Templates
+              Change Template
             </Button>
             <Button variant="outline"><Mail className="h-4 w-4" /><span>Email</span></Button>
             <Button variant="outline"><Printer className="h-4 w-4" /><span>Print</span></Button>
@@ -218,11 +218,11 @@ const FinalPreview = () => {
         {/* Template Sidebar */}
         {templateSidebarOpen && (
           <div className={isMobile ? 'fixed inset-0 z-50 bg-[#f0f2f8]' : 'templates-sidebar'}>
-            <div className="p-4 bg-[#1a2e5c] text-white flex justify-between items-center">
+            <div className="p-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white flex justify-between items-center">
               <h3 className="font-semibold text-lg">Change Template</h3>
               <button 
                 onClick={() => setTemplateSidebarOpen(false)}
-                className="bg-white/20 rounded-full p-1"
+                className="bg-white/20 hover:bg-white/30 transition-colors rounded-full p-1.5"
               >
                 <X className="h-5 w-5 text-white" />
               </button>
