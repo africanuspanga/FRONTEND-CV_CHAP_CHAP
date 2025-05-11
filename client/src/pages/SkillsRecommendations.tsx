@@ -59,7 +59,7 @@ const SkillsRecommendations = () => {
         description: "We need work experience details to recommend skills.",
         variant: "destructive"
       });
-      navigate(`/cv/${templateId}/work-experience`);
+      navigate(`/cv/${templateId}/work`);
       return;
     }
 
