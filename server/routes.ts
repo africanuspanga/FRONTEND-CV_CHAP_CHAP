@@ -29,72 +29,118 @@ export function registerRoutes(app: Express): Server {
   // Register template API
   registerTemplateAPI(app);
 
-  // Special handling for sitemap and robots.txt validation
+  // Direct sitemap and robots handling with raw response writing  
   
   // Serve sitemap.xml with the correct content type
-  app.get("/sitemap.xml", async (req, res) => {
-    try {
-      // Path to sitemap.xml in the public directory
-      const sitemapPath = path.join(import.meta.dirname, '../public/sitemap.xml');
-      
-      // Read the file content
-      const sitemapContent = await fs.readFile(sitemapPath, 'utf-8');
-      
-      // Set the correct content type for XML and disable caching
-      res.setHeader('Content-Type', 'application/xml');
-      res.setHeader('Cache-Control', 'no-cache, no-store');
-      
-      // Send the file content
-      res.send(sitemapContent);
-      
-      console.log('Served sitemap.xml with Content-Type: application/xml');
-    } catch (error) {
-      console.error('Error serving sitemap.xml:', error);
-      res.status(500).json({ error: 'Could not serve sitemap.xml' });
-    }
+  app.get("/sitemap.xml", (req, res) => {
+    // Write raw XML response with proper headers
+    res.writeHead(200, {
+      'Content-Type': 'application/xml; charset=UTF-8',
+      'X-Robots-Tag': 'noindex, follow',
+      'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate'
+    });
+    
+    // Create XML content directly instead of reading from file
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://cvchapchap.replit.app/</loc>
+    <lastmod>2025-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://cvchapchap.replit.app/cv/select-template</loc>
+    <lastmod>2025-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cvchapchap.replit.app/cv/personal-info</loc>
+    <lastmod>2025-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cvchapchap.replit.app/cv/work-experience</loc>
+    <lastmod>2025-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cvchapchap.replit.app/cv/education</loc>
+    <lastmod>2025-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cvchapchap.replit.app/cv/skills</loc>
+    <lastmod>2025-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cvchapchap.replit.app/faq</loc>
+    <lastmod>2025-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://cvchapchap.replit.app/about</loc>
+    <lastmod>2025-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>`;
+    
+    // Send the XML content directly
+    res.end(xml);
+    
+    console.log('Served sitemap.xml with direct XML content-type');
   });
   
   // Serve robots.txt with the correct content type
-  app.get("/robots.txt", async (req, res) => {
-    try {
-      // Path to robots.txt in the public directory
-      const robotsPath = path.join(import.meta.dirname, '../public/robots.txt');
-      
-      // Read the file content
-      const robotsContent = await fs.readFile(robotsPath, 'utf-8');
-      
-      // Set the correct content type and disable caching
-      res.setHeader('Content-Type', 'text/plain');
-      res.setHeader('Cache-Control', 'no-cache, no-store');
-      
-      // Send the file content
-      res.send(robotsContent);
-      
-      console.log('Served robots.txt with Content-Type: text/plain');
-    } catch (error) {
-      console.error('Error serving robots.txt:', error);
-      res.status(500).json({ error: 'Could not serve robots.txt' });
-    }
+  app.get("/robots.txt", (req, res) => {
+    // Write raw text response with proper headers
+    res.writeHead(200, {
+      'Content-Type': 'text/plain; charset=UTF-8',
+      'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate'
+    });
+    
+    // Create content directly
+    const robotsTxt = `# Allow all crawlers to access all content
+User-agent: *
+Allow: /
+
+# Point to the sitemap
+Sitemap: https://cvchapchap.replit.app/sitemap.xml`;
+    
+    // Send the text content directly
+    res.end(robotsTxt);
+    
+    console.log('Served robots.txt with direct text/plain content-type');
   });
   
-  // Handle Google sitemap validation requests for other URLs
+  // Prevent other URLs from being interpreted as sitemaps
   app.use((req, res, next) => {
     const userAgent = req.get('User-Agent') || '';
-    // Check if it's a request from Google's sitemap validation
-    if (userAgent.includes('Google-Site-Verification') || 
-        userAgent.includes('Googlebot') || 
-        req.query.hasOwnProperty('sitemap')) {
+    
+    // Search bot detection
+    if (userAgent.includes('Google') || 
+        userAgent.includes('bot') || 
+        userAgent.includes('crawl') || 
+        userAgent.includes('Spider') ||
+        userAgent.includes('spider')) {
       
-      // If it's accessing a specific URL for sitemap validation, handle it properly
-      if (req.path !== '/sitemap.xml' && req.path !== '/robots.txt' && req.method === 'GET') {
-        console.log(`Detected sitemap validation request for ${req.path} - responding with proper content type`);
-        
-        // Send a proper response that won't confuse Google's validation
-        if (req.get('Accept')?.includes('application/xml')) {
-          res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        }
+      console.log(`Bot detected: ${userAgent} - Path: ${req.path}`);
+      
+      // Handle any potential sitemap validation attempt
+      if (req.path.includes('sitemap') && req.path !== '/sitemap.xml') {
+        console.log(`Blocking incorrect sitemap path: ${req.path}`);
+        return res.status(404).send('Not found');
       }
     }
+    
     next();
   });
 
