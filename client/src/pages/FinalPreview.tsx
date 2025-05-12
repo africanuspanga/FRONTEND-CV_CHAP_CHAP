@@ -20,6 +20,8 @@ interface CVPreviewAreaProps {
   isMobile: boolean;
   onDownload: () => void;
   isDownloading: boolean;
+  navigate: (to: string, options?: any) => void;
+  setTemplateSidebarOpen: (isOpen: boolean) => void;
 }
 
 const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({ 
@@ -27,7 +29,9 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
   formData, 
   isMobile, 
   onDownload, 
-  isDownloading 
+  isDownloading,
+  navigate,
+  setTemplateSidebarOpen
 }) => {
   // Create ref for the container to measure
   const containerRef = useRef<HTMLDivElement>(null);
@@ -51,7 +55,7 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
         <div className="mobile-cv-header">
           <h2>Your CV is Ready</h2>
           <div className="action-buttons">
-            <button onClick={() => navigate('/templates')}>
+            <button onClick={() => setTemplateSidebarOpen(true)}>
               Change Template
             </button>
           </div>
@@ -278,6 +282,8 @@ const FinalPreview = () => {
           isMobile={isMobile}
           onDownload={handleDownload}
           isDownloading={isDownloading}
+          navigate={navigate}
+          setTemplateSidebarOpen={setTemplateSidebarOpen}
         />
       </div>
       
