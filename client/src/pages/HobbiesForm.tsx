@@ -71,7 +71,8 @@ const HobbiesForm = () => {
       </Helmet>
 
       <div className="max-w-3xl mx-auto px-4 py-12">
-        {templateId && templateId !== 'kilimanjaro' ? (
+        {/* Always link back to additional sections when we have a valid templateId */}
+        {templateId ? (
           <Link href={`/cv/${templateId}/additional-sections`} className="flex items-center text-indigo-600 mb-6">
             <ChevronLeft className="w-4 h-4 mr-1" />
             <span>Go Back to Additional Sections</span>
