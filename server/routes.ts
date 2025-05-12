@@ -44,49 +44,49 @@ export function registerRoutes(app: Express): Server {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://cvchapchap.replit.app/</loc>
+    <loc>https://cvchapchap.com/</loc>
     <lastmod>2025-05-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.replit.app/cv/select-template</loc>
+    <loc>https://cvchapchap.com/cv/select-template</loc>
     <lastmod>2025-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.replit.app/cv/personal-info</loc>
+    <loc>https://cvchapchap.com/cv/personal-info</loc>
     <lastmod>2025-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.replit.app/cv/work-experience</loc>
+    <loc>https://cvchapchap.com/cv/work-experience</loc>
     <lastmod>2025-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.replit.app/cv/education</loc>
+    <loc>https://cvchapchap.com/cv/education</loc>
     <lastmod>2025-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.replit.app/cv/skills</loc>
+    <loc>https://cvchapchap.com/cv/skills</loc>
     <lastmod>2025-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.replit.app/faq</loc>
+    <loc>https://cvchapchap.com/faq</loc>
     <lastmod>2025-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://cvchapchap.replit.app/about</loc>
+    <loc>https://cvchapchap.com/about</loc>
     <lastmod>2025-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -113,7 +113,7 @@ User-agent: *
 Allow: /
 
 # Point to the sitemap
-Sitemap: https://cvchapchap.replit.app/sitemap.xml`;
+Sitemap: https://cvchapchap.com/sitemap.xml`;
     
     // Send the text content directly
     res.end(robotsTxt);
