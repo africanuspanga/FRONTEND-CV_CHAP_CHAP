@@ -52,10 +52,11 @@ const HobbiesForm = () => {
     updateFormField('hobbies', filteredHobbies);
     
     // Navigate back to appropriate page based on whether we have a templateId
-    if (templateId && templateId !== 'kilimanjaro') {
+    if (templateId) {
+      // Always go back to additional sections when we have a valid templateId
       navigate(`/cv/${templateId}/additional-sections`);
     } else {
-      // If we don't have a valid templateId, go to template selection
+      // Only if we don't have any templateId, go to template selection
       navigate('/templates');
     }
   };
@@ -89,7 +90,7 @@ const HobbiesForm = () => {
           Showcase your Hobbies to an employer
         </p>
         
-        {(!templateId || templateId === 'kilimanjaro') && (
+        {!templateId && (
           <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
             <h3 className="font-medium text-blue-800 mb-1">Note</h3>
             <p className="text-blue-700 text-sm">
