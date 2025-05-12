@@ -51,7 +51,7 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
         <div className="mobile-cv-header">
           <h2>Your CV is Ready</h2>
           <div className="action-buttons">
-            <button onClick={() => window.location.href = '/cv/select-template'}>
+            <button onClick={() => navigate('/templates')}>
               Change Template
             </button>
           </div>
