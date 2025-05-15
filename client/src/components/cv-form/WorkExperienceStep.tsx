@@ -133,7 +133,7 @@ const WorkExperienceStep: React.FC = () => {
 
         {/* Max warning alert */}
         {showMaxWarning && (
-          <Alert variant="warning" className="mb-4 bg-amber-50 border-amber-200">
+          <Alert className="mb-4 bg-amber-50 border-amber-200">
             <AlertCircle className="h-4 w-4 text-amber-600" />
             <AlertDescription className="text-amber-800">
               You've reached the maximum of {MAX_EXPERIENCES} work experiences. Please remove an existing entry before adding a new one.

@@ -109,13 +109,17 @@ const WorkExperienceForm = () => {
   
   // Effect to update the live preview as user types (only when adding a new job)
   useEffect(() => {
-    // Check if the preview already exists
-    const hasPreview = formData.workExperiences?.some(job => job.id === 'preview-job');
+    // Check if the preview already exists in either workExperiences or workExp
+    const hasPreview = 
+      (formData.workExperiences?.some(job => job.id === 'preview-job') || 
+       formData.workExp?.some(job => job.id === 'preview-job'));
+    
     // Check if we should display a preview
     const shouldShowPreview = jobTitle && employer && editingJobIndex === null && showJobForm;
     
     // Create a reference to current workExperiences to avoid dependency loop
-    const currentWorkExperiences = formData.workExperiences || [];
+    // Prioritize workExperiences but fall back to workExp if needed
+    const currentWorkExperiences = formData.workExperiences || formData.workExp || [];
     
     // To prevent infinite loops, only update when the preview status changes
     if (shouldShowPreview !== hasPreview) {
@@ -186,12 +190,15 @@ const WorkExperienceForm = () => {
   
   // Update an existing work experience
   const updateExistingWorkExperience = (achievements: string[] = []) => {
-    if (editingJobIndex !== null && formData.workExperiences && formData.workExperiences[editingJobIndex]) {
+    // Get the appropriate work experience array, checking both fields
+    const workExpArray = formData.workExperiences || formData.workExp || [];
+    
+    if (editingJobIndex !== null && workExpArray[editingJobIndex]) {
       const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
       const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
       
       // Get current work experiences
-      const currentExperiences = [...(formData.workExperiences || [])];
+      const currentExperiences = [...workExpArray];
       
       // Update the specific job
       currentExperiences[editingJobIndex] = {
@@ -205,7 +212,8 @@ const WorkExperienceForm = () => {
         achievements: achievements.length > 0 ? achievements : aiRecommendations
       };
       
-      // Update in form context
+      // Update in form context - this will update both workExperiences and workExp
+      // thanks to our synchronized context updates
       updateFormField('workExperiences', currentExperiences);
       
       // Reset form and editing state
@@ -271,8 +279,11 @@ const WorkExperienceForm = () => {
   };
   
   const handleEditJob = (index: number) => {
-    if (formData.workExperiences && formData.workExperiences[index]) {
-      const job = formData.workExperiences[index];
+    // Get the appropriate work experience array, checking both fields
+    const workExpArray = formData.workExperiences || formData.workExp || [];
+    
+    if (workExpArray[index]) {
+      const job = workExpArray[index];
       
       // Fill the form with the job data
       setJobTitle(job.jobTitle || '');
@@ -599,7 +610,7 @@ const WorkExperienceForm = () => {
           {showWorkHistory && (
             <>
               <WorkHistorySummary
-                workExperiences={(formData.workExperiences || []).map(job => ({
+                workExperiences={(formData.workExperiences || formData.workExp || []).map(job => ({
                   ...job,
                   id: job.id || Date.now().toString() // Ensure all jobs have an ID
                 }))}
