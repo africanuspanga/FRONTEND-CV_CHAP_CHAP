@@ -258,9 +258,10 @@ const WorkExperienceForm = () => {
   const handleRejectRecommendations = () => {
     setShowRecommendationsDialog(false);
     setIsGeneratingRecommendations(false);
+    // Clear AI recommendations when user clicks "No thanks"
+    setAIRecommendations([]);
     setShowEditor(true);
     console.log('Proceeding to editor after declining recommendations');
-    // Keep the recommendations in state in case they want to use them later
   };
 
   const handleSaveAchievements = (achievements: string[]) => {

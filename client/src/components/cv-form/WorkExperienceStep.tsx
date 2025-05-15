@@ -248,29 +248,20 @@ const WorkExperienceStep: React.FC = () => {
                       )}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name={`workExperience.${index}.isRemote`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between space-x-3 space-y-0 rounded-md border p-4">
+                    <div className="flex flex-row items-center justify-between space-x-3 space-y-0 rounded-md border p-4">
                           <div className="space-y-1 leading-none">
-                            <FormLabel>Remote Work</FormLabel>
-                            <FormDescription>
+                            <div className="font-medium">Remote Work</div>
+                            <div className="text-sm text-muted-foreground">
                               This was a remote position
-                            </FormDescription>
+                            </div>
                           </div>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={(checked) => {
-                                field.onChange(checked);
-                                handleFieldChange(index, 'isRemote', checked);
-                              }}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                          <Switch
+                            checked={form.getValues(`workExperience.${index}.isRemote`) === true}
+                            onCheckedChange={(checked) => {
+                              form.setValue(`workExperience.${index}.isRemote`, checked);
+                              handleFieldChange(index, 'isRemote', checked);
+                            }}
+                          />
                   </div>
 
                   {/* Employment Dates */}
