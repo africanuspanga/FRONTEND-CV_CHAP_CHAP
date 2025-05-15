@@ -43,10 +43,17 @@ const WorkExperienceStep: React.FC = () => {
   const [showMaxWarning, setShowMaxWarning] = useState(false);
   
   // Get default values from context or use an empty array with one item
+  // Check both workExperiences and workExp properties for backward compatibility
   const defaultValues: FormValues = {
-    workExperience: formData.workExperiences && formData.workExperiences.length > 0
-      ? formData.workExperiences
-      : [emptyWorkExperience],
+    workExperience: 
+      // First check workExperiences (primary property)
+      (formData.workExperiences && formData.workExperiences.length > 0)
+        ? formData.workExperiences
+        // Then fall back to workExp (secondary property)
+        : (formData.workExp && formData.workExp.length > 0)
+          ? formData.workExp
+          // If neither exists, use an empty experience
+          : [emptyWorkExperience],
   };
 
   // Initialize form

@@ -26,7 +26,8 @@ const initialFormData: CVFormData = {
     postalCode: '',
     summary: '',
   },
-  workExperiences: [],
+  workExperiences: [], // Primary work experience array
+  workExp: [],        // Secondary work experience array (for backward compatibility)
   education: [],
   skills: [],
   languages: [],
@@ -90,6 +91,22 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
         const savedData = await cvStorage.loadFormData();
         if (savedData) {
           console.log('Successfully loaded saved CV data');
+          
+          // Ensure consistent work experience data by syncing workExperiences and workExp fields
+          if (savedData.workExperiences && !savedData.workExp) {
+            console.log('Syncing workExperiences to workExp');
+            savedData.workExp = savedData.workExperiences;
+          } else if (savedData.workExp && !savedData.workExperiences) {
+            console.log('Syncing workExp to workExperiences');
+            savedData.workExperiences = savedData.workExp;
+          } else if (savedData.workExp && savedData.workExperiences) {
+            // If both exist but are different, prioritize workExperiences
+            if (JSON.stringify(savedData.workExperiences) !== JSON.stringify(savedData.workExp)) {
+              console.log('Found both workExp and workExperiences with different values, syncing them');
+              savedData.workExp = savedData.workExperiences;
+            }
+          }
+          
           setFormData(savedData);
         }
         
