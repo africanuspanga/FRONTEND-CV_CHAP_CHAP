@@ -148,10 +148,27 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   
   // Update a simple field
   const updateFormField = <K extends keyof CVFormData>(section: K, value: CVFormData[K]) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: value
-    }));
+    setFormData(prev => {
+      // Special case for work experience - sync between workExperiences and workExp
+      if (section === 'workExperiences' as K) {
+        return {
+          ...prev,
+          [section]: value,
+          workExp: value as any // Type assertion for sync between properties
+        };
+      } else if (section === 'workExp' as K) {
+        return {
+          ...prev,
+          [section]: value,
+          workExperiences: value as any // Type assertion for sync between properties 
+        };
+      }
+      // Standard case for other fields
+      return {
+        ...prev,
+        [section]: value
+      };
+    });
   };
   
   // Update an item in a nested array (like workExperience items)
@@ -166,6 +183,23 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
         ...sectionArray[index],
         ...value
       };
+      
+      // Special case for work experience arrays - sync between workExperiences and workExp
+      if (section === 'workExperiences' as K) {
+        return {
+          ...prev,
+          [section]: sectionArray,
+          workExp: sectionArray as any // Type assertion for sync between properties
+        };
+      } else if (section === 'workExp' as K) {
+        return {
+          ...prev,
+          [section]: sectionArray,
+          workExperiences: sectionArray as any // Type assertion for sync between properties
+        };
+      }
+      
+      // Standard case for other fields
       return {
         ...prev,
         [section]: sectionArray
@@ -175,18 +209,58 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   
   // Add item to an array field
   const addItemToArray = <K extends keyof CVFormData>(section: K, item: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: [...(prev[section] as any[]), item]
-    }));
+    setFormData(prev => {
+      const updatedArray = [...(prev[section] as any[]), item];
+      
+      // Special case for work experience arrays - sync between workExperiences and workExp
+      if (section === 'workExperiences' as K) {
+        return {
+          ...prev,
+          [section]: updatedArray,
+          workExp: updatedArray as any // Type assertion for sync between properties
+        };
+      } else if (section === 'workExp' as K) {
+        return {
+          ...prev,
+          [section]: updatedArray,
+          workExperiences: updatedArray as any // Type assertion for sync between properties
+        };
+      }
+      
+      // Standard case for other fields
+      return {
+        ...prev,
+        [section]: updatedArray
+      };
+    });
   };
   
   // Remove item from an array field
   const removeItemFromArray = <K extends keyof CVFormData>(section: K, index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: (prev[section] as any[]).filter((_, i) => i !== index)
-    }));
+    setFormData(prev => {
+      const updatedArray = (prev[section] as any[]).filter((_, i) => i !== index);
+      
+      // Special case for work experience arrays - sync between workExperiences and workExp
+      if (section === 'workExperiences' as K) {
+        return {
+          ...prev,
+          [section]: updatedArray,
+          workExp: updatedArray as any // Type assertion for sync between properties
+        };
+      } else if (section === 'workExp' as K) {
+        return {
+          ...prev,
+          [section]: updatedArray,
+          workExperiences: updatedArray as any // Type assertion for sync between properties
+        };
+      }
+      
+      // Standard case for other fields
+      return {
+        ...prev,
+        [section]: updatedArray
+      };
+    });
   };
   
   // Move item within an array (for drag-and-drop reordering)
@@ -199,6 +273,23 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
       const sectionArray = [...(prev[section] as any[])];
       const [movedItem] = sectionArray.splice(fromIndex, 1);
       sectionArray.splice(toIndex, 0, movedItem);
+      
+      // Special case for work experience arrays - sync between workExperiences and workExp
+      if (section === 'workExperiences' as K) {
+        return {
+          ...prev,
+          [section]: sectionArray,
+          workExp: sectionArray as any // Type assertion for sync between properties
+        };
+      } else if (section === 'workExp' as K) {
+        return {
+          ...prev,
+          [section]: sectionArray,
+          workExperiences: sectionArray as any // Type assertion for sync between properties
+        };
+      }
+      
+      // Standard case for other fields
       return {
         ...prev,
         [section]: sectionArray
