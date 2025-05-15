@@ -175,8 +175,11 @@ const WorkExperienceForm = () => {
         achievements: achievements.length > 0 ? achievements : aiRecommendations
       };
       
-      // Update work experience array without the preview
-      const filteredExperiences = (formData.workExperiences || []).filter(job => job.id !== 'preview-job');
+      // Get ALL current work experiences (from either workExperiences or workExp) and filter out preview job
+      const currentExperiences = [...(formData.workExperiences || formData.workExp || [])];
+      const filteredExperiences = currentExperiences.filter(job => job.id !== 'preview-job');
+      
+      // Add the new work experience to the existing ones
       updateFormField('workExperiences', [...filteredExperiences, newWorkExperience]);
       
       // Reset form for adding another job
@@ -323,8 +326,15 @@ const WorkExperienceForm = () => {
   };
   
   const handleDeleteJob = (index: number) => {
+    // Get all current work experiences (from either workExperiences or workExp)
+    const currentExperiences = [...(formData.workExperiences || formData.workExp || [])];
+    
     // Remove the job at the specified index
-    removeItemFromArray('workExperiences', index);
+    if (currentExperiences.length > index) {
+      currentExperiences.splice(index, 1);
+      // Update both work experience arrays
+      updateFormField('workExperiences', currentExperiences);
+    }
   };
   
   const handleAddAnotherPosition = () => {
