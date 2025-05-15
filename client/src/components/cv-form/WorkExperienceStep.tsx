@@ -256,12 +256,15 @@ const WorkExperienceStep: React.FC = () => {
                             </div>
                           </div>
                           <Switch
-                            checked={form.getValues(`workExperience.${index}.isRemote`) === true}
+                            checked={form.getValues().workExperience[index]?.location === 'Remote'}
                             onCheckedChange={(checked) => {
-                              form.setValue(`workExperience.${index}.isRemote`, checked);
-                              handleFieldChange(index, 'isRemote', checked);
+                              // If checked, set location to 'Remote', otherwise clear location
+                              const newLocation = checked ? 'Remote' : '';
+                              form.setValue(`workExperience.${index}.location`, newLocation);
+                              handleFieldChange(index, 'location', newLocation);
                             }}
                           />
+                    </div>
                   </div>
 
                   {/* Employment Dates */}
