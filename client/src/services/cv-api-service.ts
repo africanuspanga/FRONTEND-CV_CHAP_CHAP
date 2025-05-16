@@ -119,11 +119,24 @@ export const normalizeWorkExperiences = (cvData: CVData): CVData => {
 
 export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
   // First normalize the data to handle workExp vs workExperiences
-  const normalizedData = normalizeWorkExperiences(cvData);
+  let processedData = normalizeWorkExperiences(cvData);
+  
+  // Apply CV data validation to ensure fields like professionalTitle are properly populated
+  try {
+    const { validateCVData } = require('@/utils/cv-data-validation');
+    const validatedData = validateCVData(processedData);
+    if (validatedData) {
+      console.log('Using validated CV data for backend transformation');
+      processedData = validatedData;
+    }
+  } catch (error) {
+    console.warn('Error validating CV data, using original data:', error);
+  }
+  
   console.log('Transforming normalized CV data for backend');
   
   // Make sure personalInfo exists, create an empty object if it doesn't
-  const personalInfo = normalizedData.personalInfo || {};
+  const personalInfo = processedData.personalInfo || {};
   
   // Extract or construct a name
   let name = '';
@@ -175,7 +188,7 @@ export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
     summary: personalInfo.summary || '',
     
     // Work experience section - match exact field names expected by backend
-    experience: (cvData.workExperiences || []).map((job: {
+    experience: (processedData.workExperiences || []).map((job: {
       jobTitle?: string;
       position?: string;
       company?: string;
@@ -299,7 +312,7 @@ export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
     }),
     
     // Projects section if available
-    projects: (cvData.projects || []).map((proj: string | {
+    projects: (processedData.projects || []).map((proj: string | {
       name?: string;
       title?: string;
       description?: string;
@@ -322,9 +335,9 @@ export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
   
   // Add optional fields that may enhance the CV using a type-safe approach
   // First, check if there are any websites in the CV data
-  if (cvData.websites && cvData.websites.length > 0) {
+  if (processedData.websites && processedData.websites.length > 0) {
     // Look for LinkedIn or other professional websites
-    const linkedinSite = cvData.websites.find(site => 
+    const linkedinSite = processedData.websites.find(site => 
       typeof site === 'object' && site.name && 
       site.name.toLowerCase().includes('linkedin'));
       
@@ -333,7 +346,7 @@ export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
     }
     
     // Look for personal website
-    const personalSite = cvData.websites.find(site => 
+    const personalSite = processedData.websites.find(site => 
       typeof site === 'object' && site.name && 
       (site.name.toLowerCase().includes('website') || 
        site.name.toLowerCase().includes('personal') || 
@@ -341,15 +354,15 @@ export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
        
     if (personalSite && typeof personalSite === 'object' && personalSite.url) {
       transformed.website = personalSite.url;
-    } else if (cvData.websites.length > 0 && typeof cvData.websites[0] === 'object' && cvData.websites[0].url) {
+    } else if (processedData.websites.length > 0 && typeof processedData.websites[0] === 'object' && processedData.websites[0].url) {
       // Use the first website as a fallback
-      transformed.website = cvData.websites[0].url;
+      transformed.website = processedData.websites[0].url;
     }
   }
   
   // Add additional social media or contact links if available
-  if (cvData.websites && cvData.websites.length > 0) {
-    transformed.socialLinks = cvData.websites
+  if (processedData.websites && processedData.websites.length > 0) {
+    transformed.socialLinks = processedData.websites
       .filter(site => typeof site === 'object' && site.url)
       .map(site => ({
         name: typeof site === 'object' ? (site.name || '') : '',
@@ -358,13 +371,13 @@ export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
   }
   
   // Ensure we're including accomplishments if they exist
-  if (cvData.accomplishments && cvData.accomplishments.length > 0) {
-    transformed.accomplishments = cvData.accomplishments;
+  if (processedData.accomplishments && processedData.accomplishments.length > 0) {
+    transformed.accomplishments = processedData.accomplishments;
   }
   
   // Add any additional fields that might be in the CV but not explicitly mapped
   // Using type assertion to handle dynamically added properties
-  const additionalFields = Object.entries(cvData).filter(([key, value]) => {
+  const additionalFields = Object.entries(processedData).filter(([key, value]) => {
     return ![
       'personalInfo', 
       'workExperiences', 
