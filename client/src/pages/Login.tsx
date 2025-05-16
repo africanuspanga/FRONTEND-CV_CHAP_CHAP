@@ -36,11 +36,11 @@ const Login = () => {
         description: "Welcome back to CV Chap Chap!",
       });
       navigate('/');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       toast({
         title: "Login failed",
-        description: "Invalid email or password. Please try again.",
+        description: error.message || "Invalid email or password. Please try again.",
         variant: "destructive",
       });
       setIsSubmitting(false);

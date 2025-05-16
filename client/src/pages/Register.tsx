@@ -40,17 +40,19 @@ const Register = () => {
     setIsSubmitting(true);
     
     try {
-      await register(fullName, email, password, phoneNumber);
+      // Use the updated register function with the correct parameter order
+      await register(email, password, fullName, phoneNumber);
+      
       toast({
         title: "Registration successful",
         description: "Welcome to CV Chap Chap!",
       });
       navigate('/');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration error:', error);
       toast({
         title: "Registration failed",
-        description: "There was a problem creating your account. Please try again.",
+        description: error.message || "There was a problem creating your account. Please try again.",
         variant: "destructive",
       });
       setIsSubmitting(false);

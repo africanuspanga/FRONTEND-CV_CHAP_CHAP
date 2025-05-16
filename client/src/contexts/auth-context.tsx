@@ -225,7 +225,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     isLoading,
     login,
     register,
-    logout
+    logout,
+    forgotPassword,
+    resetPassword
   };
 
   return (
