@@ -194,6 +194,10 @@ export const personalInfoSchema = z.object({
   postalCode: z.string().optional(),
   professionalTitle: z.string().optional(),
   summary: z.string().optional(),
+  // Adding location field to support the structure requirements
+  location: z.string().optional(),
+  // Job title is an alias for professionalTitle used by some templates
+  jobTitle: z.string().optional(),
 });
 
 export const accomplishmentSchema = z.object({

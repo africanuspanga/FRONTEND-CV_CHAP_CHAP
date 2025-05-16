@@ -115,7 +115,9 @@ const USSDPaymentPage: React.FC = () => {
         ...formData.personalInfo,
         firstName: formData.personalInfo?.firstName?.trim() || '',
         lastName: formData.personalInfo?.lastName?.trim() || '',
-        professionalTitle: formData.personalInfo?.professionalTitle?.trim() || ''
+        professionalTitle: formData.personalInfo?.professionalTitle?.trim() || '',
+        // Ensure location field is properly populated from address if missing
+        location: formData.personalInfo?.location?.trim() || formData.personalInfo?.address?.trim() || ''
       };
 
       // Clean work experiences data (remove trailing spaces)

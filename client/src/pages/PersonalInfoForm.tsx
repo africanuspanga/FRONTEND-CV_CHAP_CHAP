@@ -150,7 +150,9 @@ const PersonalInfoForm = () => {
                 value={formData.personalInfo.address || ''}
                 onChange={(value) => updateFormField('personalInfo', {
                   ...formData.personalInfo,
-                  address: value
+                  address: value,
+                  // Also update location field to ensure consistency with address
+                  location: value
                 })}
                 placeholder="Dar es Salaam, Tanzania"
                 className="w-full"
