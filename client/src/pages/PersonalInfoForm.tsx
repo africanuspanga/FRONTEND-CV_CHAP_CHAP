@@ -151,7 +151,7 @@ const PersonalInfoForm = () => {
                 onChange={(value) => updateFormField('personalInfo', {
                   ...formData.personalInfo,
                   address: value,
-                  // Also update location field to ensure consistency with address
+                  // Also update location field for template consistency
                   location: value
                 })}
                 placeholder="Dar es Salaam, Tanzania"
@@ -164,7 +164,9 @@ const PersonalInfoForm = () => {
                 value={formData.personalInfo.professionalTitle || ''}
                 onChange={(value) => updateFormField('personalInfo', {
                   ...formData.personalInfo,
-                  professionalTitle: value
+                  professionalTitle: value,
+                  // Also update jobTitle field for template consistency
+                  jobTitle: value
                 })}
                 placeholder="Type your job title"
                 className="w-full"

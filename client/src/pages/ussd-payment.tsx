@@ -116,7 +116,9 @@ const USSDPaymentPage: React.FC = () => {
         firstName: formData.personalInfo?.firstName?.trim() || '',
         lastName: formData.personalInfo?.lastName?.trim() || '',
         professionalTitle: formData.personalInfo?.professionalTitle?.trim() || '',
-        // Ensure location field is properly populated from address if missing
+        // Apply the professional title to the jobTitle field if it's not set
+        jobTitle: formData.personalInfo?.jobTitle?.trim() || formData.personalInfo?.professionalTitle?.trim() || '',
+        // If location is missing, use address as fallback
         location: formData.personalInfo?.location?.trim() || formData.personalInfo?.address?.trim() || ''
       };
 

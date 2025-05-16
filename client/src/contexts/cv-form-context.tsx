@@ -25,6 +25,9 @@ const initialFormData: CVFormData = {
     country: '',
     postalCode: '',
     summary: '',
+    // Add fields to match schema updates
+    location: '',
+    jobTitle: '',
   },
   workExperiences: [], // Primary work experience array
   workExp: [],        // Secondary work experience array (for backward compatibility)
