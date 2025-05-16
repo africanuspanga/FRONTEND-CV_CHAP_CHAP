@@ -34,7 +34,10 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByPhoneNumber(phone_number: string): Promise<User | undefined>;
+  getUserByResetToken(reset_token: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: string, updateData: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>): Promise<User>;
   
   // CV methods
   getCV(id: string): Promise<CV | undefined>;
@@ -152,6 +155,18 @@ export class MemStorage implements IStorage {
       (user) => user.email === email,
     );
   }
+  
+  async getUserByPhoneNumber(phone_number: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.phone_number === phone_number,
+    );
+  }
+  
+  async getUserByResetToken(reset_token: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.reset_token === reset_token,
+    );
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = uuidv4();
@@ -160,11 +175,34 @@ export class MemStorage implements IStorage {
       ...insertUser, 
       id, 
       role: "user",
+      reset_token: null,
+      reset_token_expires: null,
+      last_login: null,
+      username: insertUser.username || null,
+      full_name: insertUser.full_name || null,
+      phone_number: insertUser.phone_number || null,
       createdAt: now, 
       updatedAt: now 
     };
     this.users.set(id, user);
     return user;
+  }
+  
+  async updateUser(id: string, updateData: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>): Promise<User> {
+    const user = this.users.get(id);
+    
+    if (!user) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+    
+    const updatedUser: User = {
+      ...user,
+      ...updateData,
+      updatedAt: new Date()
+    };
+    
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
 
   // CV methods

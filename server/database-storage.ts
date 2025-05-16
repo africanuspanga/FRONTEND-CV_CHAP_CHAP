@@ -45,11 +45,44 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user;
   }
+  
+  async getUserByPhoneNumber(phone_number: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.phone_number, phone_number));
+    return user;
+  }
+  
+  async getUserByResetToken(reset_token: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.reset_token, reset_token));
+    return user;
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = uuidv4();
-    const [user] = await db.insert(users).values({...insertUser, id}).returning();
+    const [user] = await db.insert(users).values({
+      ...insertUser, 
+      id,
+      username: insertUser.username || null,
+      full_name: insertUser.full_name || null,
+      phone_number: insertUser.phone_number || null,
+      reset_token: null,
+      reset_token_expires: null,
+      last_login: null
+    }).returning();
     return user;
+  }
+  
+  async updateUser(id: string, updateData: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+      
+    if (!updatedUser) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+    
+    return updatedUser;
   }
 
   // CV methods
@@ -167,7 +200,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(paymentsTable.cvId, cvId));
   }
 
-  async getPaymentsByUserId(userId: number): Promise<Payment[]> {
+  async getPaymentsByUserId(userId: string): Promise<Payment[]> {
     return await db
       .select()
       .from(paymentsTable)
@@ -196,7 +229,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Check payment status for a specific CV
-  async checkPaymentStatus(cvId: string, userId: number): Promise<{ status: string; hasPayment: boolean; paymentUrl?: string }> {
+  async checkPaymentStatus(cvId: string, userId: string): Promise<{ status: string; hasPayment: boolean; paymentUrl?: string }> {
     const payments = await db
       .select()
       .from(paymentsTable)

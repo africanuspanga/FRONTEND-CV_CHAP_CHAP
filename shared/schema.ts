@@ -10,8 +10,11 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   full_name: varchar("full_name", { length: 255 }),
-  phone_number: varchar("phone_number", { length: 20 }),
+  phone_number: varchar("phone_number", { length: 20 }).unique(),
   role: varchar("role", { length: 20 }).default("user").notNull(),
+  reset_token: varchar("reset_token", { length: 255 }),
+  reset_token_expires: timestamp("reset_token_expires"),
+  last_login: timestamp("last_login"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -1,156 +1,468 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { Express } from "express";
+import { Express, Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
+import jwt from "jsonwebtoken";
 import { storage } from "./storage";
-import type { User } from "@shared/schema";
+import { User, insertUserSchema } from "@shared/schema";
+import { z } from "zod";
+
+// Extended User type for our application
+interface AppUser extends Omit<User, "password"> {}
 
 declare global {
   namespace Express {
-    interface User extends User {}
+    interface User extends AppUser {}
   }
 }
 
+// Use environment variable for JWT secret or a default for development
+const JWT_SECRET = process.env.JWT_SECRET || "cv-chap-chap-jwt-secret-key";
+const JWT_EXPIRY = "24h"; // Token expires in 24 hours
+
 const scryptAsync = promisify(scrypt);
 
-async function hashPassword(password: string) {
+async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16).toString("hex");
   const buf = (await scryptAsync(password, salt, 64)) as Buffer;
   return `${buf.toString("hex")}.${salt}`;
 }
 
-async function comparePasswords(supplied: string, stored: string) {
+async function comparePasswords(supplied: string, stored: string): Promise<boolean> {
   const [hashed, salt] = stored.split(".");
   const hashedBuf = Buffer.from(hashed, "hex");
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
-export function setupAuth(app: Express) {
-  const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || 'cv-chap-chap-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    store: storage.sessionStore,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
+// Generate JWT token
+function generateToken(user: User): string {
+  const payload = {
+    sub: user.id,
+    email: user.email,
+    role: user.role,
+    iat: Math.floor(Date.now() / 1000)
   };
+  
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+}
 
-  app.set("trust proxy", 1);
-  app.use(session(sessionSettings));
+// Verify JWT token
+function verifyToken(token: string): any {
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch (error) {
+    return null;
+  }
+}
+
+// Authentication middleware
+function authenticateJWT(req: Request, res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader) {
+    return res.status(401).json({ 
+      success: false, 
+      message: "Authentication required", 
+      code: "AUTH_REQUIRED" 
+    });
+  }
+  
+  const parts = authHeader.split(' ');
+  
+  if (parts.length !== 2 || parts[0] !== 'Bearer') {
+    return res.status(401).json({ 
+      success: false, 
+      message: "Invalid token format", 
+      code: "INVALID_TOKEN_FORMAT" 
+    });
+  }
+  
+  const token = parts[1];
+  const decoded = verifyToken(token);
+  
+  if (!decoded) {
+    return res.status(401).json({ 
+      success: false, 
+      message: "Invalid or expired token", 
+      code: "INVALID_TOKEN" 
+    });
+  }
+  
+  // Set user in request for route handlers
+  (req as any).user = decoded;
+  next();
+}
+
+// Registration schema with validation
+const registerSchema = z.object({
+  email: z.string().email("Please provide a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  phone_number: z.string().optional(),
+  username: z.string().optional(),
+  full_name: z.string().optional()
+});
+
+// Login schema with conditional validation for email or phone_number
+const loginSchema = z.object({
+  email: z.string().email("Please provide a valid email address").optional(),
+  phone_number: z.string().optional(),
+  password: z.string().min(1, "Password is required")
+}).refine(data => data.email || data.phone_number, {
+  message: "Either email or phone number must be provided",
+  path: ["email"]
+});
+
+export function setupAuth(app: Express) {
+  // Initialize passport
   app.use(passport.initialize());
-  app.use(passport.session());
-
-  passport.use(
-    new LocalStrategy({
-      usernameField: 'email', // Using email as the username field
-    }, async (email, password, done) => {
-      try {
-        const user = await storage.getUserByEmail(email);
-        if (!user || !(await comparePasswords(password, user.password))) {
-          return done(null, false);
-        } else {
-          return done(null, user);
-        }
-      } catch (error) {
-        return done(error);
-      }
-    }),
-  );
-
-  passport.serializeUser((user, done) => done(null, user.id));
-  passport.deserializeUser(async (id: string, done) => {
-    try {
-      const user = await storage.getUser(id);
-      done(null, user);
-    } catch (error) {
-      done(error);
-    }
-  });
-
+  
   // Register a new user
-  app.post("/api/auth/register", async (req, res, next) => {
+  app.post("/api/auth/register", async (req, res) => {
     try {
-      const { email, password, full_name, phone_number, username } = req.body;
+      // Validate input
+      const validationResult = registerSchema.safeParse(req.body);
       
-      if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required' });
+      if (!validationResult.success) {
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: validationResult.error.errors.map(err => ({
+            field: err.path.join('.'),
+            message: err.message
+          }))
+        });
       }
       
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ message: 'User with this email already exists' });
+      const { email, password, phone_number, username, full_name } = validationResult.data;
+      
+      // Check if user already exists
+      const existingUserByEmail = await storage.getUserByEmail(email);
+      if (existingUserByEmail) {
+        return res.status(409).json({
+          success: false,
+          message: "User with this email already exists",
+          code: "EMAIL_EXISTS"
+        });
       }
       
+      // Check if phone number is unique if provided
+      if (phone_number) {
+        const existingUserByPhone = await storage.getUserByPhoneNumber(phone_number);
+        if (existingUserByPhone) {
+          return res.status(409).json({
+            success: false,
+            message: "User with this phone number already exists",
+            code: "PHONE_EXISTS"
+          });
+        }
+      }
+      
+      // Hash password
       const hashedPassword = await hashPassword(password);
       
+      // Create user
       const user = await storage.createUser({
         email,
         password: hashedPassword,
-        ...(full_name && { full_name }),
         ...(phone_number && { phone_number }),
         ...(username && { username }),
+        ...(full_name && { full_name })
       });
       
-      req.login(user, (err) => {
-        if (err) return next(err);
-        
-        // Return user without password
-        const { password, ...userWithoutPassword } = user;
-        res.status(201).json({ 
+      // Generate token
+      const token = generateToken(user);
+      
+      // Update last login time
+      await storage.updateUser(user.id, { last_login: new Date() });
+      
+      // Return user data and token
+      const { password: _, ...userWithoutPassword } = user;
+      
+      return res.status(201).json({
+        success: true,
+        message: "User registered successfully",
+        data: {
           user: userWithoutPassword,
-          token: generateToken(user) // You might want to implement a JWT token generation function
-        });
+          token
+        }
       });
     } catch (error) {
-      console.error('Registration error:', error);
-      res.status(500).json({ message: 'Server error during registration' });
+      console.error("Registration error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred during registration"
+      });
     }
   });
-
+  
   // Login a user
-  app.post("/api/auth/login", (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-      if (err) return next(err);
-      if (!user) return res.status(401).json({ message: 'Invalid email or password' });
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      // Validate input
+      const validationResult = loginSchema.safeParse(req.body);
       
-      req.login(user, (err) => {
-        if (err) return next(err);
-        
-        // Return user without password
-        const { password, ...userWithoutPassword } = user;
-        return res.status(200).json({ 
-          user: userWithoutPassword,
-          token: generateToken(user) // You might want to implement a JWT token generation function
+      if (!validationResult.success) {
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: validationResult.error.errors.map(err => ({
+            field: err.path.join('.'),
+            message: err.message
+          }))
         });
+      }
+      
+      const { email, phone_number, password } = validationResult.data;
+      
+      // Find user by email or phone
+      let user: User | undefined;
+      
+      if (email) {
+        user = await storage.getUserByEmail(email);
+      } else if (phone_number) {
+        user = await storage.getUserByPhoneNumber(phone_number);
+      }
+      
+      // Check if user exists and password is correct
+      if (!user || !(await comparePasswords(password, user.password))) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid credentials",
+          code: "AUTH_FAILED"
+        });
+      }
+      
+      // Generate token
+      const token = generateToken(user);
+      
+      // Update last login time
+      await storage.updateUser(user.id, { last_login: new Date() });
+      
+      // Return user data and token
+      const { password: _, ...userWithoutPassword } = user;
+      
+      return res.status(200).json({
+        success: true,
+        message: "Login successful",
+        data: {
+          user: userWithoutPassword,
+          token
+        }
       });
-    })(req, res, next);
+    } catch (error) {
+      console.error("Login error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred during login"
+      });
+    }
   });
-
-  // Logout a user
-  app.post("/api/auth/logout", (req, res, next) => {
-    req.logout((err) => {
-      if (err) return next(err);
-      res.sendStatus(200);
+  
+  // Logout - just a formality for client to clear token
+  app.post("/api/auth/logout", (req, res) => {
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully"
     });
   });
-
-  // Get the current user
-  app.get("/api/auth/me", (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).json({ message: 'Not authenticated' });
-    
-    // Return user without password
-    const { password, ...userWithoutPassword } = req.user as User;
-    res.json(userWithoutPassword);
+  
+  // Get current user
+  app.get("/api/auth/me", authenticateJWT, async (req, res) => {
+    try {
+      const userId = (req as any).user.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found"
+        });
+      }
+      
+      // Return user without password
+      const { password, ...userWithoutPassword } = user;
+      
+      return res.status(200).json({
+        success: true,
+        data: userWithoutPassword
+      });
+    } catch (error) {
+      console.error("Get user error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while fetching user"
+      });
+    }
   });
-}
-
-// Simple token generation - in a real app, use JWT
-function generateToken(user: User): string {
-  const data = `${user.id}:${user.email}:${Date.now()}`;
-  return Buffer.from(data).toString('base64');
+  
+  // Update user profile
+  app.put("/api/auth/update-profile", authenticateJWT, async (req, res) => {
+    try {
+      const userId = (req as any).user.sub;
+      const { username, phone_number, full_name } = req.body;
+      
+      // Check if user exists
+      const existingUser = await storage.getUser(userId);
+      if (!existingUser) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found"
+        });
+      }
+      
+      // Check if phone number is unique if provided
+      if (phone_number && phone_number !== existingUser.phone_number) {
+        const existingUserByPhone = await storage.getUserByPhoneNumber(phone_number);
+        if (existingUserByPhone && existingUserByPhone.id !== userId) {
+          return res.status(409).json({
+            success: false,
+            message: "Phone number is already in use",
+            code: "PHONE_EXISTS"
+          });
+        }
+      }
+      
+      // Check if username is unique if provided
+      if (username && username !== existingUser.username) {
+        const existingUserByUsername = await storage.getUserByUsername(username);
+        if (existingUserByUsername && existingUserByUsername.id !== userId) {
+          return res.status(409).json({
+            success: false,
+            message: "Username is already in use",
+            code: "USERNAME_EXISTS"
+          });
+        }
+      }
+      
+      // Update user
+      const updatedUser = await storage.updateUser(userId, {
+        ...(username && { username }),
+        ...(phone_number && { phone_number }),
+        ...(full_name && { full_name })
+      });
+      
+      // Return updated user without password
+      const { password, ...userWithoutPassword } = updatedUser;
+      
+      return res.status(200).json({
+        success: true,
+        message: "Profile updated successfully",
+        data: userWithoutPassword
+      });
+    } catch (error) {
+      console.error("Update profile error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while updating profile"
+      });
+    }
+  });
+  
+  // Forgot password
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: "Email is required"
+        });
+      }
+      
+      // Find user
+      const user = await storage.getUserByEmail(email);
+      
+      // Do not reveal if user exists or not
+      if (!user) {
+        return res.status(200).json({
+          success: true,
+          message: "Password reset instructions sent to your email"
+        });
+      }
+      
+      // Generate reset token
+      const resetToken = randomBytes(32).toString("hex");
+      const resetTokenExpires = new Date(Date.now() + 3600000); // 1 hour
+      
+      // Save token to user
+      await storage.updateUser(user.id, {
+        reset_token: resetToken,
+        reset_token_expires: resetTokenExpires
+      });
+      
+      // In a real application, send email with reset link
+      // For now, just respond with success
+      
+      return res.status(200).json({
+        success: true,
+        message: "Password reset instructions sent to your email"
+      });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while processing your request"
+      });
+    }
+  });
+  
+  // Reset password
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, password } = req.body;
+      
+      if (!token || !password) {
+        return res.status(400).json({
+          success: false,
+          message: "Token and password are required"
+        });
+      }
+      
+      if (password.length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: "Password must be at least 6 characters",
+          errors: [{
+            field: "password",
+            message: "Password must be at least 6 characters"
+          }]
+        });
+      }
+      
+      // Find user by reset token
+      const user = await storage.getUserByResetToken(token);
+      
+      if (!user || !user.reset_token_expires || user.reset_token_expires < new Date()) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid or expired token"
+        });
+      }
+      
+      // Hash new password
+      const hashedPassword = await hashPassword(password);
+      
+      // Update user
+      await storage.updateUser(user.id, {
+        password: hashedPassword,
+        reset_token: null,
+        reset_token_expires: null
+      });
+      
+      return res.status(200).json({
+        success: true,
+        message: "Password has been reset successfully"
+      });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while resetting password"
+      });
+    }
+  });
 }
