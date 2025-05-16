@@ -1,0 +1,214 @@
+CV Chap Chap Authentication and User Management Guide
+Authentication Flow Instructions
+Registration Process
+Endpoint: /api/auth/register
+Method: POST
+Required Fields:
+email: Valid email address (required)
+password: Minimum 6 characters (required)
+phone_number: Valid phone number (optional but recommended)
+username: User's preferred username (optional)
+Response: JWT token for immediate login on successful registration
+Error Handling:
+Email already exists: 409 Conflict with appropriate message
+Invalid email format: 400 Bad Request with validation message
+Password too short: 400 Bad Request with minimum length message
+Login Process
+Endpoint: /api/auth/login
+Method: POST
+Login Options:
+Email + Password
+Phone Number + Password
+Response:
+JWT token in response
+User details including id, email, username, role
+Last login timestamp
+Error Handling:
+Invalid credentials: 401 Unauthorized
+Account locked: 403 Forbidden with cooldown period message
+Logout Process
+Endpoint: /api/auth/logout
+Method: POST
+Required: Valid JWT token in Authorization header
+Response: Success message on successful logout
+Client-Side: Clear token from localStorage/sessionStorage
+Password Recovery
+Request Reset:
+
+Endpoint: /api/auth/forgot-password
+Method: POST
+Required: Email address
+Response: Success message with instructions
+Reset Password:
+
+Endpoint: /api/auth/reset-password
+Method: POST
+Required: Reset token, new password
+Response: Success message on completion
+User Profile Management
+Get User Profile:
+
+Endpoint: /api/auth/me
+Method: GET
+Required: Valid JWT token
+Response: Full user details
+Update User Profile:
+
+Endpoint: /api/auth/update-profile
+Method: PUT
+Required: Valid JWT token, fields to update
+Response: Updated user profile
+Security Features
+Token Management:
+
+JWT tokens expire after 24 hours
+Include token in all authenticated requests as: Authorization: Bearer [token]
+Rate Limiting:
+
+Login attempts limited to 5 per 15 minutes per IP address
+Password reset requests limited to 3 per hour
+Input Validation:
+
+Email format validation using email-validator
+Password strength requirements enforced (minimum 6 characters)
+Phone number formatting validated
+Integration with CV Management
+Creating CVs:
+
+Authenticated users: CVs are associated with their account
+Guest users: Anonymous CVs with option to claim later
+Payment Flow:
+
+Authenticated users: Payment history tracked in account
+Guest users: One-time payment with option to create account after
+CV History:
+
+Access previously created CVs from user dashboard
+Option to duplicate and modify existing CVs
+Error Handling Protocol
+Network Issues:
+
+Implement retry logic for failed requests
+Cache form data locally to prevent data loss
+Server Errors:
+
+Display user-friendly error messages
+Log detailed errors server-side for debugging
+Validation Errors:
+
+Provide specific feedback for each validation failure
+Highlight problematic fields for immediate correction
+Would you like more detailed information about any specific part of this authentication system or other backend issues?
+
+HOW JSON DATA IS SEND FOR AUTH
+
+Just now
+AUNDEFINED
+
+africanuspanga
+JSON Data Format for Authentication Endpoints
+Registration Request
+{
+  "email": "user@example.com",
+  "password": "securepassword123",
+  "phone_number": "+255753091526",
+  "username": "johndoe"
+}
+Registration Response
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "user": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "email": "user@example.com",
+      "username": "johndoe",
+      "phone_number": "+255753091526",
+      "role": "user",
+      "created_at": "2025-05-16T22:45:30.000Z"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTYxNjc2MzUwMCwiZXhwIjoxNjE2ODQ5OTAwfQ.example_token"
+  }
+}
+Login Request
+{
+  "email": "user@example.com",
+  "password": "securepassword123"
+}
+OR (using phone number)
+
+{
+  "phone_number": "+255753091526",
+  "password": "securepassword123"
+}
+Login Response
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "email": "user@example.com",
+      "username": "johndoe",
+      "phone_number": "+255753091526",
+      "role": "user",
+      "last_login": "2025-05-16T22:45:30.000Z"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTYxNjc2MzUwMCwiZXhwIjoxNjE2ODQ5OTAwfQ.example_token"
+  }
+}
+Logout Request
+No JSON body needed, just send the JWT token in the Authorization header:
+
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTYxNjc2MzUwMCwiZXhwIjoxNjE2ODQ5OTAwfQ.example_token
+Logout Response
+{
+  "success": true,
+  "message": "Logged out successfully"
+}
+Forgot Password Request
+{
+  "email": "user@example.com"
+}
+Forgot Password Response
+{
+  "success": true,
+  "message": "Password reset instructions sent to your email"
+}
+Reset Password Request
+{
+  "token": "reset_token_from_email",
+  "password": "new_secure_password"
+}
+Reset Password Response
+{
+  "success": true,
+  "message": "Password has been reset successfully"
+}
+Get User Profile Request
+No JSON body needed, just send the JWT token in the Authorization header:
+
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTYxNjc2MzUwMCwiZXhwIjoxNjE2ODQ5OTAwfQ.example_token
+Update Profile Request
+{
+  "username": "newusername",
+  "phone_number": "+255753091555"
+}
+Error Response Format
+{
+  "success": false,
+  "message": "Error message describing what went wrong",
+  "errors": [
+    {
+      "field": "email",
+      "message": "Invalid email format"
+    }
+  ]
+}
+For authentication errors (401):
+
+{
+  "success": false,
+  "message": "Invalid credentials",
+  "code": "AUTH_FAILED"
+}

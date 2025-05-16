@@ -31,17 +31,18 @@ export interface IStorage {
   sessionStore: session.Store;
   
   // User methods
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
   // CV methods
   getCV(id: string): Promise<CV | undefined>;
-  getCVsByUserId(userId: number): Promise<CV[]>;
+  getCVsByUserId(userId: string): Promise<CV[]>;
   getAllCVs(): Promise<CV[]>;
   createCV(cv: Omit<InsertCV, 'id'>): Promise<CV>;
   // Create a CV bypassing userId foreign key constraint for anonymous users
-  createRawCV(cv: { id: string, templateId: string, cvData: string, userId?: number }): Promise<CV>;
+  createRawCV(cv: { id: string, templateId: string, cvData: string, userId?: string }): Promise<CV>;
   updateCV(id: string, updateData: Partial<Omit<CV, 'id' | 'userId' | 'createdAt' | 'updatedAt'>>): Promise<CV | undefined>;
   deleteCV(id: string): Promise<boolean>;
   
@@ -55,10 +56,10 @@ export interface IStorage {
   // Payment methods
   getPayment(id: string): Promise<Payment | undefined>;
   getPaymentsByCVId(cvId: string): Promise<Payment[]>;
-  getPaymentsByUserId(userId: number): Promise<Payment[]>;
+  getPaymentsByUserId(userId: string): Promise<Payment[]>;
   createPayment(payment: Omit<InsertPayment, 'id' | 'createdAt' | 'updatedAt'>): Promise<Payment>;
   updatePayment(id: string, updateData: Partial<Omit<Payment, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Payment | undefined>;
-  checkPaymentStatus(cvId: string, userId: number): Promise<{ status: string; hasPayment: boolean; paymentUrl?: string; }>;
+  checkPaymentStatus(cvId: string, userId: string): Promise<{ status: string; hasPayment: boolean; paymentUrl?: string; }>;
 }
 
 // We'll import the DatabaseStorage to replace MemStorage
@@ -67,11 +68,10 @@ import { DatabaseStorage } from "./database-storage";
 // We'll still keep MemStorage for compatibility and testing purposes
 export class MemStorage implements IStorage {
   sessionStore: session.Store;
-  private users: Map<number, User>;
+  private users: Map<string, User>;
   private cvs: Map<string, CV>;
   private templates: Map<string, Template>;
   private payments: Map<string, Payment>;
-  private userCurrentId: number;
 
   constructor() {
     this.sessionStore = new MemoryStore({
@@ -81,7 +81,6 @@ export class MemStorage implements IStorage {
     this.cvs = new Map();
     this.templates = new Map();
     this.payments = new Map();
-    this.userCurrentId = 1;
 
     // Initialize with default template data
     const defaultTemplates = [
@@ -138,7 +137,7 @@ export class MemStorage implements IStorage {
   }
 
   // User methods
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
   }
 
@@ -147,13 +146,20 @@ export class MemStorage implements IStorage {
       (user) => user.username === username,
     );
   }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
+    );
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userCurrentId++;
+    const id = uuidv4();
     const now = new Date();
     const user: User = { 
       ...insertUser, 
       id, 
+      role: "user",
       createdAt: now, 
       updatedAt: now 
     };
@@ -166,7 +172,7 @@ export class MemStorage implements IStorage {
     return this.cvs.get(id);
   }
 
-  async getCVsByUserId(userId: number): Promise<CV[]> {
+  async getCVsByUserId(userId: string): Promise<CV[]> {
     return Array.from(this.cvs.values()).filter(cv => cv.userId === userId);
   }
 
@@ -187,7 +193,7 @@ export class MemStorage implements IStorage {
     return newCV;
   }
 
-  async createRawCV(cv: { id: string, templateId: string, cvData: string, userId?: number }): Promise<CV> {
+  async createRawCV(cv: { id: string, templateId: string, cvData: string, userId?: string }): Promise<CV> {
     const now = new Date();
     const newCV: CV = { 
       ...cv as any,
@@ -277,7 +283,7 @@ export class MemStorage implements IStorage {
     return Array.from(this.payments.values()).filter(payment => payment.cvId === cvId);
   }
 
-  async getPaymentsByUserId(userId: number): Promise<Payment[]> {
+  async getPaymentsByUserId(userId: string): Promise<Payment[]> {
     return Array.from(this.payments.values()).filter(payment => payment.userId === userId);
   }
 
@@ -314,7 +320,7 @@ export class MemStorage implements IStorage {
     return updatedPayment;
   }
 
-  async checkPaymentStatus(cvId: string, userId: number): Promise<{ status: string; hasPayment: boolean; paymentUrl?: string; }> {
+  async checkPaymentStatus(cvId: string, userId: string): Promise<{ status: string; hasPayment: boolean; paymentUrl?: string; }> {
     const payments = Array.from(this.payments.values()).filter(
       payment => payment.cvId === cvId && payment.userId === userId
     );

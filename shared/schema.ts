@@ -5,10 +5,13 @@ import { relations } from "drizzle-orm";
 
 // User schema
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: varchar("username", { length: 100 }).notNull().unique(),
+  id: varchar("id", { length: 36 }).primaryKey(),
+  username: varchar("username", { length: 100 }).unique(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
+  full_name: varchar("full_name", { length: 255 }),
+  phone_number: varchar("phone_number", { length: 20 }),
+  role: varchar("role", { length: 20 }).default("user").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -18,10 +21,11 @@ export const userRelations = relations(users, ({ many }) => ({
   payments: many(payments),
 }));
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  email: true,
-  password: true,
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  role: true,
+  createdAt: true,
+  updatedAt: true
 });
 
 // Template schema
@@ -50,7 +54,7 @@ export const insertTemplateSchema = createInsertSchema(templates).omit({
 // CV schema
 export const cvs = pgTable("cvs", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  userId: serial("user_id").references(() => users.id),
+  userId: varchar("user_id", { length: 36 }).references(() => users.id),
   templateId: varchar("template_id", { length: 64 }).references(() => templates.id),
   cvData: text("cv_data").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -86,7 +90,7 @@ export const paymentStatusEnum = pgEnum("payment_status", [
 // Payment schema
 export const payments = pgTable("payments", {
   id: varchar("id", { length: 36 }).primaryKey(),
-  userId: serial("user_id").references(() => users.id).notNull(),
+  userId: varchar("user_id", { length: 36 }).references(() => users.id).notNull(),
   cvId: varchar("cv_id", { length: 36 }).references(() => cvs.id),
   status: paymentStatusEnum("status").default("pending").notNull(),
   amount: varchar("amount", { length: 10 }).notNull(),

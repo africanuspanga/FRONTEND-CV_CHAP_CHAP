@@ -31,7 +31,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // User methods
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
@@ -41,8 +41,14 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+    const id = uuidv4();
+    const [user] = await db.insert(users).values({...insertUser, id}).returning();
     return user;
   }
 
@@ -52,7 +58,7 @@ export class DatabaseStorage implements IStorage {
     return cv;
   }
 
-  async getCVsByUserId(userId: number): Promise<CV[]> {
+  async getCVsByUserId(userId: string): Promise<CV[]> {
     return await db.select().from(cvsTable).where(eq(cvsTable.userId, userId));
   }
 
@@ -66,7 +72,7 @@ export class DatabaseStorage implements IStorage {
     return newCV;
   }
 
-  async createRawCV(cv: { id: string, templateId: string, cvData: string, userId?: number }): Promise<CV> {
+  async createRawCV(cv: { id: string, templateId: string, cvData: string, userId?: string }): Promise<CV> {
     const now = new Date();
     // Use raw SQL for direct insertion without FK constraint
     const query = `
