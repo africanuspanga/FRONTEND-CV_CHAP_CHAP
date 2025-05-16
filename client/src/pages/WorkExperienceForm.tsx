@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ChevronLeft, Briefcase, Building2, MapPin, Calendar, CheckCircle } from 'lucide-react';
+import { ChevronLeft, Briefcase, Building2, MapPin, Calendar, CheckCircle, Trash2, PlusCircle, Pencil } from 'lucide-react';
 import { useCVForm } from '@/contexts/cv-form-context';
 import ReactConfetti from 'react-confetti';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -692,88 +692,22 @@ const WorkExperienceForm = () => {
           
           {showWorkHistory && (
             <>
-              {/* EMERGENCY FIX: Force the component to use raw data directly */}
-              <div className="mt-4">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                  Work history summary
-                </h2>
-                
-                {Array.isArray(formData.workExperiences) && formData.workExperiences.length > 0 ? (
-                  <div className="space-y-6">
-                    {formData.workExperiences.map((job: any, index: number) => (
-                      <div key={job.id || index} className="border rounded-lg shadow-sm p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex">
-                            <div className="mr-3">
-                              <span className="text-primary font-medium inline-block w-6 h-6 text-center rounded-full bg-blue-100">
-                                {index + 1}
-                              </span>
-                            </div>
-                            <div>
-                              <h3 className="text-primary font-medium">
-                                {job.jobTitle} at {job.company}
-                              </h3>
-                              <p className="text-gray-600 text-sm mt-1">
-                                {job.location || ''} | {job.startDate || ''} - {job.endDate || ''}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            <button 
-                              onClick={() => handleEditJob(index)} 
-                              className="text-amber-500 p-1 hover:bg-amber-50 rounded"
-                              aria-label="Edit job"
-                            >
-                              <PenLine className="h-4 w-4" />
-                            </button>
-                            <button 
-                              onClick={() => handleDeleteJob(index)} 
-                              className="text-red-500 p-1 hover:bg-red-50 rounded"
-                              aria-label="Delete job"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="mt-4">
-                          <ul className="space-y-3 pl-7">
-                            {Array.isArray(job.achievements) && job.achievements.slice(0, 2).map((achievement: string, i: number) => (
-                              <li key={i} className="flex items-start">
-                                <span className="text-gray-500 absolute -ml-4">•</span>
-                                <span className="text-sm text-gray-700">{achievement}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    ))}
-                    
-                    <div className="border border-dashed rounded-lg p-6 flex justify-center">
-                      <Button 
-                        variant="ghost"
-                        onClick={handleAddAnotherPosition}
-                        className="bg-blue-100 text-primary hover:bg-blue-200 flex items-center justify-center"
-                      >
-                        <PlusCircle className="h-4 w-4 mr-2" /> Add another position
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center text-gray-500 py-8">
-                    No work experience added yet.
-                    <div className="mt-4">
-                      <Button 
-                        variant="ghost"
-                        onClick={handleAddAnotherPosition}
-                        className="bg-blue-100 text-primary hover:bg-blue-200 flex items-center justify-center"
-                      >
-                        <PlusCircle className="h-4 w-4 mr-2" /> Add position
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              {/* Reverting to use existing WorkHistorySummary component */}
+              <WorkHistorySummary
+                workExperiences={(formData.workExperiences || formData.workExp || []).map((job: any) => ({
+                  ...job,
+                  id: job.id || Date.now().toString(), // Ensure all jobs have an ID
+                  // Make sure all required fields exist
+                  jobTitle: job.jobTitle || '',
+                  company: job.company || '',
+                  startDate: job.startDate || '',
+                  endDate: job.endDate || '',
+                  achievements: Array.isArray(job.achievements) ? job.achievements : []
+                }))}
+                onEdit={handleEditJob}
+                onDelete={handleDeleteJob}
+                onAddAnother={handleAddAnotherPosition}
+              />
               
               <div className="flex justify-between mt-8">
                 <Button 
