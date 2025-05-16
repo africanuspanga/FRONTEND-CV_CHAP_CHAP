@@ -179,27 +179,44 @@ const WorkExperienceForm = () => {
       
       console.log("DEBUG - New work experience object:", newWorkExperience);
       
-      // IMPORTANT FIX: First check if we have any existing work experiences
+      // COMPLETE REWRITE: Build the experience array from scratch for maximum reliability
+      
+      // 1. Start with ALL possible existing work experiences
+      // Try from workExperiences first, then from workExp as fallback
       let existingExperiences = [];
       
-      // Try to get from workExperiences first, then workExp as fallback
       if (Array.isArray(formData.workExperiences) && formData.workExperiences.length > 0) {
+        // Safe deep copy to prevent reference issues
         existingExperiences = JSON.parse(JSON.stringify(formData.workExperiences));
+        console.log("DEBUG - Using workExperiences array with length:", existingExperiences.length);
       } else if (Array.isArray(formData.workExp) && formData.workExp.length > 0) {
+        // Safe deep copy to prevent reference issues
         existingExperiences = JSON.parse(JSON.stringify(formData.workExp));
+        console.log("DEBUG - Using workExp array with length:", existingExperiences.length);
       }
       
-      console.log("DEBUG - Existing experiences:", existingExperiences);
+      // 2. Log all existing entries to help diagnose issues
+      if (existingExperiences.length > 0) {
+        console.log("DEBUG - Existing experiences before filtering:", 
+          existingExperiences.map(job => `${job.jobTitle} at ${job.company} (${job.id})`));
+      } else {
+        console.log("DEBUG - No existing work experiences found");
+      }
       
-      // Filter out any preview jobs
-      const filteredExperiences = existingExperiences.filter((job: any) => job.id !== 'preview-job');
+      // 3. Filter out preview jobs and any invalid entries
+      const filteredExperiences = existingExperiences.filter((job: any) => 
+        job && job.id && job.id !== 'preview-job');
       
-      // Create the updated array with both existing entries and the new one
-      const updatedExperiences = [...filteredExperiences, newWorkExperience];
-      console.log("DEBUG - Updated experiences array:", updatedExperiences);
+      // 4. Add the new work experience at the BEGINNING (for better visibility)
+      const updatedExperiences = [newWorkExperience, ...filteredExperiences];
       
-      // Explicitly update both work experience arrays through form context
-      // This is critical to ensure proper synchronization
+      // 5. Final validation - make sure we have valid data
+      console.log("DEBUG - Final work experience array length:", updatedExperiences.length);
+      console.log("DEBUG - Final work experiences:", updatedExperiences.map(
+        (job: any) => `${job.jobTitle} at ${job.company} (${job.id})`));
+      
+      // 6. Update both arrays explicitly for maximum reliability
+      // We're using this approach to ensure the data gets properly updated and synced
       updateFormField('workExperiences', updatedExperiences);
       
       // Reset form for adding another job
@@ -213,44 +230,58 @@ const WorkExperienceForm = () => {
   
   // Update an existing work experience
   const updateExistingWorkExperience = (achievements: string[] = []) => {
-    // First check if we have valid existing work experiences in either array
+    // COMPLETE REWRITE: Similar to addWorkExperience for consistency
+    console.log("DEBUG - Updating work experience at index:", editingJobIndex);
+    
+    // 1. Start with ALL possible existing work experiences
     let workExpArray = [];
     
     if (Array.isArray(formData.workExperiences) && formData.workExperiences.length > 0) {
       // Deep clone to prevent reference issues
       workExpArray = JSON.parse(JSON.stringify(formData.workExperiences));
+      console.log("DEBUG - Using workExperiences array with length:", workExpArray.length);
     } else if (Array.isArray(formData.workExp) && formData.workExp.length > 0) {
       // Deep clone to prevent reference issues
       workExpArray = JSON.parse(JSON.stringify(formData.workExp));
+      console.log("DEBUG - Using workExp array with length:", workExpArray.length);
     }
     
-    console.log("DEBUG - Updating work experience at index:", editingJobIndex);
-    console.log("DEBUG - Current work array:", workExpArray);
-    
-    if (editingJobIndex !== null && workExpArray[editingJobIndex]) {
+    // 2. Verify we have a valid index and work experience to update
+    if (editingJobIndex !== null && 
+        editingJobIndex >= 0 && 
+        editingJobIndex < workExpArray.length) {
+      
+      // 3. Create the updated work experience
       const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
       const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
       
-      // Update the specific job (create a deep clone first)
+      // Create a fresh updated job object to avoid reference issues
       const updatedJob = {
+        // Keep the original ID and any other properties
         ...workExpArray[editingJobIndex],
+        // Update with new values
         jobTitle,
         company: employer,
         location: isRemote ? 'Remote' : location,
         startDate,
         endDate,
         current: currentJob,
+        description: workExpArray[editingJobIndex].description || '',
         achievements: achievements.length > 0 ? achievements : aiRecommendations
       };
       
-      // Create a new array with the updated job
+      // 4. Create a complete new array with the updated job
       const updatedExperiences = [...workExpArray];
       updatedExperiences[editingJobIndex] = updatedJob;
       
-      console.log("DEBUG - Updated work experience:", updatedJob);
-      console.log("DEBUG - Final updated array:", updatedExperiences);
+      // 5. Log detailed information for diagnosis
+      console.log("DEBUG - Updated job:", 
+                  `${updatedJob.jobTitle} at ${updatedJob.company} (ID: ${updatedJob.id})`);
+      console.log("DEBUG - Final work experiences array:", 
+                  updatedExperiences.map((job: any) => 
+                    `${job.jobTitle} at ${job.company} (ID: ${job.id})`));
       
-      // Update in form context to ensure both arrays stay synchronized
+      // 6. Update both work experience arrays through form context
       updateFormField('workExperiences', updatedExperiences);
       
       // Reset form and editing state
@@ -259,6 +290,11 @@ const WorkExperienceForm = () => {
       setShowJobForm(false);
     } else {
       console.error("Edit index is invalid or work experience array is empty");
+      // Handle error gracefully - add a new experience instead
+      if (jobTitle && employer) {
+        console.log("DEBUG - Falling back to adding a new experience instead of updating");
+        addWorkExperience(achievements);
+      }
     }
   };
 

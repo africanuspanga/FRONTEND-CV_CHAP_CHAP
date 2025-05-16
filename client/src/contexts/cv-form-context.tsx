@@ -102,26 +102,30 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
             savedData.workExp = [];
           }
           
-          // Now determine which array to use as the source of truth
+          // Determine which array to use as source of truth (prefer the one with more entries)
           let workExpToUse;
           
-          if (Array.isArray(savedData.workExperiences) && savedData.workExperiences.length > 0) {
-            console.log('Using workExperiences as source of truth');
+          const workExpLength = Array.isArray(savedData.workExp) ? savedData.workExp.length : 0;
+          const workExperiencesLength = Array.isArray(savedData.workExperiences) ? savedData.workExperiences.length : 0;
+          
+          // Choose the array with more entries as the source of truth
+          if (workExperiencesLength >= workExpLength && workExperiencesLength > 0) {
+            console.log('Using workExperiences as source of truth (has more entries)');
             workExpToUse = JSON.parse(JSON.stringify(savedData.workExperiences));
-          } else if (Array.isArray(savedData.workExp) && savedData.workExp.length > 0) {
-            console.log('Using workExp as source of truth');
+          } else if (workExpLength > 0) {
+            console.log('Using workExp as source of truth (has more entries)');
             workExpToUse = JSON.parse(JSON.stringify(savedData.workExp));
           } else {
             console.log('Both work experience arrays are empty');
             workExpToUse = [];
           }
           
-          // Update both arrays to ensure consistency
+          // Ensure both arrays are assigned the complete set of work experiences
           savedData.workExperiences = workExpToUse;
           savedData.workExp = workExpToUse;
           
-          console.log('After sync - workExperiences:', savedData.workExperiences);
-          console.log('After sync - workExp:', savedData.workExp);
+          console.log('After sync - workExperiences count:', savedData.workExperiences.length);
+          console.log('After sync - workExp count:', savedData.workExp.length);
           
           setFormData(savedData);
         }
