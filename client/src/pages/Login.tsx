@@ -57,74 +57,71 @@ const Login = () => {
         />
       </Helmet>
 
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+      <div className="flex items-center justify-center min-h-screen bg-white px-4">
         <div className="w-full max-w-md">
-          <div className="bg-white p-8 rounded-lg shadow-sm border">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-indigo-950 mb-2">Welcome Back</h1>
-              <p className="text-gray-500">Sign in to continue to CV Chap Chap</p>
+          <div className="bg-white p-8 rounded-lg border">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <h1 className="text-2xl font-bold text-navy-900">LOGIN</h1>
             </div>
 
             <form onSubmit={handleSubmit}>
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="email" className="text-gray-700">Email Address</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-12"
+                    className="mt-1"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link href="/forgot-password" className="text-sm text-blue-500 hover:text-blue-700">
-                      Forgot password?
-                    </Link>
-                  </div>
+                <div>
+                  <Label htmlFor="password" className="text-gray-700">Password</Label>
                   <Input
                     id="password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-12"
+                    className="mt-1"
                   />
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="remember" 
-                    checked={rememberMe}
-                    onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                  />
-                  <Label htmlFor="remember" className="text-sm">Remember me</Label>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="remember" 
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                    />
+                    <Label htmlFor="remember" className="text-sm">Remember me</Label>
+                  </div>
+                  <Link href="/forgot-password" className="text-sm text-gray-600">
+                    Forgot password?
+                  </Link>
                 </div>
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-blue-500 hover:bg-blue-600 text-lg"
+                  className="w-full font-medium"
+                  variant="default"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Signing in...' : 'Sign in'}
+                  {isSubmitting ? 'Signing in...' : 'Login'}
                 </Button>
               </div>
             </form>
-
-            <div className="mt-8 text-center">
-              <p className="text-gray-600">
-                Don't have an account?{' '}
-                <Link href="/register" className="text-blue-500 hover:text-blue-700 font-medium">
-                  Sign up
-                </Link>
-              </p>
-            </div>
           </div>
         </div>
       </div>

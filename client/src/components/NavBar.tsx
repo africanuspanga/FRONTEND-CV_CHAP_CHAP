@@ -88,15 +88,9 @@ const NavBar: React.FC = () => {
               <UserProfileMenu username={user?.username || 'User'} />
             ) : (
               <>
-                <Button asChild variant="outline">
+                <Button asChild variant="ghost">
                   <Link href="/login" className="px-3 py-2 rounded-md text-sm font-medium">
                     Login
-                  </Link>
-                </Button>
-                
-                <Button asChild>
-                  <Link href="/register" className="px-4 py-2 rounded-md text-sm font-medium">
-                    Sign Up
                   </Link>
                 </Button>
               </>
@@ -200,14 +194,6 @@ const NavBar: React.FC = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Login
-              </Link>
-              
-              <Link
-                href="/register"
-                className="block px-3 py-2 rounded-md text-base font-medium bg-primary text-white"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Sign Up
               </Link>
             </>
           )}
