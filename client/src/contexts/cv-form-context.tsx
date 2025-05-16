@@ -165,26 +165,49 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   
   // Update a simple field
   const updateFormField = <K extends keyof CVFormData>(section: K, value: CVFormData[K]) => {
-    console.log(`DEBUG - updateFormField called with section:`, section);
-    console.log("DEBUG - updateFormField value:", value);
-    
-    setFormData(prev => {
+    setFormData((prev: CVFormData) => {
+      // Make sure value isn't undefined
+      if (value === undefined) {
+        return prev;
+      }
+      
       // Special case for work experience - sync between workExperiences and workExp
       if (section === 'workExperiences' as K) {
-        console.log("DEBUG - Syncing workExperiences to workExp:", value);
-        return {
+        // Make sure value is an array
+        const workArray = Array.isArray(value) ? value : [];
+        
+        // Clone this directly to avoid reference issues
+        const newData = {
           ...prev,
-          [section]: value,
-          workExp: value as any // Type assertion for sync between properties
+          [section]: [...workArray],
+          workExp: [...workArray]  // Sync both properties
         };
+        
+        // Immediately trigger storage to save the updated data
+        setTimeout(() => {
+          cvStorage.saveFormData(newData);
+        }, 0);
+        
+        return newData;
       } else if (section === 'workExp' as K) {
-        console.log("DEBUG - Syncing workExp to workExperiences:", value);
-        return {
+        // Make sure value is an array
+        const workArray = Array.isArray(value) ? value : [];
+        
+        // Clone this directly to avoid reference issues
+        const newData = {
           ...prev,
-          [section]: value,
-          workExperiences: value as any // Type assertion for sync between properties 
+          [section]: [...workArray],
+          workExperiences: [...workArray]  // Sync both properties
         };
+        
+        // Immediately trigger storage to save the updated data
+        setTimeout(() => {
+          cvStorage.saveFormData(newData);
+        }, 0);
+        
+        return newData;
       }
+      
       // Standard case for other fields
       return {
         ...prev,
@@ -199,12 +222,17 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
     index: number,
     value: any
   ) => {
-    setFormData(prev => {
-      const sectionArray = [...(prev[section] as any[])];
-      sectionArray[index] = {
-        ...sectionArray[index],
-        ...value
-      };
+    setFormData((prev: CVFormData) => {
+      // Safely copy the array
+      const sectionArray = prev[section] ? [...(prev[section] as any[])] : [];
+      
+      // Make sure the index exists before updating
+      if (index >= 0 && index < sectionArray.length) {
+        sectionArray[index] = {
+          ...sectionArray[index],
+          ...value
+        };
+      }
       
       // Special case for work experience arrays - sync between workExperiences and workExp
       if (section === 'workExperiences' as K) {
