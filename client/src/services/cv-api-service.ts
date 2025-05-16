@@ -117,6 +117,51 @@ export const normalizeWorkExperiences = (cvData: CVData): CVData => {
   return normalizedData;
 };
 
+/**
+ * Extract a professional title from CV data, using multiple fallback options
+ * to ensure we always have a valid title
+ */
+export function getFallbackProfessionalTitle(cvData: CVData): string {
+  // First check if we have a professionalTitle in personalInfo
+  if (cvData.personalInfo?.professionalTitle && 
+      cvData.personalInfo.professionalTitle.trim() !== '') {
+    return cvData.personalInfo.professionalTitle;
+  }
+  
+  // Next, check if we have a jobTitle in personalInfo
+  if (cvData.personalInfo?.jobTitle && 
+      cvData.personalInfo.jobTitle.trim() !== '') {
+    return cvData.personalInfo.jobTitle;
+  }
+  
+  // If not, try to get the job title from the first work experience
+  if (cvData.workExperiences && 
+      cvData.workExperiences.length > 0 && 
+      cvData.workExperiences[0].jobTitle && 
+      cvData.workExperiences[0].jobTitle.trim() !== '') {
+    return cvData.workExperiences[0].jobTitle;
+  }
+  
+  // If workExperiences isn't found, try workExp as an alternative
+  if (cvData.workExp && 
+      cvData.workExp.length > 0 && 
+      cvData.workExp[0].jobTitle && 
+      cvData.workExp[0].jobTitle.trim() !== '') {
+    return cvData.workExp[0].jobTitle;
+  }
+  
+  // As a last resort, if the user has a company name, use "Employee at [Company]"
+  if (cvData.workExperiences && 
+      cvData.workExperiences.length > 0 && 
+      cvData.workExperiences[0].company && 
+      cvData.workExperiences[0].company.trim() !== '') {
+    return `Professional at ${cvData.workExperiences[0].company}`;
+  }
+  
+  // If all else fails, use a generic professional title
+  return "Professional";
+}
+
 export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
   // First normalize the data to handle workExp vs workExperiences
   let processedData = normalizeWorkExperiences(cvData);
@@ -173,8 +218,8 @@ export const transformCVDataForBackend = (cvData: CVData): BackendCVData => {
     // Optional but recommended fields
     phone: personalInfo.phone || '',
     
-    // Professional title - use professionalTitle if available
-    title: personalInfo.professionalTitle || '',
+    // Professional title - must be populated from a valid source
+    title: getFallbackProfessionalTitle(processedData),
     
     // Location field - combine address components
     location: [

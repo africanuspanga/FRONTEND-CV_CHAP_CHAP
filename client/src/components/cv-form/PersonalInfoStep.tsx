@@ -18,7 +18,11 @@ import { jobTitles } from '@/lib/job-titles-data';
 
 // Extend the schema with client-side validation
 const formSchema = personalInfoSchema.extend({
-  // Add any additional client-side validation if needed
+  // Make professionalTitle required for CV generation
+  professionalTitle: z.string().min(1, 'Professional title is required'),
+  // Add social media fields that aren't in the base schema
+  linkedin: z.string().optional(),
+  website: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -40,6 +44,9 @@ const PersonalInfoStep: React.FC = () => {
     country: formData.personalInfo.country || '',
     postalCode: formData.personalInfo.postalCode || '',
     summary: formData.personalInfo.summary || '',
+    // Additional social fields that might be in the form
+    linkedin: '',
+    website: '',
   };
 
   // Initialize form
@@ -261,7 +268,16 @@ const PersonalInfoStep: React.FC = () => {
                     <Input 
                       placeholder="https://linkedin.com/in/username" 
                       {...field}
-                      onChange={(e) => handleFieldChange('linkedin', e.target.value)}
+                      onChange={(e) => {
+                    form.setValue('linkedin', e.target.value);
+                    
+                    // Also update personalInfo
+                    const updatedPersonalInfo = { 
+                      ...formData.personalInfo, 
+                      linkedin: e.target.value 
+                    };
+                    updateFormField('personalInfo', updatedPersonalInfo);
+                  }}
                       className="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
                       autoCapitalize="none"
                       autoCorrect="off"
