@@ -172,40 +172,16 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
       }
       
       // Special case for work experience - sync between workExperiences and workExp
-      if (section === 'workExperiences' as K) {
-        // Make sure value is an array
-        const workArray = Array.isArray(value) ? value : [];
+      if (section === 'workExperiences' as K || section === 'workExp' as K) {
+        // Make sure value is an array and create a deep copy
+        const workArray = Array.isArray(value) ? JSON.parse(JSON.stringify(value)) : [];
         
-        // Clone this directly to avoid reference issues
-        const newData = {
+        // Create a new state object with both properties synchronized
+        return {
           ...prev,
-          [section]: [...workArray],
-          workExp: [...workArray]  // Sync both properties
+          workExperiences: workArray,
+          workExp: workArray
         };
-        
-        // Immediately trigger storage to save the updated data
-        setTimeout(() => {
-          cvStorage.saveFormData(newData);
-        }, 0);
-        
-        return newData;
-      } else if (section === 'workExp' as K) {
-        // Make sure value is an array
-        const workArray = Array.isArray(value) ? value : [];
-        
-        // Clone this directly to avoid reference issues
-        const newData = {
-          ...prev,
-          [section]: [...workArray],
-          workExperiences: [...workArray]  // Sync both properties
-        };
-        
-        // Immediately trigger storage to save the updated data
-        setTimeout(() => {
-          cvStorage.saveFormData(newData);
-        }, 0);
-        
-        return newData;
       }
       
       // Standard case for other fields
@@ -235,17 +211,14 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
       }
       
       // Special case for work experience arrays - sync between workExperiences and workExp
-      if (section === 'workExperiences' as K) {
+      if (section === 'workExperiences' as K || section === 'workExp' as K) {
+        // Create a deep copy to avoid reference issues
+        const workArray = JSON.parse(JSON.stringify(sectionArray));
+        
         return {
           ...prev,
-          [section]: sectionArray,
-          workExp: sectionArray as any // Type assertion for sync between properties
-        };
-      } else if (section === 'workExp' as K) {
-        return {
-          ...prev,
-          [section]: sectionArray,
-          workExperiences: sectionArray as any // Type assertion for sync between properties
+          workExperiences: workArray,
+          workExp: workArray
         };
       }
       
@@ -259,21 +232,20 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   
   // Add item to an array field
   const addItemToArray = <K extends keyof CVFormData>(section: K, item: any) => {
-    setFormData(prev => {
-      const updatedArray = [...(prev[section] as any[]), item];
+    setFormData((prev: CVFormData) => {
+      // Safely create the updated array
+      const currentArray = prev[section] ? [...(prev[section] as any[])] : [];
+      const updatedArray = [...currentArray, item];
       
       // Special case for work experience arrays - sync between workExperiences and workExp
-      if (section === 'workExperiences' as K) {
+      if (section === 'workExperiences' as K || section === 'workExp' as K) {
+        // Create a deep copy to avoid reference issues
+        const workArray = JSON.parse(JSON.stringify(updatedArray));
+        
         return {
           ...prev,
-          [section]: updatedArray,
-          workExp: updatedArray as any // Type assertion for sync between properties
-        };
-      } else if (section === 'workExp' as K) {
-        return {
-          ...prev,
-          [section]: updatedArray,
-          workExperiences: updatedArray as any // Type assertion for sync between properties
+          workExperiences: workArray,
+          workExp: workArray
         };
       }
       
@@ -287,21 +259,20 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   
   // Remove item from an array field
   const removeItemFromArray = <K extends keyof CVFormData>(section: K, index: number) => {
-    setFormData(prev => {
-      const updatedArray = (prev[section] as any[]).filter((_, i) => i !== index);
+    setFormData((prev: CVFormData) => {
+      // Safely filter the array
+      const sourceArray = prev[section] as any[] || [];
+      const updatedArray = sourceArray.filter((_, i) => i !== index);
       
       // Special case for work experience arrays - sync between workExperiences and workExp
-      if (section === 'workExperiences' as K) {
+      if (section === 'workExperiences' as K || section === 'workExp' as K) {
+        // Create a deep copy to avoid reference issues
+        const workArray = JSON.parse(JSON.stringify(updatedArray));
+        
         return {
           ...prev,
-          [section]: updatedArray,
-          workExp: updatedArray as any // Type assertion for sync between properties
-        };
-      } else if (section === 'workExp' as K) {
-        return {
-          ...prev,
-          [section]: updatedArray,
-          workExperiences: updatedArray as any // Type assertion for sync between properties
+          workExperiences: workArray,
+          workExp: workArray
         };
       }
       
@@ -319,23 +290,26 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
     fromIndex: number,
     toIndex: number
   ) => {
-    setFormData(prev => {
-      const sectionArray = [...(prev[section] as any[])];
-      const [movedItem] = sectionArray.splice(fromIndex, 1);
-      sectionArray.splice(toIndex, 0, movedItem);
+    setFormData((prev: CVFormData) => {
+      // Safely copy and manipulate the array
+      const sectionArray = prev[section] ? [...(prev[section] as any[])] : [];
+      
+      // Only perform the move if both indices are valid
+      if (fromIndex >= 0 && fromIndex < sectionArray.length && 
+          toIndex >= 0 && toIndex < sectionArray.length) {
+        const [movedItem] = sectionArray.splice(fromIndex, 1);
+        sectionArray.splice(toIndex, 0, movedItem);
+      }
       
       // Special case for work experience arrays - sync between workExperiences and workExp
-      if (section === 'workExperiences' as K) {
+      if (section === 'workExperiences' as K || section === 'workExp' as K) {
+        // Create a deep copy to avoid reference issues
+        const workArray = JSON.parse(JSON.stringify(sectionArray));
+        
         return {
           ...prev,
-          [section]: sectionArray,
-          workExp: sectionArray as any // Type assertion for sync between properties
-        };
-      } else if (section === 'workExp' as K) {
-        return {
-          ...prev,
-          [section]: sectionArray,
-          workExperiences: sectionArray as any // Type assertion for sync between properties
+          workExperiences: workArray,
+          workExp: workArray
         };
       }
       
