@@ -3,7 +3,7 @@
  * Provides enhanced validation for form inputs
  */
 
-import { z } from 'zod';
+import { z, ZodFormattedError } from 'zod';
 import { validateSafeData } from './secure-storage';
 
 /**
@@ -83,6 +83,28 @@ export const skillSchema = z.object({
 });
 
 /**
+ * Extract error messages from Zod formatted errors
+ */
+function extractErrorMessages(formattedErrors: ZodFormattedError<any>): Record<string, string> {
+  const errors: Record<string, string> = {};
+  
+  for (const key in formattedErrors) {
+    if (key !== '_errors') {
+      const fieldError = formattedErrors[key as keyof typeof formattedErrors];
+      
+      if (fieldError && typeof fieldError === 'object' && '_errors' in fieldError) {
+        const errorMessages = (fieldError as any)._errors;
+        if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+          errors[key] = errorMessages[0];
+        }
+      }
+    }
+  }
+  
+  return errors;
+}
+
+/**
  * Validate personal information
  * @param data - Personal information to validate
  * @returns - Validation result
@@ -100,15 +122,7 @@ export function validatePersonalInfo(data: any): { valid: boolean; errors?: Reco
     // Try to validate with schema
     const result = personalInfoSchema.safeParse(data);
     if (!result.success) {
-      const formattedErrors = result.error.format();
-      const errors: Record<string, string> = {};
-      
-      // Convert Zod errors to simple string format
-      Object.keys(formattedErrors).forEach(key => {
-        if (key !== '_errors' && formattedErrors[key]?._errors?.length > 0) {
-          errors[key] = formattedErrors[key]._errors[0];
-        }
-      });
+      const errors = extractErrorMessages(result.error.format());
       
       return {
         valid: false,
@@ -144,15 +158,7 @@ export function validateWorkExperience(data: any): { valid: boolean; errors?: Re
     // Try to validate with schema
     const result = workExperienceSchema.safeParse(data);
     if (!result.success) {
-      const formattedErrors = result.error.format();
-      const errors: Record<string, string> = {};
-      
-      // Convert Zod errors to simple string format
-      Object.keys(formattedErrors).forEach(key => {
-        if (key !== '_errors' && formattedErrors[key]?._errors?.length > 0) {
-          errors[key] = formattedErrors[key]._errors[0];
-        }
-      });
+      const errors = extractErrorMessages(result.error.format());
       
       return {
         valid: false,
