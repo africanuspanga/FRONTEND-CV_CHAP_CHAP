@@ -176,6 +176,20 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
         // Make sure value is an array and create a deep copy
         const workArray = Array.isArray(value) ? JSON.parse(JSON.stringify(value)) : [];
         
+        // Debug logging
+        console.log('Updating work experience arrays with:', workArray);
+        
+        // Verify workArray is valid after JSON operations
+        if (!Array.isArray(workArray)) {
+          console.error('Error: workArray is not an array after processing!', workArray);
+          // Fallback to empty array for safety
+          return {
+            ...prev,
+            workExperiences: [],
+            workExp: []
+          };
+        }
+        
         // Create a new state object with both properties synchronized
         return {
           ...prev,
@@ -233,14 +247,21 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   // Add item to an array field
   const addItemToArray = <K extends keyof CVFormData>(section: K, item: any) => {
     setFormData((prev: CVFormData) => {
-      // Safely create the updated array
-      const currentArray = prev[section] ? [...(prev[section] as any[])] : [];
-      const updatedArray = [...currentArray, item];
+      // Safely create the updated array, ensuring we have a proper deep copy
+      const currentArray = prev[section] ? JSON.parse(JSON.stringify(prev[section])) : [];
+      
+      // Create a deep copy of the item to prevent reference issues
+      const itemCopy = JSON.parse(JSON.stringify(item));
+      
+      // Add the item to the array
+      const updatedArray = [...currentArray, itemCopy];
       
       // Special case for work experience arrays - sync between workExperiences and workExp
       if (section === 'workExperiences' as K || section === 'workExp' as K) {
-        // Create a deep copy to avoid reference issues
+        // Make sure we're working with deep copies to avoid reference issues
         const workArray = JSON.parse(JSON.stringify(updatedArray));
+        
+        console.log('Adding to work experience arrays:', workArray);
         
         return {
           ...prev,
