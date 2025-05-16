@@ -61,7 +61,7 @@ const Login = () => {
         <div className="w-full max-w-md">
           <div className="bg-white p-8 rounded-lg border">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle>
@@ -120,6 +120,15 @@ const Login = () => {
                 >
                   {isSubmitting ? 'Signing in...' : 'Login'}
                 </Button>
+                
+                <div className="mt-6 text-center">
+                  <p className="text-gray-600">
+                    If you are not registered,{' '}
+                    <Link href="/register" className="text-blue-500 hover:text-blue-700 font-medium">
+                      Sign up now
+                    </Link>
+                  </p>
+                </div>
               </div>
             </form>
           </div>
