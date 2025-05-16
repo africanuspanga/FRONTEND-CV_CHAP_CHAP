@@ -58,7 +58,12 @@ const PersonalInfoStep: React.FC = () => {
 
   // Handle form submission
   const onSubmit = (data: FormValues) => {
-    updateFormField('personalInfo', data);
+    // Extract only the fields that belong to personalInfo
+    const { linkedin, website, ...personalInfo } = data;
+    
+    // Update personalInfo
+    updateFormField('personalInfo', personalInfo);
+    
     // Note: Navigation is handled by the parent component
   };
 

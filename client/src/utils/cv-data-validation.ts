@@ -124,6 +124,22 @@ export function validateCVData(data: any): CVFormData | null {
              validatedData.workExperiences[0].jobTitle) {
       validatedData.personalInfo.professionalTitle = validatedData.workExperiences[0].jobTitle;
     }
+    // If still empty and work experience has company field, use "Professional at [Company]"
+    else if (validatedData.workExperiences && 
+             validatedData.workExperiences.length > 0 && 
+             validatedData.workExperiences[0].company) {
+      validatedData.personalInfo.professionalTitle = `Professional at ${validatedData.workExperiences[0].company}`;
+    }
+    // If all else fails, set a generic title to prevent empty field errors
+    else {
+      validatedData.personalInfo.professionalTitle = "Professional";
+    }
+  }
+  
+  // Ensure jobTitle is synchronized with professionalTitle
+  if (validatedData.personalInfo.professionalTitle && 
+      (!validatedData.personalInfo.jobTitle || validatedData.personalInfo.jobTitle === '')) {
+    validatedData.personalInfo.jobTitle = validatedData.personalInfo.professionalTitle;
   }
   
   // Make sure location exists

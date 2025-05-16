@@ -198,6 +198,11 @@ export const personalInfoSchema = z.object({
   location: z.string().optional(),
   // Job title is an alias for professionalTitle used by some templates
   jobTitle: z.string().optional(),
+  // Profile picture URL or data URI
+  profilePicture: z.string().optional(),
+  // Social profile links
+  linkedin: z.string().optional(),
+  website: z.string().optional(),
 });
 
 export const accomplishmentSchema = z.object({
