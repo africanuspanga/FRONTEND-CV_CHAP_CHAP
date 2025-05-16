@@ -165,15 +165,20 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   
   // Update a simple field
   const updateFormField = <K extends keyof CVFormData>(section: K, value: CVFormData[K]) => {
+    console.log(`DEBUG - updateFormField called with section:`, section);
+    console.log("DEBUG - updateFormField value:", value);
+    
     setFormData(prev => {
       // Special case for work experience - sync between workExperiences and workExp
       if (section === 'workExperiences' as K) {
+        console.log("DEBUG - Syncing workExperiences to workExp:", value);
         return {
           ...prev,
           [section]: value,
           workExp: value as any // Type assertion for sync between properties
         };
       } else if (section === 'workExp' as K) {
+        console.log("DEBUG - Syncing workExp to workExperiences:", value);
         return {
           ...prev,
           [section]: value,

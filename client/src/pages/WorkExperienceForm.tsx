@@ -159,6 +159,8 @@ const WorkExperienceForm = () => {
   const addWorkExperience = (achievements: string[] = []) => {
     // Only add if we have at least job title and employer
     if (jobTitle && employer) {
+      console.log("DEBUG - Adding work experience for:", jobTitle, "at", employer);
+      
       const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
       const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
       
@@ -175,12 +177,21 @@ const WorkExperienceForm = () => {
         achievements: achievements.length > 0 ? achievements : aiRecommendations
       };
       
+      console.log("DEBUG - New work experience object:", newWorkExperience);
+      
       // Get ALL current work experiences (from either workExperiences or workExp) and filter out preview job
       const currentExperiences = [...(formData.workExperiences || formData.workExp || [])];
+      console.log("DEBUG - Current experiences before adding:", currentExperiences);
+      
       const filteredExperiences = currentExperiences.filter(job => job.id !== 'preview-job');
+      console.log("DEBUG - Filtered experiences (without preview):", filteredExperiences);
+      
+      // Create the combined array with existing experiences plus the new one
+      const updatedExperiences = [...filteredExperiences, newWorkExperience];
+      console.log("DEBUG - Final updated experiences array:", updatedExperiences);
       
       // Add the new work experience to the existing ones
-      updateFormField('workExperiences', [...filteredExperiences, newWorkExperience]);
+      updateFormField('workExperiences', updatedExperiences);
       
       // Reset form for adding another job
       resetFormFields();
