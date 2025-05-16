@@ -92,20 +92,36 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
         if (savedData) {
           console.log('Successfully loaded saved CV data');
           
-          // Ensure consistent work experience data by syncing workExperiences and workExp fields
-          if (savedData.workExperiences && !savedData.workExp) {
-            console.log('Syncing workExperiences to workExp');
-            savedData.workExp = savedData.workExperiences;
-          } else if (savedData.workExp && !savedData.workExperiences) {
-            console.log('Syncing workExp to workExperiences');
-            savedData.workExperiences = savedData.workExp;
-          } else if (savedData.workExp && savedData.workExperiences) {
-            // If both exist but are different, prioritize workExperiences
-            if (JSON.stringify(savedData.workExperiences) !== JSON.stringify(savedData.workExp)) {
-              console.log('Found both workExp and workExperiences with different values, syncing them');
-              savedData.workExp = savedData.workExperiences;
-            }
+          // ENHANCED DATA INTEGRITY: Ensure consistent work experience data between arrays
+          // First, create empty arrays if needed
+          if (!savedData.workExperiences) {
+            savedData.workExperiences = [];
           }
+          
+          if (!savedData.workExp) {
+            savedData.workExp = [];
+          }
+          
+          // Now determine which array to use as the source of truth
+          let workExpToUse;
+          
+          if (Array.isArray(savedData.workExperiences) && savedData.workExperiences.length > 0) {
+            console.log('Using workExperiences as source of truth');
+            workExpToUse = JSON.parse(JSON.stringify(savedData.workExperiences));
+          } else if (Array.isArray(savedData.workExp) && savedData.workExp.length > 0) {
+            console.log('Using workExp as source of truth');
+            workExpToUse = JSON.parse(JSON.stringify(savedData.workExp));
+          } else {
+            console.log('Both work experience arrays are empty');
+            workExpToUse = [];
+          }
+          
+          // Update both arrays to ensure consistency
+          savedData.workExperiences = workExpToUse;
+          savedData.workExp = workExpToUse;
+          
+          console.log('After sync - workExperiences:', savedData.workExperiences);
+          console.log('After sync - workExp:', savedData.workExp);
           
           setFormData(savedData);
         }

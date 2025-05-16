@@ -192,7 +192,7 @@ const WorkExperienceForm = () => {
       console.log("DEBUG - Existing experiences:", existingExperiences);
       
       // Filter out any preview jobs
-      const filteredExperiences = existingExperiences.filter(job => job.id !== 'preview-job');
+      const filteredExperiences = existingExperiences.filter((job: any) => job.id !== 'preview-job');
       
       // Create the updated array with both existing entries and the new one
       const updatedExperiences = [...filteredExperiences, newWorkExperience];
@@ -657,9 +657,15 @@ const WorkExperienceForm = () => {
           {showWorkHistory && (
             <>
               <WorkHistorySummary
-                workExperiences={(formData.workExperiences || formData.workExp || []).map(job => ({
+                workExperiences={(formData.workExperiences || formData.workExp || []).map((job: any) => ({
                   ...job,
-                  id: job.id || Date.now().toString() // Ensure all jobs have an ID
+                  id: job.id || Date.now().toString(), // Ensure all jobs have an ID
+                  // Make sure all required fields exist
+                  jobTitle: job.jobTitle || '',
+                  company: job.company || '',
+                  startDate: job.startDate || '',
+                  endDate: job.endDate || '',
+                  achievements: Array.isArray(job.achievements) ? job.achievements : []
                 }))}
                 onEdit={handleEditJob}
                 onDelete={handleDeleteJob}
