@@ -112,9 +112,18 @@ export function validateCVData(data: any): CVFormData | null {
   
   // Maintain correct naming for critical fields
   
-  // Make sure professionalTitle exists
-  if (validatedData.personalInfo.jobTitle && !validatedData.personalInfo.professionalTitle) {
-    validatedData.personalInfo.professionalTitle = validatedData.personalInfo.jobTitle;
+  // Make sure professionalTitle exists - try several sources
+  if (!validatedData.personalInfo.professionalTitle || validatedData.personalInfo.professionalTitle === '') {
+    // Try using jobTitle from personalInfo if available
+    if (validatedData.personalInfo.jobTitle) {
+      validatedData.personalInfo.professionalTitle = validatedData.personalInfo.jobTitle;
+    }
+    // If still empty and workExperiences has entries, use first work experience jobTitle
+    else if (validatedData.workExperiences && 
+             validatedData.workExperiences.length > 0 && 
+             validatedData.workExperiences[0].jobTitle) {
+      validatedData.personalInfo.professionalTitle = validatedData.workExperiences[0].jobTitle;
+    }
   }
   
   // Make sure location exists
@@ -179,19 +188,19 @@ export function fixArrayIntegrity(data: CVFormData): CVFormData {
   
   // Remove potentially corrupted entries
   if (Array.isArray(fixedData.workExperiences)) {
-    fixedData.workExperiences = fixedData.workExperiences.filter(exp => 
+    fixedData.workExperiences = fixedData.workExperiences.filter((exp: any) => 
       exp && typeof exp === 'object' && exp.id
     );
   }
   
   if (Array.isArray(fixedData.education)) {
-    fixedData.education = fixedData.education.filter(edu => 
+    fixedData.education = fixedData.education.filter((edu: any) => 
       edu && typeof edu === 'object' && edu.id
     );
   }
   
   if (Array.isArray(fixedData.skills)) {
-    fixedData.skills = fixedData.skills.filter(skill => 
+    fixedData.skills = fixedData.skills.filter((skill: any) => 
       skill && typeof skill === 'object' && skill.id
     );
   }

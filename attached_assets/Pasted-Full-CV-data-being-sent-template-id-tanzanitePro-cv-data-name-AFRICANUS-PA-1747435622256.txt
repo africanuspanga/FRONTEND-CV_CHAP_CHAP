@@ -1,0 +1,163 @@
+Full CV data being sent: {
+  "template_id": "tanzanitePro",
+  "cv_data": {
+    "name": "AFRICANUS PANGA",
+    "email": "africanuspanga@gmail.com",
+    "personalInfo": {
+      "firstName": "AFRICANUS",
+      "lastName": "PANGA",
+      "email": "africanuspanga@gmail.com",
+      "phone": "+255753091526",
+      "professionalTitle": "",
+      "address": "Dar es Salaam, Tanzania",
+      "city": "",
+      "region": "",
+      "country": "",
+      "postalCode": "",
+      "summary": "Business Development Manager with 7 years of experience, currently at LEONBET Tanzania, where spearheaded partnerships increased market share by 20%. Expertise in strategic planning and market analysis has driven a 15% annual revenue growth. Proven success in expanding client bases and enhancing visibility, alongside digital marketing achievements, including a 45% boost in online engagement at Parimatch Tanzania.",
+      "jobTitle": "",
+      "location": "Dar es Salaam, Tanzania"
+    },
+    "workExperiences": [
+      {
+        "id": "1747432041069_72",
+        "jobTitle": "Business Development Manager",
+        "company": "LEONBET Tanzania",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "May 2024",
+        "endDate": "Present",
+        "current": true,
+        "description": "",
+        "achievements": [
+          "Spearheaded partnership initiatives that increased regional market share by 20% within the first year",
+          "Cultivated and managed relationships with key stakeholders, resulting in a 15% revenue growth annually",
+          "Developed strategic business plans that expanded client base by 30%, enhancing company visibility and reach"
+        ]
+      },
+      {
+        "id": "1747431011070",
+        "jobTitle": "Digital Marketing Specialist",
+        "company": "Parimatch Tanzania",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "April 2020",
+        "endDate": "May 2024",
+        "current": false,
+        "description": "",
+        "achievements": [
+          "Developed and executed digital campaigns that boosted online engagement by 45% and increased lead generation by 30%",
+          "Optimized SEO strategies, enhancing website traffic by 60% and improving search engine rankings within 6 months",
+          "Analyzed market trends to tailor marketing strategies, achieving a 25% increase in customer acquisition rates"
+        ]
+      },
+      {
+        "id": "1747430810161",
+        "jobTitle": "Computer Technician",
+        "company": "M-BET Tanzania",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "January 2019",
+        "endDate": "March 2020",
+        "current": false,
+        "description": "",
+        "achievements": [
+          "Diagnosed and resolved 95% of technical issues within 24 hours, enhancing system uptime and user satisfaction",
+          "Implemented security protocols that reduced data breaches by 30%, safeguarding sensitive customer information",
+          "Managed network infrastructure upgrades, resulting in a 20% increase in system performance and reliability"
+        ]
+      },
+      {
+        "id": "1747428956384",
+        "jobTitle": "Content Writer",
+        "company": "Sportpesa Tanzania",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "January 2019",
+        "endDate": "October 2019",
+        "current": false,
+        "description": "",
+        "achievements": [
+          "Developed engaging sports content that boosted website traffic by 45% within six months of implementation",
+          "Crafted targeted email campaigns, increasing subscriber engagement rates by 30% across key demographics",
+          "Collaborated with marketing team to create social media content, enhancing follower growth by 25% in one quarter"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "id": "1747432090279",
+        "institution": "University of Dar es Salaam (UDSM)",
+        "degree": "Bachelor of Science",
+        "field": "Computer Science",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "April 2016",
+        "graduationMonth": "April",
+        "graduationYear": "2016"
+      },
+      {
+        "id": "1747432119672",
+        "institution": "University of Dar es Salaam (UDSM)",
+        "degree": "Master of Science",
+        "field": "Computer Engineering",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "August 2023",
+        "graduationMonth": "August",
+        "graduationYear": "2023"
+      }
+    ],
+    "skills": [
+      {
+        "id": "1",
+        "name": "Market Analysis",
+        "level": 3
+      },
+      {
+        "id": "2",
+        "name": "Strategic Planning",
+        "level": 5
+      },
+      {
+        "id": "3",
+        "name": "CRM Software",
+        "level": 4
+      },
+      {
+        "id": "4",
+        "name": "Negotiation",
+        "level": 5
+      },
+      {
+        "id": "5",
+        "name": "Lead Generation",
+        "level": 5
+      }
+    ],
+    "languages": [
+      {
+        "id": "1747432152493",
+        "name": "Swahili",
+        "level": "Bilingual"
+      },
+      {
+        "id": "1747432154013",
+        "name": "English",
+        "level": "Bilingual"
+      }
+    ],
+    "references": [
+      {
+        "id": "1747432199792",
+        "name": "Richard Kimaro ",
+        "position": "Former Manager",
+        "company": "",
+        "email": "africanuspanga@gmail.com",
+        "phone": "+255753091526"
+      },
+      {
+        "id": "1747432230508",
+        "name": "Valeriano Hongoa ",
+        "position": "Brother ",
+        "company": "",
+        "email": "africanuspanga@gmail.com",
+        "phone": "+255753091526"
+      }
+    ]
+  }
+}
