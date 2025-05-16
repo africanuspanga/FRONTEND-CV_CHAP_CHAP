@@ -138,12 +138,16 @@ const PersonalInfoStep: React.FC = () => {
             name="professionalTitle"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-base sm:text-sm">Professional Title</FormLabel>
+                <FormLabel className="text-base sm:text-sm">Professional Title <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                   <Autocomplete
                     options={jobTitles.map(title => ({ label: title, value: title }))}
                     value={field.value}
-                    onChange={(value) => handleFieldChange('professionalTitle', value)}
+                    onChange={(value) => {
+                      handleFieldChange('professionalTitle', value);
+                      // Also update the jobTitle field to ensure consistency
+                      handleFieldChange('jobTitle', value);
+                    }}
                     placeholder="Start typing your job title..."
                     emptyMessage="No job titles found"
                     inputClassName="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"
