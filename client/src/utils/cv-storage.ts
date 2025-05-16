@@ -2,9 +2,11 @@
  * CV Storage utility
  * Uses both localStorage and IndexedDB to store large CV form data
  * With compression fallback for environments where IndexedDB is not available
+ * Implements data sanitization and basic obfuscation for increased security
  */
 
 import { compressObject, decompressObject, splitIntoChunks, joinChunks } from './compression';
+import { sanitizeDataForStorage, obfuscateData, deobfuscateData } from './security';
 
 // DB Configuration
 const DB_NAME = 'cvChapChapDB';
