@@ -283,8 +283,8 @@ export async function login(req: Request, res: Response) {
     
     console.log('Searching for user with normalized identifier:', normalizedIdentifier);
     
-    // Check for user by username, email, or phone number
-    const user = users.find(u => {
+    // First check in-memory storage
+    let user = users.find(u => {
       // Check username match
       if (u.username === normalizedIdentifier) {
         console.log('Found user by username');
@@ -309,6 +309,42 @@ export async function login(req: Request, res: Response) {
       
       return false;
     });
+    
+    // If not found in memory, check database
+    if (!user) {
+      try {
+        const dbUsers = await db.select().from(usersTable).where(
+          or(
+            eq(usersTable.email, normalizedIdentifier),
+            eq(usersTable.username, normalizedIdentifier),
+            eq(usersTable.phone_number, normalizedIdentifier)
+          )
+        );
+        
+        if (dbUsers.length > 0) {
+          console.log('Found user in database:', dbUsers[0].email);
+          
+          // Convert database user to in-memory user format
+          user = {
+            id: dbUsers[0].id,
+            username: dbUsers[0].username,
+            email: dbUsers[0].email,
+            password: dbUsers[0].password,
+            full_name: dbUsers[0].full_name || '',
+            phone_number: dbUsers[0].phone_number || undefined,
+            role: dbUsers[0].role,
+            created_at: new Date(dbUsers[0].createdAt),
+            updated_at: new Date(dbUsers[0].updatedAt)
+          };
+          
+          // Add to in-memory store for faster access next time
+          users.push(user);
+        }
+      } catch (dbError) {
+        console.error('Error checking database for user:', dbError);
+        // Continue with in-memory result even if DB check fails
+      }
+    }
     
     if (!user) {
       console.log('No user found with identifier:', identifier);
