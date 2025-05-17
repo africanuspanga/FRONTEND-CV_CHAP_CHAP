@@ -111,13 +111,44 @@ const USSDPaymentPage: React.FC = () => {
       }
       
       // Prepare the CV data for the API
+      
+      // Get professional title from multiple sources with fallbacks
+      let professionalTitle = formData.personalInfo?.professionalTitle?.trim() || '';
+      
+      // If professional title is missing, try these fallbacks:
+      if (!professionalTitle) {
+        // 1. Try job title from personal info
+        professionalTitle = formData.personalInfo?.jobTitle?.trim() || '';
+        
+        // 2. Try first work experience job title
+        if (!professionalTitle && formData.workExperiences && formData.workExperiences.length > 0) {
+          professionalTitle = formData.workExperiences[0].jobTitle?.trim() || '';
+        }
+        
+        // 3. If still no title but we have a company name, use "Professional at Company"
+        if (!professionalTitle && formData.workExperiences && formData.workExperiences.length > 0) {
+          const company = formData.workExperiences[0].company?.trim();
+          if (company) {
+            professionalTitle = `Professional at ${company}`;
+          }
+        }
+        
+        // 4. Default fallback if all else fails
+        if (!professionalTitle) {
+          professionalTitle = "Professional";
+        }
+        
+        console.log(`Fixed missing professional title with: "${professionalTitle}"`);
+      }
+      
       const cleanedPersonalInfo = {
         ...formData.personalInfo,
         firstName: formData.personalInfo?.firstName?.trim() || '',
         lastName: formData.personalInfo?.lastName?.trim() || '',
-        professionalTitle: formData.personalInfo?.professionalTitle?.trim() || '',
-        // Apply the professional title to the jobTitle field if it's not set
-        jobTitle: formData.personalInfo?.jobTitle?.trim() || formData.personalInfo?.professionalTitle?.trim() || '',
+        // Set professionalTitle with our fallback logic
+        professionalTitle: professionalTitle,
+        // Ensure jobTitle matches professionalTitle for consistency
+        jobTitle: professionalTitle,
         // If location is missing, use address as fallback
         location: formData.personalInfo?.location?.trim() || formData.personalInfo?.address?.trim() || ''
       };
