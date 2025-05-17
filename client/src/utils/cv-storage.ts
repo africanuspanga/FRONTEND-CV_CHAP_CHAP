@@ -8,13 +8,23 @@
 import { compressObject, decompressObject, splitIntoChunks, joinChunks } from './compression';
 import { sanitizeDataForStorage, obfuscateData, deobfuscateData } from './security';
 
+import { 
+  CV_FORM_DATA_KEY, 
+  CV_FORM_STEP_KEY, 
+  CV_TEMPLATE_ID_KEY,
+  COMPRESSED_PREFIX as COMP_PREFIX,
+  CHUNK_COUNT_KEY as CHUNK_KEY,
+  USING_COMPRESSION_FLAG,
+  USING_INDEXEDDB_FLAG
+} from '../constants';
+
 // DB Configuration
 const DB_NAME = 'cvChapChapDB';
 const STORE_NAME = 'cvFormData';
 const DB_VERSION = 1;
-// Standardized keys across all storage methods - using the same format
-const CV_DATA_KEY = 'cv_form_data'; // Changed to match sessionStorage format
-const CV_STEP_KEY = 'cv_form_step'; // Changed to match format
+// Using the standardized keys from constants.ts
+const CV_DATA_KEY = CV_FORM_DATA_KEY;
+const CV_STEP_KEY = CV_FORM_STEP_KEY;
 
 // Helper to open the database connection
 const openDB = (): Promise<IDBDatabase> => {
@@ -47,9 +57,9 @@ const openDB = (): Promise<IDBDatabase> => {
 };
 
 // Constants for chunked compression storage
-const COMPRESSED_PREFIX = 'cv-compressed-';
+const COMPRESSED_PREFIX = COMP_PREFIX; // Using standardized key from constants.ts
 const CHUNK_SIZE = 1024 * 200; // 200KB chunks
-const CHUNK_COUNT_KEY = 'cv-compressed-chunks';
+const CHUNK_COUNT_KEY = CHUNK_KEY; // Using standardized key from constants.ts
 
 // Save compressed data in chunks to localStorage
 const saveCompressedData = (formData: any): void => {
