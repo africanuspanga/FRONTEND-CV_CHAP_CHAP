@@ -40,6 +40,10 @@ const emptyWorkExperience = {
 // Increased to 8 work experiences as requested
 const MAX_EXPERIENCES = 8;
 
+// IMPORTANT! 
+// The correct storage keys that match the rest of the application
+const STORAGE_KEY = 'cv_form_data';
+
 // Helper function to ensure work experience data is valid
 const sanitizeWorkExperiences = (data: any[]): any[] => {
   if (!Array.isArray(data)) return [];
@@ -135,8 +139,9 @@ const WorkExperienceStep: React.FC = () => {
           workExp: experiences 
         };
         
-        localStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
-        sessionStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
+        // CRITICAL FIX: Use the correct storage key that matches the rest of the application
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCvData));
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCvData));
         
         console.log(`Work experiences saved successfully: ${experiences.length} entries`);
         
@@ -198,8 +203,9 @@ const WorkExperienceStep: React.FC = () => {
             workExp: [...currentValues]
           };
           
-          localStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
-          sessionStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
+          // CRITICAL FIX: Use the correct storage key that matches the rest of the application
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCvData));
+          sessionStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCvData));
           
           // Mark that changes were made
           setHasChanges(true);
@@ -263,9 +269,9 @@ const WorkExperienceStep: React.FC = () => {
               workExp: safeValues 
             };
             
-            // Method 2: Direct storage updates
-            localStorage.setItem('cv-form-data', JSON.stringify(cvData));
-            sessionStorage.setItem('cv-form-data', JSON.stringify(cvData));
+            // Method 2: Direct storage updates with CRITICAL FIX
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cvData));
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cvData));
             
             // Method 3: Force a form submission
             form.handleSubmit(onSubmit)();
@@ -341,8 +347,9 @@ const WorkExperienceStep: React.FC = () => {
         };
         
         try {
-          localStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
-          sessionStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
+          // CRITICAL FIX: Use the correct storage key
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCvData));
+          sessionStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCvData));
           lastSaveTime = now;
           console.log('Auto-saved work experience data');
         } catch (storageError) {
@@ -377,9 +384,9 @@ const WorkExperienceStep: React.FC = () => {
         workExp: validExperiences
       };
       
-      // Use consistent storage keys
-      localStorage.setItem('cv_form_data', JSON.stringify(updatedCvData));
-      sessionStorage.setItem('cv_form_data', JSON.stringify(updatedCvData));
+      // CRITICAL FIX: Use the correct storage key that matches the rest of the application
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCvData));
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCvData));
       
       // Show confirmation message
       setHasChanges(false);
@@ -443,54 +450,50 @@ const WorkExperienceStep: React.FC = () => {
         {/* Work Experience Entries */}
         <Accordion type="multiple" defaultValue={[`item-0`]} className="space-y-4">
           {fields.map((field, index) => (
-            <AccordionItem 
-              key={field.id} 
-              value={`item-${index}`}
-              className="border rounded-md px-1"
-            >
-              <div className="flex items-center">
-                <div className="cursor-move p-2 opacity-50 hover:opacity-100">
-                  <GripVertical className="h-5 w-5" />
-                </div>
-                <AccordionTrigger className="flex-1 hover:no-underline py-4">
-                  <div className="flex-1 text-left font-medium">
-                    {form.watch(`workExperience.${index}.jobTitle`) || 'New Position'}
-                    {form.watch(`workExperience.${index}.company`) && (
-                      <span className="text-muted-foreground ml-2">
-                        at {form.watch(`workExperience.${index}.company`)}
-                      </span>
-                    )}
+            <AccordionItem key={field.id} value={`item-${index}`} className="border rounded-lg">
+              <Card className="overflow-hidden">
+                <div className="flex items-center p-3 border-b">
+                  <div className="cursor-move">
+                    <GripVertical className="h-5 w-5 text-gray-400" />
                   </div>
-                </AccordionTrigger>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="mr-2 h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeWorkExperience(index);
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Remove</span>
-                </Button>
-              </div>
-              
-              <AccordionContent className="pb-4 pt-1">
-                <div className="space-y-4 px-1">
-                  {/* Job Title & Company */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <AccordionTrigger className="flex-1 px-2 hover:no-underline">
+                    <div className="text-left">
+                      <h3 className="font-medium">
+                        {form.watch(`workExperience.${index}.jobTitle`) || 'New Position'}
+                        {form.watch(`workExperience.${index}.company`) && (
+                          <span className="text-muted-foreground"> at {form.watch(`workExperience.${index}.company`)}</span>
+                        )}
+                      </h3>
+                    </div>
+                  </AccordionTrigger>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="p-1 h-8 w-8"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeWorkExperience(index);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                    <span className="sr-only">Remove</span>
+                  </Button>
+                </div>
+                
+                <AccordionContent className="p-4">
+                  <div className="space-y-4">
+                    {/* Job Title */}
                     <FormField
                       control={form.control}
                       name={`workExperience.${index}.jobTitle`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Job Title <span className="text-red-500">*</span></FormLabel>
+                          <FormLabel className="font-medium">Job Title</FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="e.g. Senior Developer" 
+                            <Input
                               {...field}
+                              placeholder="e.g. Software Engineer"
                               onChange={(e) => {
                                 field.onChange(e);
                                 handleFieldChange(index, 'jobTitle', e.target.value);
@@ -502,16 +505,17 @@ const WorkExperienceStep: React.FC = () => {
                       )}
                     />
 
+                    {/* Company Name */}
                     <FormField
                       control={form.control}
                       name={`workExperience.${index}.company`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Company <span className="text-red-500">*</span></FormLabel>
+                          <FormLabel className="font-medium">Company</FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="e.g. Acme Corporation" 
+                            <Input
                               {...field}
+                              placeholder="e.g. Acme Corporation"
                               onChange={(e) => {
                                 field.onChange(e);
                                 handleFieldChange(index, 'company', e.target.value);
@@ -522,20 +526,18 @@ const WorkExperienceStep: React.FC = () => {
                         </FormItem>
                       )}
                     />
-                  </div>
 
-                  {/* Location & Remote Work */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Location */}
                     <FormField
                       control={form.control}
                       name={`workExperience.${index}.location`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Location</FormLabel>
+                          <FormLabel className="font-medium">Location</FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="e.g. Dar es Salaam, Tanzania" 
+                            <Input
                               {...field}
+                              placeholder="e.g. Dar es Salaam, Tanzania"
                               onChange={(e) => {
                                 field.onChange(e);
                                 handleFieldChange(index, 'location', e.target.value);
@@ -547,39 +549,18 @@ const WorkExperienceStep: React.FC = () => {
                       )}
                     />
 
-                    <div className="flex flex-row items-center justify-between space-x-3 space-y-0 rounded-md border p-4">
-                          <div className="space-y-1 leading-none">
-                            <div className="font-medium">Remote Work</div>
-                            <div className="text-sm text-muted-foreground">
-                              This was a remote position
-                            </div>
-                          </div>
-                          <Switch
-                            checked={form.getValues().workExperience[index]?.location === 'Remote'}
-                            onCheckedChange={(checked) => {
-                              // If checked, set location to 'Remote', otherwise clear location
-                              const newLocation = checked ? 'Remote' : '';
-                              form.setValue(`workExperience.${index}.location`, newLocation);
-                              handleFieldChange(index, 'location', newLocation);
-                            }}
-                          />
-                    </div>
-                  </div>
-
-                  {/* Employment Dates */}
-                  <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Start Date */}
                       <FormField
                         control={form.control}
                         name={`workExperience.${index}.startDate`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Start Date <span className="text-red-500">*</span></FormLabel>
+                            <FormLabel className="font-medium">Start Date</FormLabel>
                             <FormControl>
-                              <Input 
-                                type="month"
-                                placeholder="MM/YYYY" 
+                              <Input
                                 {...field}
+                                placeholder="e.g. Jan 2020"
                                 onChange={(e) => {
                                   field.onChange(e);
                                   handleFieldChange(index, 'startDate', e.target.value);
@@ -591,123 +572,108 @@ const WorkExperienceStep: React.FC = () => {
                         )}
                       />
 
-                      {!form.watch(`workExperience.${index}.current`) && (
+                      {/* End Date */}
+                      <div className="space-y-4">
                         <FormField
                           control={form.control}
-                          name={`workExperience.${index}.endDate`}
+                          name={`workExperience.${index}.current`}
                           render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>End Date <span className="text-red-500">*</span></FormLabel>
+                            <FormItem className="flex items-center gap-2 space-y-0">
                               <FormControl>
-                                <Input 
-                                  type="month"
-                                  placeholder="MM/YYYY" 
-                                  {...field}
-                                  onChange={(e) => {
-                                    field.onChange(e);
-                                    handleFieldChange(index, 'endDate', e.target.value);
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={(checked) => {
+                                    field.onChange(checked);
+                                    handleFieldChange(index, 'current', checked);
                                   }}
                                 />
                               </FormControl>
-                              <FormMessage />
+                              <FormLabel className="font-normal cursor-pointer">
+                                I currently work here
+                              </FormLabel>
                             </FormItem>
                           )}
                         />
-                      )}
+
+                        {!form.watch(`workExperience.${index}.current`) && (
+                          <FormField
+                            control={form.control}
+                            name={`workExperience.${index}.endDate`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-medium">End Date</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    {...field}
+                                    placeholder="e.g. Jun 2023"
+                                    onChange={(e) => {
+                                      field.onChange(e);
+                                      handleFieldChange(index, 'endDate', e.target.value);
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
+                      </div>
                     </div>
 
+                    {/* Description */}
                     <FormField
                       control={form.control}
-                      name={`workExperience.${index}.current`}
+                      name={`workExperience.${index}.description`}
                       render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormItem>
+                          <FormLabel className="font-medium">Description</FormLabel>
                           <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={(checked) => {
-                                const isChecked = checked as boolean;
-                                field.onChange(isChecked);
-                                handleFieldChange(index, 'current', isChecked);
-                                
-                                // Clear end date if current job
-                                if (isChecked) {
-                                  form.setValue(`workExperience.${index}.endDate`, '');
-                                  handleFieldChange(index, 'endDate', '');
-                                }
+                            <Textarea
+                              {...field}
+                              placeholder="Describe your responsibilities and achievements..."
+                              rows={4}
+                              className="resize-y"
+                              onChange={(e) => {
+                                field.onChange(e);
+                                handleFieldChange(index, 'description', e.target.value);
                               }}
                             />
                           </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel>
-                              I currently work here
-                            </FormLabel>
-                          </div>
+                          <FormDescription>
+                            Briefly describe your responsibilities and the company.
+                          </FormDescription>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
-
-                  {/* Description */}
-                  <FormField
-                    control={form.control}
-                    name={`workExperience.${index}.description`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Describe your responsibilities, achievements, and technologies used..."
-                            className="min-h-[120px]"
-                            {...field}
-                            onChange={(e) => {
-                              field.onChange(e);
-                              handleFieldChange(index, 'description', e.target.value);
-                            }}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Highlight your key responsibilities and achievements using bullet points or paragraphs.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </AccordionContent>
+                </AccordionContent>
+              </Card>
             </AccordionItem>
           ))}
         </Accordion>
 
-        {/* Add Experience Button */}
+        {/* Add another button */}
         <Button
           type="button"
           variant="outline"
-          className="w-full flex items-center gap-2"
+          className="flex items-center gap-2 my-4 w-full"
           onClick={addWorkExperience}
           disabled={fields.length >= MAX_EXPERIENCES}
         >
           <PlusCircle className="h-4 w-4" />
-          Add Another Work Experience
+          Add Another Position
         </Button>
-        
-        {fields.length === 0 && (
-          <Card className="p-8 flex flex-col items-center justify-center text-center space-y-3 border-dashed">
-            <AlertCircle className="h-8 w-8 text-muted-foreground" />
-            <div>
-              <p className="text-sm text-muted-foreground">
-                No work experience added yet.
-              </p>
-              <Button
-                type="button"
-                variant="link"
-                className="mt-2 px-0"
-                onClick={addWorkExperience}
-              >
-                Add your first experience
-              </Button>
-            </div>
-          </Card>
-        )}
+
+        {/* Form buttons */}
+        <div className="flex justify-end gap-2 mt-6">
+          <Button 
+            type="submit"
+            className="px-6"
+          >
+            Save Work Experience
+          </Button>
+        </div>
       </form>
     </Form>
   );
