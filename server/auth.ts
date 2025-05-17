@@ -31,16 +31,15 @@ async function comparePasswords(password: string, hash: string): Promise<boolean
 
 // Generate a JWT token
 function generateToken(user: JwtPayload): string {
-  return jwt.sign(
-    {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      role: user.role
-    },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
-  );
+  // Ensure we have valid non-null values
+  const payload = {
+    id: user.id,
+    username: user.username,
+    email: user.email || '', // Provide empty string if null
+    role: user.role
+  };
+  
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
 
 // Authentication middleware
@@ -118,13 +117,16 @@ export async function register(req: Request, res: Response) {
       updatedAt: users.updatedAt
     });
     
-    // Generate a token
-    const token = generateToken({
+    // Prepare payload with type assertion
+    const payload = {
       id: newUser.id,
-      username: newUser.username,
-      email: newUser.email,
+      username: String(newUser.username), // Convert to string explicitly
+      email: String(newUser.email), // Convert to string explicitly
       role: newUser.role
-    });
+    };
+
+    // Generate a token
+    const token = generateToken(payload);
     
     // Return the user and token
     return res.status(201).json({
@@ -167,13 +169,16 @@ export async function login(req: Request, res: Response) {
       .set({ last_login: new Date() })
       .where(eq(users.id, user.id));
     
-    // Generate a token
-    const token = generateToken({
+    // Prepare payload with type assertion
+    const payload = {
       id: user.id,
-      username: user.username,
-      email: user.email,
+      username: String(user.username), // Convert to string explicitly
+      email: String(user.email), // Convert to string explicitly
       role: user.role
-    });
+    };
+
+    // Generate a token
+    const token = generateToken(payload);
     
     // Return the user without the password and token
     const { password: _, ...userWithoutPassword } = user;
