@@ -385,18 +385,147 @@ const WorkExperienceForm = () => {
   };
 
   const handleSaveAchievements = (achievements: string[]) => {
-    setAIRecommendations(achievements);
-    
-    if (editingJobIndex !== null) {
-      updateExistingWorkExperience(achievements);
+    try {
+      console.log("🔄 EMERGENCY FIX - Saving work experience with achievements:", achievements);
+      setAIRecommendations(achievements);
+      
+      // Create the job entry immediately for maximum reliability
+      const startDate = startMonth && startYear ? `${startMonth} ${startYear}` : '';
+      const endDate = currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : '');
+      
+      // Create the job object with all necessary fields
+      const jobEntry = {
+        id: `job_${Date.now()}_${Math.floor(Math.random() * 100000)}`,
+        jobTitle,
+        company: employer,
+        location: isRemote ? 'Remote' : location,
+        startDate,
+        endDate,
+        current: currentJob,
+        description: '',
+        achievements: achievements
+      };
+      
+      console.log("📝 EMERGENCY FIX - Created job entry:", jobEntry);
+      
+      // Get existing data from storage for maximum reliability
+      let existingData = {};
+      const storageKey = 'cv_form_data';
+      
+      try {
+        const storedData = localStorage.getItem(storageKey);
+        if (storedData) {
+          existingData = JSON.parse(storedData);
+        }
+      } catch (error) {
+        console.error("❌ Error getting existing data:", error);
+      }
+      
+      // Prepare work experience arrays
+      let existingExperiences = [];
+      
+      if (Array.isArray(formData.workExperiences) && formData.workExperiences.length > 0) {
+        existingExperiences = JSON.parse(JSON.stringify(formData.workExperiences));
+        console.log("📊 Using workExperiences array:", existingExperiences.length, "entries");
+      } else if (Array.isArray(formData.workExp) && formData.workExp.length > 0) {
+        existingExperiences = JSON.parse(JSON.stringify(formData.workExp));
+        console.log("📊 Using workExp array:", existingExperiences.length, "entries");
+      } else {
+        console.log("⚠️ No existing work experiences found - starting fresh array");
+      }
+      
+      // If editing, replace the job at that index
+      if (editingJobIndex !== null && existingExperiences[editingJobIndex]) {
+        console.log(`✏️ Replacing job at index ${editingJobIndex}`);
+        existingExperiences[editingJobIndex] = jobEntry;
+      } else {
+        // Otherwise add it to the beginning for better visibility
+        console.log("➕ Adding new job to the beginning of array");
+        existingExperiences = [jobEntry, ...existingExperiences];
+      }
+      
+      console.log("📊 Final work experience array:", existingExperiences.length, "entries");
+      
+      // Update context with both arrays
+      console.log("🔄 Updating workExperiences in context");
+      updateFormField('workExperiences', [...existingExperiences]);
+      console.log("🔄 Updating workExp in context");
+      updateFormField('workExp', [...existingExperiences]);
+      
+      // Directly save to storage for maximum reliability
+      const updatedData = {
+        ...existingData,
+        workExperiences: [...existingExperiences],
+        workExp: [...existingExperiences]
+      };
+      
+      // Save to both storage types
+      console.log("💾 Saving to localStorage");
+      localStorage.setItem(storageKey, JSON.stringify(updatedData));
+      console.log("💾 Saving to sessionStorage");
+      sessionStorage.setItem(storageKey, JSON.stringify(updatedData));
+      
+      // Verify the data was properly saved
+      try {
+        const verification = localStorage.getItem(storageKey);
+        if (verification) {
+          const parsed = JSON.parse(verification);
+          console.log("✅ VERIFICATION: Job saved successfully. Array count:", 
+                    parsed.workExperiences?.length || 0);
+        } else {
+          console.error("❌ VERIFICATION FAILED: Could not find saved data");
+        }
+      } catch (verifyError) {
+        console.error("❌ VERIFICATION ERROR:", verifyError);
+      }
+      
+      // Reset states
       setEditingJobIndex(null);
-    } else {
-      addWorkExperience(achievements);
+      setShowEditor(false);
+      setShowWorkHistory(true);
+      setShowJobForm(false);
+      
+      // Show confetti to indicate success
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+      
+    } catch (error) {
+      console.error("❌ CRITICAL ERROR saving job:", error);
+      alert("There was a problem saving your work experience. Please try again.");
+      
+      // If the proper flow fails, try a last-resort direct approach
+      try {
+        const jobEntry = {
+          id: `emergency_${Date.now()}`,
+          jobTitle,
+          company: employer,
+          location: isRemote ? 'Remote' : location, 
+          startDate: startMonth && startYear ? `${startMonth} ${startYear}` : '',
+          endDate: currentJob ? 'Present' : (endMonth && endYear ? `${endMonth} ${endYear}` : ''),
+          achievements
+        };
+        
+        // Direct manipulation of localStorage as absolute last resort
+        const rawData = localStorage.getItem('cv_form_data');
+        if (rawData) {
+          const parsed = JSON.parse(rawData);
+          if (!Array.isArray(parsed.workExperiences)) {
+            parsed.workExperiences = [];
+          }
+          if (!Array.isArray(parsed.workExp)) {
+            parsed.workExp = [];
+          }
+          
+          parsed.workExperiences.unshift(jobEntry);
+          parsed.workExp.unshift(jobEntry);
+          
+          localStorage.setItem('cv_form_data', JSON.stringify(parsed));
+          console.log("🛟 EMERGENCY RECOVERY: Direct localStorage manipulation successful");
+        }
+      } catch (emergencyError) {
+        console.error("💥 EMERGENCY RECOVERY FAILED:", emergencyError);
+      }
     }
-    
-    setShowEditor(false);
-    setShowWorkHistory(true);
-    setShowJobForm(false);
   };
   
   const handleEditJob = (index: number) => {
