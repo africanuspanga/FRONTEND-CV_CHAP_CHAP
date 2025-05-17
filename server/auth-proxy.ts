@@ -2,6 +2,10 @@ import { Request, Response, NextFunction, Express } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import { db } from './db';
+import { users } from '@shared/schema';
+import { eq, or } from 'drizzle-orm';
+import { initializeDatabase } from './db';
 
 // JWT Secret (in production, this would be an environment variable)
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
