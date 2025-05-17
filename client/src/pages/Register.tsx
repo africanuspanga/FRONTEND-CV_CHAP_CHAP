@@ -21,11 +21,10 @@ import { Link } from "wouter";
 
 // Define the registration form schema
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  full_name: z.string().optional(),
-  phone_number: z.string().optional(),
+  full_name: z.string().min(1, "Full name is required"),
+  phone_number: z.string().min(1, "Phone number is required"),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -39,7 +38,6 @@ export default function Register() {
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
       full_name: "",
@@ -50,13 +48,16 @@ export default function Register() {
   // Handle form submission
   const onSubmit = async (values: RegisterFormValues) => {
     try {
-      // Only include fields that have values
+      // Create username from email if not provided
+      const username = values.email.split('@')[0];
+      
+      // Prepare the form data
       const formData = {
-        username: values.username,
+        username,
         email: values.email,
         password: values.password,
-        ...(values.full_name ? { full_name: values.full_name } : {}),
-        ...(values.phone_number ? { phone_number: values.phone_number } : {}),
+        full_name: values.full_name,
+        phone_number: values.phone_number,
       };
       
       await register(formData);
@@ -126,24 +127,6 @@ export default function Register() {
                     <FormControl>
                       <Input 
                         placeholder="+255612345678" 
-                        {...field} 
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="johndoe" 
                         {...field} 
                         disabled={isLoading}
                       />

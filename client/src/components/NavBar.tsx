@@ -87,18 +87,11 @@ const NavBar: React.FC = () => {
             {isAuthenticated ? (
               <UserProfileMenu username={user?.username || user?.full_name || 'User'} />
             ) : (
-              <>
-                <Button asChild variant="ghost">
-                  <Link href="/login" className="px-3 py-2 rounded-md text-sm font-medium">
-                    Login
-                  </Link>
-                </Button>
-                <Button asChild variant="default">
-                  <Link href="/register" className="px-3 py-2 rounded-md text-sm font-medium">
-                    Register
-                  </Link>
-                </Button>
-              </>
+              <Button asChild variant="default">
+                <Link href="/login" className="px-3 py-2 rounded-md text-sm font-medium">
+                  Login
+                </Link>
+              </Button>
             )}
           </div>
           
