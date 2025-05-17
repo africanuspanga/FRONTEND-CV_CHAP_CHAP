@@ -65,11 +65,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const token = localStorage.getItem('auth_token');
         if (!token) return null;
 
-        const res = await apiRequest('GET', '/api/auth/me', undefined, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        // Create headers object for authorization
+        const headers: Record<string, string> = {
+          Authorization: `Bearer ${token}`
+        };
+
+        const res = await apiRequest('GET', '/api/auth/me', undefined, headers);
 
         if (!res.ok) {
           if (res.status === 401) {
@@ -156,11 +157,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async () => {
       const token = localStorage.getItem('auth_token');
       if (token) {
-        await apiRequest('POST', '/api/auth/logout', undefined, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        // Create headers object for authorization
+        const headers: Record<string, string> = {
+          Authorization: `Bearer ${token}`
+        };
+        
+        await apiRequest('POST', '/api/auth/logout', undefined, headers);
       }
       return null;
     },
