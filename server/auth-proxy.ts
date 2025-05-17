@@ -194,17 +194,15 @@ export async function register(req: Request, res: Response) {
     users.push(newUser);
     
     try {
-      // Also store in database - using camelCase for timestamps to match schema.ts
-      await db.insert(usersTable).values({
+      // Store in database using our storage module
+      await userStorage.createUser({
         id: userId,
         username: finalUsername,
         email,
         password: hashedPassword,
         full_name: full_name || '',
         phone_number,
-        role: 'user',
-        createdAt: new Date(), // Use camelCase to match schema.ts
-        updatedAt: new Date()  // Use camelCase to match schema.ts
+        role: 'user'
       });
       console.log('User successfully stored in database:', email);
     } catch (dbError) {
@@ -308,28 +306,33 @@ export async function login(req: Request, res: Response) {
     // If not found in memory, check database
     if (!user) {
       try {
-        const dbUsers = await db.select().from(usersTable).where(
-          or(
-            eq(usersTable.email, normalizedIdentifier),
-            eq(usersTable.username, normalizedIdentifier),
-            eq(usersTable.phone_number, normalizedIdentifier)
-          )
-        );
+        // Try to find by email
+        let dbUser = await userStorage.getUserByEmail(normalizedIdentifier);
         
-        if (dbUsers.length > 0) {
-          console.log('Found user in database:', dbUsers[0].email);
+        // If not found by email, try by username
+        if (!dbUser) {
+          dbUser = await userStorage.getUserByUsername(normalizedIdentifier);
+        }
+        
+        // If not found by username, try by phone
+        if (!dbUser) {
+          dbUser = await userStorage.getUserByPhone(normalizedIdentifier);
+        }
+        
+        if (dbUser) {
+          console.log('Found user in database:', dbUser.email);
           
           // Convert database user to in-memory user format
           user = {
-            id: dbUsers[0].id,
-            username: dbUsers[0].username || '',
-            email: dbUsers[0].email,
-            password: dbUsers[0].password,
-            full_name: dbUsers[0].full_name || '',
-            phone_number: dbUsers[0].phone_number || undefined,
-            role: dbUsers[0].role,
-            created_at: new Date(dbUsers[0].createdAt),
-            updated_at: new Date(dbUsers[0].updatedAt)
+            id: dbUser.id,
+            username: dbUser.username || '',
+            email: dbUser.email,
+            password: dbUser.password,
+            full_name: dbUser.full_name || '',
+            phone_number: dbUser.phone_number || undefined,
+            role: dbUser.role,
+            created_at: new Date(dbUser.createdAt),
+            updated_at: new Date(dbUser.updatedAt)
           };
           
           // Add to in-memory store for faster access next time
