@@ -12,8 +12,9 @@ import { sanitizeDataForStorage, obfuscateData, deobfuscateData } from './securi
 const DB_NAME = 'cvChapChapDB';
 const STORE_NAME = 'cvFormData';
 const DB_VERSION = 1;
-const CV_DATA_KEY = 'cv-form-data';
-const CV_STEP_KEY = 'cv-form-step';
+// Standardized keys across all storage methods - using the same format
+const CV_DATA_KEY = 'cv_form_data'; // Changed to match sessionStorage format
+const CV_STEP_KEY = 'cv_form_step'; // Changed to match format
 
 // Helper to open the database connection
 const openDB = (): Promise<IDBDatabase> => {
@@ -134,7 +135,7 @@ export const saveFormData = async (formData: any): Promise<void> => {
     
     // Try to save in sessionStorage first (more reliable for payment flow)
     try {
-      sessionStorage.setItem('cv_form_data', formDataStr);
+      sessionStorage.setItem(CV_DATA_KEY, formDataStr); // Using consistent key
       console.log('CV data stored in sessionStorage');
     } catch (sessionStorageError) {
       console.error('Error storing in sessionStorage:', sessionStorageError);
@@ -312,7 +313,7 @@ export const loadFormData = async (): Promise<any | null> => {
   try {
     // First try sessionStorage (more reliable for payment flow)
     try {
-      const sessionData = sessionStorage.getItem('cv_form_data');
+      const sessionData = sessionStorage.getItem(CV_DATA_KEY);
       if (sessionData) {
         console.log('CV data found in sessionStorage');
         const parsed = JSON.parse(sessionData);
