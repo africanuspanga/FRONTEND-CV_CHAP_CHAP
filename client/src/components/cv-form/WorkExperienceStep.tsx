@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
@@ -13,8 +13,9 @@ import { Card } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { generateId } from '@/lib/utils';
-import { Trash2, PlusCircle, GripVertical, AlertCircle } from 'lucide-react';
+import { Trash2, PlusCircle, GripVertical, AlertCircle, Save } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
 
 // Extend the schema with client-side validation
 const formSchema = z.object({
@@ -36,178 +37,396 @@ const emptyWorkExperience = {
   achievements: [],
 };
 
-const MAX_EXPERIENCES = 5;
+// Increased to 8 work experiences as requested
+const MAX_EXPERIENCES = 8;
+
+// Helper function to ensure work experience data is valid
+const sanitizeWorkExperiences = (data: any[]): any[] => {
+  if (!Array.isArray(data)) return [];
+  
+  return data.map(exp => ({
+    id: exp.id || generateId(),
+    jobTitle: exp.jobTitle || '',
+    company: exp.company || '',
+    location: exp.location || '',
+    startDate: exp.startDate || '',
+    endDate: exp.endDate || '',
+    current: !!exp.current,
+    description: exp.description || '',
+    achievements: Array.isArray(exp.achievements) ? exp.achievements : [],
+  }));
+};
 
 const WorkExperienceStep: React.FC = () => {
   const { formData, updateFormField } = useCVForm();
   const [showMaxWarning, setShowMaxWarning] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const { toast } = useToast();
   
-  // Get default values from context or use an empty array with one item
-  // Check both workExperiences and workExp properties for backward compatibility
-  const defaultValues: FormValues = {
-    workExperience: 
-      // First check workExperiences (primary property)
-      (formData.workExperiences && formData.workExperiences.length > 0)
-        ? formData.workExperiences
-        // Then fall back to workExp (secondary property)
-        : (formData.workExp && formData.workExp.length > 0)
-          ? formData.workExp
-          // If neither exists, use an empty experience
-          : [emptyWorkExperience],
-  };
-
-  // Initialize form
+  // Get and sanitize existing work experiences
+  const existingExperiences = (() => {
+    // First check workExperiences (primary property)
+    if (Array.isArray(formData.workExperiences) && formData.workExperiences.length > 0) {
+      return sanitizeWorkExperiences(formData.workExperiences);
+    }
+    // Then fall back to workExp (secondary property)
+    else if (Array.isArray(formData.workExp) && formData.workExp.length > 0) {
+      return sanitizeWorkExperiences(formData.workExp);
+    }
+    // If neither exists, start with one empty experience
+    return [emptyWorkExperience];
+  })();
+  
+  // Initialize form with sanitized data
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      workExperience: existingExperiences
+    },
     mode: 'onChange',
   });
-
+  
   // Setup field array for work experiences
-  const { fields, append, remove, move } = useFieldArray({
+  const { fields, append, remove, update } = useFieldArray({
     control: form.control,
     name: 'workExperience',
   });
+  
+  // Effect to check if both arrays are empty and add a default empty experience
+  useEffect(() => {
+    if (fields.length === 0) {
+      append(emptyWorkExperience);
+    }
+  }, [fields.length, append]);
 
-  // Handle form submission
+  // Handle form submission with improved reliability
   const onSubmit = (data: FormValues) => {
-    // Make a deep copy to avoid reference issues
-    const experiences = JSON.parse(JSON.stringify(data.workExperience));
-    
-    // Make sure each experience has an ID
-    experiences.forEach((exp: any) => {
-      if (!exp.id) {
-        exp.id = generateId();
-      }
-    });
-    
-    // Update both arrays to ensure consistency
-    updateFormField('workExperiences', experiences);
-    updateFormField('workExp', experiences);
-    
-    // Save to storage immediately
-    form.handleSubmit(() => {
-      console.log('Work experience data saved:', experiences);
+    try {
+      // Deep copy to avoid reference issues
+      const experiences = JSON.parse(JSON.stringify(data.workExperience));
       
-      // Force an extra save after a slight delay to ensure persistence
-      setTimeout(() => {
-        const cvData = { ...formData, workExperiences: experiences, workExp: experiences };
-        localStorage.setItem('cv-form-data', JSON.stringify(cvData));
-        sessionStorage.setItem('cv-form-data', JSON.stringify(cvData));
-      }, 100);
-    })();
+      // Make sure each experience has a valid ID and required fields
+      experiences.forEach((exp: any, index: number) => {
+        if (!exp.id) {
+          exp.id = generateId();
+        }
+        
+        // Ensure all experiences have at least the required fields
+        exp.jobTitle = exp.jobTitle || `Position ${index + 1}`;
+        exp.company = exp.company || '';
+        exp.achievements = Array.isArray(exp.achievements) ? exp.achievements : [];
+      });
+      
+      console.log(`Saving ${experiences.length} work experiences`);
+      
+      // Update both arrays in context for consistent state
+      updateFormField('workExperiences', experiences);
+      updateFormField('workExp', experiences);
+      
+      // Mark that changes have been made
+      setHasChanges(false);
+      
+      // Save to all storage methods for maximum reliability
+      try {
+        // Update CV data in localStorage and sessionStorage directly
+        const updatedCvData = { 
+          ...formData, 
+          workExperiences: experiences, 
+          workExp: experiences 
+        };
+        
+        localStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
+        sessionStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
+        
+        console.log(`Work experiences saved successfully: ${experiences.length} entries`);
+        
+        // Show success toast
+        toast({
+          title: "Work experience saved",
+          description: `Successfully saved ${experiences.length} work experience entries`,
+        });
+      } catch (storageError) {
+        console.error('Error saving to storage:', storageError);
+        // Continue even if storage fails
+      }
+    } catch (error) {
+      console.error('Error in work experience submission:', error);
+      toast({
+        title: "Error saving",
+        description: "There was a problem saving your work experience. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  // Add a new work experience entry
+  // Add a new work experience entry - completely rewritten for reliability
   const addWorkExperience = () => {
     if (fields.length >= MAX_EXPERIENCES) {
       setShowMaxWarning(true);
+      toast({
+        title: "Maximum limit reached",
+        description: `You can add up to ${MAX_EXPERIENCES} work experiences.`,
+        variant: "destructive",
+      });
       return;
     }
     
     // Create a new work experience with unique ID
     const newExperience = {
       ...emptyWorkExperience,
-      id: generateId() // Ensure unique ID
+      id: generateId()
     };
     
-    // Add to form fields
-    append(newExperience);
-    
-    // Wait a tick for the field to be added to the form
-    setTimeout(() => {
-      // Get current form values after append
-      const currentValues = form.getValues('workExperience');
+    try {
+      // Add to form fields
+      append(newExperience);
       
-      // Update both work experience arrays in context
-      updateFormField('workExperiences', currentValues);
-      updateFormField('workExp', currentValues);
-      
-      // Force form submission to ensure data is saved
-      form.handleSubmit(onSubmit)();
-      
-      // Log the addition to verify
-      console.log('Added new work experience:', newExperience);
-      console.log('Work experiences after add:', currentValues);
-    }, 50);
+      // Wait to ensure field is added to the form
+      setTimeout(() => {
+        try {
+          // Get current values after append
+          const currentValues = form.getValues('workExperience');
+          
+          // Update both arrays in context (main fix)
+          updateFormField('workExperiences', [...currentValues]);
+          updateFormField('workExp', [...currentValues]);
+          
+          // Force immediate storage update
+          const updatedCvData = { 
+            ...formData, 
+            workExperiences: [...currentValues], 
+            workExp: [...currentValues]
+          };
+          
+          localStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
+          sessionStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
+          
+          // Mark that changes were made
+          setHasChanges(true);
+          
+          console.log(`Added new experience - total: ${currentValues.length}`);
+          
+          // Force form submission to ensure data is saved
+          form.handleSubmit(onSubmit)();
+        } catch (innerError) {
+          console.error('Error after adding work experience:', innerError);
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Error adding work experience:', error);
+      toast({
+        title: "Error adding work experience",
+        description: "Please try again or refresh the page",
+        variant: "destructive",
+      });
+    }
   };
 
-  // Remove a work experience entry
+  // Remove a work experience entry - enhanced for reliability
   const removeWorkExperience = (index: number) => {
-    // Remove from form field array
-    remove(index);
-    setShowMaxWarning(false);
-    
-    // Give time for the form to update
-    setTimeout(() => {
-      // Get current values after removal
+    try {
+      console.log(`Removing work experience at index ${index}`);
+      
+      // Create a backup of current values before removal
+      const backupValues = [...form.getValues('workExperience')];
+      
+      // Remove from form field array
+      remove(index);
+      setShowMaxWarning(false);
+      
+      // Give time for the form to update
+      setTimeout(() => {
+        try {
+          // Get current values after removal
+          const currentValues = form.getValues('workExperience');
+          
+          // Verify the removal worked correctly
+          if (currentValues.length !== backupValues.length - 1) {
+            console.warn('Removal may not have worked correctly, length mismatch');
+          }
+          
+          // Create a fresh array to break any reference issues
+          const safeValues = [...currentValues].map(exp => ({...exp}));
+          
+          console.log(`After remove: ${safeValues.length} work experiences remaining`);
+          
+          // Update both arrays in context for consistency
+          updateFormField('workExperiences', safeValues);
+          updateFormField('workExp', safeValues);
+          
+          // Force an immediate direct storage update with multiple methods
+          try {
+            // Method 1: Update through context data
+            const cvData = { 
+              ...formData, 
+              workExperiences: safeValues, 
+              workExp: safeValues 
+            };
+            
+            // Method 2: Direct storage updates
+            localStorage.setItem('cv-form-data', JSON.stringify(cvData));
+            sessionStorage.setItem('cv-form-data', JSON.stringify(cvData));
+            
+            // Method 3: Force a form submission
+            form.handleSubmit(onSubmit)();
+            
+            // Confirm successful removal
+            toast({
+              title: "Entry removed",
+              description: `Work experience removed successfully. ${safeValues.length} remaining.`,
+            });
+          } catch (storageError) {
+            console.error('Error saving after removal:', storageError);
+            // Continue even if storage fails
+          }
+        } catch (innerError) {
+          console.error('Error processing work experience removal:', innerError);
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Error removing work experience:', error);
+      toast({
+        title: "Error removing entry",
+        description: "There was a problem removing the work experience. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Update form data on change with enhanced reliability
+  const handleFieldChange = (index: number, field: string, value: any) => {
+    try {
+      // Mark that changes have been made - triggers save confirmation
+      setHasChanges(true);
+      
+      // Get the current form values ensuring we're working with the latest data
       const currentValues = form.getValues('workExperience');
       
-      // Update both arrays in context for consistency
-      updateFormField('workExperiences', currentValues);
-      updateFormField('workExp', currentValues);
-      
-      // Also force an immediate direct storage update
-      const cvData = { ...formData, workExperiences: currentValues, workExp: currentValues };
-      try {
-        localStorage.setItem('cv-form-data', JSON.stringify(cvData));
-        sessionStorage.setItem('cv-form-data', JSON.stringify(cvData));
-      } catch (e) {
-        console.error('Error saving work experience data:', e);
+      // Safety check - make sure we have an array
+      if (!currentValues || !Array.isArray(currentValues)) {
+        console.error('Current form values is not an array:', currentValues);
+        return;
       }
       
-      // Log the removal to verify
-      console.log('Removed work experience at index:', index);
-      console.log('Remaining work experiences:', currentValues);
+      // Make sure the index exists
+      if (!currentValues[index]) {
+        console.warn(`Work experience at index ${index} doesn't exist. Creating it.`);
+        currentValues[index] = { ...emptyWorkExperience, id: generateId() };
+      }
       
-      // Force form submission to ensure data is saved
-      form.handleSubmit(onSubmit)();
-    }, 50);
+      // Deep clone to avoid reference issues
+      const updatedValues = JSON.parse(JSON.stringify(currentValues));
+      
+      // Update the field in the cloned values
+      updatedValues[index] = {
+        ...updatedValues[index],
+        [field]: value,
+      };
+      
+      // Update the form value
+      form.setValue('workExperience', updatedValues);
+      
+      // Update both arrays in context for consistency and preview
+      updateFormField('workExperiences', updatedValues);
+      updateFormField('workExp', updatedValues);
+      
+      // Every 2 seconds, auto-save the form data
+      const now = Date.now();
+      if (!lastSaveTime || now - lastSaveTime > 2000) {
+        // Force storage update for added reliability
+        const updatedCvData = { 
+          ...formData, 
+          workExperiences: updatedValues, 
+          workExp: updatedValues 
+        };
+        
+        try {
+          localStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
+          sessionStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
+          lastSaveTime = now;
+          console.log('Auto-saved work experience data');
+        } catch (storageError) {
+          console.error('Error auto-saving:', storageError);
+        }
+      }
+    } catch (error) {
+      console.error(`Error updating field '${field}' at index ${index}:`, error);
+    }
   };
+  
+  // Track last save time for auto-save throttling
+  let lastSaveTime = 0;
 
-  // Update form data on change to provide real-time preview
-  const handleFieldChange = (index: number, field: string, value: any) => {
-    // Get the current form values to ensure we're working with the latest data
-    const currentValues = form.getValues('workExperience');
-    
-    // Make sure we have an array to work with
-    if (!currentValues || !Array.isArray(currentValues)) {
-      console.error('Current form values is not an array:', currentValues);
-      return;
+  // Handle manual save function
+  const handleManualSave = () => {
+    try {
+      // Get current values
+      const currentValues = form.getValues('workExperience');
+      
+      // Create a valid copy of all entries
+      const validExperiences = sanitizeWorkExperiences(currentValues);
+      
+      // Update both arrays in the CV context
+      updateFormField('workExperiences', validExperiences);
+      updateFormField('workExp', validExperiences);
+      
+      // Force save to storage
+      const updatedCvData = {
+        ...formData,
+        workExperiences: validExperiences,
+        workExp: validExperiences
+      };
+      
+      localStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
+      sessionStorage.setItem('cv-form-data', JSON.stringify(updatedCvData));
+      
+      // Show confirmation message
+      setHasChanges(false);
+      toast({
+        title: "Work experience saved",
+        description: `Successfully saved ${validExperiences.length} work experience entries.`,
+      });
+      
+      console.log(`Manually saved ${validExperiences.length} work experiences`);
+    } catch (error) {
+      console.error('Error during manual save:', error);
+      toast({
+        title: "Error saving",
+        description: "There was a problem saving your work experience. Please try again.",
+        variant: "destructive",
+      });
     }
-    
-    // Make sure the index exists
-    if (!currentValues[index]) {
-      console.warn(`Work experience at index ${index} does not exist. Creating it.`);
-      currentValues[index] = { ...emptyWorkExperience, id: generateId() };
-    }
-    
-    // Update the field in the form values
-    currentValues[index] = {
-      ...currentValues[index],
-      [field]: value,
-    };
-    
-    // Update the form value
-    form.setValue('workExperience', currentValues);
-    
-    // Update both arrays in context for consistency and preview
-    updateFormField('workExperiences', currentValues);
-    updateFormField('workExp', currentValues);
-    
-    // Log for debugging
-    console.log(`Updated work experience field '${field}' at index ${index}:`, value);
-    console.log('Both work experience arrays are synced. Current count:', currentValues.length);
   };
 
   return (
     <Form {...form}>
-      <form onChange={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Introduction */}
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">
-            Add your work experience, starting with your most recent position. For best results, include measurable achievements.
-          </p>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Introduction and Save button */}
+        <div className="flex justify-between items-start mb-4">
+          <div className="space-y-2 flex-1">
+            <p className="text-sm text-muted-foreground">
+              Add your work experience, starting with your most recent position. Each entry will be saved automatically.
+            </p>
+          </div>
+          
+          <Button 
+            type="button"
+            onClick={handleManualSave}
+            className="ml-4 flex items-center gap-2"
+            variant="outline"
+          >
+            <Save className="h-4 w-4" />
+            Save All Entries
+          </Button>
+        </div>
+        
+        {/* Work experience count indicator */}
+        <div className="text-sm text-muted-foreground mb-4">
+          {fields.length === 0 ? (
+            <p>No work experiences added yet. Click "Add Another Position" below to get started.</p>
+          ) : (
+            <p>You have added {fields.length} of {MAX_EXPERIENCES} possible work experiences.</p>
+          )}
         </div>
 
         {/* Max warning alert */}
