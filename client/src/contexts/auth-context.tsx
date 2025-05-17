@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     error,
     isLoading,
     refetch
-  } = useQuery<User, Error>({
+  } = useQuery<User | null, Error>({
     queryKey: ['auth', 'user'],
     queryFn: async () => {
       const token = getToken();
@@ -74,22 +74,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return null;
       }
       
-      const response = await fetch('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      try {
+        const response = await fetch('/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          if (response.status === 401) {
+            removeToken();
+            return null;
+          }
+          throw new Error('Failed to fetch user data');
         }
-      });
-      
-      if (!response.ok) {
-        if (response.status === 401) {
-          removeToken();
-          return null;
-        }
-        throw new Error('Failed to fetch user data');
+        
+        const data = await response.json();
+        return data.user || null;
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        return null;
       }
-      
-      const data = await response.json();
-      return data.user;
     },
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -294,7 +299,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        user,
+        user: user || null,
         isLoading,
         isAuthenticated: !!user,
         error,

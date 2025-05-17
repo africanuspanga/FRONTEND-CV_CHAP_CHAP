@@ -116,8 +116,8 @@ export function setupAuth(app: Express) {
       // Create user
       const newUser = await storage.createUser({
         ...validatedData,
-        password: hashedPassword,
-        role: "user"
+        password: hashedPassword
+        // role is set to "user" by default in the storage implementation
       });
       
       // Update last login time
