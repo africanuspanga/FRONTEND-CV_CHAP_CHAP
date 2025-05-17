@@ -31,6 +31,53 @@ interface AnonymousCV {
 const users: User[] = [];
 const anonymousCVs: AnonymousCV[] = [];
 
+// Create a demo user for testing
+async function createDemoUsers() {
+  if (users.length === 0) {
+    // Create a test user with email login
+    const emailUser: User = {
+      id: uuidv4(),
+      username: 'demoemail',
+      email: 'test@example.com',
+      password: await hashPassword('password123'),
+      phone_number: '+255123456789',
+      full_name: 'Demo Email User',
+      role: 'user',
+      created_at: new Date(),
+      updated_at: new Date()
+    };
+    
+    // Create a user with africanuspanga@gmail.com
+    const realUser1: User = {
+      id: uuidv4(),
+      username: 'africanuspanga',
+      email: 'africanuspanga@gmail.com',
+      password: await hashPassword('password123'),
+      phone_number: '+255689743434',
+      full_name: 'Africanus Panga',
+      role: 'user',
+      created_at: new Date(),
+      updated_at: new Date()
+    };
+    
+    // Create a user with bibianasarwatt1@gmail.com
+    const realUser2: User = {
+      id: uuidv4(),
+      username: 'bibianasarwatt1',
+      email: 'bibianasarwatt1@gmail.com',
+      password: await hashPassword('password123'),
+      phone_number: '+255789123456',
+      full_name: 'Bibiana Sarwatt',
+      role: 'user',
+      created_at: new Date(),
+      updated_at: new Date()
+    };
+    
+    users.push(emailUser, realUser1, realUser2);
+    console.log('Created demo users:', users.map(u => u.email));
+  }
+}
+
 // Define user data for the JWT token payload
 interface JwtPayload {
   id: string;
@@ -364,7 +411,10 @@ async function createAnonymous(req: Request, res: Response) {
 }
 
 // Set up authentication routes
-export function setupAuth(app: Express) {
+export async function setupAuth(app: Express) {
+  // Create demo users on startup
+  await createDemoUsers();
+  
   // Extend Express Request interface to include user
   app.use((req: Request, res: Response, next: NextFunction) => {
     req.user = undefined;

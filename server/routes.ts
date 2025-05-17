@@ -26,9 +26,9 @@ const cvRequests: Record<string, CVRequest> = {};
 // Configure multer for form-data parsing
 const upload = multer();
 
-export function registerRoutes(app: Express): Server {
+export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
-  setupAuth(app);
+  await setupAuth(app);
   
   // Register template API
   registerTemplateAPI(app);
