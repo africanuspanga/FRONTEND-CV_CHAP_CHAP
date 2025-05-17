@@ -71,7 +71,12 @@ const WorkExperienceStep: React.FC = () => {
 
   // Handle form submission
   const onSubmit = (data: FormValues) => {
+    // Update both workExperiences and workExp for backward compatibility
     updateFormField('workExperiences', data.workExperience);
+    updateFormField('workExp', data.workExperience);
+    
+    // Log the update to verify data is being saved
+    console.log('Work experience data updated:', data.workExperience);
   };
 
   // Add a new work experience entry
@@ -81,44 +86,81 @@ const WorkExperienceStep: React.FC = () => {
       return;
     }
     
-    append(emptyWorkExperience);
-    // Auto-open the newly added accordion item
-    form.setValue('workExperience', [...form.getValues('workExperience')]);
+    // Create a new work experience with unique ID
+    const newExperience = {
+      ...emptyWorkExperience,
+      id: generateId() // Ensure unique ID
+    };
     
-    // Update the preview with the new empty field
-    const updatedExperience = [...formData.workExperiences || [], emptyWorkExperience];
-    updateFormField('workExperiences', updatedExperience);
+    // Add to form fields
+    append(newExperience);
+    
+    // Get current form values
+    const currentValues = form.getValues('workExperience');
+    
+    // Update both work experience arrays in context
+    updateFormField('workExperiences', [...currentValues, newExperience]);
+    updateFormField('workExp', [...currentValues, newExperience]);
+    
+    // Log the addition to verify
+    console.log('Added new work experience:', newExperience);
+    console.log('Updated work experiences:', [...currentValues, newExperience]);
   };
 
   // Remove a work experience entry
   const removeWorkExperience = (index: number) => {
+    // Remove from form field array
     remove(index);
     setShowMaxWarning(false);
     
-    // Update the preview immediately
-    const updatedExperience = [...(formData.workExperiences || [])];
-    updatedExperience.splice(index, 1);
-    updateFormField('workExperiences', updatedExperience);
+    // Get current values after removal
+    const currentValues = form.getValues('workExperience');
+    
+    // Update both arrays in context for consistency
+    updateFormField('workExperiences', currentValues);
+    updateFormField('workExp', currentValues);
+    
+    // Log the removal to verify
+    console.log('Removed work experience at index:', index);
+    console.log('Remaining work experiences:', currentValues);
+    
+    // Force form submission to ensure data is saved
+    form.handleSubmit(onSubmit)();
   };
 
   // Update form data on change to provide real-time preview
   const handleFieldChange = (index: number, field: string, value: any) => {
-    // Clone the current work experience array
-    const updatedExperiences = [...(formData.workExperiences || [])];
+    // Get the current form values to ensure we're working with the latest data
+    const currentValues = form.getValues('workExperience');
     
-    // Ensure the index exists
-    if (!updatedExperiences[index]) {
-      updatedExperiences[index] = { ...emptyWorkExperience };
+    // Make sure we have an array to work with
+    if (!currentValues || !Array.isArray(currentValues)) {
+      console.error('Current form values is not an array:', currentValues);
+      return;
     }
     
-    // Update the specific field
-    updatedExperiences[index] = {
-      ...updatedExperiences[index],
+    // Make sure the index exists
+    if (!currentValues[index]) {
+      console.warn(`Work experience at index ${index} does not exist. Creating it.`);
+      currentValues[index] = { ...emptyWorkExperience, id: generateId() };
+    }
+    
+    // Update the field in the form values
+    currentValues[index] = {
+      ...currentValues[index],
       [field]: value,
     };
     
-    // Update the global state for preview
-    updateFormField('workExperiences', updatedExperiences);
+    // Update the form value
+    form.setValue('workExperience', currentValues);
+    
+    // Update both arrays in context for consistency and preview
+    updateFormField('workExperiences', currentValues);
+    updateFormField('workExp', currentValues);
+    
+    // Log for debugging
+    console.log(`Updated work experience field '${field}' at index ${index}:`, value);
+    console.log('Both work experience arrays are synced. Current count:', currentValues.length);
   };
 
   return (
