@@ -1,56 +1,40 @@
-import { Request, Response, NextFunction, Express } from "express";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { storage } from "./storage";
-import { User, InsertUser } from "@shared/schema";
+import { Request, Response, NextFunction, Express } from 'express';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
+import { db } from './db';
+import { users } from '@shared/schema';
+import { eq, or } from 'drizzle-orm';
 
-// Set up JWT secret
-const JWT_SECRET = process.env.JWT_SECRET || "cv-chap-chap-secret-key";
-const JWT_EXPIRES_IN = "7d";
+// JWT Secret (in production, this would be an environment variable)
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_EXPIRES_IN = '7d';
 
-// Create schema for registration
-const registerSchema = z.object({
-  username: z.string().optional(),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  full_name: z.string().optional(),
-  phone_number: z.string().optional(),
-});
+// Define user data for the JWT token payload
+interface JwtPayload {
+  id: string;
+  username: string;
+  email?: string;
+  role: string;
+}
 
-// Create schema for login
-const loginSchema = z.object({
-  identifier: z.string().min(3, "Email or phone number is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-// Create schema for password reset request
-const forgotPasswordSchema = z.object({
-  email: z.string().email("Invalid email address"),
-});
-
-// Create schema for password reset
-const resetPasswordSchema = z.object({
-  token: z.string(),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-// Hash password
+// Hash a password
 async function hashPassword(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(10);
   return await bcrypt.hash(password, salt);
 }
 
-// Compare password with hash
+// Compare a password with a hash
 async function comparePasswords(password: string, hash: string): Promise<boolean> {
   return await bcrypt.compare(password, hash);
 }
 
-// Generate JWT token
-function generateToken(user: User): string {
+// Generate a JWT token
+function generateToken(user: JwtPayload): string {
   return jwt.sign(
-    { 
+    {
       id: user.id,
+      username: user.username,
       email: user.email,
       role: user.role
     },
@@ -59,260 +43,195 @@ function generateToken(user: User): string {
   );
 }
 
-// Verify JWT token
-function verifyToken(token: string): any {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (error) {
-    return null;
-  }
-}
-
 // Authentication middleware
-function authenticateJWT(req: Request, res: Response, next: NextFunction) {
+export function authenticate(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-
-  const token = authHeader.split(" ")[1];
   
-  const decoded = verifyToken(token);
-  if (!decoded) {
-    return res.status(401).json({ message: "Invalid or expired token" });
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'No token provided' });
   }
-
-  // Add user to request
-  (req as any).user = decoded;
-  next();
+  
+  const token = authHeader.split(' ')[1];
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
 }
 
-// Setup auth routes
+// Role-based authorization middleware
+export function authorize(roles: string[] = ['user']) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Forbidden: insufficient permissions' });
+    }
+    
+    next();
+  };
+}
+
+// Register a new user
+export async function register(req: Request, res: Response) {
+  try {
+    const { username, email, password, full_name, phone_number } = req.body;
+    
+    // Check if the user already exists
+    const existingUser = await db.query.users.findFirst({
+      where: or(
+        eq(users.username, username),
+        eq(users.email, email),
+        ...(phone_number ? [eq(users.phone_number, phone_number)] : [])
+      )
+    });
+    
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+    
+    // Hash the password
+    const hashedPassword = await hashPassword(password);
+    
+    // Create a new user
+    const [newUser] = await db.insert(users).values({
+      id: uuidv4(),
+      username,
+      email,
+      password: hashedPassword,
+      full_name,
+      phone_number,
+      role: 'user'
+    }).returning({
+      id: users.id,
+      username: users.username,
+      email: users.email,
+      full_name: users.full_name,
+      phone_number: users.phone_number,
+      role: users.role,
+      createdAt: users.createdAt,
+      updatedAt: users.updatedAt
+    });
+    
+    // Generate a token
+    const token = generateToken({
+      id: newUser.id,
+      username: newUser.username,
+      email: newUser.email || undefined,
+      role: newUser.role
+    });
+    
+    // Return the user and token
+    return res.status(201).json({
+      user: newUser,
+      token
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+// Login a user
+export async function login(req: Request, res: Response) {
+  try {
+    const { identifier, password } = req.body;
+    
+    // Identifier can be username, email, or phone
+    const user = await db.query.users.findFirst({
+      where: or(
+        eq(users.username, identifier),
+        eq(users.email, identifier),
+        eq(users.phone_number, identifier)
+      )
+    });
+    
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    
+    // Compare the password
+    const isMatch = await comparePasswords(password, user.password);
+    
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    
+    // Update last login time
+    await db.update(users)
+      .set({ last_login: new Date() })
+      .where(eq(users.id, user.id));
+    
+    // Generate a token
+    const token = generateToken({
+      id: user.id,
+      username: user.username,
+      email: user.email || undefined,
+      role: user.role
+    });
+    
+    // Return the user without the password and token
+    const { password: _, ...userWithoutPassword } = user;
+    
+    return res.status(200).json({
+      user: userWithoutPassword,
+      token
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+// Get the current user
+export async function getMe(req: Request, res: Response) {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+    
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, req.user.id)
+    });
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Return the user without the password
+    const { password, ...userWithoutPassword } = user;
+    
+    return res.status(200).json(userWithoutPassword);
+  } catch (error) {
+    console.error('Get user error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+// Set up authentication routes
 export function setupAuth(app: Express) {
-  // Register new user
-  app.post("/api/auth/register", async (req: Request, res: Response) => {
-    try {
-      // Validate request body
-      const validatedData = registerSchema.parse(req.body);
-      
-      // Check if email already exists
-      const existingUserByEmail = await storage.getUserByEmail(validatedData.email);
-      if (existingUserByEmail) {
-        return res.status(400).json({ message: "Email already in use" });
-      }
-      
-      // Check if phone number already exists (if provided)
-      if (validatedData.phone_number) {
-        const existingUserByPhone = await storage.getUserByPhoneNumber(validatedData.phone_number);
-        if (existingUserByPhone) {
-          return res.status(400).json({ message: "Phone number already in use" });
-        }
-      }
-      
-      // Hash password
-      const hashedPassword = await hashPassword(validatedData.password);
-      
-      // Create user
-      const newUser = await storage.createUser({
-        ...validatedData,
-        password: hashedPassword
-        // role is set to "user" by default in the storage implementation
-      });
-      
-      // Update last login time
-      await storage.updateUser(newUser.id, {
-        last_login: new Date()
-      });
-      
-      // Generate JWT token
-      const token = generateToken(newUser);
-      
-      // Return user data (excluding password) and token
-      const { password, ...userData } = newUser;
-      
-      res.status(201).json({
-        user: userData,
-        token
-      });
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ 
-          message: "Validation error", 
-          errors: error.errors 
-        });
-      }
-      
-      res.status(500).json({ message: error.message || "Server error" });
-    }
+  // Extend Express Request interface to include user
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    req.user = undefined;
+    next();
   });
   
-  // Login user
-  app.post("/api/auth/login", async (req: Request, res: Response) => {
-    try {
-      // Validate request body
-      const validatedData = loginSchema.parse(req.body);
-      
-      // Find user by email or phone
-      let user = await storage.getUserByEmail(validatedData.identifier);
-      
-      // If not found by email, try phone number
-      if (!user) {
-        user = await storage.getUserByPhoneNumber(validatedData.identifier);
-      }
-      
-      // Check if user exists
-      if (!user) {
-        return res.status(400).json({ message: "Invalid credentials" });
-      }
-      
-      // Verify password
-      const isPasswordValid = await comparePasswords(
-        validatedData.password,
-        user.password
-      );
-      
-      if (!isPasswordValid) {
-        return res.status(400).json({ message: "Invalid credentials" });
-      }
-      
-      // Update last login time
-      await storage.updateUser(user.id, {
-        last_login: new Date()
-      });
-      
-      // Generate JWT token
-      const token = generateToken(user);
-      
-      // Return user data (excluding password) and token
-      const { password, ...userData } = user;
-      
-      res.status(200).json({
-        user: userData,
-        token
-      });
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ 
-          message: "Validation error", 
-          errors: error.errors 
-        });
-      }
-      
-      res.status(500).json({ message: error.message || "Server error" });
-    }
+  // Register a new user
+  app.post('/api/auth/register', register);
+  
+  // Login a user
+  app.post('/api/auth/login', login);
+  
+  // Logout (client-side only - just clear the token)
+  app.post('/api/auth/logout', (req, res) => {
+    return res.status(200).json({ message: 'Logged out successfully' });
   });
   
-  // Get current user
-  app.get("/api/auth/me", authenticateJWT, async (req: Request, res: Response) => {
-    try {
-      const userId = (req as any).user.id;
-      
-      // Get user from database (to get updated info)
-      const user = await storage.getUser(userId);
-      
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      // Return user data (excluding password)
-      const { password, ...userData } = user;
-      
-      res.status(200).json({ user: userData });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message || "Server error" });
-    }
-  });
-  
-  // Logout user (client-side, just for completeness)
-  app.post("/api/auth/logout", (_req: Request, res: Response) => {
-    res.status(200).json({ message: "Logged out successfully" });
-  });
-  
-  // Forgot password - send reset token
-  app.post("/api/auth/forgot-password", async (req: Request, res: Response) => {
-    try {
-      const { email } = forgotPasswordSchema.parse(req.body);
-      
-      // Find user by email
-      const user = await storage.getUserByEmail(email);
-      
-      // For security reasons, always return success even if email doesn't exist
-      if (!user) {
-        return res.status(200).json({ 
-          message: "If your email is registered, you will receive a password reset link" 
-        });
-      }
-      
-      // Generate reset token (random UUID)
-      const resetToken = Array.from(crypto.getRandomValues(new Uint8Array(32)))
-        .map(b => b.toString(16).padStart(2, '0')).join('');
-      const resetTokenExpires = new Date();
-      resetTokenExpires.setHours(resetTokenExpires.getHours() + 1); // Token expires in 1 hour
-      
-      // Update user with reset token
-      await storage.updateUser(user.id, {
-        reset_token: resetToken,
-        reset_token_expires: resetTokenExpires
-      });
-      
-      // In a real app, you would send an email with the reset link
-      // For this implementation, we'll just return the token directly (for testing)
-      
-      res.status(200).json({ 
-        message: "If your email is registered, you will receive a password reset link",
-        // Include this in development only:
-        resetToken 
-      });
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ 
-          message: "Validation error", 
-          errors: error.errors 
-        });
-      }
-      
-      res.status(500).json({ message: error.message || "Server error" });
-    }
-  });
-  
-  // Reset password
-  app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
-    try {
-      const { token, password } = resetPasswordSchema.parse(req.body);
-      
-      // Find user by reset token
-      const user = await storage.getUserByResetToken(token);
-      
-      if (!user) {
-        return res.status(400).json({ message: "Invalid or expired token" });
-      }
-      
-      // Check if token is expired
-      if (user.reset_token_expires && user.reset_token_expires < new Date()) {
-        return res.status(400).json({ message: "Reset token has expired" });
-      }
-      
-      // Hash new password
-      const hashedPassword = await hashPassword(password);
-      
-      // Update user with new password and remove reset token
-      await storage.updateUser(user.id, {
-        password: hashedPassword,
-        reset_token: null,
-        reset_token_expires: null
-      });
-      
-      res.status(200).json({ message: "Password reset successful" });
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ 
-          message: "Validation error", 
-          errors: error.errors 
-        });
-      }
-      
-      res.status(500).json({ message: error.message || "Server error" });
-    }
-  });
+  // Get the current user
+  app.get('/api/auth/me', authenticate, getMe);
 }

@@ -57,7 +57,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     data: user,
     error,
     isLoading,
-    refetch,
   } = useQuery<User | null, Error>({
     queryKey: ['user'],
     queryFn: async () => {
@@ -65,22 +64,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const token = localStorage.getItem('auth_token');
         if (!token) return null;
 
-        // Create headers object for authorization
-        const headers: Record<string, string> = {
+        // Create headers with authorization token
+        const headers = {
           Authorization: `Bearer ${token}`
         };
 
-        const res = await apiRequest('GET', '/api/auth/me', undefined, headers);
+        const response = await fetch('/api/auth/me', {
+          method: 'GET',
+          headers: headers,
+          credentials: 'include',
+        });
 
-        if (!res.ok) {
-          if (res.status === 401) {
-            localStorage.removeItem('auth_token');
-            return null;
-          }
+        if (response.status === 401) {
+          localStorage.removeItem('auth_token');
+          return null;
+        }
+
+        if (!response.ok) {
           throw new Error('Failed to fetch user data');
         }
 
-        return await res.json();
+        const userData = await response.json();
+        return userData;
       } catch (err) {
         console.error('Error fetching user:', err);
         return null;
@@ -93,12 +98,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest('POST', '/api/auth/login', credentials);
-      if (!res.ok) {
-        const errorData = await res.json();
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
         throw new Error(errorData.message || 'Login failed');
       }
-      return await res.json();
+
+      return await response.json();
     },
     onSuccess: (data) => {
       // Store token in localStorage
@@ -124,12 +138,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Register mutation
   const registerMutation = useMutation({
     mutationFn: async (userData: RegisterData) => {
-      const res = await apiRequest('POST', '/api/auth/register', userData);
-      if (!res.ok) {
-        const errorData = await res.json();
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
         throw new Error(errorData.message || 'Registration failed');
       }
-      return await res.json();
+
+      return await response.json();
     },
     onSuccess: (data) => {
       // Store token in localStorage
@@ -156,14 +179,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       const token = localStorage.getItem('auth_token');
+      
       if (token) {
-        // Create headers object for authorization
-        const headers: Record<string, string> = {
-          Authorization: `Bearer ${token}`
-        };
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: 'include',
+        });
         
-        await apiRequest('POST', '/api/auth/logout', undefined, headers);
+        if (!response.ok) {
+          console.error('Logout failed with status:', response.status);
+        }
       }
+      
       return null;
     },
     onSuccess: () => {
@@ -209,7 +239,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        user,
+        user: user || null,
         isLoading: isLoading || loginMutation.isPending || registerMutation.isPending,
         isAuthenticated: !!user,
         error,
