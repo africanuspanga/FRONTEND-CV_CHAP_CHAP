@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from './db';
-import { users } from '@shared/schema';
+import { users as usersTable } from '@shared/schema';
 import { eq, or } from 'drizzle-orm';
 import { initializeDatabase } from './db';
 
@@ -154,23 +154,37 @@ export async function register(req: Request, res: Response) {
     // Generate username from email if not provided
     const finalUsername = username || email.split('@')[0];
     
-    // Check if the user already exists
+    // Check if the user already exists in both memory and database
     const existingUser = users.find(u => 
       (finalUsername && u.username === finalUsername) || 
       u.email === email ||
       (phone_number && u.phone_number === phone_number)
     );
     
-    if (existingUser) {
+    // Also check database
+    const existingUserInDb = await db.select()
+      .from(usersTable)
+      .where(
+        or(
+          eq(usersTable.email, email),
+          eq(usersTable.username, finalUsername),
+          phone_number ? eq(usersTable.phone_number, phone_number) : undefined
+        )
+      );
+    
+    if (existingUser || existingUserInDb.length > 0) {
       return res.status(400).json({ message: 'User already exists' });
     }
     
     // Hash the password
     const hashedPassword = await hashPassword(password);
     
+    // Generate a UUID for the user
+    const userId = uuidv4();
+    
     // Create a new user
     const newUser: User = {
-      id: uuidv4(),
+      id: userId,
       username: finalUsername,
       email,
       password: hashedPassword,
@@ -183,6 +197,25 @@ export async function register(req: Request, res: Response) {
 
     // Add to in-memory store
     users.push(newUser);
+    
+    try {
+      // Also store in database - converting field names to match DB schema
+      await db.insert(usersTable).values({
+        id: userId,
+        username: finalUsername,
+        email,
+        password: hashedPassword,
+        full_name: full_name || '',
+        phone_number,
+        role: 'user',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      console.log('User successfully stored in database:', email);
+    } catch (dbError) {
+      console.error('Error storing user in database:', dbError);
+      // Continue with in-memory store even if DB fails
+    }
     
     // If anonymous_id is provided, associate anonymous CVs with the new user
     if (anonymous_id) {
