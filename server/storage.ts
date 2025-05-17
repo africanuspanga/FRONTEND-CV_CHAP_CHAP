@@ -32,16 +32,14 @@ export class DatabaseUserStorage implements UserStorage {
     role?: string;
   }) {
     try {
+      // Match the actual database structure - only include fields that exist
       const result = await db.insert(usersTable).values({
-        id: userData.id,
         username: userData.username,
         email: userData.email,
         password: userData.password,
-        full_name: userData.full_name || null,
-        phone_number: userData.phone_number || null,
-        role: userData.role || 'user',
-        createdAt: new Date(),
-        updatedAt: new Date()
+        // Note: id is auto-generated as serial in the database
+        created_at: new Date(),
+        updated_at: new Date()
       }).returning();
       
       return result[0];
@@ -63,6 +61,7 @@ export class DatabaseUserStorage implements UserStorage {
   
   async getUserByEmail(email: string) {
     try {
+      // Only use fields that exist in the actual database
       const results = await db.select().from(usersTable).where(eq(usersTable.email, email));
       return results.length > 0 ? results[0] : null;
     } catch (error) {
@@ -73,6 +72,7 @@ export class DatabaseUserStorage implements UserStorage {
   
   async getUserByUsername(username: string) {
     try {
+      // Only use fields that exist in the actual database
       const results = await db.select().from(usersTable).where(eq(usersTable.username, username));
       return results.length > 0 ? results[0] : null;
     } catch (error) {
@@ -82,13 +82,9 @@ export class DatabaseUserStorage implements UserStorage {
   }
   
   async getUserByPhone(phone: string) {
-    try {
-      const results = await db.select().from(usersTable).where(eq(usersTable.phone_number, phone));
-      return results.length > 0 ? results[0] : null;
-    } catch (error) {
-      console.error('Database error getting user by phone:', error);
-      return null;
-    }
+    // Phone number field doesn't exist in the actual database
+    // Just return null as we can't query by phone
+    return null;
   }
 }
 

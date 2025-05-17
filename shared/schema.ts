@@ -3,20 +3,15 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
-// User schema
+// User schema - updated to match actual database structure
 export const users = pgTable("users", {
-  id: varchar("id", { length: 36 }).primaryKey(),
+  id: serial("id").primaryKey(),
   username: varchar("username", { length: 100 }).unique(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
-  full_name: varchar("full_name", { length: 255 }),
-  phone_number: varchar("phone_number", { length: 20 }).unique(),
-  role: varchar("role", { length: 20 }).default("user").notNull(),
-  reset_token: varchar("reset_token", { length: 255 }),
-  reset_token_expires: timestamp("reset_token_expires"),
-  last_login: timestamp("last_login"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  // The created_at and updated_at fields use snake_case in DB, not camelCase
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const userRelations = relations(users, ({ many }) => ({

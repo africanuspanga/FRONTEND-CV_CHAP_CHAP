@@ -323,16 +323,17 @@ export async function login(req: Request, res: Response) {
           console.log('Found user in database:', dbUser.email);
           
           // Convert database user to in-memory user format
+          // Map actual db structure to the expected format
           user = {
-            id: dbUser.id,
+            id: String(dbUser.id), // Convert number to string
             username: dbUser.username || '',
             email: dbUser.email,
             password: dbUser.password,
-            full_name: dbUser.full_name || '',
-            phone_number: dbUser.phone_number || undefined,
-            role: dbUser.role,
-            created_at: new Date(dbUser.createdAt),
-            updated_at: new Date(dbUser.updatedAt)
+            full_name: '', // Not in db, use empty string
+            phone_number: undefined, // Not in db
+            role: 'user', // Not in db, use default
+            created_at: dbUser.created_at,
+            updated_at: dbUser.updated_at
           };
           
           // Add to in-memory store for faster access next time
