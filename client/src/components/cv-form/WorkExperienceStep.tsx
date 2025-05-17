@@ -13,9 +13,20 @@ import { Card } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { generateId } from '@/lib/utils';
-import { Trash2, PlusCircle, GripVertical, AlertCircle, Save } from 'lucide-react';
+import { Trash2, PlusCircle, GripVertical, AlertCircle, Save, CheckCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
+
+// CRITICAL FIX: Import the storage fixer utility to permanently solve work experience issues
+import { 
+  STORAGE_KEYS,
+  sanitizeWorkExperiences,
+  saveWorkExperiencesToStorage,
+  updateWorkExperiencesInContext,
+  safelyAddWorkExperience,
+  logWorkExperience,
+  LogLevel
+} from '@/utils/work-experience-fixer';
 
 // Extend the schema with client-side validation
 const formSchema = z.object({
@@ -40,26 +51,10 @@ const emptyWorkExperience = {
 // Increased to 8 work experiences as requested
 const MAX_EXPERIENCES = 8;
 
-// IMPORTANT! 
-// The correct storage keys that match the rest of the application
-const STORAGE_KEY = 'cv_form_data';
+// Use the standardized storage key from the fixer utility
+const STORAGE_KEY = STORAGE_KEYS.CV_DATA;
 
-// Helper function to ensure work experience data is valid
-const sanitizeWorkExperiences = (data: any[]): any[] => {
-  if (!Array.isArray(data)) return [];
-  
-  return data.map(exp => ({
-    id: exp.id || generateId(),
-    jobTitle: exp.jobTitle || '',
-    company: exp.company || '',
-    location: exp.location || '',
-    startDate: exp.startDate || '',
-    endDate: exp.endDate || '',
-    current: !!exp.current,
-    description: exp.description || '',
-    achievements: Array.isArray(exp.achievements) ? exp.achievements : [],
-  }));
-};
+// Use the imported sanitizer from the fixer utility instead of local one
 
 const WorkExperienceStep: React.FC = () => {
   const { formData, updateFormField } = useCVForm();
