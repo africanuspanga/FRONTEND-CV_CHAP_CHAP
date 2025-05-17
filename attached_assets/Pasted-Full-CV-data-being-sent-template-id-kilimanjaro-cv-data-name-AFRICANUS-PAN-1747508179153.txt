@@ -1,0 +1,163 @@
+Full CV data being sent: {
+  "template_id": "kilimanjaro",
+  "cv_data": {
+    "name": "AFRICANUS PANGA",
+    "email": "africanuspanga@gmail.com",
+    "personalInfo": {
+      "firstName": "AFRICANUS",
+      "lastName": "PANGA",
+      "email": "africanuspanga@gmail.com",
+      "phone": "+255753091526",
+      "professionalTitle": "",
+      "address": "Dar es Salaam, Tanzania",
+      "city": "",
+      "region": "",
+      "country": "",
+      "postalCode": "",
+      "summary": "Digital Marketing Specialist with 6.5 years of experience, currently at LEONBET Tanzania, where digital campaigns increased website traffic by 45% and customer engagement by 32%. Expert in SEO Optimization and Google Analytics, effectively enhancing brand visibility by 50% through strategic partnerships and influencer collaborations. Proven record in data-driven insights and content strategy to drive business growth.",
+      "location": "Dar es Salaam, Tanzania",
+      "jobTitle": ""
+    },
+    "workExperiences": [
+      {
+        "id": "job_1747507475106_27459",
+        "jobTitle": "Digital Marketing Specialist",
+        "company": "LEONBET Tanzania",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "May 2024",
+        "endDate": "Present",
+        "current": true,
+        "description": "",
+        "achievements": [
+          "Developed and executed digital marketing campaigns that boosted website traffic by 45% within six months",
+          "Increased customer engagement by 32% through strategic social media content optimization and targeted ads",
+          "Enhanced brand visibility by 50% via successful partnerships and influencer collaborations across key platforms"
+        ]
+      },
+      {
+        "id": "job_1747507436561_60694",
+        "jobTitle": "",
+        "company": "Parimatch Tanzania",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "March 2020",
+        "endDate": "May 2024",
+        "current": false,
+        "description": "",
+        "achievements": [
+          "Winning on every single thing we did step by step without mkaing any mistakes at all ",
+          "King kong is the best king animal in the netire universe never ever make a mistake of believing otherwise ",
+          "Move fast break things and wake, run throug the same, remarkabkle in the circus midfgit wining mock "
+        ]
+      },
+      {
+        "id": "job_1747507281452_23762",
+        "jobTitle": "Data Analyst",
+        "company": "Bazuka Company Limited",
+        "location": "Arusha, Tanzania",
+        "startDate": "October 2019",
+        "endDate": "March 2020",
+        "current": false,
+        "description": "",
+        "achievements": [
+          "Developed predictive models that enhanced decision-making accuracy by 25%, boosting operational efficiency",
+          "Analyzed large datasets to identify trends, reducing report preparation time by 30% and improving insights",
+          "Implemented data visualization tools, increasing stakeholder engagement by 40% through clear, actionable insights"
+        ]
+      },
+      {
+        "id": "job_1747507221611_88893",
+        "jobTitle": "Computer Technician",
+        "company": "Sportpesa Tanzania",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "January 2019",
+        "endDate": "September 2019",
+        "current": false,
+        "description": "",
+        "achievements": [
+          "Diagnosed and resolved technical issues, reducing downtime by 45% and increasing operational efficiency",
+          "Implemented system upgrades, enhancing processing speed by 30% and improving user satisfaction",
+          "Trained 50+ staff on IT protocols, resulting in a 60% reduction in technical support requests"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "id": "1747507884127",
+        "institution": "University of Dar es Salaam (UDSM)",
+        "degree": "Bachelor of Arts",
+        "field": "Computer Engineering",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "July 2018",
+        "graduationMonth": "July",
+        "graduationYear": "2018"
+      },
+      {
+        "id": "1747507907873",
+        "institution": "University of Dar es Salaam (UDSM)",
+        "degree": "Master of Science",
+        "field": "Computer Engineering",
+        "location": "Dar es Salaam, Tanzania",
+        "startDate": "August 2022",
+        "graduationMonth": "August",
+        "graduationYear": "2022"
+      }
+    ],
+    "skills": [
+      {
+        "id": "1",
+        "name": "SEO Optimization",
+        "level": 5
+      },
+      {
+        "id": "2",
+        "name": "Google Analytics",
+        "level": 3
+      },
+      {
+        "id": "3",
+        "name": "Content Strategy",
+        "level": 4
+      },
+      {
+        "id": "4",
+        "name": "PPC Advertising",
+        "level": 3
+      },
+      {
+        "id": "5",
+        "name": "Social Media Management",
+        "level": 5
+      }
+    ],
+    "languages": [
+      {
+        "id": "1747507925598",
+        "name": "Swahili",
+        "level": "Bilingual"
+      },
+      {
+        "id": "1747507926243",
+        "name": "English",
+        "level": "Bilingual"
+      }
+    ],
+    "references": [
+      {
+        "id": "1747508046727",
+        "name": "John Kimaro ",
+        "position": "Former Manager ",
+        "company": "",
+        "email": "africanuspanga@gmail.com",
+        "phone": "+255753091526"
+      },
+      {
+        "id": "1747508073823",
+        "name": "Luciano ",
+        "position": "",
+        "company": "",
+        "email": "africanuspanga@gmail.com",
+        "phone": "+255753091526"
+      }
+    ]
+  }
+}
