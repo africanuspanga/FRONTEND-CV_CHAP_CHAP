@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import { openaiProxyHandler } from './openai-proxy';
 import { registerTemplateAPI } from './template-api';
 import { cvScreenerProxyHandler } from './cv-screener-proxy';
-import { setupAuth } from './auth';
+import { setupAuth } from './auth-proxy';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
