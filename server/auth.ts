@@ -13,8 +13,8 @@ const JWT_EXPIRES_IN = '7d';
 // Define user data for the JWT token payload
 interface JwtPayload {
   id: string;
-  username: string;
-  email: string; // Email is required in the schema
+  username: string | null;
+  email: string | null;
   role: string;
 }
 
