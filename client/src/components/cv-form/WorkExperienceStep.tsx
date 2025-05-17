@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 // CRITICAL FIX: Import the storage fixer utility to permanently solve work experience issues
 import { 
   STORAGE_KEYS,
-  sanitizeWorkExperiences,
+  sanitizeWorkExperiences as sanitizeWorkExperiencesFn,
   saveWorkExperiencesToStorage,
   updateWorkExperiencesInContext,
   safelyAddWorkExperience,
@@ -54,9 +54,6 @@ const MAX_EXPERIENCES = 8;
 // Use the standardized storage key from the fixer utility
 const STORAGE_KEY = STORAGE_KEYS.CV_DATA;
 
-// Use the sanitizer from the fixer utility
-const sanitizeWorkExperiences = sanitizeWorkExperiencesFn;
-
 const WorkExperienceStep: React.FC = () => {
   const { formData, updateFormField } = useCVForm();
   const [showMaxWarning, setShowMaxWarning] = useState(false);
@@ -65,16 +62,22 @@ const WorkExperienceStep: React.FC = () => {
   
   // Get and sanitize existing work experiences
   const existingExperiences = (() => {
-    // First check workExperiences (primary property)
-    if (Array.isArray(formData.workExperiences) && formData.workExperiences.length > 0) {
-      return sanitizeWorkExperiences(formData.workExperiences);
+    try {
+      // First check workExperiences (primary property)
+      if (Array.isArray(formData.workExperiences) && formData.workExperiences.length > 0) {
+        return sanitizeWorkExperiencesFn(formData.workExperiences);
+      }
+      // Then fall back to workExp (secondary property)
+      else if (Array.isArray(formData.workExp) && formData.workExp.length > 0) {
+        return sanitizeWorkExperiencesFn(formData.workExp);
+      }
+      
+      // If neither exists, start with one empty experience
+      return [emptyWorkExperience];
+    } catch (error) {
+      console.error("Error getting experiences:", error);
+      return [emptyWorkExperience];
     }
-    // Then fall back to workExp (secondary property)
-    else if (Array.isArray(formData.workExp) && formData.workExp.length > 0) {
-      return sanitizeWorkExperiences(formData.workExp);
-    }
-    // If neither exists, start with one empty experience
-    return [emptyWorkExperience];
   })();
   
   // Initialize form with sanitized data
