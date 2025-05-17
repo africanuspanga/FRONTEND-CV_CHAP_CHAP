@@ -2,10 +2,8 @@ import { Request, Response, NextFunction, Express } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
-import { db } from './db';
-import { users as usersTable } from '@shared/schema';
+import { userStorage } from './storage';
 import { eq, or } from 'drizzle-orm';
-import { initializeDatabase } from './db';
 
 // JWT Secret (in production, this would be an environment variable)
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -161,18 +159,15 @@ export async function register(req: Request, res: Response) {
       (phone_number && u.phone_number === phone_number)
     );
     
-    // Also check database
-    const existingUserInDb = await db.select()
-      .from(usersTable)
-      .where(
-        or(
-          eq(usersTable.email, email),
-          eq(usersTable.username, finalUsername),
-          phone_number ? eq(usersTable.phone_number, phone_number) : undefined
-        )
-      );
+    // Check if user exists in database
+    const emailUser = await userStorage.getUserByEmail(email);
+    const usernameUser = await userStorage.getUserByUsername(finalUsername);
+    const phoneUser = phone_number ? await userStorage.getUserByPhone(phone_number) : null;
     
-    if (existingUser || existingUserInDb.length > 0) {
+    // Combine results to check if user exists in any form
+    const existingUserInDb = emailUser || usernameUser || phoneUser;
+    
+    if (existingUser || existingUserInDb) {
       return res.status(400).json({ message: 'User already exists' });
     }
     
@@ -199,7 +194,7 @@ export async function register(req: Request, res: Response) {
     users.push(newUser);
     
     try {
-      // Also store in database - converting field names to match DB schema
+      // Also store in database - using camelCase for timestamps to match schema.ts
       await db.insert(usersTable).values({
         id: userId,
         username: finalUsername,
@@ -208,8 +203,8 @@ export async function register(req: Request, res: Response) {
         full_name: full_name || '',
         phone_number,
         role: 'user',
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date(), // Use camelCase to match schema.ts
+        updatedAt: new Date()  // Use camelCase to match schema.ts
       });
       console.log('User successfully stored in database:', email);
     } catch (dbError) {
@@ -327,7 +322,7 @@ export async function login(req: Request, res: Response) {
           // Convert database user to in-memory user format
           user = {
             id: dbUsers[0].id,
-            username: dbUsers[0].username,
+            username: dbUsers[0].username || '',
             email: dbUsers[0].email,
             password: dbUsers[0].password,
             full_name: dbUsers[0].full_name || '',
