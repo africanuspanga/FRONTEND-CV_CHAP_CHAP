@@ -14,6 +14,7 @@ interface User {
   email: string;
   password: string;
   role: string;
+  full_name?: string;
   phone_number?: string;
   created_at: Date;
   updated_at: Date;
@@ -205,12 +206,37 @@ export async function login(req: Request, res: Response) {
       phone: u.phone_number
     })));
     
-    // Identifier can be username, email, or phone number
-    const user = users.find(u => 
-      u.username === identifier || 
-      u.email === identifier || 
-      u.phone_number === identifier
-    );
+    // Normalize the identifier - remove any spaces or special characters for phone numbers
+    const normalizedIdentifier = identifier.replace(/\s+/g, '');
+    
+    console.log('Searching for user with normalized identifier:', normalizedIdentifier);
+    
+    // Check for user by username, email, or phone number
+    const user = users.find(u => {
+      // Check username match
+      if (u.username === normalizedIdentifier) {
+        console.log('Found user by username');
+        return true;
+      }
+      
+      // Check email match 
+      if (u.email === normalizedIdentifier) {
+        console.log('Found user by email');
+        return true;
+      }
+      
+      // Check phone number match - normalize stored phone number too
+      if (u.phone_number) {
+        const normalizedPhone = u.phone_number.replace(/\s+/g, '');
+        console.log('Comparing stored phone:', normalizedPhone, 'with input:', normalizedIdentifier);
+        if (normalizedPhone === normalizedIdentifier) {
+          console.log('Found user by phone number');
+          return true;
+        }
+      }
+      
+      return false;
+    });
     
     if (!user) {
       console.log('No user found with identifier:', identifier);

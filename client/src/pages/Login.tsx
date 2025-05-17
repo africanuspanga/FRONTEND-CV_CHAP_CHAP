@@ -73,10 +73,10 @@ export default function Login() {
                 name="identifier"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel>Email or Phone Number</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder="+255612345678" 
+                        placeholder="name@example.com or +255612345678" 
                         {...field} 
                         disabled={isLoading}
                       />
