@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/auth-context";
 import { AdminAuthProvider } from "@/contexts/admin-auth-context";
 import { CVRequestProvider } from "@/contexts/cv-request-context";
 import { ProtectedAdminRoute } from "@/components/admin/ProtectedAdminRoute";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { StorageWarningModal } from "@/components/StorageWarningModal";
 import ScrollToTop from "@/components/ScrollToTop";
 import SEO from "@/components/SEO";
@@ -42,6 +43,7 @@ import Contact from "@/pages/Contact";
 import FAQ from "@/pages/FAQ";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import UserProfile from "@/pages/UserProfile";
 import WebsitesPortfoliosForm from "@/pages/WebsitesPortfoliosForm";
 import CertificationsForm from "@/pages/CertificationsForm";
 import AccomplishmentsForm from "@/pages/AccomplishmentsForm";
@@ -156,6 +158,7 @@ function Router() {
                 <Route path="/faq" component={FAQ} />
                 <Route path="/login" component={Login} />
                 <Route path="/register" component={Register} />
+                <ProtectedRoute path="/profile" component={UserProfile} />
                 <Route path="/test-pages" component={TestPagesIndex} />
                 <Route path="/openai-test" component={OpenAITestPage} />
                 <Route path="/backend-test" component={BackendTest} />

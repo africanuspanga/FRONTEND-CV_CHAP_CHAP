@@ -1,82 +1,75 @@
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/auth-context";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Loader2, Eye, EyeOff, User } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Link } from "wouter";
 
-// Form schema
+// Define the login form schema
 const loginSchema = z.object({
-  identifier: z.string().min(3, "Email or phone number is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  identifier: z.string().min(1, "Email or phone number is required"),
+  password: z.string().min(6, "Password must be at least 6 characters")
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function Login() {
-  const { login, isAuthenticated } = useAuth();
-  const [_, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  const { login, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Form setup
+  
+  // Parse return_to parameter from URL
+  const params = new URLSearchParams(location.split("?")[1] || "");
+  const returnTo = params.get("return_to") || "/";
+  
+  // Initialize form with react-hook-form
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       identifier: "",
-      password: "",
-    },
+      password: ""
+    }
   });
-
-  // Check if user is already logged in
-  if (isAuthenticated) {
-    navigate("/");
-    return null;
-  }
-
-  // Form submission handler
+  
+  // Handle form submission
   const onSubmit = async (values: LoginFormValues) => {
-    setIsLoading(true);
     try {
-      await login(values.identifier, values.password);
-      navigate("/");
+      await login(values);
+      // Navigate to the returnTo path or home if login is successful
+      navigate(returnTo);
     } catch (error) {
-      // Error handling is done in auth context
+      // Error is handled by the auth context
       console.error("Login error:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
-
-  // Toggle password visibility
-  const toggleShowPassword = () => setShowPassword(!showPassword);
-
+  
   return (
-    <div className="flex min-h-screen bg-muted/40">
-      {/* Left side - Login form */}
-      <div className="flex flex-col justify-center items-center w-full md:w-1/2 p-6">
-        <Card className="w-full max-w-md shadow-lg">
-          <CardHeader className="space-y-1 flex flex-col items-center">
-            <Avatar className="h-16 w-16 bg-blue-500/20 mb-2">
-              <AvatarImage src="" alt="User" />
-              <AvatarFallback className="bg-blue-500 text-white">
-                <User className="h-8 w-8" />
-              </AvatarFallback>
-            </Avatar>
-            <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
-            <CardDescription className="text-center">
+    <div className="flex flex-col md:flex-row min-h-[80vh] p-4 md:p-8">
+      {/* Form Column */}
+      <div className="w-full md:w-1/2 flex justify-center items-center mb-8 md:mb-0">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">Login to CV Chap Chap</CardTitle>
+            <CardDescription>
               Enter your credentials to access your account
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
                   name="identifier"
@@ -85,7 +78,7 @@ export default function Login() {
                       <FormLabel>Email or Phone</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="Enter your email or phone number" 
+                          placeholder="email@example.com or +255612345678" 
                           {...field} 
                           disabled={isLoading}
                         />
@@ -94,6 +87,7 @@ export default function Login() {
                     </FormItem>
                   )}
                 />
+                
                 <FormField
                   control={form.control}
                   name="password"
@@ -102,20 +96,25 @@ export default function Login() {
                       <FormLabel>Password</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Enter your password"
+                          <Input 
+                            type={showPassword ? "text" : "password"} 
+                            placeholder="••••••••"
                             {...field}
                             disabled={isLoading}
                           />
                           <Button
                             type="button"
                             variant="ghost"
-                            size="icon"
-                            className="absolute right-0 top-0 h-full px-3"
-                            onClick={toggleShowPassword}
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                            disabled={isLoading}
                           >
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4 text-gray-500" />
+                            ) : (
+                              <Eye className="h-4 w-4 text-gray-500" />
+                            )}
                           </Button>
                         </div>
                       </FormControl>
@@ -123,10 +122,12 @@ export default function Login() {
                     </FormItem>
                   )}
                 />
-                <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline block text-right">
-                  Forgot password?
-                </Link>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isLoading}
+                >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -139,52 +140,99 @@ export default function Login() {
               </form>
             </Form>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <div className="text-center text-sm">
+          <CardFooter className="flex flex-col space-y-2">
+            <div className="text-sm text-center">
+              <Link href="/forgot-password" className="text-primary hover:underline">
+                Forgot your password?
+              </Link>
+            </div>
+            <div className="text-sm text-center">
               Don't have an account?{" "}
-              <Link href="/register" className="text-blue-600 hover:underline">
+              <Link href="/register" className="text-primary hover:underline">
                 Sign up
               </Link>
             </div>
           </CardFooter>
         </Card>
       </div>
-
-      {/* Right side - Hero section */}
-      <div className="hidden md:flex md:w-1/2 bg-blue-600 text-white flex-col justify-center items-center p-12">
-        <div className="max-w-lg space-y-6">
-          <h1 className="text-4xl font-bold">CV Chap Chap</h1>
-          <h2 className="text-2xl">Professional CV Creation</h2>
-          <p className="text-lg text-blue-100">
-            Create professional CVs in minutes with our easy-to-use platform. Choose from various templates
-            and get expert guidance to make your CV stand out.
-          </p>
-          <ul className="space-y-2">
-            <li className="flex items-center">
-              <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+      
+      {/* Hero Column - only shown on medium screens and up */}
+      <div className="hidden md:flex md:w-1/2 flex-col justify-center p-8 bg-blue-50 rounded-lg">
+        <h2 className="text-3xl font-bold text-primary mb-4">Welcome Back!</h2>
+        <p className="text-lg text-gray-700 mb-6">
+          Log in to access your CV Chap Chap account. Create, edit, and download
+          professional CVs that stand out in the job market.
+        </p>
+        <div className="space-y-4">
+          <div className="flex items-start">
+            <div className="bg-primary/10 p-2 rounded-full mr-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5 text-primary"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
-              Professional Templates
-            </li>
-            <li className="flex items-center">
-              <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">Professional Templates</h3>
+              <p className="text-gray-600">
+                Access to premium CV templates designed by professionals.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start">
+            <div className="bg-primary/10 p-2 rounded-full mr-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5 text-primary"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
-              AI-powered Recommendations
-            </li>
-            <li className="flex items-center">
-              <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">AI-Powered Assistance</h3>
+              <p className="text-gray-600">
+                Get smart recommendations for improving your CV content.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start">
+            <div className="bg-primary/10 p-2 rounded-full mr-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5 text-primary"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
-              Mobile-friendly Design
-            </li>
-            <li className="flex items-center">
-              <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              Easy PDF Download
-            </li>
-          </ul>
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">Save Your Progress</h3>
+              <p className="text-gray-600">
+                Securely save and access your CVs anytime, anywhere.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

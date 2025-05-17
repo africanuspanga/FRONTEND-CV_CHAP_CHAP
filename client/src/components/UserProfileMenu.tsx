@@ -1,104 +1,84 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { ChevronDown, User, FileText, Layout, LogOut } from 'lucide-react';
+import { FC } from 'react';
+import { useAuth } from '@/contexts/auth-context';
+import { Link } from 'wouter';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { User, LogOut, FileText, Settings } from 'lucide-react';
 
 interface UserProfileMenuProps {
   username: string;
 }
 
-const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ username }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const [, navigate] = useLocation();
+const UserProfileMenu: FC<UserProfileMenuProps> = ({ username }) => {
+  const { logout } = useAuth();
 
-  // Handle clicks outside the dropdown to close it
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
+  // Get the initials from the username
+  const getInitials = (name: string) => {
+    if (!name || name.length === 0) return 'U';
+    return name.charAt(0).toUpperCase();
+  };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const handleLogout = () => {
-    // Here you would handle the logout logic
-    console.log('Logging out...');
-    // Navigate to login page
-    navigate('/login');
+  const handleLogout = async () => {
+    await logout();
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        className="flex items-center space-x-2 text-indigo-900 font-medium py-2 px-3 rounded-md hover:bg-gray-100"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <User className="h-5 w-5" />
-        <span className="uppercase">{username}</span>
-        <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
-          <div className="py-2 border-b">
-            <div className="px-4 py-2 font-medium text-indigo-900">My Account</div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <Avatar className="h-8 w-8">
+            <AvatarFallback className="bg-blue-500 text-white">
+              {getInitials(username)}
+            </AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{username}</p>
+            <p className="text-xs leading-none text-muted-foreground">
+              My Account
+            </p>
           </div>
-          
-          <div className="py-1">
-            <button
-              className="flex items-center w-full px-4 py-2 text-left text-indigo-900 hover:bg-gray-100"
-              onClick={() => {
-                navigate('/profile');
-                setIsOpen(false);
-              }}
-            >
-              <User className="h-4 w-4 mr-3" />
-              Profile
-            </button>
-            
-            <button
-              className="flex items-center w-full px-4 py-2 text-left text-indigo-900 hover:bg-gray-100"
-              onClick={() => {
-                navigate('/my-cvs');
-                setIsOpen(false);
-              }}
-            >
-              <FileText className="h-4 w-4 mr-3" />
-              My CVs
-            </button>
-            
-            <button
-              className="flex items-center w-full px-4 py-2 text-left text-indigo-900 hover:bg-gray-100"
-              onClick={() => {
-                navigate('/templates');
-                setIsOpen(false);
-              }}
-            >
-              <Layout className="h-4 w-4 mr-3" />
-              Templates
-            </button>
-          </div>
-          
-          <div className="py-1 border-t">
-            <button
-              className="flex items-center w-full px-4 py-2 text-left text-red-600 hover:bg-gray-100"
-              onClick={() => {
-                handleLogout();
-                setIsOpen(false);
-              }}
-            >
-              <LogOut className="h-4 w-4 mr-3" />
-              Logout
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/profile" className="flex items-center cursor-pointer">
+            <User className="mr-2 h-4 w-4" />
+            <span>Profile</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/profile?tab=mycvs" className="flex items-center cursor-pointer">
+            <FileText className="mr-2 h-4 w-4" />
+            <span>My CVs</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/profile?tab=settings" className="flex items-center cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Settings</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem 
+          className="text-red-600 focus:text-red-600 cursor-pointer"
+          onClick={handleLogout}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Log out</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
