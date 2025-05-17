@@ -27,6 +27,9 @@ const cvRequests: Record<string, CVRequest> = {};
 const upload = multer();
 
 export function registerRoutes(app: Express): Server {
+  // Set up authentication
+  setupAuth(app);
+  
   // Register template API
   registerTemplateAPI(app);
 

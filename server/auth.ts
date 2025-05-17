@@ -1,52 +1,62 @@
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import { Express, Request, Response, NextFunction } from "express";
-import session from "express-session";
-import { scrypt, randomBytes, timingSafeEqual } from "crypto";
-import { promisify } from "util";
+import { Request, Response, NextFunction, Express } from "express";
+import { z } from "zod";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { storage } from "./storage";
-import { User, insertUserSchema } from "@shared/schema";
-import { z } from "zod";
+import { User, InsertUser } from "@shared/schema";
 
-// Extended User type for our application
-interface AppUser extends Omit<User, "password"> {}
+// Set up JWT secret
+const JWT_SECRET = process.env.JWT_SECRET || "cv-chap-chap-secret-key";
+const JWT_EXPIRES_IN = "7d";
 
-declare global {
-  namespace Express {
-    interface User extends AppUser {}
-  }
-}
+// Create schema for registration
+const registerSchema = z.object({
+  username: z.string().optional(),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  full_name: z.string().optional(),
+  phone_number: z.string().optional(),
+});
 
-// Use environment variable for JWT secret or a default for development
-const JWT_SECRET = process.env.JWT_SECRET || "cv-chap-chap-jwt-secret-key";
-const JWT_EXPIRY = "24h"; // Token expires in 24 hours
+// Create schema for login
+const loginSchema = z.object({
+  identifier: z.string().min(3, "Email or phone number is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
-const scryptAsync = promisify(scrypt);
+// Create schema for password reset request
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
 
+// Create schema for password reset
+const resetPasswordSchema = z.object({
+  token: z.string(),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+// Hash password
 async function hashPassword(password: string): Promise<string> {
-  const salt = randomBytes(16).toString("hex");
-  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-  return `${buf.toString("hex")}.${salt}`;
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(password, salt);
 }
 
-async function comparePasswords(supplied: string, stored: string): Promise<boolean> {
-  const [hashed, salt] = stored.split(".");
-  const hashedBuf = Buffer.from(hashed, "hex");
-  const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
-  return timingSafeEqual(hashedBuf, suppliedBuf);
+// Compare password with hash
+async function comparePasswords(password: string, hash: string): Promise<boolean> {
+  return await bcrypt.compare(password, hash);
 }
 
 // Generate JWT token
 function generateToken(user: User): string {
-  const payload = {
-    sub: user.id,
-    email: user.email,
-    role: user.role,
-    iat: Math.floor(Date.now() / 1000)
-  };
-  
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+  return jwt.sign(
+    { 
+      id: user.id,
+      email: user.email,
+      role: user.role
+    },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN }
+  );
 }
 
 // Verify JWT token
@@ -61,408 +71,248 @@ function verifyToken(token: string): any {
 // Authentication middleware
 function authenticateJWT(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
-  
+
   if (!authHeader) {
-    return res.status(401).json({ 
-      success: false, 
-      message: "Authentication required", 
-      code: "AUTH_REQUIRED" 
-    });
+    return res.status(401).json({ message: "No token provided" });
   }
+
+  const token = authHeader.split(" ")[1];
   
-  const parts = authHeader.split(' ');
-  
-  if (parts.length !== 2 || parts[0] !== 'Bearer') {
-    return res.status(401).json({ 
-      success: false, 
-      message: "Invalid token format", 
-      code: "INVALID_TOKEN_FORMAT" 
-    });
-  }
-  
-  const token = parts[1];
   const decoded = verifyToken(token);
-  
   if (!decoded) {
-    return res.status(401).json({ 
-      success: false, 
-      message: "Invalid or expired token", 
-      code: "INVALID_TOKEN" 
-    });
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
-  
-  // Set user in request for route handlers
+
+  // Add user to request
   (req as any).user = decoded;
   next();
 }
 
-// Registration schema with validation
-const registerSchema = z.object({
-  email: z.string().email("Please provide a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  phone_number: z.string().optional(),
-  username: z.string().optional(),
-  full_name: z.string().optional()
-});
-
-// Login schema with conditional validation for email or phone_number
-const loginSchema = z.object({
-  email: z.string().email("Please provide a valid email address").optional(),
-  phone_number: z.string().optional(),
-  password: z.string().min(1, "Password is required")
-}).refine(data => data.email || data.phone_number, {
-  message: "Either email or phone number must be provided",
-  path: ["email"]
-});
-
+// Setup auth routes
 export function setupAuth(app: Express) {
-  // Initialize passport
-  app.use(passport.initialize());
-  
-  // Register a new user
-  app.post("/api/auth/register", async (req, res) => {
+  // Register new user
+  app.post("/api/auth/register", async (req: Request, res: Response) => {
     try {
-      // Validate input
-      const validationResult = registerSchema.safeParse(req.body);
+      // Validate request body
+      const validatedData = registerSchema.parse(req.body);
       
-      if (!validationResult.success) {
-        return res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: validationResult.error.errors.map(err => ({
-            field: err.path.join('.'),
-            message: err.message
-          }))
-        });
-      }
-      
-      const { email, password, phone_number, username, full_name } = validationResult.data;
-      
-      // Check if user already exists
-      const existingUserByEmail = await storage.getUserByEmail(email);
+      // Check if email already exists
+      const existingUserByEmail = await storage.getUserByEmail(validatedData.email);
       if (existingUserByEmail) {
-        return res.status(409).json({
-          success: false,
-          message: "User with this email already exists",
-          code: "EMAIL_EXISTS"
-        });
+        return res.status(400).json({ message: "Email already in use" });
       }
       
-      // Check if phone number is unique if provided
-      if (phone_number) {
-        const existingUserByPhone = await storage.getUserByPhoneNumber(phone_number);
+      // Check if phone number already exists (if provided)
+      if (validatedData.phone_number) {
+        const existingUserByPhone = await storage.getUserByPhoneNumber(validatedData.phone_number);
         if (existingUserByPhone) {
-          return res.status(409).json({
-            success: false,
-            message: "User with this phone number already exists",
-            code: "PHONE_EXISTS"
-          });
+          return res.status(400).json({ message: "Phone number already in use" });
         }
       }
       
       // Hash password
-      const hashedPassword = await hashPassword(password);
+      const hashedPassword = await hashPassword(validatedData.password);
       
       // Create user
-      const user = await storage.createUser({
-        email,
+      const newUser = await storage.createUser({
+        ...validatedData,
         password: hashedPassword,
-        ...(phone_number && { phone_number }),
-        ...(username && { username }),
-        ...(full_name && { full_name })
+        role: "user"
       });
-      
-      // Generate token
-      const token = generateToken(user);
       
       // Update last login time
-      await storage.updateUser(user.id, { last_login: new Date() });
-      
-      // Return user data and token
-      const { password: _, ...userWithoutPassword } = user;
-      
-      return res.status(201).json({
-        success: true,
-        message: "User registered successfully",
-        data: {
-          user: userWithoutPassword,
-          token
-        }
+      await storage.updateUser(newUser.id, {
+        last_login: new Date()
       });
-    } catch (error) {
-      console.error("Registration error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "An error occurred during registration"
-      });
-    }
-  });
-  
-  // Login a user
-  app.post("/api/auth/login", async (req, res) => {
-    try {
-      // Validate input
-      const validationResult = loginSchema.safeParse(req.body);
       
-      if (!validationResult.success) {
-        return res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: validationResult.error.errors.map(err => ({
-            field: err.path.join('.'),
-            message: err.message
-          }))
+      // Generate JWT token
+      const token = generateToken(newUser);
+      
+      // Return user data (excluding password) and token
+      const { password, ...userData } = newUser;
+      
+      res.status(201).json({
+        user: userData,
+        token
+      });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: error.errors 
         });
       }
       
-      const { email, phone_number, password } = validationResult.data;
+      res.status(500).json({ message: error.message || "Server error" });
+    }
+  });
+  
+  // Login user
+  app.post("/api/auth/login", async (req: Request, res: Response) => {
+    try {
+      // Validate request body
+      const validatedData = loginSchema.parse(req.body);
       
       // Find user by email or phone
-      let user: User | undefined;
+      let user = await storage.getUserByEmail(validatedData.identifier);
       
-      if (email) {
-        user = await storage.getUserByEmail(email);
-      } else if (phone_number) {
-        user = await storage.getUserByPhoneNumber(phone_number);
+      // If not found by email, try phone number
+      if (!user) {
+        user = await storage.getUserByPhoneNumber(validatedData.identifier);
       }
       
-      // Check if user exists and password is correct
-      if (!user || !(await comparePasswords(password, user.password))) {
-        return res.status(401).json({
-          success: false,
-          message: "Invalid credentials",
-          code: "AUTH_FAILED"
+      // Check if user exists
+      if (!user) {
+        return res.status(400).json({ message: "Invalid credentials" });
+      }
+      
+      // Verify password
+      const isPasswordValid = await comparePasswords(
+        validatedData.password,
+        user.password
+      );
+      
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: "Invalid credentials" });
+      }
+      
+      // Update last login time
+      await storage.updateUser(user.id, {
+        last_login: new Date()
+      });
+      
+      // Generate JWT token
+      const token = generateToken(user);
+      
+      // Return user data (excluding password) and token
+      const { password, ...userData } = user;
+      
+      res.status(200).json({
+        user: userData,
+        token
+      });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: error.errors 
         });
       }
       
-      // Generate token
-      const token = generateToken(user);
-      
-      // Update last login time
-      await storage.updateUser(user.id, { last_login: new Date() });
-      
-      // Return user data and token
-      const { password: _, ...userWithoutPassword } = user;
-      
-      return res.status(200).json({
-        success: true,
-        message: "Login successful",
-        data: {
-          user: userWithoutPassword,
-          token
-        }
-      });
-    } catch (error) {
-      console.error("Login error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "An error occurred during login"
-      });
+      res.status(500).json({ message: error.message || "Server error" });
     }
-  });
-  
-  // Logout - just a formality for client to clear token
-  app.post("/api/auth/logout", (req, res) => {
-    return res.status(200).json({
-      success: true,
-      message: "Logged out successfully"
-    });
   });
   
   // Get current user
-  app.get("/api/auth/me", authenticateJWT, async (req, res) => {
+  app.get("/api/auth/me", authenticateJWT, async (req: Request, res: Response) => {
     try {
-      const userId = (req as any).user.sub;
+      const userId = (req as any).user.id;
+      
+      // Get user from database (to get updated info)
       const user = await storage.getUser(userId);
       
       if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: "User not found"
-        });
+        return res.status(404).json({ message: "User not found" });
       }
       
-      // Return user without password
-      const { password, ...userWithoutPassword } = user;
+      // Return user data (excluding password)
+      const { password, ...userData } = user;
       
-      return res.status(200).json({
-        success: true,
-        data: userWithoutPassword
-      });
-    } catch (error) {
-      console.error("Get user error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "An error occurred while fetching user"
-      });
+      res.status(200).json({ user: userData });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Server error" });
     }
   });
   
-  // Update user profile
-  app.put("/api/auth/update-profile", authenticateJWT, async (req, res) => {
-    try {
-      const userId = (req as any).user.sub;
-      const { username, phone_number, full_name } = req.body;
-      
-      // Check if user exists
-      const existingUser = await storage.getUser(userId);
-      if (!existingUser) {
-        return res.status(404).json({
-          success: false,
-          message: "User not found"
-        });
-      }
-      
-      // Check if phone number is unique if provided
-      if (phone_number && phone_number !== existingUser.phone_number) {
-        const existingUserByPhone = await storage.getUserByPhoneNumber(phone_number);
-        if (existingUserByPhone && existingUserByPhone.id !== userId) {
-          return res.status(409).json({
-            success: false,
-            message: "Phone number is already in use",
-            code: "PHONE_EXISTS"
-          });
-        }
-      }
-      
-      // Check if username is unique if provided
-      if (username && username !== existingUser.username) {
-        const existingUserByUsername = await storage.getUserByUsername(username);
-        if (existingUserByUsername && existingUserByUsername.id !== userId) {
-          return res.status(409).json({
-            success: false,
-            message: "Username is already in use",
-            code: "USERNAME_EXISTS"
-          });
-        }
-      }
-      
-      // Update user
-      const updatedUser = await storage.updateUser(userId, {
-        ...(username && { username }),
-        ...(phone_number && { phone_number }),
-        ...(full_name && { full_name })
-      });
-      
-      // Return updated user without password
-      const { password, ...userWithoutPassword } = updatedUser;
-      
-      return res.status(200).json({
-        success: true,
-        message: "Profile updated successfully",
-        data: userWithoutPassword
-      });
-    } catch (error) {
-      console.error("Update profile error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "An error occurred while updating profile"
-      });
-    }
+  // Logout user (client-side, just for completeness)
+  app.post("/api/auth/logout", (_req: Request, res: Response) => {
+    res.status(200).json({ message: "Logged out successfully" });
   });
   
-  // Forgot password
-  app.post("/api/auth/forgot-password", async (req, res) => {
+  // Forgot password - send reset token
+  app.post("/api/auth/forgot-password", async (req: Request, res: Response) => {
     try {
-      const { email } = req.body;
+      const { email } = forgotPasswordSchema.parse(req.body);
       
-      if (!email) {
-        return res.status(400).json({
-          success: false,
-          message: "Email is required"
-        });
-      }
-      
-      // Find user
+      // Find user by email
       const user = await storage.getUserByEmail(email);
       
-      // Do not reveal if user exists or not
+      // For security reasons, always return success even if email doesn't exist
       if (!user) {
-        return res.status(200).json({
-          success: true,
-          message: "Password reset instructions sent to your email"
+        return res.status(200).json({ 
+          message: "If your email is registered, you will receive a password reset link" 
         });
       }
       
-      // Generate reset token
-      const resetToken = randomBytes(32).toString("hex");
-      const resetTokenExpires = new Date(Date.now() + 3600000); // 1 hour
+      // Generate reset token (random UUID)
+      const resetToken = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+        .map(b => b.toString(16).padStart(2, '0')).join('');
+      const resetTokenExpires = new Date();
+      resetTokenExpires.setHours(resetTokenExpires.getHours() + 1); // Token expires in 1 hour
       
-      // Save token to user
+      // Update user with reset token
       await storage.updateUser(user.id, {
         reset_token: resetToken,
         reset_token_expires: resetTokenExpires
       });
       
-      // In a real application, send email with reset link
-      // For now, just respond with success
+      // In a real app, you would send an email with the reset link
+      // For this implementation, we'll just return the token directly (for testing)
       
-      return res.status(200).json({
-        success: true,
-        message: "Password reset instructions sent to your email"
+      res.status(200).json({ 
+        message: "If your email is registered, you will receive a password reset link",
+        // Include this in development only:
+        resetToken 
       });
-    } catch (error) {
-      console.error("Forgot password error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "An error occurred while processing your request"
-      });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: error.errors 
+        });
+      }
+      
+      res.status(500).json({ message: error.message || "Server error" });
     }
   });
   
   // Reset password
-  app.post("/api/auth/reset-password", async (req, res) => {
+  app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
     try {
-      const { token, password } = req.body;
-      
-      if (!token || !password) {
-        return res.status(400).json({
-          success: false,
-          message: "Token and password are required"
-        });
-      }
-      
-      if (password.length < 6) {
-        return res.status(400).json({
-          success: false,
-          message: "Password must be at least 6 characters",
-          errors: [{
-            field: "password",
-            message: "Password must be at least 6 characters"
-          }]
-        });
-      }
+      const { token, password } = resetPasswordSchema.parse(req.body);
       
       // Find user by reset token
       const user = await storage.getUserByResetToken(token);
       
-      if (!user || !user.reset_token_expires || user.reset_token_expires < new Date()) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid or expired token"
-        });
+      if (!user) {
+        return res.status(400).json({ message: "Invalid or expired token" });
+      }
+      
+      // Check if token is expired
+      if (user.reset_token_expires && user.reset_token_expires < new Date()) {
+        return res.status(400).json({ message: "Reset token has expired" });
       }
       
       // Hash new password
       const hashedPassword = await hashPassword(password);
       
-      // Update user
+      // Update user with new password and remove reset token
       await storage.updateUser(user.id, {
         password: hashedPassword,
         reset_token: null,
         reset_token_expires: null
       });
       
-      return res.status(200).json({
-        success: true,
-        message: "Password has been reset successfully"
-      });
-    } catch (error) {
-      console.error("Reset password error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "An error occurred while resetting password"
-      });
+      res.status(200).json({ message: "Password reset successful" });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: error.errors 
+        });
+      }
+      
+      res.status(500).json({ message: error.message || "Server error" });
     }
   });
 }
