@@ -14,7 +14,7 @@ const JWT_EXPIRES_IN = '7d';
 interface JwtPayload {
   id: string;
   username: string;
-  email?: string;
+  email: string; // Email is required in the schema
   role: string;
 }
 
@@ -122,7 +122,7 @@ export async function register(req: Request, res: Response) {
     const token = generateToken({
       id: newUser.id,
       username: newUser.username,
-      email: newUser.email || undefined,
+      email: newUser.email,
       role: newUser.role
     });
     
@@ -171,7 +171,7 @@ export async function login(req: Request, res: Response) {
     const token = generateToken({
       id: user.id,
       username: user.username,
-      email: user.email || undefined,
+      email: user.email,
       role: user.role
     });
     
