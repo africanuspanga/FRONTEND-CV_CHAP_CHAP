@@ -174,12 +174,9 @@ export async function register(req: Request, res: Response) {
     // Hash the password
     const hashedPassword = await hashPassword(password);
     
-    // Generate a UUID for the user
-    const userId = uuidv4();
-    
-    // Create a new user
+    // Create a new user - no need for UUID as database will auto-assign ID
     const newUser: User = {
-      id: userId,
+      id: '0', // Will be updated after DB insert
       username: finalUsername,
       email,
       password: hashedPassword,
@@ -189,21 +186,22 @@ export async function register(req: Request, res: Response) {
       created_at: new Date(),
       updated_at: new Date()
     };
-
-    // Add to in-memory store
-    users.push(newUser);
     
     try {
-      // Store in database using our storage module
-      await userStorage.createUser({
-        id: userId,
+      // Store in database with only the fields that exist in DB
+      const dbUser = await userStorage.createUser({
         username: finalUsername,
         email,
-        password: hashedPassword,
-        full_name: full_name || '',
-        phone_number,
-        role: 'user'
+        password: hashedPassword
       });
+      
+      // Update in-memory user with ID from database
+      if (dbUser && dbUser.id) {
+        newUser.id = String(dbUser.id);
+      }
+      
+      // Add to in-memory store
+      users.push(newUser);
       console.log('User successfully stored in database:', email);
     } catch (dbError) {
       console.error('Error storing user in database:', dbError);

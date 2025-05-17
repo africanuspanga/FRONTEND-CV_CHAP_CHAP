@@ -71,12 +71,31 @@ const WorkExperienceStep: React.FC = () => {
 
   // Handle form submission
   const onSubmit = (data: FormValues) => {
-    // Update both workExperiences and workExp for backward compatibility
-    updateFormField('workExperiences', data.workExperience);
-    updateFormField('workExp', data.workExperience);
+    // Make a deep copy to avoid reference issues
+    const experiences = JSON.parse(JSON.stringify(data.workExperience));
     
-    // Log the update to verify data is being saved
-    console.log('Work experience data updated:', data.workExperience);
+    // Make sure each experience has an ID
+    experiences.forEach((exp: any) => {
+      if (!exp.id) {
+        exp.id = generateId();
+      }
+    });
+    
+    // Update both arrays to ensure consistency
+    updateFormField('workExperiences', experiences);
+    updateFormField('workExp', experiences);
+    
+    // Save to storage immediately
+    form.handleSubmit(() => {
+      console.log('Work experience data saved:', experiences);
+      
+      // Force an extra save after a slight delay to ensure persistence
+      setTimeout(() => {
+        const cvData = { ...formData, workExperiences: experiences, workExp: experiences };
+        localStorage.setItem('cv-form-data', JSON.stringify(cvData));
+        sessionStorage.setItem('cv-form-data', JSON.stringify(cvData));
+      }, 100);
+    })();
   };
 
   // Add a new work experience entry
@@ -95,16 +114,22 @@ const WorkExperienceStep: React.FC = () => {
     // Add to form fields
     append(newExperience);
     
-    // Get current form values
-    const currentValues = form.getValues('workExperience');
-    
-    // Update both work experience arrays in context
-    updateFormField('workExperiences', [...currentValues, newExperience]);
-    updateFormField('workExp', [...currentValues, newExperience]);
-    
-    // Log the addition to verify
-    console.log('Added new work experience:', newExperience);
-    console.log('Updated work experiences:', [...currentValues, newExperience]);
+    // Wait a tick for the field to be added to the form
+    setTimeout(() => {
+      // Get current form values after append
+      const currentValues = form.getValues('workExperience');
+      
+      // Update both work experience arrays in context
+      updateFormField('workExperiences', currentValues);
+      updateFormField('workExp', currentValues);
+      
+      // Force form submission to ensure data is saved
+      form.handleSubmit(onSubmit)();
+      
+      // Log the addition to verify
+      console.log('Added new work experience:', newExperience);
+      console.log('Work experiences after add:', currentValues);
+    }, 50);
   };
 
   // Remove a work experience entry
@@ -113,19 +138,31 @@ const WorkExperienceStep: React.FC = () => {
     remove(index);
     setShowMaxWarning(false);
     
-    // Get current values after removal
-    const currentValues = form.getValues('workExperience');
-    
-    // Update both arrays in context for consistency
-    updateFormField('workExperiences', currentValues);
-    updateFormField('workExp', currentValues);
-    
-    // Log the removal to verify
-    console.log('Removed work experience at index:', index);
-    console.log('Remaining work experiences:', currentValues);
-    
-    // Force form submission to ensure data is saved
-    form.handleSubmit(onSubmit)();
+    // Give time for the form to update
+    setTimeout(() => {
+      // Get current values after removal
+      const currentValues = form.getValues('workExperience');
+      
+      // Update both arrays in context for consistency
+      updateFormField('workExperiences', currentValues);
+      updateFormField('workExp', currentValues);
+      
+      // Also force an immediate direct storage update
+      const cvData = { ...formData, workExperiences: currentValues, workExp: currentValues };
+      try {
+        localStorage.setItem('cv-form-data', JSON.stringify(cvData));
+        sessionStorage.setItem('cv-form-data', JSON.stringify(cvData));
+      } catch (e) {
+        console.error('Error saving work experience data:', e);
+      }
+      
+      // Log the removal to verify
+      console.log('Removed work experience at index:', index);
+      console.log('Remaining work experiences:', currentValues);
+      
+      // Force form submission to ensure data is saved
+      form.handleSubmit(onSubmit)();
+    }, 50);
   };
 
   // Update form data on change to provide real-time preview

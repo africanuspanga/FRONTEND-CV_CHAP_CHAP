@@ -4,17 +4,14 @@ import { eq } from 'drizzle-orm';
 
 // Define an interface for our user storage
 export interface UserStorage {
+  // Updated to match actual database structure
   createUser(userData: {
-    id: string;
     username: string;
     email: string;
     password: string;
-    full_name?: string;
-    phone_number?: string;
-    role?: string;
   }): Promise<any>;
   
-  getUserById(id: string): Promise<any | null>;
+  getUserById(id: number): Promise<any | null>;
   getUserByEmail(email: string): Promise<any | null>;
   getUserByUsername(username: string): Promise<any | null>;
   getUserByPhone(phone: string): Promise<any | null>;
@@ -23,13 +20,9 @@ export interface UserStorage {
 // Database implementation of UserStorage
 export class DatabaseUserStorage implements UserStorage {
   async createUser(userData: {
-    id: string;
     username: string;
     email: string;
     password: string;
-    full_name?: string;
-    phone_number?: string;
-    role?: string;
   }) {
     try {
       // Match the actual database structure - only include fields that exist
@@ -37,7 +30,6 @@ export class DatabaseUserStorage implements UserStorage {
         username: userData.username,
         email: userData.email,
         password: userData.password,
-        // Note: id is auto-generated as serial in the database
         created_at: new Date(),
         updated_at: new Date()
       }).returning();
@@ -49,7 +41,7 @@ export class DatabaseUserStorage implements UserStorage {
     }
   }
   
-  async getUserById(id: string) {
+  async getUserById(id: number) {
     try {
       const results = await db.select().from(usersTable).where(eq(usersTable.id, id));
       return results.length > 0 ? results[0] : null;
