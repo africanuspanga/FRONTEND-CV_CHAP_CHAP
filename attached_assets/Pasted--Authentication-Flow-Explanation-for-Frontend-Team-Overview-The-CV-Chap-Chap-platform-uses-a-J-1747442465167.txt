@@ -1,0 +1,111 @@
+# Authentication Flow Explanation for Frontend Team
+
+## Overview
+
+The CV Chap Chap platform uses a JWT (JSON Web Token) based authentication system. Here's a high-level explanation of how it works and what the frontend needs to implement.
+
+## User Registration & Login Flow
+
+### User Registration
+
+1. **Collection of User Information:**
+   - The frontend collects basic user information (email, password, phone number)
+   - Email and password are required; username is optional (will be generated from email if not provided)
+
+2. **Registration API Call:**
+   - Frontend sends data to `POST /api/auth/register`
+   - Backend validates the data and creates a new user account
+   - Backend generates and returns a JWT token
+
+3. **Post-Registration:**
+   - Frontend stores the JWT token (localStorage/cookies)
+   - JWT token contains an encoded user ID which the backend can verify
+   - Frontend redirects the user to the dashboard or CV creation page
+
+### User Login
+
+1. **Login Options:**
+   - Users can log in with either email or phone number + password
+   - The backend supports flexible identification through a unified login endpoint
+
+2. **Login API Call:**
+   - Frontend sends credentials to `POST /api/auth/login`
+   - Backend validates credentials and returns a JWT token
+   - Login response includes user details for immediate use in the UI
+
+3. **Authentication State:**
+   - Frontend should maintain an authentication state (logged in/out)
+   - JWT token should be included in future API requests via Authorization header
+
+### User Logout
+
+1. **Logout Process:**
+   - Frontend calls `POST /api/auth/logout` (though this is mostly symbolic)
+   - The main logout action happens on the frontend by removing the stored JWT token
+   - After logout, user should be redirected to login page or homepage
+
+## Authentication Verification
+
+1. **Protected Routes:**
+   - Frontend should implement route protection for authenticated sections
+   - Before rendering protected pages, verify JWT token exists and is valid
+
+2. **User Profile:**
+   - Frontend can get the current user's profile with `GET /api/auth/me`
+   - This endpoint requires the JWT token in the Authorization header
+   - Use this to display user information and verify authentication status
+
+## Token Management
+
+1. **Token Storage:**
+   - Store JWT token securely in localStorage or cookies
+   - Token expiration is set to 24 hours from issuance
+
+2. **Token Usage:**
+   - Include token in every protected API request:
+     ```
+     Authorization: Bearer <jwt-token>
+     ```
+
+3. **Token Refreshing:**
+   - When token expires, redirect user to login page
+   - We currently do not implement refresh tokens, so re-login is required after expiration
+
+## Error Handling
+
+1. **Common Errors:**
+   - 401 Unauthorized: Invalid or missing token
+   - 400 Bad Request: Invalid input data
+   - 404 Not Found: Resource not available
+   - 500 Server Error: Backend issues
+
+2. **User Feedback:**
+   - Display appropriate error messages to users
+   - Redirect to login page on authentication errors
+
+## Anonymous User Flow
+
+1. **Guest Users:**
+   - Users can create CVs without registering (as anonymous users)
+   - Anonymous CVs get an `anonymous_id` assigned
+
+2. **Conversion to Registered User:**
+   - When an anonymous user registers, provide the `anonymous_id` in the registration request
+   - Backend will associate anonymous CVs with the newly created user account
+
+## Testing Authentication
+
+You can test the authentication endpoints with these example credentials:
+
+- **Email:** test@example.com
+- **Password:** password123
+
+Use the `/api/auth/register` endpoint to create test accounts as needed.
+
+## Security Considerations
+
+1. Always use HTTPS for API requests
+2. Never store the plain password in any client-side storage
+3. Clear authentication data on logout
+4. Implement proper input validation before sending to the backend
+

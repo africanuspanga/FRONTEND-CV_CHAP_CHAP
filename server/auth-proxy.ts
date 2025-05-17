@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 // JWT Secret (in production, this would be an environment variable)
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const JWT_EXPIRES_IN = '7d';
+const JWT_EXPIRES_IN = '24h'; // Token expires in 24 hours as per requirements
 
 // In-memory users store (for development only)
 interface User {
@@ -14,12 +14,21 @@ interface User {
   email: string;
   password: string;
   role: string;
+  phone_number?: string;
   created_at: Date;
   updated_at: Date;
 }
 
-// Simple in-memory storage for users
+// Anonymous user CVs
+interface AnonymousCV {
+  anonymous_id: string;
+  cv_data: any;
+  created_at: Date;
+}
+
+// Simple in-memory storage for users and anonymous CVs
 const users: User[] = [];
+const anonymousCVs: AnonymousCV[] = [];
 
 // Define user data for the JWT token payload
 interface JwtPayload {
@@ -91,11 +100,21 @@ export function authorize(roles: string[] = ['user']) {
 // Register a new user
 export async function register(req: Request, res: Response) {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, phone_number, anonymous_id } = req.body;
+    
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+    
+    // Generate username from email if not provided
+    const finalUsername = username || email.split('@')[0];
     
     // Check if the user already exists
     const existingUser = users.find(u => 
-      u.username === username || u.email === email
+      (finalUsername && u.username === finalUsername) || 
+      u.email === email ||
+      (phone_number && u.phone_number === phone_number)
     );
     
     if (existingUser) {
@@ -108,9 +127,10 @@ export async function register(req: Request, res: Response) {
     // Create a new user
     const newUser: User = {
       id: uuidv4(),
-      username,
+      username: finalUsername,
       email,
       password: hashedPassword,
+      phone_number,
       role: 'user',
       created_at: new Date(),
       updated_at: new Date()
@@ -119,11 +139,23 @@ export async function register(req: Request, res: Response) {
     // Add to in-memory store
     users.push(newUser);
     
+    // If anonymous_id is provided, associate anonymous CVs with the new user
+    if (anonymous_id) {
+      // In a real implementation, this would update CVs in the database
+      // For now, we just log that we would do this
+      console.log(`Associating anonymous CVs with ID ${anonymous_id} to user ${newUser.id}`);
+      
+      // Find and "update" anonymous CVs (just logging for now)
+      const userAnonymousCVs = anonymousCVs.filter(cv => cv.anonymous_id === anonymous_id);
+      console.log(`Found ${userAnonymousCVs.length} anonymous CVs to associate with user`);
+    }
+    
     // Create user response without password
     const userResponse = {
       id: newUser.id,
       username: newUser.username,
       email: newUser.email,
+      phone_number: newUser.phone_number,
       role: newUser.role,
       created_at: newUser.created_at,
       updated_at: newUser.updated_at
@@ -153,9 +185,15 @@ export async function login(req: Request, res: Response) {
   try {
     const { identifier, password } = req.body;
     
-    // Identifier can be username or email
+    if (!identifier || !password) {
+      return res.status(400).json({ message: 'Identifier and password are required' });
+    }
+    
+    // Identifier can be username, email, or phone number
     const user = users.find(u => 
-      u.username === identifier || u.email === identifier
+      u.username === identifier || 
+      u.email === identifier || 
+      u.phone_number === identifier
     );
     
     if (!user) {
@@ -169,7 +207,7 @@ export async function login(req: Request, res: Response) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     
-    // Update last login time (not actually needed for in-memory)
+    // Update last login time
     user.updated_at = new Date();
     
     // Generate a token
@@ -216,6 +254,34 @@ export async function getMe(req: Request, res: Response) {
   }
 }
 
+// Create an anonymous user
+async function createAnonymous(req: Request, res: Response) {
+  try {
+    // Generate a unique anonymous ID
+    const anonymousId = uuidv4();
+    
+    // If CV data was provided, store it
+    if (req.body.cv_data) {
+      const anonymousCV: AnonymousCV = {
+        anonymous_id: anonymousId,
+        cv_data: req.body.cv_data,
+        created_at: new Date()
+      };
+      
+      anonymousCVs.push(anonymousCV);
+    }
+    
+    // Return the anonymous ID
+    return res.status(201).json({ 
+      anonymous_id: anonymousId,
+      message: 'Anonymous session created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating anonymous session:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
 // Set up authentication routes
 export function setupAuth(app: Express) {
   // Extend Express Request interface to include user
@@ -237,4 +303,28 @@ export function setupAuth(app: Express) {
   
   // Get the current user
   app.get('/api/auth/me', authenticate, getMe);
+  
+  // Create an anonymous session
+  app.post('/api/auth/anonymous', createAnonymous);
+  
+  // Handle error responses
+  app.use('/api/auth/*', (err: any, req: Request, res: Response, next: NextFunction) => {
+    console.error('Auth API error:', err);
+    
+    // Handle specific error types as mentioned in the documentation
+    if (err.name === 'UnauthorizedError' || err.status === 401) {
+      return res.status(401).json({ message: 'Unauthorized: Invalid or missing token' });
+    }
+    
+    if (err.name === 'ValidationError' || err.status === 400) {
+      return res.status(400).json({ message: 'Bad Request: Invalid input data' });
+    }
+    
+    if (err.status === 404) {
+      return res.status(404).json({ message: 'Resource not found' });
+    }
+    
+    // Default server error
+    return res.status(500).json({ message: 'Internal server error' });
+  });
 }
