@@ -100,7 +100,11 @@ export function authorize(roles: string[] = ['user']) {
 // Register a new user
 export async function register(req: Request, res: Response) {
   try {
-    const { username, email, password, phone_number, anonymous_id } = req.body;
+    const { username, email, password, full_name, phone_number, anonymous_id } = req.body;
+    
+    console.log('Registration attempt with data:', {
+      email, phone_number, full_name, username 
+    });
     
     // Validate required fields
     if (!email || !password) {
@@ -130,6 +134,7 @@ export async function register(req: Request, res: Response) {
       username: finalUsername,
       email,
       password: hashedPassword,
+      full_name: full_name || '',
       phone_number,
       role: 'user',
       created_at: new Date(),
@@ -192,6 +197,13 @@ export async function login(req: Request, res: Response) {
     if (!identifier || !password) {
       return res.status(400).json({ message: 'Identifier and password are required' });
     }
+    
+    // Log users for debugging
+    console.log('Available users:', users.map(u => ({
+      username: u.username,
+      email: u.email,
+      phone: u.phone_number
+    })));
     
     // Identifier can be username, email, or phone number
     const user = users.find(u => 
