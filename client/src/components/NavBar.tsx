@@ -185,22 +185,13 @@ const NavBar: React.FC = () => {
               </button>
             </>
           ) : (
-            <>
-              <Link
-                href="/login"
-                className="block px-3 py-2 rounded-md text-base font-medium text-darkText hover:text-primary"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Login
-              </Link>
-              <Link
-                href="/register"
-                className="block px-3 py-2 rounded-md text-base font-medium text-primary hover:text-blue-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Register
-              </Link>
-            </>
+            <Link
+              href="/login"
+              className="block px-3 py-2 rounded-md text-base font-medium text-primary hover:text-blue-700"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Login
+            </Link>
           )}
         </div>
       </div>
