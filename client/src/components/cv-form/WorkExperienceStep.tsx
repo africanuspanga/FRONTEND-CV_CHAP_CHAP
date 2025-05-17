@@ -54,7 +54,8 @@ const MAX_EXPERIENCES = 8;
 // Use the standardized storage key from the fixer utility
 const STORAGE_KEY = STORAGE_KEYS.CV_DATA;
 
-// Use the imported sanitizer from the fixer utility instead of local one
+// Use the sanitizer from the fixer utility
+const sanitizeWorkExperiences = sanitizeWorkExperiencesFn;
 
 const WorkExperienceStep: React.FC = () => {
   const { formData, updateFormField } = useCVForm();

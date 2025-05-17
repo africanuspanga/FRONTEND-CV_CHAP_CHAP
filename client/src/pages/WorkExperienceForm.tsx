@@ -221,9 +221,26 @@ const WorkExperienceForm = () => {
         // 6. IMPORTANT: No limit check on total number of jobs!
         console.log("DEBUG - Now saving work experiences - total count:", updatedExperiences.length);
         
-        // 7. Update both arrays through form context
-        // Set to a brand new array to ensure reference changes trigger React updates
+        // 7. Update BOTH work experience arrays through form context
+        // CRITICAL FIX 1: Set to a brand new array to ensure reference changes trigger React updates
         updateFormField('workExperiences', [...updatedExperiences]);
+        
+        // CRITICAL FIX 2: Also update the secondary workExp array which is used by some components
+        updateFormField('workExp', [...updatedExperiences]);
+        
+        // CRITICAL FIX 3: Force save to storage for maximum reliability
+        try {
+          const dataToSave = {
+            ...formData,
+            workExperiences: [...updatedExperiences],
+            workExp: [...updatedExperiences]
+          };
+          localStorage.setItem('cv_form_data', JSON.stringify(dataToSave));
+          sessionStorage.setItem('cv_form_data', JSON.stringify(dataToSave));
+          console.log("✅ WORK EXPERIENCE SAVED SUCCESSFULLY:", updatedExperiences.length, "entries");
+        } catch (storageError) {
+          console.error("❌ STORAGE FAILURE:", storageError);
+        }
         
         // Reset form for adding another job
         resetFormFields();
