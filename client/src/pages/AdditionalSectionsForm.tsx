@@ -70,20 +70,6 @@ const AdditionalSectionsForm = () => {
       path: `/cv/${templateId}/websites-portfolios`
     },
     {
-      id: 'certifications',
-      title: 'Certifications',
-      description: 'List relevant certifications and licenses',
-      icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="14" x="3" y="4" rx="2"></rect><line x1="3" x2="21" y1="12" y2="12"></line><line x1="12" x2="12" y1="4" y2="18"></line></svg>,
-      path: `/cv/${templateId}/certifications`
-    },
-    {
-      id: 'accomplishments',
-      title: 'Accomplishments',
-      description: 'Showcase key achievements and accomplishments',
-      icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.11"></path><path d="M15 7a3 3 0 1 0-6 0c0 1.66 1.34 3 3 3 .5 0 1-.1 1.46-.27"></path><path d="M12 10c.5 0 1-.1 1.46-.27"></path><path d="M15 7c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3c-.5 0-1 .11-1.46.27"></path><path d="M3 7c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3c-.5 0-1 .11-1.46.27"></path></svg>,
-      path: `/cv/${templateId}/accomplishments`
-    },
-    {
       id: 'hobbies',
       title: 'Hobbies',
       description: 'Show your personality and cultural fit',
