@@ -51,6 +51,7 @@ import HobbiesForm from "@/pages/HobbiesForm";
 import TemplateGallery from "@/pages/template-gallery";
 import CVSteps from "@/pages/CVSteps";
 import EditSections from "@/pages/EditSections";
+import WorkExperienceSummary from "@/pages/WorkExperienceSummary";
 import NotFound from "@/pages/not-found";
 
 // Admin pages
@@ -129,7 +130,7 @@ function Router() {
                 <Route path="/cv/:templateId/personal" component={PersonalInfoForm} />
                 <Route path="/cv/:templateId/work" component={WorkExperienceForm} />
                 <Route path="/cv/:templateId/work-experience" component={WorkExperienceForm} />
-                <Route path="/cv/:templateId/work-experience/summary" component={WorkExperienceForm} />
+                <Route path="/cv/:templateId/work-experience/summary" component={WorkExperienceSummary} />
                 <Route path="/cv/:templateId/education" component={EducationForm} />
                 <Route path="/cv/:templateId/skills" component={SkillsIntro} />
                 <Route path="/cv/:templateId/skills-recommendations" component={SkillsRecommendations} />
