@@ -11,18 +11,18 @@ import { TemplateWithMetadata } from './templates-registry';
 const templatePriorityOrder = [
   'kilimanjaro',        // 1
   'tanzanitePro',       // 2
-  'safariOriginal',     // 3
-  'brightDiamond',      // 4
-  'streetHustler',      // 5
-  'mwalimuOne',         // 6
-  'serengetiFlow',      // 7
-  'mjenziWaTaifa',      // 8
-  'jijengeClassic',     // 9
-  'bigBoss',            // 10
-  'madiniMob',          // 11
-  'moonlightSonata',    // 12
-  'kaziFasta',          // 13
-  'smartBongo',         // 14
+  'brightDiamond',      // 3
+  'mwalimuOne',         // 4
+  'bigBoss',            // 5
+  'mjenziWaTaifa',      // 6
+  'madiniMob',          // 7
+  'serengetiFlow',      // 8
+  'smartBongo',         // 9
+  'streetHustler',      // 10
+  'safariOriginal',     // 11
+  'jijengeClassic',     // 12
+  'moonlightSonata',    // 13
+  'kaziFasta',          // 14
   'mkaliModern'         // 15
 ];
 
@@ -30,8 +30,8 @@ const templatePriorityOrder = [
 export const homePageFeaturedTemplates = [
   'kilimanjaro',
   'tanzanitePro',
-  'safariOriginal',
-  'brightDiamond'
+  'brightDiamond',
+  'mwalimuOne'
 ];
 
 /**

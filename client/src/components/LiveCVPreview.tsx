@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Eye } from 'lucide-react';
+import { ChevronDown, ChevronUp, Eye, AlertCircle } from 'lucide-react';
 import { ClientSideTemplateRenderer } from './ClientSideTemplateRenderer';
 import DirectTemplateRenderer from './DirectTemplateRenderer';
 import { CVData } from '@shared/schema';
 import ErrorBoundary from './ErrorBoundary';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface LiveCVPreviewProps {
   cvData: CVData;
@@ -14,6 +15,7 @@ interface LiveCVPreviewProps {
 const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
   
   // Check if the device is mobile
   useEffect(() => {
@@ -30,6 +32,49 @@ const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => 
     // Cleanup
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+  
+  // Validate CV data to ensure it has the necessary structure
+  const validatedData = useMemo(() => {
+    try {
+      // Create a deep copy to avoid modifying the original data
+      const processedData = JSON.parse(JSON.stringify(cvData || {}));
+      
+      // Ensure personal info exists
+      if (!processedData.personalInfo) {
+        processedData.personalInfo = {};
+      }
+      
+      // Ensure work experience arrays exist
+      if (!Array.isArray(processedData.workExperiences)) {
+        processedData.workExperiences = [];
+      }
+      
+      if (!Array.isArray(processedData.workExp)) {
+        processedData.workExp = [];
+      }
+      
+      // Ensure other arrays exist
+      ['education', 'skills', 'languages', 'references', 
+       'certifications', 'projects', 'hobbies', 'websites', 
+       'accomplishments'].forEach(field => {
+        if (!Array.isArray(processedData[field])) {
+          processedData[field] = [];
+        }
+      });
+      
+      // Ensure name field for renderer
+      if (processedData.personalInfo.firstName || processedData.personalInfo.lastName) {
+        processedData.name = `${processedData.personalInfo.firstName || ''} ${processedData.personalInfo.lastName || ''}`.trim();
+      }
+      
+      setPreviewError(null);
+      return processedData;
+    } catch (error) {
+      console.error('Error processing CV data for preview:', error);
+      setPreviewError('Could not process CV data properly. Please continue filling the form.');
+      return cvData;
+    }
+  }, [cvData]);
   
   // Debug form data to see what's being passed to the template
   React.useEffect(() => {
@@ -63,6 +108,13 @@ const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => 
           <h3 className="text-lg font-semibold mb-3">Live Preview</h3>
           <p className="text-sm text-gray-500 mb-4">This preview updates in real-time as you fill in your information.</p>
           
+          {previewError && (
+            <Alert variant="warning" className="mb-4">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              <AlertDescription>{previewError}</AlertDescription>
+            </Alert>
+          )}
+          
           <div className="bg-white border rounded-md overflow-auto" style={{ height: '600px' }}>
             <ErrorBoundary
               fallback={
@@ -79,7 +131,7 @@ const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => 
             >
               <DirectTemplateRenderer 
                 templateId={templateId} 
-                cvData={cvData} 
+                cvData={validatedData} 
                 height="auto"
               />
             </ErrorBoundary>
