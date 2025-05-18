@@ -1,79 +1,102 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Save, Check } from 'lucide-react';
+import React, { ReactNode } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon, EyeIcon } from 'lucide-react';
 
 interface MobileFormNavigationProps {
   onPrevious?: () => void;
   onNext?: () => void;
-  onSave?: () => void;
+  onPreview?: () => void;
+  currentStep?: number;
+  totalSteps?: number;
   isPreviousDisabled?: boolean;
   isNextDisabled?: boolean;
-  isSaveDisabled?: boolean;
   previousLabel?: string;
   nextLabel?: string;
-  saveLabel?: string;
+  showPreview?: boolean;
   className?: string;
-  showSaveButton?: boolean;
+  nextButtonContent?: ReactNode;
 }
 
 /**
- * Mobile-friendly navigation buttons for multi-step forms
- * Adapts to different screen sizes with appropriate spacing and button sizes
+ * Navigation component for mobile form flows
+ * Provides Previous/Next buttons and step indicators
  */
 const MobileFormNavigation: React.FC<MobileFormNavigationProps> = ({
   onPrevious,
   onNext,
-  onSave,
+  onPreview,
+  currentStep = 1,
+  totalSteps = 5,
   isPreviousDisabled = false,
   isNextDisabled = false,
-  isSaveDisabled = false,
   previousLabel = 'Previous',
   nextLabel = 'Next',
-  saveLabel = 'Save',
+  showPreview = true,
   className = '',
-  showSaveButton = false
+  nextButtonContent
 }) => {
   return (
-    <div className={`flex ${showSaveButton ? 'justify-between' : 'justify-between'} gap-2 ${className}`}>
-      {onPrevious && (
-        <Button
-          variant="outline"
+    <div className={`mobile-form-navigation ${className}`}>
+      {/* Step indicator */}
+      <div className="flex justify-center mb-3">
+        <div className="text-sm font-medium text-gray-600">
+          Step {currentStep} of {totalSteps}
+        </div>
+      </div>
+      
+      {/* Progress bar */}
+      <div className="w-full h-1 bg-gray-200 rounded-full mb-3">
+        <div 
+          className="h-full bg-primary rounded-full transition-all duration-300 ease-in-out"
+          style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+        ></div>
+      </div>
+      
+      {/* Navigation buttons */}
+      <div className="flex items-center justify-between">
+        <button
           onClick={onPrevious}
           disabled={isPreviousDisabled}
-          className="flex-1 text-sm flex items-center justify-center gap-1"
+          className={`flex items-center px-3 py-2 text-sm rounded-md ${
+            isPreviousDisabled 
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeftIcon className="w-4 h-4 mr-1" />
           {previousLabel}
-        </Button>
-      )}
-      
-      {showSaveButton && onSave && (
-        <Button
-          variant="secondary"
-          onClick={onSave}
-          disabled={isSaveDisabled}
-          className="flex-1 text-sm flex items-center justify-center gap-1"
-        >
-          <Save className="h-4 w-4" />
-          {saveLabel}
-        </Button>
-      )}
-      
-      {onNext && (
-        <Button
-          variant={nextLabel === 'Complete' ? 'destructive' : 'default'}
-          onClick={onNext}
-          disabled={isNextDisabled}
-          className="flex-1 text-sm flex items-center justify-center gap-1"
-        >
-          {nextLabel}
-          {nextLabel === 'Complete' ? (
-            <Check className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
+        </button>
+        
+        <div className="flex items-center">
+          {showPreview && onPreview && (
+            <button
+              onClick={onPreview}
+              className="flex items-center px-2 py-2 mr-2 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              aria-label="Preview CV"
+            >
+              <EyeIcon className="w-4 h-4" />
+            </button>
           )}
-        </Button>
-      )}
+          
+          <button
+            onClick={onNext}
+            disabled={isNextDisabled}
+            className={`flex items-center px-3 py-2 text-sm rounded-md ${
+              isNextDisabled
+                ? 'bg-primary/50 text-white cursor-not-allowed'
+                : 'bg-primary text-white hover:bg-primary/90'
+            }`}
+          >
+            {nextButtonContent ? (
+              nextButtonContent
+            ) : (
+              <>
+                {nextLabel}
+                <ChevronRightIcon className="w-4 h-4 ml-1" />
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

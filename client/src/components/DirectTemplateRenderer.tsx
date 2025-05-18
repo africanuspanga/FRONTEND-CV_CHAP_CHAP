@@ -1,61 +1,49 @@
 import React from 'react';
-import { CVData } from '@/types/cv-types';
+import { CVData } from '../types/cv-types';
 
-// Import our templates
-import KilimanjaroTemplate from '@/templates/KilimanjaroTemplate';
-import TanzaniteProTemplate from '@/templates/TanzaniteProTemplate';
-import BigBossTemplate from '@/templates/BigBossTemplate';
-import MjenziWaTaifaTemplate from '@/templates/MjenziWaTaifaTemplate';
-import StreetHustlerTemplate from '@/templates/StreetHustlerTemplate';
+// Import all template components
+import KilimanjaroTemplate from '../templates/KilimanjaroTemplate';
+import TanzaniteProTemplate from '../templates/TanzaniteProTemplate';
+import BigBossTemplate from '../templates/BigBossTemplate';
+import MjenziWaTaifaTemplate from '../templates/MjenziWaTaifaTemplate';
+import StreetHustlerTemplate from '../templates/StreetHustlerTemplate';
 
 interface DirectTemplateRendererProps {
   templateId: string;
-  cvData: CVData;
-  height?: string | number;
-  width?: string | number;
-  className?: string;
+  data: CVData;
+  containerClassName?: string;
 }
 
 /**
- * Renders CV templates directly as React components
- * Unlike ClientSideTemplateRenderer, this component renders templates directly
- * rather than in an iframe, which is more efficient for mobile devices
+ * A component that directly renders CV templates based on templateId
+ * Used primarily for mobile preview to optimize performance
  */
 const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
   templateId,
-  cvData,
-  height = 'auto',
-  width = '100%',
-  className = ''
+  data,
+  containerClassName = ''
 }) => {
+  // Render the appropriate template based on templateId
   const renderTemplate = () => {
-    // Map templateId to component
-    switch(templateId) {
+    switch (templateId) {
       case 'kilimanjaro':
-        return <KilimanjaroTemplate data={cvData} />;
+        return <KilimanjaroTemplate data={data} />;
       case 'tanzanitePro':
-        return <TanzaniteProTemplate data={cvData} />;
+        return <TanzaniteProTemplate data={data} />;
       case 'bigBoss':
-        return <BigBossTemplate data={cvData} />;
+        return <BigBossTemplate data={data} />;
       case 'mjenziWaTaifa':
-        return <MjenziWaTaifaTemplate data={cvData} />;
+        return <MjenziWaTaifaTemplate data={data} />;
       case 'streetHustler':
-        return <StreetHustlerTemplate data={cvData} />;
+        return <StreetHustlerTemplate data={data} />;
       default:
-        // Fallback to default template
-        return <TanzaniteProTemplate data={cvData} />;
+        // Default to TanzaniteProTemplate if templateId is not recognized
+        return <TanzaniteProTemplate data={data} />;
     }
   };
 
   return (
-    <div 
-      className={`cv-template-container ${className}`}
-      style={{ 
-        height: typeof height === 'number' ? `${height}px` : height,
-        width: typeof width === 'number' ? `${width}px` : width,
-        overflow: 'hidden'
-      }}
-    >
+    <div className={`template-container ${containerClassName}`}>
       {renderTemplate()}
     </div>
   );
