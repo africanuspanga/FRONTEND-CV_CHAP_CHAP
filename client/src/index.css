@@ -4,6 +4,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile Meta Tags */
+@media screen and (max-width: 768px) {
+  html {
+    overflow-x: hidden;
+  }
+  
+  body {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
+
 :root {
   --background: 0 0% 100%;
   --foreground: 222.2 47.4% 11.2%;
@@ -89,6 +102,8 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
     font-family: 'Inter', sans-serif;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -97,6 +112,54 @@
   
   p {
     @apply text-muted-foreground;
+  }
+}
+
+@layer utilities {
+  /* Mobile optimizations */
+  .mobile-container {
+    @apply px-4 md:px-6 lg:px-8 max-w-full;
+  }
+  
+  .mobile-form-container {
+    @apply w-full max-w-md mx-auto px-4 sm:px-6;
+  }
+  
+  .mobile-buttons {
+    @apply flex flex-col sm:flex-row gap-2 w-full mt-4;
+  }
+  
+  .mobile-buttons button {
+    @apply w-full sm:w-auto;
+  }
+  
+  /* CV preview optimizations for mobile */
+  .cv-preview-mobile {
+    @apply w-full overflow-hidden shadow-md rounded-md;
+    transform-origin: top center;
+  }
+  
+  /* Mobile scaling for CV preview using the A4 aspect ratio */
+  .cv-preview-container-mobile {
+    @apply relative w-full overflow-hidden;
+    padding-bottom: 141.4%;  /* A4 aspect ratio (29.7/21 = 1.414) */
+  }
+  
+  /* Fix for inputs on mobile to prevent zooming */
+  input, textarea, select {
+    @apply text-base;
+    font-size: 16px;
+  }
+  
+  /* Sticky navigation for mobile */
+  .mobile-sticky-nav {
+    @apply sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  
+  /* Full-width sections for mobile */
+  .mobile-full-width {
+    @apply w-full -mx-4 sm:mx-0 px-4 sm:px-0;
   }
 }
 

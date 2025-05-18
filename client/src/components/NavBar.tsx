@@ -46,12 +46,12 @@ const NavBar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="mobile-sticky-nav bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <h1 className="text-3xl font-bold text-primary">CV Chap Chap</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">CV Chap Chap</h1>
             </Link>
           </div>
           
@@ -95,10 +95,21 @@ const NavBar: React.FC = () => {
             )}
           </div>
           
-          <div className="flex md:hidden items-center">
+          <div className="flex md:hidden items-center gap-2">
+            {/* Show a simplified create button on mobile */}
+            <Link href="/cv-steps">
+              <Button
+                variant="default"
+                size="sm"
+                className="px-2 text-xs"
+              >
+                Create CV
+              </Button>
+            </Link>
+            
             <button
               type="button"
-              className="text-gray-500 hover:text-primary"
+              className="text-gray-500 hover:text-primary p-2"
               onClick={toggleMobileMenu}
               aria-label="Toggle mobile menu"
             >
@@ -113,7 +124,7 @@ const NavBar: React.FC = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
+                  d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
                 />
               </svg>
             </button>
@@ -121,15 +132,20 @@ const NavBar: React.FC = () => {
         </div>
       </div>
       
-      {/* Mobile menu */}
-      <div className={cn('md:hidden bg-white', isMobileMenuOpen ? 'block' : 'hidden')}>
-        <div className="px-2 pt-2 pb-3 space-y-1">
+      {/* Mobile menu with slide-down animation */}
+      <div 
+        className={cn(
+          'md:hidden bg-white shadow-md transition-all duration-200 ease-in-out overflow-hidden', 
+          isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+        )}
+      >
+        <div className="px-4 py-3 space-y-2 divide-y divide-gray-100">
           {routes.map((route) => (
             <Link
               key={route.path}
               href={route.path}
               className={cn(
-                'block px-3 py-2 rounded-md text-base font-medium',
+                'block py-3 text-base font-medium',
                 isActive(route.path)
                   ? 'text-primary'
                   : 'text-darkText hover:text-primary'
@@ -143,7 +159,7 @@ const NavBar: React.FC = () => {
           {/* Only show Reset CV button on CV creation-related pages */}
           {location.includes('/create') || location.includes('/templates') ? (
             <button
-              className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-darkText hover:text-primary"
+              className="block w-full text-left py-3 text-base font-medium text-darkText hover:text-primary"
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 handleResetCV();
@@ -160,7 +176,7 @@ const NavBar: React.FC = () => {
             <>
               <Link
                 href="/profile"
-                className="block px-3 py-2 rounded-md text-base font-medium text-darkText hover:text-primary"
+                className="block py-3 text-base font-medium text-darkText hover:text-primary"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 My Profile
@@ -168,14 +184,14 @@ const NavBar: React.FC = () => {
               
               <Link
                 href="/my-cvs"
-                className="block px-3 py-2 rounded-md text-base font-medium text-darkText hover:text-primary"
+                className="block py-3 text-base font-medium text-darkText hover:text-primary"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 My CVs
               </Link>
               
               <button
-                className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-800"
+                className="block w-full text-left py-3 text-base font-medium text-red-600 hover:text-red-800"
                 onClick={() => {
                   setIsMobileMenuOpen(false);
                   logout();
@@ -187,10 +203,12 @@ const NavBar: React.FC = () => {
           ) : (
             <Link
               href="/login"
-              className="block px-3 py-2 rounded-md text-base font-medium text-primary hover:text-blue-700"
+              className="block py-3 text-base font-medium text-primary hover:text-blue-700"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Login
+              <div className="flex justify-center">
+                <Button size="sm">Login</Button>
+              </div>
             </Link>
           )}
         </div>
