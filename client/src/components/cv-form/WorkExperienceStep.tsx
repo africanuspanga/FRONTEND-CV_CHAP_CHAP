@@ -17,7 +17,7 @@ import { Trash2, PlusCircle, GripVertical, AlertCircle, Save, CheckCircle } from
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 
-// CRITICAL FIX: Import the storage fixer utility to permanently solve work experience issues
+// CRITICAL FIX: Import the storage fixer utilities to permanently solve work experience issues
 import { 
   STORAGE_KEYS,
   sanitizeWorkExperiences as sanitizeWorkExperiencesFn,
@@ -27,6 +27,13 @@ import {
   logWorkExperience,
   LogLevel
 } from '@/utils/work-experience-fixer';
+
+// CRITICAL FIX: Import the job title fixer utility to ensure job titles are always saved
+import {
+  fixJobTitles,
+  ensureJobTitlesAreSaved,
+  saveJobTitleForSpecificEntry
+} from '@/utils/job-title-fixer';
 
 // Extend the schema with client-side validation
 const formSchema = z.object({
@@ -524,21 +531,45 @@ const WorkExperienceStep: React.FC = () => {
                                 
                                 // Log the update for debugging
                                 console.log(`Job title updated for position ${index+1}:`, e.target.value);
+                                
+                                // CRITICAL FIX: Target update for specific job entry by ID
+                                const currentEntry = form.getValues(`workExperience.${index}`);
+                                if (currentEntry && currentEntry.id) {
+                                  console.log(`⚡ Direct job title update for ID ${currentEntry.id}`);
+                                  // Use the specific job title saver utility
+                                  saveJobTitleForSpecificEntry(
+                                    e.target.value,
+                                    currentEntry.id,
+                                    updateFormField,
+                                    formData
+                                  );
+                                }
                               }}
                               onBlur={() => {
                                 // Save data immediately when field loses focus
                                 const values = form.getValues();
-                                updateFormField('workExperiences', values.workExperience);
-                                updateFormField('workExp', values.workExperience);
                                 
-                                // Force save to storage
+                                // CRITICAL FIX: Ensure all job titles are properly saved
+                                const fixedValues = fixJobTitles(values.workExperience);
+                                
+                                // Update form fields with fixed values
+                                form.setValue('workExperience', fixedValues);
+                                
+                                // Update context
+                                updateFormField('workExperiences', fixedValues);
+                                updateFormField('workExp', fixedValues);
+                                
+                                // Force save to storage with fixed values
                                 const updatedData = {
                                   ...formData,
-                                  workExperiences: values.workExperience,
-                                  workExp: values.workExperience
+                                  workExperiences: fixedValues,
+                                  workExp: fixedValues
                                 };
+                                
                                 localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
                                 sessionStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
+                                
+                                console.log(`💾 Saved all job titles - ${fixedValues.length} entries confirmed`);
                               }}
                             />
                           </FormControl>
