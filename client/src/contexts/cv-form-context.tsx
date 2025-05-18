@@ -2,6 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CVData, Accomplishment, Hobby } from '@shared/schema';
 import * as cvStorage from '../utils/cv-storage';
 import StorageWarningToast from '@/components/StorageWarningToast';
+import { validateCVData, ensureArray, ensureObjectFields } from '@/utils/data-validator';
+import { loadCVFormData, saveCVFormData, saveCurrentStep, loadCurrentStep } from '@/utils/storage-manager';
+import { runAllCVTests, logTestResults } from '@/utils/test-utils';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Define form data structure with additional template information
 export interface CVFormData extends CVData {
@@ -86,57 +90,94 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [storageWarningShown, setStorageWarningShown] = useState<boolean>(false);
   
-  // Load saved data on initial mount
+  // Load saved data on initial mount with enhanced validation and recovery
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load form data from any available storage method
-        const savedData = await cvStorage.loadFormData();
-        if (savedData) {
-          console.log('Successfully loaded saved CV data');
+        // Load form data with improved storage manager (handles multiple storage options and fallbacks)
+        const { data: savedData, source } = loadCVFormData(initialFormData);
+        
+        if (savedData && savedData !== initialFormData) {
+          console.log(`Successfully loaded saved CV data from ${source}`);
           
-          // ENHANCED DATA INTEGRITY: Ensure consistent work experience data between arrays
-          // First, create empty arrays if needed
-          if (!savedData.workExperiences) {
-            savedData.workExperiences = [];
-          }
+          // Run validation tests on loaded data to check for inconsistencies
+          const testResults = runAllCVTests(savedData);
           
-          if (!savedData.workExp) {
-            savedData.workExp = [];
-          }
+          // Log test results (only visible in console for debugging)
+          logTestResults(testResults.results);
           
+          // ENHANCED DATA INTEGRITY: Ensure all required arrays exist and are valid
+          const safeData = {
+            ...savedData,
+            // Ensure arrays are properly initialized with ensureArray utility
+            workExperiences: ensureArray(savedData.workExperiences, []),
+            workExp: ensureArray(savedData.workExp, []),
+            education: ensureArray(savedData.education, []),
+            skills: ensureArray(savedData.skills, []),
+            languages: ensureArray(savedData.languages, []),
+            references: ensureArray(savedData.references, []),
+            websites: ensureArray(savedData.websites, []),
+          };
+          
+          // CONSISTENCY CHECK: Ensure work experiences are synchronized between arrays
           // Determine which array to use as source of truth (prefer the one with more entries)
           let workExpToUse;
           
-          const workExpLength = Array.isArray(savedData.workExp) ? savedData.workExp.length : 0;
-          const workExperiencesLength = Array.isArray(savedData.workExperiences) ? savedData.workExperiences.length : 0;
+          const workExpLength = safeData.workExp.length;
+          const workExperiencesLength = safeData.workExperiences.length;
           
           // Choose the array with more entries as the source of truth
           if (workExperiencesLength >= workExpLength && workExperiencesLength > 0) {
             console.log('Using workExperiences as source of truth (has more entries)');
-            workExpToUse = JSON.parse(JSON.stringify(savedData.workExperiences));
+            workExpToUse = JSON.parse(JSON.stringify(safeData.workExperiences));
           } else if (workExpLength > 0) {
             console.log('Using workExp as source of truth (has more entries)');
-            workExpToUse = JSON.parse(JSON.stringify(savedData.workExp));
+            workExpToUse = JSON.parse(JSON.stringify(safeData.workExp));
           } else {
             console.log('Both work experience arrays are empty');
             workExpToUse = [];
           }
           
           // Ensure both arrays are assigned the complete set of work experiences
-          savedData.workExperiences = workExpToUse;
-          savedData.workExp = workExpToUse;
+          safeData.workExperiences = workExpToUse;
+          safeData.workExp = workExpToUse;
           
-          console.log('After sync - workExperiences count:', savedData.workExperiences.length);
-          console.log('After sync - workExp count:', savedData.workExp.length);
+          console.log('After sync - workExperiences count:', safeData.workExperiences.length);
+          console.log('After sync - workExp count:', safeData.workExp.length);
           
-          setFormData(savedData);
+          // Process all website URLs to ensure they have proper format (if they are strings)
+          if (Array.isArray(safeData.websites)) {
+            safeData.websites = safeData.websites.map(site => {
+              // If it's already a proper object with id, name, url properties, use it
+              if (typeof site === 'object' && site !== null && 'url' in site) {
+                return site;
+              }
+              
+              // If it's a string, convert to proper object format
+              if (typeof site === 'string' && site.trim() !== '') {
+                return {
+                  id: `website-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                  name: site.includes('linkedin') ? 'LinkedIn' : 
+                        site.includes('github') ? 'GitHub' : 'Website',
+                  url: site
+                };
+              }
+              
+              // Invalid data, return null to be filtered out
+              return null;
+            }).filter(Boolean); // Remove null entries
+          }
+          
+          setFormData(safeData);
+          
+          // Save the sanitized data back to storage to ensure consistency
+          saveCVFormData(safeData);
         }
         
-        // Load current step
-        const savedStep = cvStorage.loadStep();
-        if (savedStep !== null) {
-          setCurrentStep(savedStep);
+        // Load current step with improved storage manager
+        const step = loadCurrentStep(0);
+        if (typeof step === 'number' && !isNaN(step)) {
+          setCurrentStep(step);
         }
       } catch (error) {
         console.error('Failed to load saved form data:', error);
@@ -149,40 +190,54 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   // Track data size for monitoring
   const [dataSize, setDataSize] = useState(0);
   
-  // Save form data whenever it changes, with multi-tiered storage
+  // Save form data whenever it changes, with enhanced validation and storage
   useEffect(() => {
     const saveData = async () => {
       try {
-        // Calculate data size (JSON-stringified) for monitoring
+        // Run quick validation before saving
+        const validation = validateCVData(formData);
+        
+        // Log validation issues but still try to save (for resilience)
+        if (!validation.valid && validation.errors) {
+          console.warn('CV data validation issues:', validation.errors);
+        }
+        
+        // Calculate data size for monitoring
         const dataString = JSON.stringify(formData);
         const currentSize = dataString.length;
         setDataSize(currentSize);
         
-        // Save using our multi-tiered storage system
-        await cvStorage.saveFormData(formData);
+        // ENHANCED SAVE: Use new storage manager with improved error handling
+        const result = saveCVFormData(formData);
+        
+        if (!result.success) {
+          console.warn('Storage issue detected:', result.error);
+          if (result.error?.includes('quota') && !storageWarningShown) {
+            setStorageWarningShown(true);
+          }
+        }
       } catch (error) {
         console.error('Failed to save form data:', error);
         
-        // No need to show alerts since we now use a tiered storage system with fallbacks
-        if (error instanceof Error) {
-          console.warn(`Storage issue details: ${error.message}`);
-          // If it's a quota error, mark that we've shown the warning
-          if (error.message.includes('quota') && !storageWarningShown) {
-            setStorageWarningShown(true);
-          }
+        if (error instanceof Error && error.message.includes('quota') && !storageWarningShown) {
+          setStorageWarningShown(true);
         }
       }
     };
     
-    saveData();
+    // Only save if form data has content
+    if (formData && formData.personalInfo) {
+      saveData();
+    }
   }, [formData, storageWarningShown]);
   
-  // Save current step whenever it changes
+  // Save current step whenever it changes with enhanced storage manager
   useEffect(() => {
-    try {
-      cvStorage.saveStep(currentStep);
-    } catch (error) {
-      console.error('Failed to save step:', error);
+    if (typeof currentStep === 'number' && !isNaN(currentStep)) {
+      const result = saveCurrentStep(currentStep);
+      if (!result.success) {
+        console.warn('Failed to save current step');
+      }
     }
   }, [currentStep]);
   
