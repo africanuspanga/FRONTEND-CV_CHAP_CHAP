@@ -28,6 +28,12 @@ const MobileCVPreview: React.FC<MobileCVPreviewProps> = ({
     setScale(prev => Math.max(prev - 0.1, 0.4)); // Min zoom 40%
   };
   
+  const handleRefresh = () => {
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
+  
   return (
     <div className="mobile-cv-preview relative w-full overflow-hidden bg-gray-100 rounded-md">
       {/* Zoom controls */}
@@ -46,11 +52,36 @@ const MobileCVPreview: React.FC<MobileCVPreviewProps> = ({
         >
           <PlusIcon className="w-4 h-4" />
         </button>
+        {onRefresh && (
+          <button 
+            onClick={handleRefresh}
+            className="bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md"
+            aria-label="Refresh preview"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              className="w-4 h-4"
+            >
+              <path d="M21 2v6h-6"></path>
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+              <path d="M3 22v-6h6"></path>
+              <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+            </svg>
+          </button>
+        )}
       </div>
       
       {/* Template container with scale transform */}
       <div 
-        className="w-full overflow-auto bg-white shadow-lg"
+        className={`w-full overflow-auto bg-white shadow-lg ${containerClassName}`}
         style={{ 
           height: '70vh', 
           maxHeight: '500px',
@@ -58,11 +89,7 @@ const MobileCVPreview: React.FC<MobileCVPreviewProps> = ({
         }}
       >
         <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
-          <DirectTemplateRenderer 
-            templateId={templateId} 
-            data={data} 
-            containerClassName="min-h-[842px] w-[595px] mx-auto"
-          />
+          {children}
         </div>
       </div>
       

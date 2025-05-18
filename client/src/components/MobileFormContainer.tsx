@@ -5,6 +5,7 @@ interface MobileFormContainerProps {
   title?: string;
   subtitle?: string;
   className?: string;
+  fullWidth?: boolean;
 }
 
 /**
@@ -15,7 +16,8 @@ const MobileFormContainer: React.FC<MobileFormContainerProps> = ({
   children, 
   title, 
   subtitle, 
-  className = '' 
+  className = '',
+  fullWidth = false
 }) => {
   return (
     <div className={`mobile-form-container bg-white rounded-lg shadow-sm p-4 ${className}`}>
