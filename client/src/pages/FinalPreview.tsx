@@ -139,6 +139,13 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
             <button onClick={() => setTemplateSidebarOpen(true)}>
               Change Template
             </button>
+            <button 
+              onClick={() => navigate('/edit-sections')}
+              className="ml-2 bg-green-600 text-white"
+            >
+              <Edit className="h-4 w-4 mr-1 inline" />
+              Edit
+            </button>
           </div>
         </div>
         
@@ -318,6 +325,15 @@ const FinalPreview = () => {
               onClick={() => setTemplateSidebarOpen(!templateSidebarOpen)}
             >
               <span className="flex items-center gap-1">Change Template</span>
+            </Button>
+            <Button 
+              className="bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 transition-all text-sm px-4 py-1 h-9 rounded-full shadow-sm" 
+              onClick={() => navigate('/edit-sections')}
+            >
+              <span className="flex items-center gap-1">
+                <Edit className="h-4 w-4 mr-1" />
+                Edit Sections
+              </span>
             </Button>
             <Button variant="outline" className="text-sm px-4 py-1 h-9 rounded-full shadow-sm">
               <Mail className="h-4 w-4 mr-1" />
