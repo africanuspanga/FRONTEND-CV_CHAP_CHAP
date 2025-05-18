@@ -1,25 +1,63 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, UserCircle, Briefcase, GraduationCap, 
-  LibraryBig, Globe, FileText, Users, PlusCircle } from 'lucide-react';
+  LibraryBig, Globe, FileText, Users, PlusCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { navigateWithScrollReset } from '@/lib/navigation-utils';
 import { useCVForm } from '@/contexts/cv-form-context';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
 
 const EditSections = () => {
   const [, navigate] = useLocation();
   const { formData } = useCVForm();
-  const templateId = formData.templateId || 'kilimanjaro';
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [templateId, setTemplateId] = useState<string>('kilimanjaro');
+  
+  // Initialize and validate data on component mount
+  useEffect(() => {
+    setLoading(true);
+    try {
+      // Check if we have CV data
+      if (!formData || !Object.keys(formData).length) {
+        // Try to load from storage if context is empty
+        const storedData = sessionStorage.getItem('cv_form_data') || localStorage.getItem('cv_form_data');
+        if (!storedData) {
+          setError('No CV data found. Please start creating a CV first.');
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Set template ID from form data or storage
+      const tempId = formData.templateId || 
+                    sessionStorage.getItem('cv_template_id') || 
+                    localStorage.getItem('cv_template_id') || 
+                    'kilimanjaro';
+      setTemplateId(tempId);
+      
+      setLoading(false);
+    } catch (err) {
+      console.error('Error initializing EditSections page:', err);
+      setError('There was a problem loading your CV data. Please try again.');
+      setLoading(false);
+    }
+  }, [formData]);
 
-  // Navigation functions
+  // Navigation functions - direct to the specific edit pages rather than the intro pages
   const goToFinalPreview = () => navigateWithScrollReset(navigate, `/cv/${templateId}/final-preview`);
   const goToPersonalInfo = () => navigateWithScrollReset(navigate, `/cv/${templateId}/personal`);
+  // For work experience, go directly to the work experience form
   const goToWorkExperience = () => navigateWithScrollReset(navigate, `/cv/${templateId}/work-experience`);
   const goToEducation = () => navigateWithScrollReset(navigate, `/cv/${templateId}/education`);
-  const goToSkills = () => navigateWithScrollReset(navigate, `/cv/${templateId}/skills`);
+  // For skills, go directly to the skills editor
+  const goToSkills = () => navigateWithScrollReset(navigate, `/cv/${templateId}/skills-editor`);
   const goToLanguages = () => navigateWithScrollReset(navigate, `/cv/${templateId}/languages`);
-  const goToSummary = () => navigateWithScrollReset(navigate, `/cv/${templateId}/summary`);
+  // For summary, go directly to the summary editor
+  const goToSummary = () => navigateWithScrollReset(navigate, `/cv/${templateId}/summary-editor`);
   const goToReferences = () => navigateWithScrollReset(navigate, `/cv/${templateId}/references`);
   const goToAdditional = () => navigateWithScrollReset(navigate, `/cv/${templateId}/additional-sections`);
 
@@ -40,6 +78,31 @@ const EditSections = () => {
     formData.personalInfo.summary && 
     typeof formData.personalInfo.summary === 'string' &&
     formData.personalInfo.summary.length > 0;
+
+  // Handle error cases with helpful messages
+  if (error) {
+    return (
+      <div className="container mx-auto max-w-4xl py-8 px-4">
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4 mr-2" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+        <Button onClick={() => navigate('/')} className="mt-4">
+          Go to Homepage
+        </Button>
+      </div>
+    );
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="container mx-auto max-w-4xl py-8 px-4 flex flex-col items-center justify-center min-h-[50vh]">
+        <Loader2 className="h-8 w-8 animate-spin mb-4 text-primary" />
+        <p className="text-muted-foreground">Loading your CV data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto max-w-4xl py-8 px-4">
