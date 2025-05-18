@@ -50,8 +50,8 @@ const EditSections = () => {
   // Navigation functions - direct to the specific edit pages rather than the intro pages
   const goToFinalPreview = () => navigateWithScrollReset(navigate, `/cv/${templateId}/final-preview`);
   const goToPersonalInfo = () => navigateWithScrollReset(navigate, `/cv/${templateId}/personal`);
-  // For work experience, go directly to the work experience form
-  const goToWorkExperience = () => navigateWithScrollReset(navigate, `/cv/${templateId}/work-experience`);
+  // For work experience, go directly to the work history summary page
+  const goToWorkExperience = () => navigateWithScrollReset(navigate, `/cv/${templateId}/work-experience/summary`);
   const goToEducation = () => navigateWithScrollReset(navigate, `/cv/${templateId}/education`);
   // For skills, go directly to the skills editor
   const goToSkills = () => navigateWithScrollReset(navigate, `/cv/${templateId}/skills-editor`);
