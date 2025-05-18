@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -6,9 +6,11 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
 import { getAllTemplates, getTemplateById } from '@/lib/templates-registry';
 import { sortTemplatesByPriority } from '@/lib/template-priority';
-import { X, Download, Printer, Mail, CheckCircle, Edit, Loader2 } from 'lucide-react';
+import { X, Download, Printer, Mail, CheckCircle, Edit, Loader2, AlertCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDynamicScale, A4_WIDTH_PX, A4_HEIGHT_PX } from '@/hooks/use-dynamic-scale';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Add CSS styles for improved mobile experience
 import '../styles/cvPreview.css';
@@ -35,6 +37,7 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
 }) => {
   // Create ref for the container to measure
   const containerRef = useRef<HTMLDivElement>(null);
+  const [renderError, setRenderError] = useState<string | null>(null);
   
   // Use dynamic scaling hook to calculate the optimal scale factor
   const { scale } = useDynamicScale(containerRef, [templateId, isMobile]);
@@ -44,8 +47,86 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
   // Set a fixed scale factor for desktop
   const displayScale = isMobile ? 0.5 : 0.55;
   
+  // Validate and prepare CV data to ensure it has the necessary structure
+  const validatedData = useMemo(() => {
+    try {
+      // Create a deep copy to avoid modifying the original data
+      const processedData = JSON.parse(JSON.stringify(formData || {}));
+      
+      // Ensure personal info exists
+      if (!processedData.personalInfo) {
+        processedData.personalInfo = {};
+      }
+      
+      // Ensure work experience arrays exist
+      if (!Array.isArray(processedData.workExperiences)) {
+        processedData.workExperiences = [];
+      }
+      
+      if (!Array.isArray(processedData.workExp)) {
+        processedData.workExp = [];
+      }
+      
+      // Ensure professional title is set
+      let professionalTitle = processedData.personalInfo?.professionalTitle?.trim() || '';
+      
+      // If professional title is missing, try these fallbacks:
+      if (!professionalTitle) {
+        // 1. Try job title from personal info
+        professionalTitle = processedData.personalInfo?.jobTitle?.trim() || '';
+        
+        // 2. Try first work experience job title
+        if (!professionalTitle && processedData.workExperiences && processedData.workExperiences.length > 0) {
+          professionalTitle = processedData.workExperiences[0].jobTitle?.trim() || '';
+        }
+        
+        // 3. If still no title but we have a company name, use "Professional at Company"
+        if (!professionalTitle && processedData.workExperiences && processedData.workExperiences.length > 0) {
+          const company = processedData.workExperiences[0].company?.trim();
+          if (company) {
+            professionalTitle = `Professional at ${company}`;
+          }
+        }
+        
+        // 4. Default fallback if all else fails
+        if (!professionalTitle) {
+          professionalTitle = "Professional";
+        }
+        
+        console.log(`Fixed missing professional title in preview with: "${professionalTitle}"`);
+        processedData.personalInfo.professionalTitle = professionalTitle;
+      }
+      
+      // Ensure other arrays exist
+      ['education', 'skills', 'languages', 'references', 
+       'certifications', 'projects', 'hobbies', 'websites', 
+       'accomplishments'].forEach(field => {
+        if (!Array.isArray(processedData[field])) {
+          processedData[field] = [];
+        }
+      });
+      
+      // Ensure name field for renderer
+      if (processedData.personalInfo.firstName || processedData.personalInfo.lastName) {
+        processedData.name = `${processedData.personalInfo.firstName || ''} ${processedData.personalInfo.lastName || ''}`.trim();
+      }
+      
+      // Map workExperiences to workExperience if needed (template compatibility)
+      if (!processedData.workExperience && Array.isArray(processedData.workExperiences)) {
+        processedData.workExperience = [...processedData.workExperiences];
+      }
+      
+      setRenderError(null);
+      return processedData;
+    } catch (error) {
+      console.error('Error processing CV data for preview:', error);
+      setRenderError('Could not process CV data properly.');
+      return formData;
+    }
+  }, [formData]);
+  
   if (isMobile) {
-    const { personalInfo = {} } = formData;
+    const { personalInfo = {} } = validatedData;
     const { firstName = "", lastName = "" } = personalInfo;
     // Extract initials for avatar
     const initials = `${firstName?.[0] || ""}${lastName?.[0] || ""}`;
@@ -60,16 +141,34 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
             </button>
           </div>
         </div>
+        
+        {renderError && (
+          <Alert className="m-4 border-amber-200 bg-amber-50">
+            <AlertCircle className="h-4 w-4 mr-2 text-amber-500" />
+            <AlertDescription className="text-amber-700">{renderError}</AlertDescription>
+          </Alert>
+        )}
 
         <div className="mobile-cv-card">
           <div className="scaled-preview">
-            <DirectTemplateRenderer
-              templateId={templateId}
-              cvData={formData}
-              width={A4_WIDTH_PX}
-              height={A4_HEIGHT_PX}
-              scaleFactor={1} // No internal scaling, we scale with CSS
-            />
+            <ErrorBoundary
+              fallback={
+                <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+                  <h3 className="text-lg font-medium text-red-800 mb-2">Rendering Error</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    There was an error displaying your template. Try selecting a different template.
+                  </p>
+                </div>
+              }
+            >
+              <DirectTemplateRenderer
+                templateId={templateId}
+                cvData={validatedData}
+                width={A4_WIDTH_PX}
+                height={A4_HEIGHT_PX}
+                scaleFactor={1} // No internal scaling, we scale with CSS
+              />
+            </ErrorBoundary>
           </div>
           <div className="mobile-cv-watermark">
             Preview
@@ -101,6 +200,13 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
       ref={containerRef}
       className="cv-preview-container"
     >
+      {renderError && (
+        <Alert className="m-4 border-amber-200 bg-amber-50">
+          <AlertCircle className="h-4 w-4 mr-2 text-amber-500" />
+          <AlertDescription className="text-amber-700">{renderError}</AlertDescription>
+        </Alert>
+      )}
+      
       <div className="cv-container-wrapper">
         <div 
           className="cv-template-container"
@@ -119,13 +225,24 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
             overflow: 'hidden'
           }}
         >
-          <DirectTemplateRenderer
-            templateId={templateId}
-            cvData={formData}
-            height="auto"
-            width="100%"
-            scaleFactor={1}
-          />
+          <ErrorBoundary
+            fallback={
+              <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+                <h3 className="text-lg font-medium text-red-800 mb-2">Template Error</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  There was an error rendering this template. Try selecting a different template.
+                </p>
+              </div>
+            }
+          >
+            <DirectTemplateRenderer
+              templateId={templateId}
+              cvData={validatedData}
+              height="auto"
+              width="100%"
+              scaleFactor={1}
+            />
+          </ErrorBoundary>
         </div>
       </div>
     </div>

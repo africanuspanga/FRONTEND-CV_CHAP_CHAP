@@ -109,9 +109,9 @@ const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({ cvData, templateId }) => 
           <p className="text-sm text-gray-500 mb-4">This preview updates in real-time as you fill in your information.</p>
           
           {previewError && (
-            <Alert variant="warning" className="mb-4">
-              <AlertCircle className="h-4 w-4 mr-2" />
-              <AlertDescription>{previewError}</AlertDescription>
+            <Alert className="mb-4 border-amber-200 bg-amber-50">
+              <AlertCircle className="h-4 w-4 mr-2 text-amber-500" />
+              <AlertDescription className="text-amber-700">{previewError}</AlertDescription>
             </Alert>
           )}
           
