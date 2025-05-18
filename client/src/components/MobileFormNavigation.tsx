@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Save } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ChevronLeft, ChevronRight, Save, Check } from 'lucide-react';
 
 interface MobileFormNavigationProps {
   onPrevious?: () => void;
@@ -31,51 +30,50 @@ const MobileFormNavigation: React.FC<MobileFormNavigationProps> = ({
   previousLabel = 'Previous',
   nextLabel = 'Next',
   saveLabel = 'Save',
-  className,
+  className = '',
   showSaveButton = false
 }) => {
   return (
-    <div className={cn('mobile-buttons sticky bottom-0 z-10 pt-3 pb-4 bg-white border-t', className)}>
-      <div className="flex flex-col sm:flex-row justify-between w-full gap-2">
-        {/* Previous button */}
-        {onPrevious && (
-          <Button
-            onClick={onPrevious}
-            disabled={isPreviousDisabled}
-            variant="outline"
-            className="w-full sm:w-auto order-2 sm:order-1"
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            {previousLabel}
-          </Button>
-        )}
-        
-        {/* Save button (optional) */}
-        {showSaveButton && onSave && (
-          <Button
-            onClick={onSave}
-            disabled={isSaveDisabled}
-            variant="secondary"
-            className="w-full sm:w-auto order-1 sm:order-2"
-          >
-            <Save className="h-4 w-4 mr-1" />
-            {saveLabel}
-          </Button>
-        )}
-        
-        {/* Next button */}
-        {onNext && (
-          <Button
-            onClick={onNext}
-            disabled={isNextDisabled}
-            variant="default"
-            className="w-full sm:w-auto order-1 sm:order-3"
-          >
-            {nextLabel}
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
-        )}
-      </div>
+    <div className={`flex ${showSaveButton ? 'justify-between' : 'justify-between'} gap-2 ${className}`}>
+      {onPrevious && (
+        <Button
+          variant="outline"
+          onClick={onPrevious}
+          disabled={isPreviousDisabled}
+          className="flex-1 text-sm flex items-center justify-center gap-1"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          {previousLabel}
+        </Button>
+      )}
+      
+      {showSaveButton && onSave && (
+        <Button
+          variant="secondary"
+          onClick={onSave}
+          disabled={isSaveDisabled}
+          className="flex-1 text-sm flex items-center justify-center gap-1"
+        >
+          <Save className="h-4 w-4" />
+          {saveLabel}
+        </Button>
+      )}
+      
+      {onNext && (
+        <Button
+          variant={nextLabel === 'Complete' ? 'destructive' : 'default'}
+          onClick={onNext}
+          disabled={isNextDisabled}
+          className="flex-1 text-sm flex items-center justify-center gap-1"
+        >
+          {nextLabel}
+          {nextLabel === 'Complete' ? (
+            <Check className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </Button>
+      )}
     </div>
   );
 };
