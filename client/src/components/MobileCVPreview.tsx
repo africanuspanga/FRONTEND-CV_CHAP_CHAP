@@ -4,15 +4,20 @@ import DirectTemplateRenderer from './DirectTemplateRenderer';
 import { CVData } from '../types/cv-types';
 
 interface MobileCVPreviewProps {
-  data: CVData;
-  templateId: string;
+  children: React.ReactNode;
+  onRefresh?: () => void;
+  containerClassName?: string;
 }
 
 /**
  * A mobile-optimized CV preview component with zoom controls
  * Uses DirectTemplateRenderer for efficient template rendering
  */
-const MobileCVPreview: React.FC<MobileCVPreviewProps> = ({ data, templateId }) => {
+const MobileCVPreview: React.FC<MobileCVPreviewProps> = ({ 
+  children, 
+  onRefresh,
+  containerClassName = ""
+}) => {
   const [scale, setScale] = useState(0.8); // Start at 80% zoom for mobile
   
   const zoomIn = () => {

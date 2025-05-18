@@ -374,8 +374,7 @@ const CreateCVContent = () => {
                 >
                   <DirectTemplateRenderer
                     templateId={formData.templateId}
-                    cvData={formData}
-                    height="auto"
+                    data={formData}
                   />
                 </MobileCVPreview>
               )}

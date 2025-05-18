@@ -154,8 +154,7 @@ const AdditionalSectionsForm = () => {
             <div className="border border-gray-200 rounded-md bg-white p-4 overflow-auto" style={{ maxHeight: '700px' }}>
               <DirectTemplateRenderer
                 templateId={templateId}
-                cvData={formData}
-                height="auto"
+                data={formData}
               />
             </div>
           </div>
@@ -178,8 +177,7 @@ const AdditionalSectionsForm = () => {
             <div className="p-4">
               <DirectTemplateRenderer
                 templateId={templateId}
-                cvData={formData}
-                height={800}
+                data={formData}
               />
             </div>
           </div>
