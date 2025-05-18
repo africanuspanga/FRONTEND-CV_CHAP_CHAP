@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { CVData } from '@shared/schema';
+import { v4 as uuidv4 } from 'uuid';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 interface AdditionalSectionsFormProps {
@@ -25,8 +26,8 @@ interface AdditionalSectionsFormProps {
 }
 
 const formSchema = z.object({
-  hobbies: z.string().max(500, "Hobbies section should be 500 characters or less").optional(),
-  portfolioUrl: z.string().url("Please enter a valid URL").optional().or(z.string().length(0))
+  hobbies: z.string().max(500, "Hobbies section should be 500 characters or less").optional().default(''),
+  portfolioUrl: z.string().url("Please enter a valid URL").optional().or(z.string().length(0)).default('')
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -41,7 +42,8 @@ const AdditionalSectionsForm: React.FC<AdditionalSectionsFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       hobbies: defaultValues.hobbies || '',
-      portfolioUrl: defaultValues.website || ''
+      portfolioUrl: defaultValues.website || 
+                   (defaultValues.personalInfo?.website) || ''
     },
     mode: 'onChange'
   });
@@ -49,10 +51,36 @@ const AdditionalSectionsForm: React.FC<AdditionalSectionsFormProps> = ({
   const { handleSubmit } = form;
 
   const handleFormSubmit = (data: FormValues) => {
-    onSubmit({
-      hobbies: data.hobbies,
-      website: data.portfolioUrl, // Save the portfolio URL to the website field so templates can display it
-    });
+    // Create properly structured data for form submission with proper typing
+    const submissionData: Partial<CVData> = {
+      hobbies: data.hobbies || '',
+    };
+    
+    // Initialize websites array with proper typing
+    const websites: Array<{id: string; name: string; url: string}> = [];
+    
+    // Handle portfolio URL in a type-safe way
+    if (data.portfolioUrl) {
+      // Create website entry if URL exists
+      websites.push({
+        id: uuidv4(), // Generate a unique ID using UUID
+        name: 'Portfolio',
+        url: data.portfolioUrl
+      });
+      
+      // Also update personalInfo.website for compatibility with some templates
+      submissionData.personalInfo = {
+        firstName: '',
+        lastName: '',
+        email: '',
+        website: data.portfolioUrl
+      };
+    }
+    
+    // Always assign the websites array to ensure proper typing
+    submissionData.websites = websites;
+    
+    onSubmit(submissionData);
   };
 
   return (
