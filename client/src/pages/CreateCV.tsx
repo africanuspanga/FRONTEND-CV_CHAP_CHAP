@@ -3,12 +3,16 @@ import { useParams, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
-import { Eye, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, Check, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCVForm, CVFormProvider } from '@/contexts/cv-form-context';
 import CVFormStepper from '@/components/CVFormStepper';
 import ClientSideTemplateRenderer from '@/components/ClientSideTemplateRenderer';
-import { useIsMobile } from '@/hooks/use-mobile';
+import DirectTemplateRenderer from '@/components/DirectTemplateRenderer';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import MobileCVPreview from '@/components/MobileCVPreview';
+import MobileFormContainer from '@/components/MobileFormContainer';
+import MobileFormNavigation from '@/components/MobileFormNavigation';
 
 // Create placeholder components for now
 // We'll implement the actual functionality step by step
@@ -40,19 +44,21 @@ const NavigationButton = ({
   disabled = false, 
   variant = 'default',
   direction = 'next',
-  children 
+  children,
+  className
 }: { 
   onClick: () => void; 
   disabled?: boolean; 
   variant?: 'default' | 'outline' | 'secondary'; 
   direction?: 'next' | 'prev';
   children: React.ReactNode;
+  className?: string;
 }) => (
   <Button
     onClick={onClick}
     disabled={disabled}
     variant={variant}
-    className="px-6 py-2 flex items-center gap-2"
+    className={`px-6 py-2 flex items-center gap-2 ${className || ''}`}
   >
     {direction === 'prev' && <ChevronLeft className="h-4 w-4" />}
     {children}
@@ -65,8 +71,9 @@ const CreateCVContent = () => {
   const { step } = useParams<{ step?: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const isMobile = useIsMobile();
+  const { isMobile } = useIsMobile();
   const [previewVisible, setPreviewVisible] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   
   // Get context values
   const { 
@@ -157,6 +164,11 @@ const CreateCVContent = () => {
   const togglePreview = () => {
     setPreviewVisible(!previewVisible);
   };
+  
+  // Handle preview refresh
+  const handleRefreshPreview = () => {
+    setRefreshKey(prev => prev + 1);
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -218,70 +230,95 @@ const CreateCVContent = () => {
       {/* Main Content Area */}
       <div className="flex-1 bg-white">
         <div className="flex min-h-screen">
-          {/* Form Section */}
-          <div className="flex-1 p-10">
-            {/* Back button */}
-            <button 
-              onClick={handlePrevStep}
-              className="text-primary flex items-center mb-6" 
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Go Back
-            </button>
+          {/* Form Section - Mobile optimized */}
+          <div className={`flex-1 ${isMobile ? 'p-4 pb-40' : 'p-10'}`}>
+            {/* Back button - hidden on mobile as it's in the bottom nav */}
+            {!isMobile && (
+              <button 
+                onClick={handlePrevStep}
+                className="text-primary flex items-center mb-6" 
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Go Back
+              </button>
+            )}
             
-            {/* Form heading */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-800">
-                Great, let's work on your
+            {/* Form heading - Condensed on mobile */}
+            <div className={`${isMobile ? 'mb-5' : 'mb-8'}`}>
+              <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-gray-800`}>
+                {isMobile ? `${formSteps[currentStep].title}` : "Great, let's work on your"}
               </h1>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">
-                {formSteps[currentStep].title}
-              </h2>
               
-              <div className="text-gray-600">
-                <p className="mb-1">Here's what you need to know:</p>
-                <p>Employers quickly scan the {formSteps[currentStep].title.toLowerCase()} section.</p>
-                <p>We'll take care of the formatting so it's easy to find.</p>
+              {!isMobile && (
+                <h2 className="text-3xl font-bold text-gray-800 mb-6">
+                  {formSteps[currentStep].title}
+                </h2>
+              )}
+              
+              <div className={`${isMobile ? 'text-sm' : ''} text-gray-600`}>
+                {isMobile ? (
+                  <p>Employers quickly scan this section - we'll handle the formatting.</p>
+                ) : (
+                  <>
+                    <p className="mb-1">Here's what you need to know:</p>
+                    <p>Employers quickly scan the {formSteps[currentStep].title.toLowerCase()} section.</p>
+                    <p>We'll take care of the formatting so it's easy to find.</p>
+                  </>
+                )}
               </div>
+              
+              {/* Mobile-specific progress indicator */}
+              {isMobile && (
+                <div className="mt-4">
+                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>Progress</span>
+                    <span>{Math.round(progress)}%</span>
+                  </div>
+                  <Progress value={progress} className="h-1.5" />
+                </div>
+              )}
             </div>
             
             {/* Current Form Step Content */}
-            <div className="mb-8">
-              {renderCurrentStep()}
+            <div className={`${isMobile ? 'mb-4' : 'mb-8'}`}>
+              <MobileFormContainer fullWidth={isMobile}>
+                {renderCurrentStep()}
+              </MobileFormContainer>
             </div>
             
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-12">
-              <Button 
-                variant="outline"
-                className="border-primary text-primary px-6 py-2 rounded-full hover:bg-primary/10"
-                onClick={() => {
-                  // TODO: Preview functionality 
-                  toast({
-                    title: "Preview functionality",
-                    description: "Preview in a new tab will be implemented soon."
-                  });
-                }}
-              >
-                Preview
-              </Button>
-              
-              {currentStep < formSteps.length - 1 ? (
+            {/* Navigation Buttons - Hidden on mobile as they're in the bottom nav */}
+            {!isMobile && (
+              <div className="flex justify-between mt-12">
                 <Button 
-                  className="bg-primary hover:bg-primary/90 text-white px-10 py-2 rounded-full"
-                  onClick={handleNextStep}
+                  variant="outline"
+                  className="border-primary text-primary px-6 py-2 rounded-full hover:bg-primary/10"
+                  onClick={() => {
+                    toast({
+                      title: "Preview functionality",
+                      description: "Preview in a new tab will be implemented soon."
+                    });
+                  }}
                 >
-                  Next
+                  Preview
                 </Button>
-              ) : (
-                <Button 
-                  className="bg-accent hover:bg-accent/90 text-white px-10 py-2 rounded-full"
-                  onClick={handleComplete}
-                >
-                  Complete
-                </Button>
-              )}
-            </div>
+                
+                {currentStep < formSteps.length - 1 ? (
+                  <Button 
+                    className="bg-primary hover:bg-primary/90 text-white px-10 py-2 rounded-full"
+                    onClick={handleNextStep}
+                  >
+                    Next
+                  </Button>
+                ) : (
+                  <Button 
+                    className="bg-accent hover:bg-accent/90 text-white px-10 py-2 rounded-full"
+                    onClick={handleComplete}
+                  >
+                    Complete
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
           
           {/* Preview Section (Desktop only) */}
@@ -307,9 +344,19 @@ const CreateCVContent = () => {
             </div>
           )}
           
-          {/* Mobile Preview Toggle and View */}
+          {/* Mobile Preview Toggle and View - Enhanced for mobile */}
           {isMobile && (
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-40">
+              <MobileFormNavigation
+                onPrevious={currentStep > 1 ? handlePrevStep : undefined}
+                onNext={currentStep < formSteps.length - 1 ? handleNextStep : handleComplete}
+                isPreviousDisabled={currentStep === 0}
+                isNextDisabled={!isFormValid(currentStep)}
+                previousLabel="Back"
+                nextLabel={currentStep < formSteps.length - 1 ? "Next" : "Complete"}
+                className="mb-4"
+              />
+            
               <Button
                 variant="outline"
                 className="w-full mb-2 flex items-center justify-center gap-2"
@@ -320,13 +367,17 @@ const CreateCVContent = () => {
               </Button>
               
               {previewVisible && formData.templateId && (
-                <div className="border rounded overflow-hidden">
-                  <ClientSideTemplateRenderer
+                <MobileCVPreview
+                  key={refreshKey}
+                  onRefresh={handleRefreshPreview}
+                  containerClassName="mt-2 mb-4"
+                >
+                  <DirectTemplateRenderer
                     templateId={formData.templateId}
                     cvData={formData}
-                    height={300}
+                    height="auto"
                   />
-                </div>
+                </MobileCVPreview>
               )}
             </div>
           )}

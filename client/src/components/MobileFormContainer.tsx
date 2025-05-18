@@ -1,5 +1,4 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
 
 interface MobileFormContainerProps {
   children: React.ReactNode;
@@ -8,21 +7,21 @@ interface MobileFormContainerProps {
 }
 
 /**
- * A container component optimized for forms on mobile devices
- * Provides consistent spacing, padding, and width constraints
+ * Container component optimized for mobile form display
+ * Adds appropriate padding and spacing for small screens
  */
-const MobileFormContainer: React.FC<MobileFormContainerProps> = ({ 
-  children, 
-  className,
+const MobileFormContainer: React.FC<MobileFormContainerProps> = ({
+  children,
+  className = '',
   fullWidth = false
 }) => {
   return (
     <div 
-      className={cn(
-        'mobile-form-container py-4',
-        fullWidth ? 'w-full max-w-full' : 'w-full max-w-md',
-        className
-      )}
+      className={`
+        ${fullWidth ? 'w-full' : 'max-w-md mx-auto'}
+        bg-white rounded-md 
+        ${className}
+      `}
     >
       {children}
     </div>
