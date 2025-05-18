@@ -1,5 +1,5 @@
 import React from 'react';
-import { CVData } from '@/types/cv-types';
+import { CVData } from '../types/cv-types';
 
 interface TemplateProps {
   data: CVData;

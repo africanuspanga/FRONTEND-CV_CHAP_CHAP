@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PlusIcon, MinusIcon } from 'lucide-react';
 import DirectTemplateRenderer from './DirectTemplateRenderer';
-import { CVData } from '@/types/cv-types';
+import { CVData } from '../types/cv-types';
 
 interface MobileCVPreviewProps {
   data: CVData;

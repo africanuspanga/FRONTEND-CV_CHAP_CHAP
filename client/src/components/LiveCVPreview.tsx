@@ -137,8 +137,7 @@ const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({
               >
                 <DirectTemplateRenderer 
                   templateId={templateId} 
-                  cvData={validatedData} 
-                  height="auto"
+                  data={validatedData} 
                 />
               </ErrorBoundary>
             </MobileCVPreview>
@@ -201,8 +200,7 @@ const LiveCVPreview: React.FC<LiveCVPreviewProps> = ({
               <DirectTemplateRenderer 
                 key={refreshKey}
                 templateId={templateId} 
-                cvData={validatedData} 
-                height="auto"
+                data={validatedData}
               />
             </ErrorBoundary>
           </div>
