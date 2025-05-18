@@ -129,6 +129,7 @@ function Router() {
                 <Route path="/cv/:templateId/personal" component={PersonalInfoForm} />
                 <Route path="/cv/:templateId/work" component={WorkExperienceForm} />
                 <Route path="/cv/:templateId/work-experience" component={WorkExperienceForm} />
+                <Route path="/cv/:templateId/work-experience/summary" component={WorkExperienceForm} />
                 <Route path="/cv/:templateId/education" component={EducationForm} />
                 <Route path="/cv/:templateId/skills" component={SkillsIntro} />
                 <Route path="/cv/:templateId/skills-recommendations" component={SkillsRecommendations} />
