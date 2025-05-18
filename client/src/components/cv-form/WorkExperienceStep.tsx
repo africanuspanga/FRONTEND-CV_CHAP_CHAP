@@ -328,8 +328,22 @@ const WorkExperienceStep: React.FC = () => {
         [field]: value,
       };
       
+      // Special logging for job title fields to identify any issues
+      if (field === 'jobTitle') {
+        console.log(`Job title update for index ${index}:`, {
+          oldValue: currentValues[index]?.jobTitle,
+          newValue: value,
+          experienceId: updatedValues[index]?.id
+        });
+      }
+      
       // Update the form value
       form.setValue('workExperience', updatedValues);
+      
+      // Force direct field update for job titles
+      if (field === 'jobTitle') {
+        form.setValue(`workExperience.${index}.jobTitle`, value);
+      }
       
       // Update both arrays in context for consistency and preview
       updateFormField('workExperiences', updatedValues);
