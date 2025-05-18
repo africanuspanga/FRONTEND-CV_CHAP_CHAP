@@ -37,7 +37,7 @@ const AdditionalSectionsForm: React.FC<AdditionalSectionsFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       hobbies: defaultValues.hobbies || '',
-      portfolioUrl: ''
+      portfolioUrl: defaultValues.website || ''
     },
     mode: 'onChange'
   });
@@ -47,7 +47,7 @@ const AdditionalSectionsForm: React.FC<AdditionalSectionsFormProps> = ({
   const handleFormSubmit = (data: FormValues) => {
     onSubmit({
       hobbies: data.hobbies,
-      // Could add additional sections here in the future
+      website: data.portfolioUrl, // Save the portfolio URL to the website field so templates can display it
     });
   };
 
