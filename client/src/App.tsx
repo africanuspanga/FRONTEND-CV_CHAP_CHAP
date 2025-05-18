@@ -52,6 +52,7 @@ import TemplateGallery from "@/pages/template-gallery";
 import CVSteps from "@/pages/CVSteps";
 import EditSections from "@/pages/EditSections";
 import WorkExperienceSummary from "@/pages/WorkExperienceSummary";
+import AuthTest from "@/pages/auth-test";
 import NotFound from "@/pages/not-found";
 
 // Admin pages
@@ -172,6 +173,7 @@ function Router() {
                 <Route path="/ussd-payment-test" component={USSDPaymentTest} />
                 <Route path="/template-gallery" component={TemplateGallery} />
                 <Route path="/edit-sections" component={EditSections} />
+                <Route path="/auth-test" component={AuthTest} />
                 <Route component={NotFound} />
               </Switch>
             </div>

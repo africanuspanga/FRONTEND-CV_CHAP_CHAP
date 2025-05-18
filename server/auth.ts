@@ -218,6 +218,30 @@ export async function getMe(req: Request, res: Response) {
   }
 }
 
+// Get all users (for testing only)
+export async function getAllUsers(req: Request, res: Response) {
+  try {
+    // Get all users from database
+    const allUsers = await db.query.users.findMany();
+    
+    // Return only non-sensitive information
+    const sanitizedUsers = allUsers.map(user => ({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      phone_number: user.phone_number,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    }));
+    
+    return res.status(200).json(sanitizedUsers);
+  } catch (error) {
+    console.error('Get all users error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
 // Set up authentication routes
 export function setupAuth(app: Express) {
   // Extend Express Request interface to include user
@@ -239,4 +263,7 @@ export function setupAuth(app: Express) {
   
   // Get the current user
   app.get('/api/auth/me', authenticate, getMe);
+  
+  // Get all users (for testing only)
+  app.get('/api/users/test', getAllUsers);
 }
