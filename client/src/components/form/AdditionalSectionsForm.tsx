@@ -52,9 +52,22 @@ const AdditionalSectionsForm: React.FC<AdditionalSectionsFormProps> = ({
 
   const handleFormSubmit = (data: FormValues) => {
     // Create properly structured data for form submission with proper typing
-    const submissionData: Partial<CVData> = {
-      hobbies: data.hobbies || '',
-    };
+    const submissionData: Partial<CVData> = {};
+    
+    // Format hobbies as an array of objects to match schema
+    if (data.hobbies) {
+      // Split hobbies by commas and convert to proper format
+      const hobbiesArray = data.hobbies.split(',').map(hobby => ({
+        id: uuidv4(),
+        name: hobby.trim()
+      })).filter(hobby => hobby.name.length > 0);
+      
+      // Assign properly formatted hobbies array
+      submissionData.hobbies = hobbiesArray;
+    } else {
+      // Initialize as empty array if no hobbies
+      submissionData.hobbies = [];
+    }
     
     // Initialize websites array with proper typing
     const websites: Array<{id: string; name: string; url: string}> = [];

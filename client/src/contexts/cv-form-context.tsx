@@ -145,28 +145,53 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
           console.log('After sync - workExperiences count:', safeData.workExperiences.length);
           console.log('After sync - workExp count:', safeData.workExp.length);
           
-          // Process all website URLs to ensure they have proper format (if they are strings)
-          if (Array.isArray(safeData.websites)) {
-            safeData.websites = safeData.websites.map(site => {
-              // If it's already a proper object with id, name, url properties, use it
-              if (typeof site === 'object' && site !== null && 'url' in site) {
-                return site;
-              }
+          // Process all website URLs to ensure they have proper format
+          // Define the expected Website type to match schema
+          type WebsiteEntry = {
+            id: string;
+            name: string;
+            url: string;
+          };
+          
+          // Initialize empty array with proper typing
+          const processedWebsites: WebsiteEntry[] = [];
+          
+          // Handle existing websites array if it exists
+          if (safeData.websites && Array.isArray(safeData.websites)) {
+            // Process each website entry
+            for (let i = 0; i < safeData.websites.length; i++) {
+              const site = safeData.websites[i];
               
-              // If it's a string, convert to proper object format
-              if (typeof site === 'string' && site.trim() !== '') {
-                return {
-                  id: `website-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                  name: site.includes('linkedin') ? 'LinkedIn' : 
-                        site.includes('github') ? 'GitHub' : 'Website',
-                  url: site
-                };
+              // If it's a valid object with all required properties
+              if (site && 
+                  typeof site === 'object' && 
+                  typeof site.url === 'string' && 
+                  typeof site.id === 'string' && 
+                  typeof site.name === 'string') {
+                
+                processedWebsites.push({
+                  id: site.id,
+                  name: site.name,
+                  url: site.url
+                });
+              } 
+              // If it's a string, convert to a proper website object 
+              else if (typeof site === 'string') {
+                const urlStr = site.toString().trim();
+                if (urlStr) {
+                  processedWebsites.push({
+                    id: `website-${Date.now()}-${i}`,
+                    name: urlStr.toLowerCase().includes('linkedin') ? 'LinkedIn' : 
+                          urlStr.toLowerCase().includes('github') ? 'GitHub' : 'Website',
+                    url: urlStr
+                  });
+                }
               }
-              
-              // Invalid data, return null to be filtered out
-              return null;
-            }).filter(Boolean); // Remove null entries
+            }
           }
+          
+          // Replace the websites array with properly typed array
+          safeData.websites = processedWebsites;
           
           setFormData(safeData);
           
