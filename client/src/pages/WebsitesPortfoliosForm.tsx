@@ -23,20 +23,53 @@ const WebsitesPortfoliosForm = () => {
   const [websites, setWebsites] = useState<WebsiteLink[]>(() => {
     // If we have existing website links as objects, use them
     if (Array.isArray(formData.websites) && formData.websites.length > 0) {
-      // Check if first item is an object with url property
-      if (typeof formData.websites[0] === 'object' && formData.websites[0] !== null && 'url' in formData.websites[0]) {
-        return formData.websites as WebsiteLink[];
-      }
-      
-      // Handle legacy string array format
-      if (typeof formData.websites[0] === 'string') {
-        return formData.websites
-          .filter((url: any) => url && typeof url === 'string' && url.trim() !== '')
-          .map((url: string, index: number) => ({
-            id: `link-${Date.now()}-${index}`,
-            name: index === 0 ? 'LinkedIn' : index === 1 ? 'GitHub' : 'Portfolio',
-            url: url
-          }));
+      try {
+        // Check if first item is an object with url property
+        if (typeof formData.websites[0] === 'object' && formData.websites[0] !== null && 'url' in formData.websites[0]) {
+          // Type check before returning to ensure data integrity
+          const validWebsites = formData.websites
+            .filter(site => site && typeof site === 'object' && 'url' in site)
+            .map(site => ({
+              id: site.id || `link-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              name: site.name || 'Website',
+              url: site.url || ''
+            }));
+          
+          return validWebsites;
+        }
+        
+        // Handle legacy string array format
+        const websiteArray = formData.websites as any[];
+        if (websiteArray.some(item => typeof item === 'string')) {
+          // Convert string array to proper WebsiteLink objects
+          const stringItems = websiteArray.filter(item => typeof item === 'string' && item.trim() !== '');
+          
+          return stringItems.map((url, index) => {
+            const uniqueId = `link-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`;
+            // Determine appropriate name based on URL content or index
+            let name = 'Website';
+            if (url.includes('linkedin')) {
+              name = 'LinkedIn';
+            } else if (url.includes('github')) {
+              name = 'GitHub';
+            } else if (url.includes('behance')) {
+              name = 'Behance';
+            } else if (url.includes('dribbble')) {
+              name = 'Dribbble';
+            } else if (index === 0) {
+              name = 'Portfolio';
+            }
+            
+            return {
+              id: uniqueId,
+              name: name,
+              url: url
+            };
+          });
+        }
+      } catch (error) {
+        console.error('Error processing website data:', error);
+        // If there's any error in parsing, return default empty links
       }
     }
     

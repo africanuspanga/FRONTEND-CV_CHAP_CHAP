@@ -14,6 +14,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import SEO from "@/components/SEO";
 import StructuredData from "@/components/StructuredData";
 import FaviconUpdater from "@/components/FaviconUpdater";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -200,7 +201,13 @@ function App() {
                 <StructuredData type="webApplication" />
                 <FaviconUpdater />
                 
-                <Router />
+                <ErrorBoundary 
+                  onError={(error) => {
+                    console.error("Application error caught by root ErrorBoundary:", error);
+                  }}
+                >
+                  <Router />
+                </ErrorBoundary>
                 <Toaster />
                 <StorageWarningModal />
               </CVRequestProvider>

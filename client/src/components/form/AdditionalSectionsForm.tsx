@@ -14,6 +14,10 @@ interface AdditionalSectionsFormProps {
     hobbies: string;
     projects?: { id: string; name: string; description?: string; url?: string }[];
     certifications?: { id: string; name: string; issuer?: string; date?: string }[];
+    website?: string; // Added website field for portfolio URL
+    personalInfo?: {
+      website?: string; // For compatibility with older data models
+    }
   };
   onSubmit: (data: Partial<CVData>) => void;
   onBack: () => void;
