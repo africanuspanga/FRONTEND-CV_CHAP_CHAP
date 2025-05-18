@@ -384,7 +384,7 @@ const WorkExperienceStep: React.FC = () => {
       const currentValues = form.getValues('workExperience');
       
       // Create a valid copy of all entries
-      const validExperiences = sanitizeWorkExperiences(currentValues);
+      const validExperiences = sanitizeWorkExperiencesFn(currentValues);
       
       // Update both arrays in the CV context
       updateFormField('workExperiences', validExperiences);
@@ -507,9 +507,38 @@ const WorkExperienceStep: React.FC = () => {
                             <Input
                               {...field}
                               placeholder="e.g. Software Engineer"
+                              value={field.value || ''}
                               onChange={(e) => {
+                                // First update the field directly
                                 field.onChange(e);
+                                
+                                // Then use our enhanced handler for reliability
                                 handleFieldChange(index, 'jobTitle', e.target.value);
+                                
+                                // Force update the specific field value
+                                form.setValue(`workExperience.${index}.jobTitle`, e.target.value, {
+                                  shouldValidate: true,
+                                  shouldDirty: true,
+                                  shouldTouch: true
+                                });
+                                
+                                // Log the update for debugging
+                                console.log(`Job title updated for position ${index+1}:`, e.target.value);
+                              }}
+                              onBlur={() => {
+                                // Save data immediately when field loses focus
+                                const values = form.getValues();
+                                updateFormField('workExperiences', values.workExperience);
+                                updateFormField('workExp', values.workExperience);
+                                
+                                // Force save to storage
+                                const updatedData = {
+                                  ...formData,
+                                  workExperiences: values.workExperience,
+                                  workExp: values.workExperience
+                                };
+                                localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
+                                sessionStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
                               }}
                             />
                           </FormControl>
