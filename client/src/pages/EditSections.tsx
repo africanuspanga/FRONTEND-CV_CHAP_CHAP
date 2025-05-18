@@ -13,15 +13,15 @@ const EditSections = () => {
   const templateId = formData.templateId || 'kilimanjaro';
 
   // Navigation functions
-  const goToFinalPreview = () => navigateWithScrollReset(`/final-preview/${templateId}`);
-  const goToPersonalInfo = () => navigateWithScrollReset('/personal-info');
-  const goToWorkExperience = () => navigateWithScrollReset('/work-experience');
-  const goToEducation = () => navigateWithScrollReset('/education');
-  const goToSkills = () => navigateWithScrollReset('/skills');
-  const goToLanguages = () => navigateWithScrollReset('/languages');
-  const goToSummary = () => navigateWithScrollReset('/summary');
-  const goToReferences = () => navigateWithScrollReset('/references');
-  const goToAdditional = () => navigateWithScrollReset('/additional');
+  const goToFinalPreview = () => navigateWithScrollReset(navigate, `/cv/${templateId}/final-preview`);
+  const goToPersonalInfo = () => navigateWithScrollReset(navigate, `/cv/${templateId}/personal`);
+  const goToWorkExperience = () => navigateWithScrollReset(navigate, `/cv/${templateId}/work-experience`);
+  const goToEducation = () => navigateWithScrollReset(navigate, `/cv/${templateId}/education`);
+  const goToSkills = () => navigateWithScrollReset(navigate, `/cv/${templateId}/skills`);
+  const goToLanguages = () => navigateWithScrollReset(navigate, `/cv/${templateId}/languages`);
+  const goToSummary = () => navigateWithScrollReset(navigate, `/cv/${templateId}/summary`);
+  const goToReferences = () => navigateWithScrollReset(navigate, `/cv/${templateId}/references`);
+  const goToAdditional = () => navigateWithScrollReset(navigate, `/cv/${templateId}/additional-sections`);
 
   // Counts to show status
   const workExperienceCount = (formData.workExperiences || []).length;
@@ -38,6 +38,7 @@ const EditSections = () => {
   // Check if summary is filled
   const hasSummary = formData.personalInfo && 
     formData.personalInfo.summary && 
+    typeof formData.personalInfo.summary === 'string' &&
     formData.personalInfo.summary.length > 0;
 
   return (
@@ -205,9 +206,11 @@ const EditSections = () => {
             <div className="text-sm text-muted-foreground">
               {hasSummary ? (
                 <span className="text-sm text-green-600">
-                  Summary added ({formData.personalInfo.summary.length < 50 
+                  Summary added ({formData.personalInfo?.summary && typeof formData.personalInfo.summary === 'string' && formData.personalInfo.summary.length < 50 
                     ? formData.personalInfo.summary 
-                    : formData.personalInfo.summary.substring(0, 50) + '...'})
+                    : formData.personalInfo?.summary && typeof formData.personalInfo.summary === 'string' 
+                      ? formData.personalInfo.summary.substring(0, 50) + '...'
+                      : 'Added'})
                 </span>
               ) : (
                 <span className="text-amber-600">No professional summary added yet</span>

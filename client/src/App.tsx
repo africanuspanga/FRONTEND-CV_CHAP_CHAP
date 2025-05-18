@@ -169,6 +169,7 @@ function Router() {
                 <Route path="/proxy-test" component={ProxyTestPage} />
                 <Route path="/ussd-payment-test" component={USSDPaymentTest} />
                 <Route path="/template-gallery" component={TemplateGallery} />
+                <Route path="/edit-sections" component={EditSections} />
                 <Route component={NotFound} />
               </Switch>
             </div>
