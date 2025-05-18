@@ -50,6 +50,7 @@ import AccomplishmentsForm from "@/pages/AccomplishmentsForm";
 import HobbiesForm from "@/pages/HobbiesForm";
 import TemplateGallery from "@/pages/template-gallery";
 import CVSteps from "@/pages/CVSteps";
+import EditSections from "@/pages/EditSections";
 import NotFound from "@/pages/not-found";
 
 // Admin pages
