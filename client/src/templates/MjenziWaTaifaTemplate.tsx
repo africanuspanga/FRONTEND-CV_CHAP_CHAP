@@ -1,5 +1,5 @@
 import React from 'react';
-import { CVData } from '../types/cv-types';
+import { CVData } from '@shared/schema';
 
 interface TemplateProps {
   data: CVData;
@@ -87,7 +87,7 @@ const MjenziWaTaifaTemplate: React.FC<TemplateProps> = ({ data }) => {
               <div key={job.id || index} className="mb-5 relative pl-6 border-l-2 border-green-200 pb-4">
                 <div className="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-green-500"></div>
                 <div className="flex flex-col md:flex-row md:justify-between">
-                  <h4 className="font-bold text-green-700">{job.jobTitle}</h4>
+                  <h4 className="font-bold text-green-700">{(job as any).jobTitle}</h4>
                   <span className="text-sm text-gray-600">
                     {job.startDate} - {job.current ? 'Present' : job.endDate}
                   </span>

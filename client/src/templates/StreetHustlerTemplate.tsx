@@ -1,5 +1,5 @@
 import React from 'react';
-import { CVData } from '../types/cv-types';
+import { CVData } from '@shared/schema';
 
 interface TemplateProps {
   data: CVData;
@@ -64,7 +64,7 @@ const StreetHustlerTemplate: React.FC<TemplateProps> = ({ data }) => {
             {workExperiences.map((job, index) => (
               <div key={job.id || index} className="mb-5 bg-gray-900 p-4 rounded">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start">
-                  <h4 className="font-bold text-white text-lg">{job.jobTitle}</h4>
+                  <h4 className="font-bold text-white text-lg">{(job as any).jobTitle}</h4>
                   <span className="text-sm text-orange-300 px-3 py-1 rounded bg-orange-900 bg-opacity-30 md:ml-2">
                     {job.startDate} - {job.current ? 'Present' : job.endDate}
                   </span>

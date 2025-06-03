@@ -115,7 +115,7 @@ const KilimanjaroTemplate: React.FC<TemplateProps> = ({ data }) => {
               {workExperiences.map((job, index) => (
                 <div key={job.id || index} className="mb-4">
                   <div className="flex flex-col md:flex-row md:justify-between mb-1">
-                    <h4 className="font-bold text-emerald-800">{job.jobTitle}</h4>
+                    <h4 className="font-bold text-emerald-800">{(job as any).jobTitle}</h4>
                     <span className="text-sm text-gray-600 italic">
                       {job.startDate} - {job.current ? 'Present' : job.endDate}
                     </span>

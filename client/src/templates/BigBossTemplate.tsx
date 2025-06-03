@@ -1,5 +1,5 @@
 import React from 'react';
-import { CVData } from '../types/cv-types';
+import { CVData } from '@shared/schema';
 
 interface TemplateProps {
   data: CVData;
@@ -66,7 +66,7 @@ const BigBossTemplate: React.FC<TemplateProps> = ({ data }) => {
             {workExperiences.map((job, index) => (
               <div key={job.id || index} className="mb-5">
                 <div className="flex flex-col lg:flex-row lg:justify-between mb-1">
-                  <h4 className="text-lg font-bold text-gray-900">{job.jobTitle}</h4>
+                  <h4 className="text-lg font-bold text-gray-900">{(job as any).jobTitle}</h4>
                   <span className="text-gray-600 font-medium">
                     {job.startDate} - {job.current ? 'Present' : job.endDate}
                   </span>

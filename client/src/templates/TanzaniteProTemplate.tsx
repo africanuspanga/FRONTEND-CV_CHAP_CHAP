@@ -1,5 +1,5 @@
 import React from 'react';
-import { CVData } from '../types/cv-types';
+import { CVData } from '@shared/schema';
 
 interface TemplateProps {
   data: CVData;
@@ -60,7 +60,7 @@ const TanzaniteProTemplate: React.FC<TemplateProps> = ({ data }) => {
           {workExperiences.map((job, index) => (
             <div key={job.id || index} className="mb-3">
               <div className="flex justify-between">
-                <h4 className="font-bold">{job.jobTitle}</h4>
+                <h4 className="font-bold">{(job as any).jobTitle}</h4>
                 <span className="text-sm text-gray-600">
                   {job.startDate} - {job.current ? 'Present' : job.endDate}
                 </span>
