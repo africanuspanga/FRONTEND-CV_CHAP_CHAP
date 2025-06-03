@@ -66,13 +66,13 @@ const BigBossTemplate: React.FC<TemplateProps> = ({ data }) => {
             {workExperiences.map((job, index) => (
               <div key={job.id || index} className="mb-5">
                 <div className="flex flex-col lg:flex-row lg:justify-between mb-1">
-                  <h4 className="text-lg font-bold text-gray-900">{job.position}</h4>
+                  <h4 className="text-lg font-bold text-gray-900">{job.jobTitle}</h4>
                   <span className="text-gray-600 font-medium">
                     {job.startDate} - {job.current ? 'Present' : job.endDate}
                   </span>
                 </div>
                 <p className="text-gray-800 font-semibold mb-2">{job.company}{job.location ? ` | ${job.location}` : ''}</p>
-                <p className="text-gray-700">{job.description}</p>
+                {job.description && <p className="text-gray-700">{job.description}</p>}
                 
                 {job.achievements && job.achievements.length > 0 && (
                   <ul className="mt-2 ml-5 list-disc text-gray-700">

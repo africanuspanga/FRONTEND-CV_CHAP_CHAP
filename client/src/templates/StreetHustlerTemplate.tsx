@@ -64,13 +64,23 @@ const StreetHustlerTemplate: React.FC<TemplateProps> = ({ data }) => {
             {workExperiences.map((job, index) => (
               <div key={job.id || index} className="mb-5 bg-gray-900 p-4 rounded">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start">
-                  <h4 className="font-bold text-white text-lg">{job.position}</h4>
+                  <h4 className="font-bold text-white text-lg">{job.jobTitle}</h4>
                   <span className="text-sm text-orange-300 px-3 py-1 rounded bg-orange-900 bg-opacity-30 md:ml-2">
                     {job.startDate} - {job.current ? 'Present' : job.endDate}
                   </span>
                 </div>
                 <p className="text-gray-400 font-medium mt-1">{job.company}{job.location ? ` | ${job.location}` : ''}</p>
-                <p className="text-gray-300 mt-2">{job.description}</p>
+                {job.description && <p className="text-gray-300 mt-2">{job.description}</p>}
+                {job.achievements && job.achievements.length > 0 && (
+                  <ul className="mt-2 space-y-1">
+                    {job.achievements.map((achievement, achIndex) => (
+                      <li key={achIndex} className="flex items-start text-gray-300">
+                        <span className="mr-2 text-orange-500">•</span>
+                        <span>{achievement}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </section>

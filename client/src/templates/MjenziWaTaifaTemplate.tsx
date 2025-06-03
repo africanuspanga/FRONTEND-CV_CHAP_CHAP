@@ -87,13 +87,23 @@ const MjenziWaTaifaTemplate: React.FC<TemplateProps> = ({ data }) => {
               <div key={job.id || index} className="mb-5 relative pl-6 border-l-2 border-green-200 pb-4">
                 <div className="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-green-500"></div>
                 <div className="flex flex-col md:flex-row md:justify-between">
-                  <h4 className="font-bold text-green-700">{job.position}</h4>
+                  <h4 className="font-bold text-green-700">{job.jobTitle}</h4>
                   <span className="text-sm text-gray-600">
                     {job.startDate} - {job.current ? 'Present' : job.endDate}
                   </span>
                 </div>
                 <p className="text-gray-700 font-medium">{job.company}{job.location ? `, ${job.location}` : ''}</p>
-                <p className="text-gray-600 mt-2">{job.description}</p>
+                {job.description && <p className="text-gray-600 mt-2">{job.description}</p>}
+                {job.achievements && job.achievements.length > 0 && (
+                  <ul className="mt-2 space-y-1">
+                    {job.achievements.map((achievement, achIndex) => (
+                      <li key={achIndex} className="flex items-start text-gray-600">
+                        <span className="mr-2 text-green-600">•</span>
+                        <span>{achievement}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </section>
