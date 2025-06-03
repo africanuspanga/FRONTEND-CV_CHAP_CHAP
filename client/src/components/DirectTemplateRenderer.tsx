@@ -1,5 +1,5 @@
 import React from 'react';
-import { CVData } from '../types/cv-types';
+import { CVData } from '@shared/schema';
 
 // Import all template components
 import KilimanjaroTemplate from '../templates/KilimanjaroTemplate';

@@ -6,6 +6,11 @@ interface TemplateProps {
 }
 
 const KilimanjaroTemplate: React.FC<TemplateProps> = ({ data }) => {
+  // Add null safety for data
+  if (!data) {
+    return <div className="p-8 text-center text-gray-500">Loading template...</div>;
+  }
+  
   const { personalInfo, workExperiences, education, skills, languages, references } = data;
   
   // Fallback for empty data

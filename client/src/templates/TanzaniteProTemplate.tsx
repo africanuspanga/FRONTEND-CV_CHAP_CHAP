@@ -6,6 +6,11 @@ interface TemplateProps {
 }
 
 const TanzaniteProTemplate: React.FC<TemplateProps> = ({ data }) => {
+  // Add null safety for data
+  if (!data) {
+    return <div className="p-8 text-center text-gray-500">Loading template...</div>;
+  }
+  
   const { personalInfo, workExperiences, education, skills, languages, references } = data;
   
   // Fallback for empty data
@@ -46,10 +51,10 @@ const TanzaniteProTemplate: React.FC<TemplateProps> = ({ data }) => {
       </header>
       
       {/* Summary Section */}
-      {(personalInfo?.summary || data.summary) && (
+      {personalInfo?.summary && (
         <section className="mb-6">
           <h3 className="text-lg font-bold text-blue-700 mb-2">Professional Summary</h3>
-          <p className="text-sm">{personalInfo?.summary || data.summary}</p>
+          <p className="text-sm">{personalInfo.summary}</p>
         </section>
       )}
       
