@@ -101,10 +101,10 @@ const KilimanjaroTemplate: React.FC<TemplateProps> = ({ data }) => {
         {/* Main Content */}
         <div className="p-6 md:w-2/3">
           {/* Summary Section */}
-          {(personalInfo?.summary || data.summary) && (
+          {personalInfo?.summary && (
             <section className="mb-6">
               <h3 className="text-lg font-bold text-emerald-800 uppercase mb-2 pb-1 border-b-2 border-emerald-800">Profile</h3>
-              <p className="text-sm">{personalInfo?.summary || data.summary}</p>
+              <p className="text-sm">{personalInfo.summary}</p>
             </section>
           )}
           
