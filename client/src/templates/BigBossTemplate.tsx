@@ -157,7 +157,7 @@ const BigBossTemplate: React.FC<TemplateProps> = ({ data }) => {
                   <p className="text-gray-700">{ref.position}, {ref.company}</p>
                   {ref.email && <p className="text-gray-700">Email: {ref.email}</p>}
                   {ref.phone && <p className="text-gray-700">Phone: {ref.phone}</p>}
-                  {ref.relationship && <p className="text-gray-600 italic mt-1">Relation: {ref.relationship}</p>}
+                  {(ref as any).relationship && <p className="text-gray-600 italic mt-1">Relation: {(ref as any).relationship}</p>}
                 </div>
               ))}
             </div>

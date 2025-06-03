@@ -71,13 +71,13 @@ const MjenziWaTaifaTemplate: React.FC<TemplateProps> = ({ data }) => {
       
       <div className="p-6">
         {/* Summary Section */}
-        {(personalInfo?.summary || data.summary) && (
+        {(personalInfo as any)?.summary && (
           <section className="mb-6">
             <h3 className="text-lg font-bold text-green-800 mb-2 flex items-center">
               <div className="w-8 h-1 bg-yellow-500 mr-2"></div>
               PROFESSIONAL SUMMARY
             </h3>
-            <p className="text-gray-700">{personalInfo?.summary || data.summary}</p>
+            <p className="text-gray-700">{(personalInfo as any).summary}</p>
           </section>
         )}
         
