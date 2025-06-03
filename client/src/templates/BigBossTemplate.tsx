@@ -57,10 +57,10 @@ const BigBossTemplate: React.FC<TemplateProps> = ({ data }) => {
       
       <div className="p-8">
         {/* Summary Section */}
-        {(personalInfo?.summary || data.summary) && (
+        {(personalInfo as any)?.summary && (
           <section className="mb-8">
             <h3 className="text-xl font-bold text-gray-900 border-b-2 border-gray-900 pb-2 mb-3">EXECUTIVE PROFILE</h3>
-            <p className="text-gray-700">{personalInfo?.summary || data.summary}</p>
+            <p className="text-gray-700">{(personalInfo as any).summary}</p>
           </section>
         )}
         

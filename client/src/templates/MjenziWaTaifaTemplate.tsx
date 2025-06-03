@@ -30,10 +30,10 @@ const MjenziWaTaifaTemplate: React.FC<TemplateProps> = ({ data }) => {
             <h2 className="text-xl mt-1">{title}</h2>
           </div>
           
-          {personalInfo?.profileImage && (
+          {(personalInfo as any)?.profilePicture && (
             <div className="mt-4 md:mt-0">
               <img 
-                src={personalInfo.profileImage} 
+                src={(personalInfo as any).profilePicture} 
                 alt={name}
                 className="w-24 h-24 rounded-full border-4 border-white shadow-lg" 
               />

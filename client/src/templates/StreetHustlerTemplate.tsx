@@ -55,10 +55,10 @@ const StreetHustlerTemplate: React.FC<TemplateProps> = ({ data }) => {
       
       <div className="p-6">
         {/* Summary Section */}
-        {(personalInfo?.summary || data.summary) && (
+        {(personalInfo as any)?.summary && (
           <section className="mb-6 border-l-4 border-orange-500 pl-4">
             <h3 className="text-xl font-bold text-orange-500 mb-2">HUSTLE STATEMENT</h3>
-            <p className="text-gray-300">{personalInfo?.summary || data.summary}</p>
+            <p className="text-gray-300">{(personalInfo as any).summary}</p>
           </section>
         )}
         
