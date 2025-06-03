@@ -35,6 +35,9 @@ const JobTitleInput: React.FC<JobTitleInputProps> = ({
     const newValue = e.target.value;
     setInputValue(newValue);
     
+    // CRITICAL FIX: Always call onChange to update parent state
+    onChange(newValue);
+    
     // Only show dropdown if we have at least 2 characters
     if (newValue.length >= 2) {
       setIsOpen(true);
@@ -55,11 +58,20 @@ const JobTitleInput: React.FC<JobTitleInputProps> = ({
     setIsOpen(false);
   };
 
+  // Handle blur event to ensure value is saved when user finishes typing
+  const handleBlur = () => {
+    setIsOpen(false);
+    // Ensure the current input value is saved to parent state
+    onChange(inputValue);
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        // Ensure value is saved when clicking outside
+        onChange(inputValue);
       }
     }
 
@@ -67,7 +79,7 @@ const JobTitleInput: React.FC<JobTitleInputProps> = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [wrapperRef]);
+  }, [wrapperRef, inputValue, onChange]);
   
   return (
     <div className={`relative ${className}`} ref={wrapperRef}>
@@ -77,6 +89,7 @@ const JobTitleInput: React.FC<JobTitleInputProps> = ({
           value={inputValue}
           onChange={handleInputChange}
           onFocus={() => inputValue.length >= 2 && setIsOpen(true)}
+          onBlur={handleBlur}
           placeholder={placeholder}
           className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
