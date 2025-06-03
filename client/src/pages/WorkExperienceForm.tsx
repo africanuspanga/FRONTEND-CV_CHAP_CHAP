@@ -59,6 +59,14 @@ const WorkExperienceForm = () => {
   // Get the template ID from the URL
   const templateId = params.templateId;
   
+  // Ensure template ID is synchronized with form data
+  useEffect(() => {
+    if (templateId && templateId !== formData.templateId) {
+      console.log(`🔄 Synchronizing template ID: ${templateId} (was: ${formData.templateId})`);
+      updateFormField('templateId', templateId);
+    }
+  }, [templateId, formData.templateId, updateFormField]);
+  
   // Mobile detection
   const [isMobile, setIsMobile] = useState(false);
   const jobTitleInputRef = useRef<HTMLInputElement>(null);
