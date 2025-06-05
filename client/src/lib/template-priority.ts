@@ -9,14 +9,14 @@ import { TemplateWithMetadata } from './templates-registry';
 
 // Define template priority order - templates not in this list will be placed at the end
 const templatePriorityOrder = [
-  'kilimanjaro',        // 1
-  'tanzanitePro',       // 2
-  'brightDiamond',      // 3
+  'brightDiamond',      // 1 - Most resilient and trustworthy
+  'madiniMob',          // 2
+  'bigBoss',            // 3
   'mwalimuOne',         // 4
-  'bigBoss',            // 5
-  'mjenziWaTaifa',      // 6
-  'madiniMob',          // 7
-  'serengetiFlow',      // 8
+  'mjenziWaTaifa',      // 5
+  'serengetiFlow',      // 6 - End of most resilient and trustworthy
+  'kilimanjaro',        // 7 - Previous templates maintained
+  'tanzanitePro',       // 8
   'smartBongo',         // 9
   'streetHustler',      // 10
   'safariOriginal',     // 11
@@ -26,11 +26,11 @@ const templatePriorityOrder = [
   'mkaliModern'         // 15
 ];
 
-// Home page featured templates
+// Home page featured templates - using the most resilient and trustworthy templates
 export const homePageFeaturedTemplates = [
-  'kilimanjaro',
-  'tanzanitePro',
   'brightDiamond',
+  'madiniMob',
+  'bigBoss',
   'mwalimuOne'
 ];
 

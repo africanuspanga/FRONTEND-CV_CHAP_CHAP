@@ -154,6 +154,7 @@ const getTemplateMetadata = (templateId: string): Partial<TemplateWithMetadata> 
     brightDiamond: {
       description: 'Clean, sparkling design that makes your skills shine.',
       colorSchemes: colorSchemes.standard,
+      isPopular: true,
     },
     mjenziWaTaifa: {
       description: 'Strong, structured layout ideal for construction and engineering professionals.',
@@ -181,10 +182,12 @@ const getTemplateMetadata = (templateId: string): Partial<TemplateWithMetadata> 
     mwalimuOne: {
       description: 'Scholarly design perfect for education professionals.',
       colorSchemes: colorSchemes.standard,
+      isPopular: true,
     },
     serengetiFlow: {
       description: 'Natural, flowing design inspired by Tanzania\'s famous plains.',
       colorSchemes: colorSchemes.standard,
+      isPopular: true,
     },
     smartBongo: {
       description: 'Intelligent design with a modern twist for tech professionals.',
@@ -194,6 +197,7 @@ const getTemplateMetadata = (templateId: string): Partial<TemplateWithMetadata> 
     madiniMob: {
       description: 'Resource-rich design showcasing your valuable skills and experience.',
       colorSchemes: colorSchemes.standard,
+      isPopular: true,
     },
     mkaliModern: {
       description: 'Sharp, contemporary design for the modern professional.',
