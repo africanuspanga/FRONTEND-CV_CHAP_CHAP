@@ -170,10 +170,8 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
             >
               <DirectTemplateRenderer
                 templateId={templateId}
-                cvData={validatedData}
-                width={A4_WIDTH_PX}
-                height={A4_HEIGHT_PX}
-                scaleFactor={1} // No internal scaling, we scale with CSS
+                data={validatedData}
+                containerClassName="mobile-template-container"
               />
             </ErrorBoundary>
           </div>
@@ -244,10 +242,8 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
           >
             <DirectTemplateRenderer
               templateId={templateId}
-              cvData={validatedData}
-              height="auto"
-              width="100%"
-              scaleFactor={1}
+              data={validatedData}
+              containerClassName="desktop-template-container"
             />
           </ErrorBoundary>
         </div>
