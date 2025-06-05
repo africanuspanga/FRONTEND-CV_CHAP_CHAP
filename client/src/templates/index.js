@@ -19,22 +19,22 @@ import { MkaliModernTemplate } from './mkaliModern';
 // Import the HOC to wrap templates with safe data handling
 import withSafeTemplateData from '../lib/withSafeTemplateData';
 
-// Import template preview images
-import moonlightSonataImg from '../assets/images/templates/moonlightSonata.png';
-import kaziFastaImg from '../assets/images/templates/kaziFasta.png';
-import jijengeClassicImg from '../assets/images/templates/jijengeClassic.png';
-import kilimanjaroImg from '../assets/images/templates/kilimanjaro.png';
-import brightDiamondImg from '../assets/images/templates/brightDiamond.png';
-import mjenziWaTaifaImg from '../assets/images/templates/mjenziWaTaifa.png';
-import streetHustlerImg from '../assets/images/templates/streetHustler.png';
-import safariOriginalImg from '../assets/images/templates/safariOriginal.png';
-import bigBossImg from '../assets/images/templates/bigBoss.png';
-import tanzaniteProImg from '../assets/images/templates/tanzanitePro.png';
-import mwalimuOneImg from '../assets/images/templates/mwalimuOne.png';
-import serengetiFlowImg from '../assets/images/templates/serengetiFlow.png';
-import smartBongoImg from '../assets/images/templates/smartBongo.png';
-import madiniMobImg from '../assets/images/templates/madiniMob.png';
-import mkaliModernImg from '../assets/images/templates/mkaliModern.png';
+// Import template preview images from correct paths
+import moonlightSonataImg from '../assets/moonlight-sonata-preview.png';
+import kaziFastaImg from '../assets/kazi-fasta-preview.png';
+import jijengeClassicImg from '../assets/jijenge-classic-preview.png';
+import kilimanjaroImg from '../assets/kilimanjaro-preview.png';
+import brightDiamondImg from '../assets/bright-diamond-preview.png';
+import mjenziWaTaifaImg from '../assets/mjenzi-wa-taifa-preview.png';
+import streetHustlerImg from '../assets/street-hustler-preview.png';
+import safariOriginalImg from '../assets/safari-original-preview.png';
+import bigBossImg from '../assets/big-boss-preview.png';
+import tanzaniteProImg from '../assets/tanzanite-pro-preview.png';
+import mwalimuOneImg from '../assets/mwalimu-one-preview.png';
+import serengetiFlowImg from '../assets/serengeti-flow-preview.png';
+import smartBongoImg from '../assets/smart-bongo-preview.png';
+import madiniMobImg from '../assets/madini-mob-preview.png';
+import mkaliModernImg from '../assets/mkali-modern-preview.png';
 
 // Template definition
 export const templates = {
