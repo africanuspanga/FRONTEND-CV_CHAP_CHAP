@@ -1,12 +1,16 @@
 import React from 'react';
 import { CVData } from '@shared/schema';
 
-// Import only the working template components
+// Import all available template components
 import KilimanjaroTemplate from '../templates/KilimanjaroTemplate';
 import TanzaniteProTemplate from '../templates/TanzaniteProTemplate';
 import BigBossTemplate from '../templates/BigBossTemplate';
 import MjenziWaTaifaTemplate from '../templates/MjenziWaTaifaTemplate';
 import StreetHustlerTemplate from '../templates/StreetHustlerTemplate';
+import { BrightDiamondTemplate } from '../templates/brightDiamond';
+import { MadiniMobTemplate } from '../templates/madiniMob';
+import { MwalimuOneTemplate } from '../templates/mwalimuOne';
+import { SerengetiFlowTemplate } from '../templates/serengetiFlow';
 
 interface DirectTemplateRendererProps {
   templateId: string;
@@ -37,6 +41,12 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
     console.log('DirectTemplateRenderer rendering template:', templateId, 'with data keys:', Object.keys(data || {}));
     
     switch (templateId) {
+      case 'brightDiamond':
+        console.log('Rendering BrightDiamondTemplate');
+        return <BrightDiamondTemplate {...data} />;
+      case 'madiniMob':
+        console.log('Rendering MadiniMobTemplate');
+        return <MadiniMobTemplate {...data} />;
       case 'kilimanjaro':
         return <KilimanjaroTemplate data={data} />;
       case 'tanzanitePro':
@@ -47,18 +57,20 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
         return <MjenziWaTaifaTemplate data={data} />;
       case 'streetHustler':
         return <StreetHustlerTemplate data={data} />;
-      case 'brightDiamond':
-      case 'madiniMob':
       case 'mwalimuOne':
+        console.log('Rendering MwalimuOneTemplate');
+        return <MwalimuOneTemplate {...data} />;
       case 'serengetiFlow':
+        console.log('Rendering SerengetiFlowTemplate');
+        return <SerengetiFlowTemplate {...data} />;
       case 'safariOriginal':
       case 'jijengeClassic':
       case 'moonlightSonata':
       case 'kaziFasta':
       case 'mkaliModern':
       case 'smartBongo':
-        // For now, render these template IDs with TanzaniteProTemplate
-        console.log(`Template ${templateId} mapped to TanzaniteProTemplate`);
+        // Fallback to TanzaniteProTemplate for templates not yet implemented
+        console.log(`Template ${templateId} using TanzaniteProTemplate fallback`);
         return <TanzaniteProTemplate data={data} />;
       default:
         // Default to TanzaniteProTemplate if templateId is not recognized
