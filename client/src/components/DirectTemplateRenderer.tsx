@@ -5,7 +5,7 @@ import { CVData } from '@shared/schema';
 import KilimanjaroTemplate from '../templates/KilimanjaroTemplate';
 import TanzaniteProTemplate from '../templates/TanzaniteProTemplate';
 import BigBossTemplate from '../templates/BigBossTemplate';
-import MjenziWaTaifaTemplate from '../templates/MjenziWaTaifaTemplate';
+import { MjenziWaTaifaTemplate } from '../templates/mjenziWaTaifa';
 import StreetHustlerTemplate from '../templates/StreetHustlerTemplate';
 import { BrightDiamondTemplate } from '../templates/brightDiamond';
 import { MadiniMobTemplate } from '../templates/madiniMob';
@@ -54,7 +54,7 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
       case 'bigBoss':
         return <BigBossTemplate data={data} />;
       case 'mjenziWaTaifa':
-        return <MjenziWaTaifaTemplate data={data} />;
+        return <MjenziWaTaifaTemplate cvData={data} />;
       case 'streetHustler':
         return <StreetHustlerTemplate data={data} />;
       case 'mwalimuOne':
