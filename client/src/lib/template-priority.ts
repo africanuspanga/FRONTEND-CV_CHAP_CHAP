@@ -7,31 +7,25 @@
 import { CVTemplate } from './simple-template-registry';
 import { TemplateWithMetadata } from './templates-registry';
 
-// Define template priority order - templates not in this list will be placed at the end
+// Define template priority order - ONLY RELIABLE TEMPLATES
 const templatePriorityOrder = [
-  'brightDiamond',      // 1 - Most resilient and trustworthy
-  'madiniMob',          // 2
-  'bigBoss',            // 3
-  'mwalimuOne',         // 4
-  'mjenziWaTaifa',      // 5
-  'serengetiFlow',      // 6 - End of most resilient and trustworthy
-  'kilimanjaro',        // 7 - Previous templates maintained
-  'tanzanitePro',       // 8
-  'smartBongo',         // 9
-  'streetHustler',      // 10
-  'safariOriginal',     // 11
-  'jijengeClassic',     // 12
-  'moonlightSonata',    // 13
-  'kaziFasta',          // 14
-  'mkaliModern'         // 15
+  'brightDiamond',      // 1 - Bright Diamond
+  'madiniMob',          // 2 - Madini Mob
+  'mjenziWaTaifa',      // 3 - Mjenzi wa Taifa
+  'bigBoss',            // 4 - Big Boss
+  'mwalimuOne',         // 5 - Mwalimu One
+  'serengetiFlow'       // 6 - Serengeti Flow
+  // All other templates are archived/hidden as they are not reliable
 ];
 
-// Home page featured templates - using the most resilient and trustworthy templates
+// Home page featured templates - using only the 6 reliable templates
 export const homePageFeaturedTemplates = [
   'brightDiamond',
   'madiniMob',
+  'mjenziWaTaifa',
   'bigBoss',
-  'mwalimuOne'
+  'mwalimuOne',
+  'serengetiFlow'
 ];
 
 /**
