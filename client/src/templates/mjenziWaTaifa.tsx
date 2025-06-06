@@ -45,7 +45,7 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
         boxSizing: 'border-box',
         border: '1px solid #e0e0e0'
       }}>
-        {/* CV Header - Full Width Dark Blue */}
+        {/* CV Header */}
         <header style={{
           backgroundColor: '#2c3e50',
           color: '#ffffff',
@@ -59,14 +59,13 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
             marginBottom: 0,
             textTransform: 'uppercase',
             letterSpacing: '2px',
-            fontWeight: 900,
-            fontFamily: "'Lato', sans-serif"
+            fontWeight: 900
           }}>
             {personalInfo.firstName} {personalInfo.lastName}
           </h1>
         </header>
 
-        {/* Contact Info Bar */}
+        {/* Contact Bar */}
         <section style={{
           textAlign: 'center',
           padding: '10px 20px',
@@ -94,7 +93,7 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
           )}
         </section>
 
-        {/* Main Content Area */}
+        {/* Main Content */}
         <main style={{ padding: '30px 40px' }}>
           
           {/* Professional Summary */}
@@ -108,10 +107,9 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                 borderBottom: '2px solid #2c3e50',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                fontWeight: 700,
-                fontFamily: "'Lato', sans-serif"
+                fontWeight: 700
               }}>
-                PROFESSIONAL SUMMARY
+                Professional Summary
               </h3>
               <p style={{
                 fontSize: '0.95em',
@@ -124,7 +122,7 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
             </section>
           )}
 
-          {/* Skills Section */}
+          {/* Skills */}
           {validSkills.length > 0 && (
             <section style={{ marginBottom: '25px' }}>
               <h3 style={{
@@ -135,10 +133,9 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                 borderBottom: '2px solid #2c3e50',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                fontWeight: 700,
-                fontFamily: "'Lato', sans-serif"
+                fontWeight: 700
               }}>
-                SKILLS
+                Skills
               </h3>
               <ul style={{
                 columns: 2,
@@ -159,11 +156,10 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                     breakInside: 'avoid-column'
                   }}>
                     <span style={{
-                      content: '•',
-                      color: '#2c3e50',
                       position: 'absolute',
                       left: 0,
                       top: '0.1em',
+                      color: '#2c3e50',
                       fontSize: '1em'
                     }}>•</span>
                     {skill.name}
@@ -184,10 +180,9 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                 borderBottom: '2px solid #2c3e50',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                fontWeight: 700,
-                fontFamily: "'Lato', sans-serif"
+                fontWeight: 700
               }}>
-                WORK HISTORY
+                Work History
               </h3>
               <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                 {validWorkExperiences.map((exp, index) => (
@@ -243,17 +238,6 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                       </div>
                     </div>
                     
-                    {exp.description && (
-                      <p style={{
-                        fontSize: '0.95em',
-                        color: '#444',
-                        marginTop: '5px',
-                        marginBottom: '5px'
-                      }}>
-                        {exp.description}
-                      </p>
-                    )}
-                    
                     {exp.achievements && exp.achievements.length > 0 && (
                       <ul style={{
                         listStyle: 'none',
@@ -270,11 +254,10 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                             position: 'relative'
                           }}>
                             <span style={{
-                              content: '•',
-                              color: '#2c3e50',
                               position: 'absolute',
                               left: 0,
                               top: '0.1em',
+                              color: '#2c3e50',
                               fontSize: '1em'
                             }}>•</span>
                             {achievement}
@@ -299,10 +282,9 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                 borderBottom: '2px solid #2c3e50',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                fontWeight: 700,
-                fontFamily: "'Lato', sans-serif"
+                fontWeight: 700
               }}>
-                EDUCATION
+                Education
               </h3>
               <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                 {validEducation.map((edu, index) => (
@@ -363,7 +345,7 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
             </section>
           )}
 
-          {/* Languages Section */}
+          {/* Languages */}
           {validLanguages.length > 0 && (
             <section style={{ marginBottom: '25px' }}>
               <h3 style={{
@@ -374,10 +356,9 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                 borderBottom: '2px solid #2c3e50',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                fontWeight: 700,
-                fontFamily: "'Lato', sans-serif"
+                fontWeight: 700
               }}>
-                LANGUAGES
+                Languages
               </h3>
               {validLanguages.map((lang, index) => (
                 <div key={index} style={{ marginBottom: '12px' }}>
