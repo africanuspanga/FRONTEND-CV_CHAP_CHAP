@@ -25,19 +25,21 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
   // Filter valid languages
   const validLanguages = languages?.filter(lang => lang.name) || [];
 
+  const cvContainerStyle: React.CSSProperties = {
+    fontFamily: "'Open Sans', sans-serif",
+    margin: 0,
+    padding: '20px',
+    backgroundColor: '#f4f4f4',
+    color: '#333',
+    lineHeight: 1.6,
+    fontSize: '10pt',
+    WebkitFontSmoothing: 'antialiased',
+    MozOsxFontSmoothing: 'grayscale'
+  };
+
   return (
-    <div style={{ 
-      fontFamily: "'Open Sans', sans-serif",
-      margin: 0,
-      padding: '20px',
-      backgroundColor: '#f4f4f4',
-      color: '#333',
-      lineHeight: 1.6,
-      fontSize: '10pt',
-      WebkitFontSmoothing: 'antialiased',
-      MozOsxFontSmoothing: 'grayscale'
-    }}>
-      <div style={{
+    <div style={cvContainerStyle}>
+      <div className="cv-container" style={{
         maxWidth: '850px',
         margin: '20px auto',
         backgroundColor: '#ffffff',
@@ -45,8 +47,8 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
         boxSizing: 'border-box',
         border: '1px solid #e0e0e0'
       }}>
-        {/* CV Header */}
-        <header style={{
+        
+        <header className="cv-header" style={{
           backgroundColor: '#2c3e50',
           color: '#ffffff',
           textAlign: 'center',
@@ -59,14 +61,15 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
             marginBottom: 0,
             textTransform: 'uppercase',
             letterSpacing: '2px',
-            fontWeight: 900
+            fontWeight: 900,
+            fontFamily: "'Lato', sans-serif"
           }}>
             {personalInfo.firstName} {personalInfo.lastName}
           </h1>
+          <h2 style={{ display: 'none' }}>{personalInfo.professionalTitle}</h2>
         </header>
 
-        {/* Contact Bar */}
-        <section style={{
+        <section className="contact-bar" style={{
           textAlign: 'center',
           padding: '10px 20px',
           borderBottom: '1px solid #e0e0e0',
@@ -81,24 +84,25 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
           {personalInfo.address && <span>{personalInfo.address}</span>}
           {personalInfo.phone && (
             <>
-              <span style={{ color: '#ccc', margin: '0 3px' }}>|</span>
+              <span className="separator" style={{ color: '#ccc', margin: '0 3px' }}>|</span>
               <span>{personalInfo.phone}</span>
             </>
           )}
           {personalInfo.email && (
             <>
-              <span style={{ color: '#ccc', margin: '0 3px' }}>|</span>
+              <span className="separator" style={{ color: '#ccc', margin: '0 3px' }}>|</span>
               <span>{personalInfo.email}</span>
             </>
           )}
+          {personalInfo.linkedin && (
+            <a href={personalInfo.linkedin} style={{ display: 'none' }}>LinkedIn</a>
+          )}
         </section>
 
-        {/* Main Content */}
-        <main style={{ padding: '30px 40px' }}>
-          
-          {/* Professional Summary */}
+        <main className="main-content-area" style={{ padding: '30px 40px' }}>
+
           {summary && (
-            <section style={{ marginBottom: '25px' }}>
+            <section className="summary" style={{ marginBottom: '25px' }}>
               <h3 style={{
                 fontSize: '1.15em',
                 color: '#2c3e50',
@@ -107,7 +111,8 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                 borderBottom: '2px solid #2c3e50',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                fontWeight: 700
+                fontWeight: 700,
+                fontFamily: "'Lato', sans-serif"
               }}>
                 Professional Summary
               </h3>
@@ -122,9 +127,8 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
             </section>
           )}
 
-          {/* Skills */}
           {validSkills.length > 0 && (
-            <section style={{ marginBottom: '25px' }}>
+            <section className="skills" style={{ marginBottom: '25px' }}>
               <h3 style={{
                 fontSize: '1.15em',
                 color: '#2c3e50',
@@ -133,11 +137,12 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                 borderBottom: '2px solid #2c3e50',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                fontWeight: 700
+                fontWeight: 700,
+                fontFamily: "'Lato', sans-serif"
               }}>
                 Skills
               </h3>
-              <ul style={{
+              <ul className="skills-columns" style={{
                 columns: 2,
                 WebkitColumns: 2,
                 MozColumns: 2,
@@ -156,10 +161,11 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                     breakInside: 'avoid-column'
                   }}>
                     <span style={{
+                      content: '•',
+                      color: '#2c3e50',
                       position: 'absolute',
                       left: 0,
                       top: '0.1em',
-                      color: '#2c3e50',
                       fontSize: '1em'
                     }}>•</span>
                     {skill.name}
@@ -169,9 +175,8 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
             </section>
           )}
 
-          {/* Work History */}
           {validWorkExperiences.length > 0 && (
-            <section style={{ marginBottom: '25px' }}>
+            <section className="experience" style={{ marginBottom: '25px' }}>
               <h3 style={{
                 fontSize: '1.15em',
                 color: '#2c3e50',
@@ -180,21 +185,22 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                 borderBottom: '2px solid #2c3e50',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                fontWeight: 700
+                fontWeight: 700,
+                fontFamily: "'Lato', sans-serif"
               }}>
                 Work History
               </h3>
               <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                 {validWorkExperiences.map((exp, index) => (
                   <li key={index} style={{ marginBottom: index < validWorkExperiences.length - 1 ? '20px' : '0' }}>
-                    <div style={{
+                    <div className="entry-header" style={{
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'flex-start',
                       marginBottom: '5px',
                       flexWrap: 'wrap'
                     }}>
-                      <div style={{ flexGrow: 1 }}>
+                      <div className="title-company" style={{ flexGrow: 1 }}>
                         <strong style={{
                           fontSize: '1.05em',
                           color: '#222',
@@ -212,7 +218,7 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                           {exp.company}
                         </span>
                       </div>
-                      <div style={{
+                      <div className="location-date" style={{
                         flexShrink: 0,
                         textAlign: 'right',
                         fontSize: '0.9em',
@@ -237,13 +243,11 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                         )}
                       </div>
                     </div>
-                    
                     {exp.achievements && exp.achievements.length > 0 && (
-                      <ul style={{
+                      <ul className="details-list" style={{
                         listStyle: 'none',
                         paddingLeft: 0,
-                        marginTop: '5px',
-                        marginBottom: 0
+                        marginTop: '5px'
                       }}>
                         {exp.achievements.map((achievement, achIndex) => (
                           <li key={achIndex} style={{
@@ -254,10 +258,11 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                             position: 'relative'
                           }}>
                             <span style={{
+                              content: '•',
+                              color: '#2c3e50',
                               position: 'absolute',
                               left: 0,
                               top: '0.1em',
-                              color: '#2c3e50',
                               fontSize: '1em'
                             }}>•</span>
                             {achievement}
@@ -271,9 +276,8 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
             </section>
           )}
 
-          {/* Education */}
           {validEducation.length > 0 && (
-            <section style={{ marginBottom: '25px' }}>
+            <section className="education" style={{ marginBottom: '25px' }}>
               <h3 style={{
                 fontSize: '1.15em',
                 color: '#2c3e50',
@@ -282,21 +286,22 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                 borderBottom: '2px solid #2c3e50',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                fontWeight: 700
+                fontWeight: 700,
+                fontFamily: "'Lato', sans-serif"
               }}>
                 Education
               </h3>
               <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                 {validEducation.map((edu, index) => (
                   <li key={index} style={{ marginBottom: index < validEducation.length - 1 ? '20px' : '0' }}>
-                    <div style={{
+                    <div className="entry-header" style={{
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'flex-start',
                       marginBottom: '5px',
                       flexWrap: 'wrap'
                     }}>
-                      <div style={{ flexGrow: 1 }}>
+                      <div className="title-company" style={{ flexGrow: 1 }}>
                         <strong style={{
                           fontSize: '1.05em',
                           color: '#222',
@@ -314,7 +319,7 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                           {edu.institution}
                         </span>
                       </div>
-                      <div style={{
+                      <div className="location-date" style={{
                         flexShrink: 0,
                         textAlign: 'right',
                         fontSize: '0.9em',
@@ -345,9 +350,8 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
             </section>
           )}
 
-          {/* Languages */}
           {validLanguages.length > 0 && (
-            <section style={{ marginBottom: '25px' }}>
+            <section className="languages-visible" style={{ marginBottom: '25px' }}>
               <h3 style={{
                 fontSize: '1.15em',
                 color: '#2c3e50',
@@ -356,26 +360,27 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                 borderBottom: '2px solid #2c3e50',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                fontWeight: 700
+                fontWeight: 700,
+                fontFamily: "'Lato', sans-serif"
               }}>
                 Languages
               </h3>
               {validLanguages.map((lang, index) => (
-                <div key={index} style={{ marginBottom: '12px' }}>
-                  <div style={{
+                <div key={index} className="language-item" style={{ marginBottom: '12px' }}>
+                  <div className="language-details" style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     marginBottom: '4px',
                     fontSize: '0.95em'
                   }}>
-                    <span style={{
+                    <span className="language-name" style={{
                       color: '#333',
                       fontWeight: 600
                     }}>
                       {lang.name}
                     </span>
-                    <span style={{
+                    <span className="language-level-text" style={{
                       color: '#555',
                       fontSize: '0.9em'
                     }}>
@@ -387,13 +392,13 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                        lang.proficiency}
                     </span>
                   </div>
-                  <div style={{
+                  <div className="language-bar-container" style={{
                     height: '8px',
                     backgroundColor: '#e9ecef',
                     borderRadius: '4px',
                     overflow: 'hidden'
                   }}>
-                    <div style={{
+                    <div className="language-bar-fill" style={{
                       height: '100%',
                       backgroundColor: '#2c3e50',
                       borderRadius: '4px',
@@ -406,6 +411,37 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                   </div>
                 </div>
               ))}
+            </section>
+          )}
+
+          {/* Hidden sections for optional content */}
+          {references && references.length > 0 && (
+            <section style={{ display: 'none' }}>
+              <h3>References</h3>
+              <ul>
+                {references.map((ref, index) => (
+                  <li key={index}>
+                    <strong>{ref.name}</strong><br/>
+                    {ref.position} at {ref.company}<br/>
+                    Email: {ref.email}<br/>
+                    Phone: {ref.phone}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {hobbies && (
+            <section style={{ display: 'none' }}>
+              <h3>Hobbies</h3>
+              <p>{hobbies}</p>
+            </section>
+          )}
+
+          {personalInfo.website && (
+            <section style={{ display: 'none' }}>
+              <h3>Portfolio</h3>
+              <a href={personalInfo.website} target="_blank" rel="noopener noreferrer">View Portfolio</a>
             </section>
           )}
 
