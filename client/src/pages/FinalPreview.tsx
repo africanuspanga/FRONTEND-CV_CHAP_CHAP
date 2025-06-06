@@ -99,12 +99,26 @@ const CVPreviewArea: React.FC<CVPreviewAreaProps> = ({
       
       // Ensure other arrays exist
       ['education', 'skills', 'languages', 'references', 
-       'certifications', 'projects', 'hobbies', 'websites', 
+       'certifications', 'projects', 'websites', 
        'accomplishments'].forEach(field => {
         if (!Array.isArray(processedData[field])) {
           processedData[field] = [];
         }
       });
+      
+      // Map summary from personalInfo.summary to top-level summary for template compatibility
+      if (processedData.personalInfo?.summary && !processedData.summary) {
+        processedData.summary = processedData.personalInfo.summary;
+      }
+      
+      // Convert hobbies array to string for templates that expect it
+      if (Array.isArray(processedData.hobbies) && processedData.hobbies.length > 0) {
+        processedData.hobbies = processedData.hobbies.map(hobby => 
+          typeof hobby === 'string' ? hobby : hobby.name || ''
+        ).join(', ');
+      } else if (!processedData.hobbies) {
+        processedData.hobbies = '';
+      }
       
       // Ensure name field for renderer
       if (processedData.personalInfo.firstName || processedData.personalInfo.lastName) {
