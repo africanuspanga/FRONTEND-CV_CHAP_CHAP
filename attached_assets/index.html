@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Template - Frankie Campos Style</title>
+    <title>CV Template - Grace Mbwana Style</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,164 +12,145 @@
 <body>
     <div class="cv-container">
 
-        <section class="contact-bar-top">
-            <span>Philadelphia, PA 19111</span>
+        <header class="cv-header">
+            <h1 id="fullName">GRACE MBWANA</h1>
+            <h2 id="profession" style="display:none;">Sales Associate</h2>
+        </header>
+
+        <section class="contact-bar">
+            <span>33100, Mwanza Tanzania</span>
             <span class="separator">|</span>
-            <span id="contactPhone">555 555 5555</span>
+            <span id="contactPhone">28 250 4567</span>
             <span class="separator">|</span>
-            <span id="contactEmail">example@example.com</span>
+            <span id="contactEmail">grace.mbwana@email.com</span>
             <a id="contactLinkedin" href="#" style="display:none;">LinkedIn</a>
         </section>
 
-        <header class="cv-header">
-            <h1 id="fullName">FRANKIE CAMPOS</h1>
-            <h2 id="profession" style="display:none;">Placeholder Profession</h2>
-        </header>
+        <main class="main-content-area">
 
-        <div class="main-grid">
+            <section class="summary">
+                <h3>Professional Summary</h3>
+                <p id="careerObjective">Motivated Sales Associate with 5 years of experience boosting sales and customer loyalty through individualized service. Resourceful expert at learning customer needs, directing to desirable merchandise and upselling to meet sales quotas. Committed to strengthening customer experiences with positivity and professionalism when answering requests and processing sales.</p>
+            </section>
 
-            <div class="grid-section">
-                <div class="section-title-column">
-                    <h3>PROFESSIONAL SUMMARY</h3>
-                </div>
-                <div class="section-content-column">
-                    <p id="careerObjective">Compassionate and dedicated social worker with comprehensive knowledge of social justice issues and systems affecting marginalized communities. Knowledgeable of the Diagnostic and Statistical Manual of Mental Disorder (DSM-IV), family reunification, data collection and management and PTSD treatments. Skilled in building partnerships and collaborations with community organizations and stakeholders to promote social change and improve access to services.</p>
-                </div>
-            </div>
+            <section class="skills">
+                <h3>Skills</h3>
+                <ul id="skillsList" class="skills-columns">
+                    <li>Store opening and closing</li>
+                    <li>Sales expertise</li>
+                    <li>Accurate Money Handling</li>
+                    <li>Store Merchandising</li>
+                    <li>Loss prevention</li>
+                    <li>Product promotions</li>
+                    <li>Guest Services</li>
+                    <li>Point of Sale Systems</li>
+                </ul>
+            </section>
 
-            <div class="grid-section">
-                <div class="section-title-column">
-                    <h3>WORK HISTORY</h3>
+            <section class="experience">
+                <h3>Work History</h3>
+                <ul id="experienceList">
+                    <li>
+                        <div class="entry-header">
+                            <div class="title-company">
+                                <strong>Sales Manager</strong>
+                                <span>Mwanza Fisheries Co-op</span>
+                            </div>
+                            <div class="location-date">
+                                <span>May 2021 - Current</span>
+                                <span>Mwanza</span>
+                            </div>
+                        </div>
+                        <ul class="details-list">
+                            <li>Effectively upsold products by introducing accessories and other add-ons, adding 6,957,000 TZS to average monthly sales.</li>
+                            <li>Generated brand awareness and positive product impressions to increase sales 22%.</li>
+                            <li>Used consultative sales approach to understand customer needs and recommend relevant offerings.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div class="entry-header">
+                            <div class="title-company">
+                                <strong>Barista</strong>
+                                <span>Grano Coffee</span>
+                            </div>
+                            <div class="location-date">
+                                <span>Jan 2020 - Mar 2021</span>
+                                <span>Dar es Salaam</span>
+                            </div>
+                        </div>
+                        <ul class="details-list">
+                            <li>Created over 60 drinks per hour with consistently positive customer satisfaction scores.</li>
+                            <li>Learned every menu preparation and numerous off-label drinks to meet all customer needs.</li>
+                            <li>Upsold baked goods and extra shots with beverages, increasing store sales 8,812,200 TZS per month.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="education">
+                <h3>Education</h3>
+                <ul id="educationList">
+                    <li>
+                        <div class="entry-header">
+                            <div class="title-company">
+                                <strong>B.A.: Business</strong>
+                                <span>St. Augustine University of Tanzania</span>
+                            </div>
+                            <div class="location-date">
+                                <span>June 2018</span>
+                                <span>Mwanza, Mwanza</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="languages-visible">
+                <h3>Languages</h3>
+                <div class="language-item">
+                    <div class="language-details">
+                        <span class="language-name">Swahili</span>
+                        <span class="language-level-text">Native Language</span>
+                    </div>
+                    </div>
+                <div class="language-item">
+                    <div class="language-details">
+                        <span class="language-name">English</span>
+                        <span class="language-level-text">C2 Proficient</span>
+                    </div>
+                    <div class="language-bar-container">
+                        <div class="language-bar-fill" style="width: 100%;"></div> </div>
                 </div>
-                <div class="section-content-column">
-                    <ul id="experienceList">
-                        <li>
-                            <div class="entry-header">
-                                <span class="job-title"><strong>SENIOR SOCIAL WORKER</strong></span>
-                                <span class="date-range">11/2021 to Current</span>
-                            </div>
-                            <div class="company-location">Universal Health Services, Philadelphia, PA</div>
-                            <ul class="details-list">
-                                <li>Lead a team of five social workers, overseeing hiring, training and professional growth.</li>
-                                <li>Develop, implement and monitor appropriate procedures for the effective delivery of program services for over 150 cases.</li>
-                                <li>Investigate suspected cases of abuse and write weekly petitions, court reports, case plans and other legal documents.</li>
-                            </ul>
-                        </li>
-                        <li>
-                            <div class="entry-header">
-                                <span class="job-title"><strong>SOCIAL WORKER</strong></span>
-                                <span class="date-range">09/2015 to 10/2021</span>
-                            </div>
-                            <div class="company-location">Tower Health, Philadelphia, PA</div>
-                            <ul class="details-list">
-                                <li>Interview and visited an average of 30 individuals weekly to assess their physical, emotional, social and environmental needs to identify signs of abuse and neglect.</li>
-                                <li>Formulated treatment plan strategies with multidisciplinary teams to provide a comprehensive and continuous care plan.</li>
-                                <li>Completed detailed charts to summarize interactions with patients, booked follow-up sessions and compiled documentation for court reports.</li>
-                            </ul>
-                        </li>
-                        <li>
-                            <div class="entry-header">
-                                <span class="job-title"><strong>SOCIAL WORKER ASSISTANT</strong></span>
-                                <span class="date-range">06/2012 to 08/2015</span>
-                            </div>
-                            <div class="company-location">Genesis Healthcare Services, Philadelphia, PA</div>
-                            <ul class="details-list">
-                                <li>Supported patient intake assessments and interviewed 100 families to gather psychiatric histories and collaborated in the development of treatment plans.</li>
-                                <li>Maintained regular contact with clients by scheduling meetings and monthly phone calls.</li>
-                                <li>Developed and maintained accurate records of programs and services.</li>
-                            </ul>
-                        </li>
+                <div class="language-item">
+                    <div class="language-details">
+                        <span class="language-name">Arabic</span>
+                        <span class="language-level-text">B2 Upper Intermediate</span>
+                    </div>
+                    <div class="language-bar-container">
+                        <div class="language-bar-fill" style="width: 75%;"></div> </div>
+                </div>
+            </section>
+
+            <section id="languagesSection" style="display:none;">
+                <h3>Languages (Std)</h3>
+                <ul id="languagesList">
                     </ul>
-                </div>
-            </div>
+            </section>
 
-            <div class="grid-section">
-                <div class="section-title-column">
-                    <h3>SKILLS</h3>
-                </div>
-                <div class="section-content-column">
-                    <ul id="skillsList" class="skills-columns">
-                        <li>Data collection analysis</li>
-                        <li>Case management</li>
-                        <li>Crisis intervention</li>
-                        <li>Behavioral Intervention Plans (BIP)</li>
-                        <li>Active listening</li>
-                        <li>Critical thinking</li>
-                        <li>Problem-solving</li>
-                        <li>Communication</li>
-                        <li>Organization</li>
-                    </ul>
-                </div>
-            </div>
+            <section id="referencesSection" style="display:none;">
+                <h3>References</h3>
+                <ul id="referencesList"></ul>
+            </section>
 
-            <div class="grid-section">
-                <div class="section-title-column">
-                    <h3>EDUCATION</h3>
-                </div>
-                <div class="section-content-column">
-                    <ul id="educationList">
-                        <li>
-                            <div class="education-entry">
-                                <span>Temple University, Philadelphia, PA</span>
-                                <span><strong>Master of Social Work</strong>, Social Work</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="education-entry">
-                                <span>Temple University, Philadelphia, PA</span>
-                                <span><strong>Bachelor of Social Work</strong>, Social Work</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+            <section id="hobbiesSection" style="display:none;">
+                <h3>Hobbies</h3>
+                <p id="hobbiesText"></p>
+            </section>
 
-            <div class="grid-section">
-                <div class="section-title-column">
-                    <h3>LICENSES</h3>
-                </div>
-                <div class="section-content-column">
-                    <ul class="licenses-list">
-                        <li>Licensed Certified Social Worker (LCSW) - (Updated 2023)</li>
-                    </ul>
-                </div>
-            </div>
+            <section id="portfolioSection" style="display:none;">
+                <h3>Portfolio</h3>
+                <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
+            </section>
 
-            <div class="grid-section" id="languagesSection" style="display:none;">
-                <div class="section-title-column">
-                    <h3>LANGUAGES</h3>
-                </div>
-                <div class="section-content-column">
-                    <ul id="languagesList"></ul>
-                </div>
-            </div>
-
-            <div class="grid-section" id="referencesSection" style="display:none;">
-                <div class="section-title-column">
-                    <h3>REFERENCES</h3>
-                </div>
-                <div class="section-content-column">
-                    <ul id="referencesList"></ul>
-                </div>
-            </div>
-
-            <div class="grid-section" id="hobbiesSection" style="display:none;">
-                <div class="section-title-column">
-                    <h3>HOBBIES</h3>
-                </div>
-                <div class="section-content-column">
-                    <p id="hobbiesText"></p>
-                </div>
-            </div>
-
-            <div class="grid-section" id="portfolioSection" style="display:none;">
-                <div class="section-title-column">
-                    <h3>PORTFOLIO</h3>
-                </div>
-                <div class="section-content-column">
-                    <a id="portfolioLink" href="#" target="_blank">View Portfolio</a>
-                </div>
-            </div>
-
-        </div> </div> </body>
+        </main> </div> </body>
 </html>
