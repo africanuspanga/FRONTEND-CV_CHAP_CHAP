@@ -107,7 +107,7 @@ export function BrightDiamondTemplate({
             PROFESSIONAL SUMMARY
           </h3>
           <p style={{ fontSize: '0.95em', color: '#4a4a4a', lineHeight: 1.7 }}>
-            {summary}
+            {typeof summary === 'string' ? summary : ''}
           </p>
         </section>
 
@@ -258,7 +258,7 @@ export function BrightDiamondTemplate({
                 breakInside: 'avoid-column'
               }}>
                 <span style={{ color: '#20c997', position: 'absolute', left: 0, top: '0.1em', fontSize: '1em' }}>•</span>
-                {skill.name}
+                {typeof skill === 'string' ? skill : (skill?.name || '')}
               </div>
             ))}
           </div>
