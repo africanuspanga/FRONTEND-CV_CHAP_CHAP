@@ -3,7 +3,7 @@ import type { CVData } from '@shared/schema';
 
 export function BrightDiamondTemplate({ 
   personalInfo, 
-  workExperience = [], 
+  workExperiences = [], 
   education = [], 
   skills = [], 
   summary = "", 
@@ -126,8 +126,8 @@ export function BrightDiamondTemplate({
             EXPERIENCE
           </h3>
           <ul style={{ margin: 0 }}>
-            {workExperience.map((job, index) => (
-              <li key={index} style={{ marginBottom: index < workExperience.length - 1 ? '25px' : '0' }}>
+            {workExperiences.map((job, index) => (
+              <li key={index} style={{ marginBottom: index < workExperiences.length - 1 ? '25px' : '0' }}>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -206,7 +206,7 @@ export function BrightDiamondTemplate({
                 }}>
                   <div style={{ flexGrow: 1 }}>
                     <strong style={{ display: 'block', fontSize: '1.1em', color: '#2a2a2a', marginBottom: '2px' }}>
-                      {edu.degree} {edu.fieldOfStudy && `In ${edu.fieldOfStudy}`}
+                      {edu.degree}
                     </strong>
                     <span style={{ display: 'block', fontSize: '0.95em', color: '#555' }}>
                       {edu.institution}
@@ -356,7 +356,7 @@ export function BrightDiamondTemplate({
               HOBBIES & INTERESTS
             </h3>
             <p style={{ fontSize: '0.95em', color: '#4a4a4a', lineHeight: 1.7 }}>
-              {hobbies}
+              {typeof hobbies === 'string' ? hobbies : ''}
             </p>
           </section>
         )}
