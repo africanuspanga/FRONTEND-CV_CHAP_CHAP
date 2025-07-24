@@ -164,12 +164,37 @@ export function Autocomplete({
                     key={option.value}
                     value={option.value}
                     onSelect={(selectedValue) => {
-                      const selectedOption = options.find(
-                        (opt) => opt.value.toLowerCase() === selectedValue.toLowerCase()
+                      console.log('Autocomplete onSelect called with:', selectedValue);
+                      console.log('Looking for option with value:', selectedValue);
+                      console.log('Available options:', options.map(opt => opt.value));
+                      
+                      // Try exact match first
+                      let selectedOption = options.find(
+                        (opt) => opt.value === selectedValue
                       );
+                      
+                      // If no exact match, try case-insensitive match
+                      if (!selectedOption) {
+                        selectedOption = options.find(
+                          (opt) => opt.value.toLowerCase() === selectedValue.toLowerCase()
+                        );
+                      }
+                      
+                      // If still no match, try finding by label
+                      if (!selectedOption) {
+                        selectedOption = options.find(
+                          (opt) => opt.label.toLowerCase() === selectedValue.toLowerCase()
+                        );
+                      }
+                      
                       if (selectedOption) {
+                        console.log('Found option:', selectedOption);
                         setInputValue(selectedOption.value);
                         onChange(selectedOption.value);
+                      } else {
+                        console.log('No matching option found, using raw selectedValue:', selectedValue);
+                        setInputValue(selectedValue);
+                        onChange(selectedValue);
                       }
                       setOpen(false);
                     }}
