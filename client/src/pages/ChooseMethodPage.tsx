@@ -100,7 +100,7 @@ export default function ChooseMethodPage() {
         {/* Main Heading */}
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            How would you like to build your resume?
+            How would you like to build your CV?
           </h1>
         </div>
 
@@ -113,7 +113,7 @@ export default function ChooseMethodPage() {
                 <Plus className="w-8 h-8 text-green-600" />
               </div>
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Start with a new resume
+                Start with a new CV
               </h2>
               <p className="text-gray-600 mb-8 leading-relaxed">
                 Get step-by-step support with expert content suggestions at your fingertips!
@@ -134,10 +134,10 @@ export default function ChooseMethodPage() {
                 <Upload className="w-8 h-8 text-[#4D6FFF]" />
               </div>
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Upload an existing resume
+                Upload an existing CV
               </h2>
               <p className="text-gray-600 mb-8 leading-relaxed">
-                Edit your resume using expertly generated content in a fresh, new design.
+                Edit your CV using expertly generated content in a fresh, new design.
               </p>
               <div className="relative">
                 <input

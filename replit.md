@@ -7,6 +7,7 @@ CV Chap Chap is a comprehensive CV creation platform specifically designed for t
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Terminology preference: Use "CV" instead of "resume" throughout the application.
 
 ## System Architecture
 
