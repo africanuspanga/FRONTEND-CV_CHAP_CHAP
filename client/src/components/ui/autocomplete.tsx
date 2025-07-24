@@ -3,18 +3,6 @@ import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 export type AutocompleteOption = {
   value: string;
@@ -50,7 +38,6 @@ export function Autocomplete({
 }: AutocompleteProps) {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState(value || "");
-  const [debouncedInput, setDebouncedInput] = React.useState("");
   const [filteredOptions, setFilteredOptions] = React.useState<AutocompleteOption[]>([]);
 
   // Handle external value changes
@@ -60,30 +47,21 @@ export function Autocomplete({
     }
   }, [value]);
 
-  // Debounce input to avoid excessive filtering
+  // Filter options in real-time
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedInput(inputValue);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [inputValue]);
-
-  // Filter options based on debounced input
-  React.useEffect(() => {
-    if (debouncedInput.length < minimumInputLength) {
+    if (inputValue.length < minimumInputLength) {
       setFilteredOptions([]);
       return;
     }
 
     const matchedOptions = options
       .filter((option) =>
-        option.label.toLowerCase().includes(debouncedInput.toLowerCase())
+        option.label.toLowerCase().includes(inputValue.toLowerCase())
       )
       .slice(0, maxDisplayItems);
 
     setFilteredOptions(matchedOptions);
-  }, [debouncedInput, options, maxDisplayItems, minimumInputLength]);
+  }, [inputValue, options, maxDisplayItems, minimumInputLength]);
 
   // Clear input handler
   const handleClear = () => {
@@ -96,121 +74,87 @@ export function Autocomplete({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
+    onChange(newValue); // Always pass the current input value
     setOpen(true);
+  };
 
-    if (newValue === "") {
-      onChange("");
-    }
+  // Handle option selection
+  const handleOptionSelect = (option: AutocompleteOption) => {
+    console.log('Option selected:', option);
+    setInputValue(option.value);
+    onChange(option.value);
+    setOpen(false);
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <div className={cn("relative", className)}>
-        <PopoverTrigger asChild>
-          <div
-            className={cn(
-              "flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-base text-base sm:h-10 sm:text-sm ring-offset-background",
-              "focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
-              inputClassName
-            )}
-          >
-            <input
-              name={name}
-              value={inputValue}
-              onChange={handleInputChange}
-              placeholder={placeholder}
-              className="flex-1 bg-transparent outline-none disabled:cursor-not-allowed"
-              onClick={() => inputValue.length >= minimumInputLength && setOpen(true)}
-              aria-autocomplete="list"
-              autoComplete="off"
-              autoCapitalize="words"
-            />
-            <div className="flex">
-              {inputValue && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  onClick={handleClear}
-                  className="h-auto px-2 py-0 hover:bg-transparent focus:ring-0"
-                  aria-label="Clear input"
-                >
-                  <XIcon className="h-4 w-4 text-muted-foreground" />
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                className="h-auto px-2 py-0 hover:bg-transparent focus:ring-0"
-                aria-label="Toggle menu"
-                onClick={() => setOpen(!open)}
-              >
-                <CaretSortIcon className="h-4 w-4 text-muted-foreground" />
-              </Button>
-            </div>
-          </div>
-        </PopoverTrigger>
-        {filteredOptions.length > 0 && (
-          <PopoverContent
-            className={cn("p-0", popoverWidth)}
-            align="start"
-            sideOffset={8}
-          >
-            <Command>
-              <CommandGroup className="max-h-[200px] overflow-auto">
-                {filteredOptions.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={option.value}
-                    onSelect={(selectedValue) => {
-                      console.log('Autocomplete onSelect called with:', selectedValue);
-                      console.log('Looking for option with value:', selectedValue);
-                      console.log('Available options:', options.map(opt => opt.value));
-                      
-                      // Try exact match first
-                      let selectedOption = options.find(
-                        (opt) => opt.value === selectedValue
-                      );
-                      
-                      // If no exact match, try case-insensitive match
-                      if (!selectedOption) {
-                        selectedOption = options.find(
-                          (opt) => opt.value.toLowerCase() === selectedValue.toLowerCase()
-                        );
-                      }
-                      
-                      // If still no match, try finding by label
-                      if (!selectedOption) {
-                        selectedOption = options.find(
-                          (opt) => opt.label.toLowerCase() === selectedValue.toLowerCase()
-                        );
-                      }
-                      
-                      if (selectedOption) {
-                        console.log('Found option:', selectedOption);
-                        setInputValue(selectedOption.value);
-                        onChange(selectedOption.value);
-                      } else {
-                        console.log('No matching option found, using raw selectedValue:', selectedValue);
-                        setInputValue(selectedValue);
-                        onChange(selectedValue);
-                      }
-                      setOpen(false);
-                    }}
-                    className="flex items-center gap-2 text-sm"
-                  >
-                    <span>{option.label}</span>
-                    {option.value === inputValue && (
-                      <CheckIcon className="h-4 w-4 text-primary flex-shrink-0 ml-auto" />
-                    )}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          </PopoverContent>
+    <div className={cn("relative", className)}>
+      <div
+        className={cn(
+          "flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-base sm:h-10 sm:text-sm ring-offset-background",
+          "focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+          inputClassName
         )}
+      >
+        <input
+          name={name}
+          value={inputValue}
+          onChange={handleInputChange}
+          onFocus={() => inputValue.length >= minimumInputLength && setOpen(true)}
+          onBlur={() => setTimeout(() => setOpen(false), 200)} // Delay to allow click
+          placeholder={placeholder}
+          className="flex-1 bg-transparent outline-none disabled:cursor-not-allowed"
+          aria-autocomplete="list"
+          autoComplete="off"
+          autoCapitalize="words"
+        />
+        <div className="flex">
+          {inputValue && (
+            <Button
+              variant="ghost"
+              size="sm"
+              type="button"
+              onClick={handleClear}
+              className="h-auto px-2 py-0 hover:bg-transparent focus:ring-0"
+              aria-label="Clear input"
+            >
+              <XIcon className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            className="h-auto px-2 py-0 hover:bg-transparent focus:ring-0"
+            aria-label="Toggle menu"
+            onClick={() => setOpen(!open)}
+          >
+            <CaretSortIcon className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        </div>
       </div>
-    </Popover>
+      
+      {/* Custom dropdown without Command component */}
+      {open && filteredOptions.length > 0 && (
+        <div
+          className={cn(
+            "absolute z-50 mt-1 max-h-[200px] overflow-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
+            popoverWidth
+          )}
+        >
+          {filteredOptions.map((option) => (
+            <div
+              key={option.value}
+              className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+              onClick={() => handleOptionSelect(option)}
+            >
+              <span>{option.label}</span>
+              {option.value === inputValue && (
+                <CheckIcon className="ml-auto h-4 w-4 text-primary" />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
