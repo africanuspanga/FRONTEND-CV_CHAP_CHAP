@@ -65,6 +65,7 @@ interface CVFormContextType {
     toIndex: number
   ) => void;
   resetForm: () => void;
+  loadParsedCVData: (parsedData: any) => void;
   isFormValid: (step: number) => boolean;
   goToNextStep: () => void;
   goToPreviousStep: () => void;
@@ -489,6 +490,44 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
       setCurrentStep(currentStep - 1);
     }
   };
+
+  // Load parsed CV data from file upload
+  const loadParsedCVData = (parsedData: any) => {
+    console.log('Loading parsed CV data:', parsedData);
+    
+    // Map parsed data to our form structure
+    const mappedData: CVFormData = {
+      ...initialFormData,
+      personalInfo: {
+        ...initialFormData.personalInfo,
+        firstName: parsedData.personalInfo?.firstName || '',
+        lastName: parsedData.personalInfo?.lastName || '',
+        email: parsedData.personalInfo?.email || '',
+        phone: parsedData.personalInfo?.phone || '',
+        professionalTitle: parsedData.personalInfo?.professionalTitle || '',
+        address: parsedData.personalInfo?.address || '',
+        city: parsedData.personalInfo?.city || '',
+        region: parsedData.personalInfo?.region || '',
+        country: parsedData.personalInfo?.country || '',
+        summary: parsedData.personalInfo?.summary || '',
+        location: parsedData.personalInfo?.location || '',
+        jobTitle: parsedData.personalInfo?.jobTitle || parsedData.personalInfo?.professionalTitle || '',
+      },
+      workExperiences: parsedData.workExperiences || [],
+      workExp: parsedData.workExperiences || [], // Sync both arrays
+      education: parsedData.education || [],
+      skills: parsedData.skills || [],
+      languages: parsedData.languages || [],
+      references: parsedData.references || [],
+      certifications: parsedData.certifications || [],
+      projects: parsedData.projects || [],
+      hobbies: parsedData.hobbies || [],
+      websites: parsedData.websites || [],
+      accomplishments: parsedData.accomplishments || [],
+    };
+    
+    setFormData(mappedData);
+  };
   
   const value = {
     currentStep,
@@ -501,6 +540,7 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
     removeItemFromArray,
     moveItemInArray,
     resetForm,
+    loadParsedCVData,
     isFormValid,
     goToNextStep,
     goToPreviousStep,

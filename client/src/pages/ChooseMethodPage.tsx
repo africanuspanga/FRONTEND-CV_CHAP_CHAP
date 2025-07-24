@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,12 +6,16 @@ import { Upload, Plus, Trophy, ArrowLeft, ChevronDown } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useCVForm } from '@/contexts/cv-form-context';
 
 export default function ChooseMethodPage() {
   const [, setLocation] = useLocation();
   const [isUploading, setIsUploading] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [parsingStatus, setParsingStatus] = useState<string>('');
   const { toast } = useToast();
+  const { loadParsedCVData } = useCVForm();
 
   const uploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -20,12 +24,10 @@ export default function ChooseMethodPage() {
     },
     onSuccess: (data) => {
       console.log('File uploaded successfully. Job ID:', data.job_id);
-      setIsUploading(false);
-      // TODO: Phase 2 - Implement polling/websocket for parsing status
-      toast({
-        title: "Upload Successful",
-        description: "Your CV is being processed. We'll redirect you shortly.",
-      });
+      setJobId(data.job_id);
+      setParsingStatus('parsing');
+      // Start polling for status
+      pollParsingStatus(data.job_id);
     },
     onError: (error) => {
       console.error('Upload failed:', error);
@@ -37,6 +39,54 @@ export default function ChooseMethodPage() {
       });
     }
   });
+
+  const pollParsingStatus = async (jobId: string) => {
+    try {
+      const response = await apiRequest('GET', `/api/parsing-status/${jobId}`);
+      const statusData = await response.json();
+      
+      setParsingStatus(statusData.status);
+      
+      if (statusData.status === 'completed') {
+        // Fetch the parsed data
+        const dataResponse = await apiRequest('GET', `/api/get-parsed-cv-data/${jobId}`);
+        const parsedData = await dataResponse.json();
+        
+        console.log('Parsed CV data:', parsedData);
+        
+        // Update CV form context with parsed data
+        loadParsedCVData(parsedData);
+        
+        setIsUploading(false);
+        toast({
+          title: "CV Processed Successfully!",
+          description: "Your CV has been parsed and is ready for editing.",
+        });
+        
+        // Navigate to template selection
+        setLocation('/templates');
+        
+      } else if (statusData.status === 'failed') {
+        setIsUploading(false);
+        toast({
+          title: "Processing Failed",
+          description: statusData.error || "Failed to parse your CV. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        // Continue polling every 2 seconds
+        setTimeout(() => pollParsingStatus(jobId), 2000);
+      }
+    } catch (error) {
+      console.error('Status polling failed:', error);
+      setIsUploading(false);
+      toast({
+        title: "Processing Error",
+        description: "Unable to check parsing status. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -70,6 +120,17 @@ export default function ChooseMethodPage() {
   };
 
   if (isUploading) {
+    const getStatusMessage = () => {
+      switch (parsingStatus) {
+        case 'parsing':
+          return 'Extracting your information..';
+        case 'processing':
+          return 'Processing your CV data..';
+        default:
+          return 'Finding some good stuff..';
+      }
+    };
+
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
@@ -77,8 +138,11 @@ export default function ChooseMethodPage() {
             <Trophy className="w-12 h-12 text-green-600" />
           </div>
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-            Finding some good stuff..
+            {getStatusMessage()}
           </h2>
+          <p className="text-gray-600 mb-4">
+            This may take a few moments
+          </p>
           <div className="animate-spin w-8 h-8 border-4 border-[#4D6FFF] border-t-transparent rounded-full mx-auto"></div>
         </div>
       </div>
