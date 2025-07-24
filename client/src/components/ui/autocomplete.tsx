@@ -1,15 +1,13 @@
 import * as React from "react";
-import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-import { XIcon } from "lucide-react";
+import { ChevronDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
-export type AutocompleteOption = {
-  value: string;
+export interface AutocompleteOption {
   label: string;
-};
+  value: string;
+}
 
-type AutocompleteProps = {
+export interface AutocompleteProps {
   options: AutocompleteOption[];
   value?: string;
   onChange: (value: string) => void;
@@ -21,24 +19,23 @@ type AutocompleteProps = {
   popoverWidth?: string;
   maxDisplayItems?: number;
   minimumInputLength?: number;
-};
+}
 
 export function Autocomplete({
   options,
   value,
   onChange,
   placeholder = "Select option...",
-  emptyMessage = "No results found.",
   className,
   name,
   inputClassName,
-  popoverWidth = "w-full",
   maxDisplayItems = 5,
   minimumInputLength = 2,
 }: AutocompleteProps) {
-  const [open, setOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState(value || "");
   const [filteredOptions, setFilteredOptions] = React.useState<AutocompleteOption[]>([]);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   // Handle external value changes
   React.useEffect(() => {
@@ -47,47 +44,49 @@ export function Autocomplete({
     }
   }, [value]);
 
-  // Filter options in real-time
+  // Filter options based on input
   React.useEffect(() => {
     if (inputValue.length < minimumInputLength) {
       setFilteredOptions([]);
       return;
     }
 
-    const matchedOptions = options
+    const filtered = options
       .filter((option) =>
         option.label.toLowerCase().includes(inputValue.toLowerCase())
       )
       .slice(0, maxDisplayItems);
 
-    setFilteredOptions(matchedOptions);
+    setFilteredOptions(filtered);
+    setIsOpen(filtered.length > 0);
   }, [inputValue, options, maxDisplayItems, minimumInputLength]);
 
-  // Clear input handler
-  const handleClear = () => {
-    setInputValue("");
-    onChange("");
-    setOpen(false);
-  };
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
 
-  // Handle direct input change
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
-    setOpen(true);
-    // Only call onChange when user is typing, not on selection
   };
 
-  // Handle option selection
-  const handleOptionSelect = (option: AutocompleteOption) => {
-    console.log('Option selected:', option);
+  const handleOptionClick = (option: AutocompleteOption) => {
+    console.log('Autocomplete option clicked:', option);
     setInputValue(option.value);
     onChange(option.value);
-    setOpen(false);
+    setIsOpen(false);
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <div ref={containerRef} className={cn("relative", className)}>
       <div
         className={cn(
           "flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-base sm:h-10 sm:text-sm ring-offset-background",
@@ -99,69 +98,25 @@ export function Autocomplete({
           name={name}
           value={inputValue}
           onChange={handleInputChange}
-          onFocus={() => inputValue.length >= minimumInputLength && setOpen(true)}
-          onBlur={() => setTimeout(() => setOpen(false), 300)} // Longer delay to allow click
           placeholder={placeholder}
-          className="flex-1 bg-transparent outline-none disabled:cursor-not-allowed"
-          aria-autocomplete="list"
+          className="flex-1 bg-transparent outline-none"
           autoComplete="off"
           autoCapitalize="words"
         />
-        <div className="flex">
-          {inputValue && (
-            <Button
-              variant="ghost"
-              size="sm"
-              type="button"
-              onClick={handleClear}
-              className="h-auto px-2 py-0 hover:bg-transparent focus:ring-0"
-              aria-label="Clear input"
-            >
-              <XIcon className="h-4 w-4 text-muted-foreground" />
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            type="button"
-            className="h-auto px-2 py-0 hover:bg-transparent focus:ring-0"
-            aria-label="Toggle menu"
-            onClick={() => setOpen(!open)}
-          >
-            <CaretSortIcon className="h-4 w-4 text-muted-foreground" />
-          </Button>
-        </div>
+        <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
       </div>
       
-      {/* Custom dropdown without Command component */}
-      {open && filteredOptions.length > 0 && (
-        <div
-          className={cn(
-            "absolute z-50 mt-1 max-h-[200px] overflow-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
-            popoverWidth
-          )}
-        >
-          {filteredOptions.map((option) => (
-            <div
-              key={option.value}
-              className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-              onMouseDown={(e) => {
-                e.preventDefault(); // Prevent blur from happening first
-                console.log('MouseDown on option:', option);
-                handleOptionSelect(option);
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Click on option:', option);
-                handleOptionSelect(option);
-              }}
+      {isOpen && filteredOptions.length > 0 && (
+        <div className="absolute z-50 mt-1 w-full max-h-[200px] overflow-auto rounded-md border bg-white shadow-md">
+          {filteredOptions.map((option, index) => (
+            <button
+              key={`${option.value}-${index}`}
+              type="button"
+              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+              onClick={() => handleOptionClick(option)}
             >
-              <span>{option.label}</span>
-              {option.value === inputValue && (
-                <CheckIcon className="ml-auto h-4 w-4 text-primary" />
-              )}
-            </div>
+              {option.label}
+            </button>
           ))}
         </div>
       )}
