@@ -17,6 +17,8 @@ export function BrightDiamondTemplate({
   console.log('BrightDiamond Template Data Debug:', {
     professionalTitle: personalInfo?.professionalTitle,
     jobTitle: personalInfo?.jobTitle,
+    summary: summary,
+    personalInfoSummary: personalInfo?.summary,
     hobbies: hobbies,
     hobbiesType: typeof hobbies,
     hobbiesLength: Array.isArray(hobbies) ? hobbies.length : 'not array'
@@ -115,7 +117,7 @@ export function BrightDiamondTemplate({
             PROFESSIONAL SUMMARY
           </h3>
           <p style={{ fontSize: '0.95em', color: '#4a4a4a', lineHeight: 1.7 }}>
-            {typeof summary === 'string' ? summary : ''}
+            {summary || personalInfo?.summary || ''}
           </p>
         </section>
 
@@ -364,7 +366,9 @@ export function BrightDiamondTemplate({
               HOBBIES & INTERESTS
             </h3>
             <p style={{ fontSize: '0.95em', color: '#4a4a4a', lineHeight: 1.7 }}>
-              {Array.isArray(hobbies) ? hobbies.join(', ') : (typeof hobbies === 'string' ? hobbies : '')}
+              {Array.isArray(hobbies) 
+                ? hobbies.map(hobby => typeof hobby === 'string' ? hobby : hobby?.name || '').filter(Boolean).join(', ')
+                : (typeof hobbies === 'string' ? hobbies : '')}
             </p>
           </section>
         ) : null}
