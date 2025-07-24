@@ -1,0 +1,68 @@
+Instructions for Frontend Team: CV Chap Chap - "Upload Existing CV" Feature
+To: Frontend Development Team
+From: CTO
+Date: July 25, 2025
+Feature: "Upload Existing CV" Integration
+Objective: Enable users to upload an existing CV document (DOC, DOCX, PDF, HTML, RTF, TXT), have its content parsed by the backend, and then pre-populate the CV creation forms for review and editing.
+
+Phase 1: New "Choose" Step & File Upload (Current Sprint Focus)
+1. Create New "Choose" Page (/cv-steps/choose)
+* Route: Implement a new route for this page, ideally /cv-steps/choose.
+* UI Design: Replicate the UI from Screenshot 2025-07-25 at 00.40.48.png.
+* Two prominent cards/buttons:
+* "Start with a new resume" (leading to current template selection).
+* "Upload an existing resume" (triggering file upload).
+* Include the "acceptable file types" text: .DOC, .DOCX, .PDF, .HTML, .RTF, .TXT.
+* Navigation:
+* "Start with a new resume" button should navigate to the existing template selection route.
+* "Back" button should navigate back to the home page or previous logical step.
+
+2. Implement File Upload Logic
+* File Input: Within the "Upload an existing resume" card, integrate a hidden file input (<input type="file" />) that is triggered when the user clicks "Choose file".
+* File Selection: Capture the selected file object from the event.
+* API Integration (Placeholder):
+* When a file is selected, initiate an API call to a new backend endpoint: POST /api/upload-cv-file.
+* Use FormData to send the file. Example:
+```javascript
+const formData = new FormData();
+formData.append('cvFile', selectedFile); // 'cvFile' should match backend's expected field name
+
+        // Use TanStack Query for mutation, showing loading/error states
+        // Example structure (adjust to your React Query setup):
+        mutation.mutate(formData);
+        ```
+    * **Important:** This API call should *not* block the UI. It will be an asynchronous operation.
+* **Loading State:** Immediately upon file selection and API call initiation, display a prominent loading state (e.g., using the trophy icon from `Screenshot 2025-07-25 at 00.41.40.png` with text "Finding some good stuff.."). This should persist until a response (success or error) is received from the backend.
+3. Basic Error and Success Handling (Initial)
+* API Success: If the POST /api/upload-cv-file call returns a success (e.g., status 202 Accepted with a job_id), transition the loading state. For now, just log the job_id to console. Full data consumption comes in Phase 2.
+* API Error: If the API call fails (e.g., invalid file type, server error), display a user-friendly error message on the "Choose" page (e.g., "Failed to process your CV. Please try again or create a new one."). Clear the loading state.
+
+Phase 2: Data Consumption & Form Pre-population (Next Sprints)
+1. Implement Polling/Websocket for Parsing Status
+* Polling (Initial Approach): After receiving a job_id from POST /api/upload-cv-file, periodically poll a new backend endpoint GET /api/parsing-status/{job_id} (e.g., every 2-3 seconds) to check if the parsing is complete.
+* WebSockets (Preferred Long-Term): Research and consider implementing WebSockets for real-time notification from the backend when the parsing is complete. This provides a smoother user experience than polling.
+
+2. Fetch & Consume Parsed CV Data
+* Once the backend indicates parsing is complete (via polling or WebSocket), make a GET request to GET /api/get-parsed-cv-data/{job_id} to retrieve the full CVData JSON object.
+* State Update: Use the Context API (CV Form Data context) to update the application's global CVData state with the received parsed data. This is crucial for synchronizing with React Hook Form.
+
+3. Pre-populate Forms
+* After updating the global CVData state, React Hook Form should automatically reflect this data in all relevant form fields across the CV creation steps (Personal Information, Work Experience, Education, Skills, etc.).
+* Ensure that the form fields are correctly initialized with the CVData structure received from the backend.
+
+4. Enhanced Navigation Post-Upload
+* Upon successful data consumption and form pre-population, automatically navigate the user to the first relevant CV creation step, likely the "Review your basics" page (Screenshot 2025-07-25 at 00.47.29.png) or a dedicated "Review Imported CV" summary page.
+* Ensure the "Live Preview" updates instantly with the imported data (Screenshot 2025-07-25 at 00.03.55.png).
+
+5. AI Integration (Post-Prepopulation)
+* After forms are pre-populated, trigger the client-side AI analysis to provide suggestions based on the newly loaded data.
+* Display the "You're off to a great start!" summary (Screenshot 2025-07-25 at 00.47.06.jpg) based on the parsed CV.
+
+Technical Considerations for Frontend:
+Responsiveness: Ensure the new "Choose" page and all loading states are fully responsive and mobile-optimized.
+
+Error Boundaries: Implement robust error boundaries for the file upload process to prevent crashes.
+
+User Feedback: Provide clear, actionable feedback for users at every stage (uploading, processing, success, specific errors).
+
+Refactor CVData: Confirm the frontend CVData interface fully matches the backend's CVDocument JSON structure to avoid mapping issues.

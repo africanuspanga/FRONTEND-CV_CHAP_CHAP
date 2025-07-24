@@ -24,7 +24,39 @@ interface CVRequest {
 const cvRequests: Record<string, CVRequest> = {};
 
 // Configure multer for form-data parsing
-const upload = multer();
+const upload = multer({
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = [
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/pdf',
+      'text/html',
+      'application/rtf',
+      'text/plain'
+    ];
+    
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only DOC, DOCX, PDF, HTML, RTF, and TXT files are allowed.'));
+    }
+  }
+});
+
+// In-memory storage for CV upload jobs
+interface CVUploadJob {
+  id: string;
+  filename: string;
+  status: 'uploading' | 'parsing' | 'completed' | 'failed';
+  parsedData?: any;
+  error?: string;
+  createdAt: Date;
+}
+
+const cvUploadJobs: Record<string, CVUploadJob> = {};
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
@@ -163,6 +195,158 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
       version: "1.0.0",
       timestamp: new Date().toISOString()
     });
+  });
+
+  // CV file upload endpoint
+  app.post("/api/upload-cv-file", upload.single('cvFile'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: 'No file uploaded'
+        });
+      }
+
+      // Generate unique job ID
+      const jobId = uuidv4();
+      
+      // Create job entry
+      cvUploadJobs[jobId] = {
+        id: jobId,
+        filename: req.file.originalname,
+        status: 'parsing',
+        createdAt: new Date()
+      };
+
+      console.log(`File uploaded: ${req.file.originalname} (${req.file.size} bytes)`);
+
+      // Simulate parsing process (Phase 2 will implement actual parsing)
+      setTimeout(() => {
+        const job = cvUploadJobs[jobId];
+        if (job) {
+          // Mock parsed CV data for testing
+          job.parsedData = {
+            personalInfo: {
+              firstName: "John",
+              lastName: "Doe", 
+              email: "john.doe@example.com",
+              phone: "+255123456789",
+              address: "Dar es Salaam, Tanzania",
+              professionalTitle: "Software Developer",
+              summary: "Experienced software developer with 5+ years in web development and mobile applications."
+            },
+            workExperiences: [
+              {
+                jobTitle: "Senior Developer",
+                company: "Tech Solutions Ltd",
+                location: "Dar es Salaam",
+                startDate: "2020-01",
+                endDate: "",
+                current: true,
+                achievements: ["Led team of 5 developers", "Implemented new features that increased user engagement by 40%"]
+              }
+            ],
+            education: [
+              {
+                degree: "Bachelor of Computer Science",
+                institution: "University of Dar es Salaam",
+                location: "Dar es Salaam",
+                startDate: "2015-09",
+                endDate: "2019-06"
+              }
+            ],
+            skills: [
+              { name: "JavaScript", level: "expert" },
+              { name: "React", level: "advanced" },
+              { name: "Node.js", level: "advanced" }
+            ],
+            languages: [
+              { name: "English", proficiency: "fluent" },
+              { name: "Swahili", proficiency: "native" }
+            ]
+          };
+          job.status = 'completed';
+        }
+      }, 3000); // Simulate 3 second parsing time
+
+      // Return immediate response with job ID
+      res.status(202).json({
+        success: true,
+        job_id: jobId,
+        message: 'File uploaded successfully. Processing in progress.'
+      });
+
+    } catch (error: any) {
+      console.error('Error uploading CV file:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error'
+      });
+    }
+  });
+
+  // Get parsing status endpoint
+  app.get("/api/parsing-status/:jobId", (req, res) => {
+    try {
+      const { jobId } = req.params;
+      const job = cvUploadJobs[jobId];
+
+      if (!job) {
+        return res.status(404).json({
+          success: false,
+          error: 'Job not found'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        status: job.status,
+        filename: job.filename,
+        created_at: job.createdAt,
+        error: job.error
+      });
+
+    } catch (error: any) {
+      console.error('Error checking parsing status:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error'
+      });
+    }
+  });
+
+  // Get parsed CV data endpoint
+  app.get("/api/get-parsed-cv-data/:jobId", (req, res) => {
+    try {
+      const { jobId } = req.params;
+      const job = cvUploadJobs[jobId];
+
+      if (!job) {
+        return res.status(404).json({
+          success: false,
+          error: 'Job not found'
+        });
+      }
+
+      if (job.status !== 'completed') {
+        return res.status(400).json({
+          success: false,
+          error: 'Parsing not completed yet'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        cv_data: job.parsedData
+      });
+
+    } catch (error: any) {
+      console.error('Error retrieving parsed CV data:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error'
+      });
+    }
   });
   // API route for initiating USSD payment
   app.post("/api/cv-pdf/anonymous/initiate-ussd", async (req, res) => {

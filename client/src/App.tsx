@@ -23,6 +23,7 @@ import Home from "@/pages/Home";
 import CreateCV from "@/pages/CreateCV";
 import TemplateSelection from "@/pages/TemplateSelection";
 import CreationMethod from "@/pages/CreationMethod";
+import ChooseMethodPage from "@/pages/ChooseMethodPage";
 import PersonalInfoForm from "@/pages/PersonalInfoForm";
 import WorkExperienceForm from "@/pages/WorkExperienceForm";
 import EducationForm from "@/pages/EducationForm";
@@ -121,6 +122,7 @@ function Router() {
               <Switch>
                 <Route path="/" component={Home} />
                 <Route path="/cv-steps" component={CVSteps} />
+                <Route path="/cv-steps/choose" component={ChooseMethodPage} />
                 <Route path="/templates" component={TemplateSelection} />
                 {/* Redirect from old route to new CVSteps page */}
                 <Route path="/create/method">
