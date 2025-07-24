@@ -13,15 +13,20 @@ export async function apiRequest(
   data?: unknown | undefined,
   customHeaders?: Record<string, string>
 ): Promise<Response> {
+  // Check if data is FormData (for file uploads)
+  const isFormData = data instanceof FormData;
+  
   const headers: Record<string, string> = {
-    ...(data ? { "Content-Type": "application/json" } : {}),
+    // Don't set Content-Type for FormData - let browser set it with boundary
+    ...(data && !isFormData ? { "Content-Type": "application/json" } : {}),
     ...(customHeaders || {})
   };
 
   const res = await fetch(url, {
     method,
     headers,
-    body: data ? JSON.stringify(data) : undefined,
+    // For FormData, send directly; for other data, stringify
+    body: data ? (isFormData ? data : JSON.stringify(data)) : undefined,
     credentials: "include",
   });
 
