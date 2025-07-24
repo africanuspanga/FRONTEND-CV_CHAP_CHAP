@@ -1,21 +1,28 @@
 import React from 'react';
 import type { CVData } from '@shared/schema';
 
-export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
-  const {
-    personalInfo, 
-    workExperiences = [], 
-    education = [], 
-    skills = [], 
-    languages = [], 
-    references = [],
-    certifications = [],
-    projects = []
-  } = cvData;
+export function MjenziWaTaifaTemplate({ 
+  personalInfo, 
+  workExperiences = [], 
+  education = [], 
+  skills = [], 
+  languages = [], 
+  references = [],
+  certifications = [],
+  projects = [],
+  summary = "",
+  hobbies = ""
+}: CVData): JSX.Element {
   
-  // Extract summary and hobbies from processed data - these are added by FinalPreview
-  const summary = (cvData as any).summary || personalInfo.summary || "";
-  const hobbies = typeof (cvData as any).hobbies === 'string' ? (cvData as any).hobbies : "";
+  // Extract summary with fallback
+  const finalSummary = summary || personalInfo?.summary || "";
+  
+  // Process hobbies to handle both string and object array formats
+  const finalHobbies = typeof hobbies === 'string' 
+    ? hobbies 
+    : Array.isArray(hobbies) 
+      ? hobbies.map((hobby: any) => typeof hobby === 'string' ? hobby : hobby?.name || '').filter(Boolean).join(', ')
+      : "";
   // Filter valid work experiences
   const validWorkExperiences = workExperiences?.filter(exp => exp.jobTitle && exp.company) || [];
   // Filter valid education entries
@@ -64,9 +71,9 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
             fontWeight: 900,
             fontFamily: "'Lato', sans-serif"
           }}>
-            {personalInfo.firstName} {personalInfo.lastName}
+            {personalInfo?.firstName || ''} {personalInfo?.lastName || ''}
           </h1>
-          <h2 style={{ display: 'none' }}>{personalInfo.professionalTitle}</h2>
+          <h2 style={{ display: 'none' }}>{personalInfo?.professionalTitle || ''}</h2>
         </header>
 
         <section className="contact-bar" style={{
@@ -81,27 +88,27 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
           gap: '5px 8px',
           backgroundColor: '#f8f9fa'
         }}>
-          {personalInfo.address && <span>{personalInfo.address}</span>}
-          {personalInfo.phone && (
+          {personalInfo?.address && <span>{personalInfo.address}</span>}
+          {personalInfo?.phone && (
             <>
               <span className="separator" style={{ color: '#ccc', margin: '0 3px' }}>|</span>
               <span>{personalInfo.phone}</span>
             </>
           )}
-          {personalInfo.email && (
+          {personalInfo?.email && (
             <>
               <span className="separator" style={{ color: '#ccc', margin: '0 3px' }}>|</span>
               <span>{personalInfo.email}</span>
             </>
           )}
-          {personalInfo.linkedin && (
+          {personalInfo?.linkedin && (
             <a href={personalInfo.linkedin} style={{ display: 'none' }}>LinkedIn</a>
           )}
         </section>
 
         <main className="main-content-area" style={{ padding: '30px 40px' }}>
 
-          {summary && (
+          {finalSummary && (
             <section className="summary" style={{ marginBottom: '25px' }}>
               <h3 style={{
                 fontSize: '1.15em',
@@ -122,7 +129,7 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
                 lineHeight: 1.7,
                 marginBottom: 0
               }}>
-                {summary}
+                {finalSummary}
               </p>
             </section>
           )}
@@ -431,14 +438,14 @@ export function MjenziWaTaifaTemplate(cvData: CVData): JSX.Element {
             </section>
           )}
 
-          {hobbies && (
+          {finalHobbies && (
             <section style={{ display: 'none' }}>
               <h3>Hobbies</h3>
-              <p>{hobbies}</p>
+              <p>{finalHobbies}</p>
             </section>
           )}
 
-          {personalInfo.website && (
+          {personalInfo?.website && (
             <section style={{ display: 'none' }}>
               <h3>Portfolio</h3>
               <a href={personalInfo.website} target="_blank" rel="noopener noreferrer">View Portfolio</a>

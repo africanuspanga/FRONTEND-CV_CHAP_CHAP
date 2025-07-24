@@ -54,7 +54,7 @@ const DirectTemplateRenderer: React.FC<DirectTemplateRendererProps> = ({
       case 'bigBoss':
         return <BigBossTemplate data={data} />;
       case 'mjenziWaTaifa':
-        return <MjenziWaTaifaTemplate cvData={data} />;
+        return <MjenziWaTaifaTemplate {...data} />;
       case 'streetHustler':
         return <StreetHustlerTemplate data={data} />;
       case 'mwalimuOne':
