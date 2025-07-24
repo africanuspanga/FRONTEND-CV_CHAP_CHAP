@@ -62,11 +62,11 @@ export default function ChooseMethodPage() {
   };
 
   const handleCreateNew = () => {
-    setLocation('/cv-steps/templates');
+    setLocation('/templates');
   };
 
   const handleBack = () => {
-    setLocation('/');
+    setLocation('/cv-steps');
   };
 
   if (isUploading) {

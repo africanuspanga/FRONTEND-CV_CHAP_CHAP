@@ -28,8 +28,8 @@ const CVSteps: React.FC = () => {
   }, []);
 
   const handleNextClick = () => {
-    // Navigate to templates page
-    navigate('/templates');
+    // Navigate to choose method page first
+    navigate('/cv-steps/choose');
   };
 
   return (
