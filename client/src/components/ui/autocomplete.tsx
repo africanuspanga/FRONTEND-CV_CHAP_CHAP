@@ -74,8 +74,8 @@ export function Autocomplete({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
-    onChange(newValue); // Always pass the current input value
     setOpen(true);
+    // Only call onChange when user is typing, not on selection
   };
 
   // Handle option selection
