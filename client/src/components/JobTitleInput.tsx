@@ -34,8 +34,6 @@ const JobTitleInput: React.FC<JobTitleInputProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
-    
-    // CRITICAL FIX: Always call onChange to update parent state
     onChange(newValue);
     
     // Only show dropdown if we have at least 2 characters
@@ -53,16 +51,10 @@ const JobTitleInput: React.FC<JobTitleInputProps> = ({
 
   // Handle option selection
   const handleOptionClick = (option: string) => {
+    console.log('JobTitleInput option clicked:', option);
     setInputValue(option);
     onChange(option);
     setIsOpen(false);
-  };
-
-  // Handle blur event to ensure value is saved when user finishes typing
-  const handleBlur = () => {
-    setIsOpen(false);
-    // Ensure the current input value is saved to parent state
-    onChange(inputValue);
   };
 
   // Close dropdown when clicking outside
@@ -70,8 +62,6 @@ const JobTitleInput: React.FC<JobTitleInputProps> = ({
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
         setIsOpen(false);
-        // Ensure value is saved when clicking outside
-        onChange(inputValue);
       }
     }
 
@@ -79,7 +69,7 @@ const JobTitleInput: React.FC<JobTitleInputProps> = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [wrapperRef, inputValue, onChange]);
+  }, [wrapperRef]);
   
   return (
     <div className={`relative ${className}`} ref={wrapperRef}>
@@ -89,7 +79,6 @@ const JobTitleInput: React.FC<JobTitleInputProps> = ({
           value={inputValue}
           onChange={handleInputChange}
           onFocus={() => inputValue.length >= 2 && setIsOpen(true)}
-          onBlur={handleBlur}
           placeholder={placeholder}
           className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
@@ -98,15 +87,16 @@ const JobTitleInput: React.FC<JobTitleInputProps> = ({
       {isOpen && filteredOptions.length > 0 && (
         <div className="absolute z-10 w-full mt-1 bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm">
           {filteredOptions.map((option) => (
-            <div
+            <button
               key={option.value}
-              className="cursor-pointer select-none relative py-2 pl-10 pr-4 hover:bg-blue-50"
+              type="button"
+              className="w-full text-left cursor-pointer select-none relative py-2 pl-3 pr-4 hover:bg-blue-50 focus:outline-none"
               onClick={() => handleOptionClick(option.label)}
             >
               <span className={`block truncate ${inputValue === option.label ? 'font-medium' : 'font-normal'}`}>
                 {option.label}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       )}
