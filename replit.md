@@ -160,3 +160,19 @@ interface CVData {
 - **Performance**: Minimize bundle size for mobile users
 - **Offline Support**: Implement service workers for connectivity issues
 - **Error Handling**: Graceful degradation for PDF generation failures
+
+## Recent Changes
+
+### July 25, 2025 - CV Upload Feature (Phase 1)
+- **New Route Added**: `/cv-steps/choose` - Choose Method page implementation
+- **Backend API Endpoints**: 
+  - `POST /api/upload-cv-file` - File upload with validation
+  - `GET /api/parsing-status/:jobId` - Status polling
+  - `GET /api/get-parsed-cv-data/:jobId` - Data retrieval
+- **UI Components**: Two-card layout matching provided designs exactly
+- **Brand Colors**: Applied CV Chap Chap colors (#034694, #4D6FFF, #E5EAFF)
+- **File Validation**: DOC, DOCX, PDF, HTML, RTF, TXT support with 10MB limit
+- **Loading States**: Trophy icon with "Finding some good stuff.." message
+- **Error Handling**: Comprehensive validation and user feedback
+- **Terminology Update**: Consistent use of "CV" instead of "resume"
+- **Mobile Optimization**: Fully responsive design for mobile-first approach
