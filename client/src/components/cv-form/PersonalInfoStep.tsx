@@ -156,6 +156,7 @@ const PersonalInfoStep: React.FC = () => {
                     options={jobTitles.map(title => ({ label: title, value: title }))}
                     value={field.value}
                     onChange={(value) => {
+                      field.onChange(value); // Update React Hook Form field
                       handleFieldChange('professionalTitle', value);
                       // Also update the jobTitle field to ensure consistency
                       handleFieldChange('jobTitle', value);
@@ -240,7 +241,10 @@ const PersonalInfoStep: React.FC = () => {
                     <Autocomplete
                       options={tanzanianRegionsOptions}
                       value={field.value}
-                      onChange={(value) => handleFieldChange('address', value)}
+                      onChange={(value) => {
+                        field.onChange(value); // Update React Hook Form field
+                        handleFieldChange('address', value);
+                      }}
                       placeholder="Start typing a region, e.g. Dar es Salaam"
                       emptyMessage="No regions found"
                       inputClassName="h-12 text-base sm:h-10 sm:text-sm form-input-mobile"

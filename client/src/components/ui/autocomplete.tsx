@@ -163,20 +163,20 @@ export function Autocomplete({
                   <CommandItem
                     key={option.value}
                     value={option.value}
-                    onSelect={(value) => {
+                    onSelect={(selectedValue) => {
                       const selectedOption = options.find(
-                        (opt) => opt.value.toLowerCase() === value.toLowerCase()
+                        (opt) => opt.value.toLowerCase() === selectedValue.toLowerCase()
                       );
                       if (selectedOption) {
-                        setInputValue(selectedOption.label);
-                        onChange(selectedOption.label);
+                        setInputValue(selectedOption.value);
+                        onChange(selectedOption.value);
                       }
                       setOpen(false);
                     }}
                     className="flex items-center gap-2 text-sm"
                   >
                     <span>{option.label}</span>
-                    {option.label === inputValue && (
+                    {option.value === inputValue && (
                       <CheckIcon className="h-4 w-4 text-primary flex-shrink-0 ml-auto" />
                     )}
                   </CommandItem>
