@@ -13,6 +13,14 @@ export function BrightDiamondTemplate({
   certifications = [],
   projects = []
 }: CVData): JSX.Element {
+  // Debug logging to see what data we're getting
+  console.log('BrightDiamond Template Data Debug:', {
+    professionalTitle: personalInfo?.professionalTitle,
+    jobTitle: personalInfo?.jobTitle,
+    hobbies: hobbies,
+    hobbiesType: typeof hobbies,
+    hobbiesLength: Array.isArray(hobbies) ? hobbies.length : 'not array'
+  });
   return (
     <div style={{ 
       fontFamily: "'Lato', sans-serif",
@@ -57,7 +65,7 @@ export function BrightDiamondTemplate({
             letterSpacing: '1.5px',
             marginBottom: '0'
           }}>
-            {personalInfo.professionalTitle || personalInfo.jobTitle}
+            {personalInfo?.professionalTitle || personalInfo?.jobTitle || ''}
           </h2>
         </header>
 
@@ -341,8 +349,8 @@ export function BrightDiamondTemplate({
         )}
 
         {/* Hobbies Section (if available) */}
-        {hobbies && (
-          <section style={{ marginBottom: '25px', display: hobbies ? 'block' : 'none' }}>
+        {(hobbies && hobbies.length > 0) || (typeof hobbies === 'string' && hobbies.trim()) ? (
+          <section style={{ marginBottom: '25px' }}>
             <h3 style={{
               fontSize: '1.15em',
               color: '#20c997',
@@ -356,10 +364,10 @@ export function BrightDiamondTemplate({
               HOBBIES & INTERESTS
             </h3>
             <p style={{ fontSize: '0.95em', color: '#4a4a4a', lineHeight: 1.7 }}>
-              {typeof hobbies === 'string' ? hobbies : ''}
+              {Array.isArray(hobbies) ? hobbies.join(', ') : (typeof hobbies === 'string' ? hobbies : '')}
             </p>
           </section>
-        )}
+        ) : null}
 
         {/* References Section (if available) */}
         {references.length > 0 && (
