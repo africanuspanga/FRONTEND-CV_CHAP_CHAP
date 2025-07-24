@@ -100,7 +100,7 @@ export function Autocomplete({
           value={inputValue}
           onChange={handleInputChange}
           onFocus={() => inputValue.length >= minimumInputLength && setOpen(true)}
-          onBlur={() => setTimeout(() => setOpen(false), 200)} // Delay to allow click
+          onBlur={() => setTimeout(() => setOpen(false), 300)} // Longer delay to allow click
           placeholder={placeholder}
           className="flex-1 bg-transparent outline-none disabled:cursor-not-allowed"
           aria-autocomplete="list"
@@ -145,7 +145,17 @@ export function Autocomplete({
             <div
               key={option.value}
               className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-              onClick={() => handleOptionSelect(option)}
+              onMouseDown={(e) => {
+                e.preventDefault(); // Prevent blur from happening first
+                console.log('MouseDown on option:', option);
+                handleOptionSelect(option);
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Click on option:', option);
+                handleOptionSelect(option);
+              }}
             >
               <span>{option.label}</span>
               {option.value === inputValue && (
