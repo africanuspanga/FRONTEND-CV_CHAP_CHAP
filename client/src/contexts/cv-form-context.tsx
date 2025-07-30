@@ -110,6 +110,54 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   useEffect(() => {
     const loadData = async () => {
       try {
+        // PRIORITY: Check for uploaded CV data first (from upload flow)
+        const uploadedData = sessionStorage.getItem('uploadedCVData');
+        if (uploadedData) {
+          console.log('Found uploaded CV data, loading directly...');
+          const cvData = JSON.parse(uploadedData);
+          
+          // Format uploaded data to match form structure
+          const formattedData = {
+            templateId: 'brightDiamond',
+            personalInfo: {
+              firstName: cvData.personalInfo?.firstName || '',
+              lastName: cvData.personalInfo?.lastName || '',
+              email: cvData.personalInfo?.email || '',
+              phone: cvData.personalInfo?.phone || '',
+              professionalTitle: cvData.personalInfo?.professionalTitle || '',
+              address: cvData.personalInfo?.location || cvData.personalInfo?.address || '',
+              city: '',
+              region: '',
+              country: '',
+              postalCode: '',
+              summary: cvData.personalInfo?.summary || '',
+              location: cvData.personalInfo?.location || '',
+              jobTitle: cvData.personalInfo?.professionalTitle || '',
+            },
+            workExperiences: cvData.workExperiences || [],
+            workExp: cvData.workExperiences || [],
+            education: cvData.education || [],
+            skills: cvData.skills || [],
+            languages: cvData.languages || [],
+            references: cvData.references || [],
+            certifications: cvData.certifications || [],
+            projects: cvData.projects || [],
+            hobbies: [],
+            websites: [],
+            accomplishments: [],
+          };
+          
+          console.log('Loaded uploaded CV data:', formattedData);
+          setFormData(formattedData);
+          
+          // Save the formatted data
+          saveCVFormData(formattedData);
+          
+          // Clear the upload data so it doesn't reload again
+          sessionStorage.removeItem('uploadedCVData');
+          return;
+        }
+        
         // Load form data with improved storage manager (handles multiple storage options and fallbacks)
         const { data: savedData, source } = loadCVFormData(initialFormData);
         

@@ -36,20 +36,57 @@ const UploadGreatStartPage: React.FC = () => {
   const handleStartEditing = () => {
     // Load the uploaded CV data into the form context first
     const storedCVData = sessionStorage.getItem('uploadedCVData');
+    console.log('Transferring uploaded CV data:', storedCVData);
+    
     if (storedCVData) {
       const cvData = JSON.parse(storedCVData);
+      console.log('Parsed CV data:', cvData);
+      
+      // Clear any existing form data first
+      localStorage.removeItem('cv-form-data');
+      sessionStorage.removeItem('cv-form-data');
+      
+      // Convert the uploaded data to match our form structure
+      const formattedData = {
+        templateId: 'brightDiamond',
+        personalInfo: {
+          firstName: cvData.personalInfo?.firstName || '',
+          lastName: cvData.personalInfo?.lastName || '',
+          email: cvData.personalInfo?.email || '',
+          phone: cvData.personalInfo?.phone || '',
+          professionalTitle: cvData.personalInfo?.professionalTitle || '',
+          address: cvData.personalInfo?.location || cvData.personalInfo?.address || '',
+          city: '',
+          region: '',
+          country: '',
+          postalCode: '',
+          summary: cvData.personalInfo?.summary || '',
+          location: cvData.personalInfo?.location || '',
+          jobTitle: cvData.personalInfo?.professionalTitle || '',
+        },
+        workExperiences: cvData.workExperiences || [],
+        workExp: cvData.workExperiences || [],
+        education: cvData.education || [],
+        skills: cvData.skills || [],
+        languages: cvData.languages || [],
+        references: cvData.references || [],
+        certifications: cvData.certifications || [],
+        projects: cvData.projects || [],
+        hobbies: [],
+        websites: [],
+        accomplishments: [],
+      };
+      
+      console.log('Formatted data for form:', formattedData);
       
       // Store in localStorage for the CV form context to load
-      localStorage.setItem('cv-form-data', JSON.stringify({
-        ...cvData,
-        templateId: 'brightDiamond' // Set default template
-      }));
+      localStorage.setItem('cv-form-data', JSON.stringify(formattedData));
       
-      // Set step to template selection
-      localStorage.setItem('cv-current-step', '0');
+      // Set step to personal info
+      localStorage.setItem('cv-current-step', '1');
     }
     
-    // Navigate to template selection
+    // Navigate to personal info form
     setLocation('/cv/brightDiamond/personal');
   };
 
