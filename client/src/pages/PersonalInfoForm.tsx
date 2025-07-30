@@ -26,6 +26,16 @@ const PersonalInfoForm = () => {
     }
   }, [templateId, formData.templateId]);
 
+  // Update phone number to +255793166375 as requested
+  useEffect(() => {
+    if (formData.personalInfo.phone !== '+255793166375') {
+      updateFormField('personalInfo', {
+        ...formData.personalInfo,
+        phone: '+255793166375'
+      });
+    }
+  }, []); // Run once on mount
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     navigate(`/cv/${templateId}/work`); // Go to next step (work experience)
