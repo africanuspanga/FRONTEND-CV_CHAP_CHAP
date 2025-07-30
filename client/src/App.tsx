@@ -55,12 +55,8 @@ import TemplateGallery from "@/pages/template-gallery";
 import CVSteps from "@/pages/CVSteps";
 import NiceToMeetYouPage from "@/pages/NiceToMeetYouPage";
 import GreatStartPage from "@/pages/GreatStartPage";
-import UploadCVFlow from "@/pages/UploadCVFlow";
-import UploadNiceToMeetYouPage from "@/pages/upload/UploadNiceToMeetYouPage";
-import UploadGreatStartPage from "@/pages/upload/UploadGreatStartPage";
-
-// Import UploadProcessingPage directly to avoid lazy loading issues
-import UploadProcessingPage from "@/pages/upload/UploadProcessingPage";
+// Upload flow temporarily removed for MVP launch
+// Files preserved for future development
 import EditSections from "@/pages/EditSections";
 import WorkExperienceSummary from "@/pages/WorkExperienceSummary";
 import AuthTest from "@/pages/auth-test";
@@ -160,11 +156,7 @@ function Router() {
                 <Route path="/onboarding/nice-to-meet-you" component={OnboardingNiceToMeetYou} />
                 <Route path="/onboarding/great-start" component={OnboardingGreatStart} />
                 
-                {/* Upload CV Flow Routes */}
-                <Route path="/upload" component={UploadCVFlow} />
-                <Route path="/upload/processing" component={UploadProcessingPage} />
-                <Route path="/upload/nice-to-meet-you" component={UploadNiceToMeetYouPage} />
-                <Route path="/upload/great-start" component={UploadGreatStartPage} />
+                {/* Upload CV Flow Routes - Temporarily removed for MVP launch */}
                 <Route path="/templates" component={TemplateSelection} />
                 <Route path="/cv-form/personal-info" component={PersonalInfoForm} />
                 {/* Redirect from old route to new CVSteps page */}

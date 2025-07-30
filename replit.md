@@ -187,7 +187,7 @@ interface CVData {
 - **Professional Design**: Clean card layouts with CV Chap Chap branding
 - **Smart Navigation**: Fallback to templates if onboarding insights unavailable
 
-### July 30, 2025 (Latest) - Separate Upload CV Flow
+### July 30, 2025 - Separate Upload CV Flow (Development)
 - **New Dedicated Upload Flow**: Created completely separate flow for uploading existing CVs
 - **Upload Flow Pages**:
   - `UploadCVFlow` - Main upload interface with drag-and-drop functionality
@@ -198,3 +198,11 @@ interface CVData {
 - **Enhanced User Experience**: Two clear paths - "Create New" vs "Upload Existing"
 - **Backend Integration**: Full integration with existing CV parsing backend
 - **Data Mapping**: Intelligent parsing and mapping of uploaded CV data with proper validation
+
+### July 30, 2025 (Latest) - MVP Launch Preparation
+- **Upload Flow Removed**: Temporarily removed upload CV flow from main application routes for MVP launch
+- **Simplified User Journey**: Streamlined to single "Create New CV" path for better user experience
+- **Code Preservation**: Upload flow code preserved in codebase for future development
+- **Clean Interface**: Removed upload option from CreationMethod page, showing only CV creation
+- **Route Cleanup**: Commented out upload routes in App.tsx while preserving functionality
+- **Focus on Core Features**: MVP now focuses on core CV creation flow with templates
