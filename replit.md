@@ -186,3 +186,15 @@ interface CVData {
 - **Routing Flow**: Upload → Onboarding → Templates (if insights available)
 - **Professional Design**: Clean card layouts with CV Chap Chap branding
 - **Smart Navigation**: Fallback to templates if onboarding insights unavailable
+
+### July 30, 2025 (Latest) - Separate Upload CV Flow
+- **New Dedicated Upload Flow**: Created completely separate flow for uploading existing CVs
+- **Upload Flow Pages**:
+  - `UploadCVFlow` - Main upload interface with drag-and-drop functionality
+  - `UploadNiceToMeetYouPage` - Upload-specific personalized onboarding
+  - `UploadGreatStartPage` - Upload-specific quality feedback and improvement suggestions
+- **Separate Routing**: Upload flow uses `/upload/*` routes, distinct from create flow
+- **Session Storage**: Temporary storage for upload data between onboarding pages
+- **Enhanced User Experience**: Two clear paths - "Create New" vs "Upload Existing"
+- **Backend Integration**: Full integration with existing CV parsing backend
+- **Data Mapping**: Intelligent parsing and mapping of uploaded CV data with proper validation

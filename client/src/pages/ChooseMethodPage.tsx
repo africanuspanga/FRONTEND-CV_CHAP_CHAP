@@ -270,11 +270,11 @@ export default function ChooseMethodPage() {
                   onChange={handleFileUpload}
                 />
                 <Button 
-                  onClick={() => document.getElementById('cv-upload')?.click()}
+                  onClick={() => setLocation('/upload')}
                   className="w-full bg-orange-400 hover:bg-orange-500 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2"
                 >
                   <Upload className="w-4 h-4" />
-                  Choose file
+                  Upload CV
                 </Button>
               </div>
             </CardContent>
