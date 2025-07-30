@@ -516,7 +516,9 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
       setOnboardingInsights(insights);
     }
     
-    // Map parsed data to our form structure
+    // Map parsed data to our form structure with proper ID generation
+    const generateId = () => crypto.randomUUID();
+    
     const mappedData: CVFormData = {
       ...initialFormData,
       personalInfo: {
@@ -531,20 +533,62 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
         region: parsedData.personalInfo?.region || '',
         country: parsedData.personalInfo?.country || '',
         summary: parsedData.personalInfo?.summary || '',
-        location: parsedData.personalInfo?.location || '',
+        location: parsedData.personalInfo?.location || parsedData.personalInfo?.address || '',
         jobTitle: parsedData.personalInfo?.jobTitle || parsedData.personalInfo?.professionalTitle || '',
       },
-      workExperiences: parsedData.workExperiences || [],
-      workExp: parsedData.workExperiences || [], // Sync both arrays
-      education: parsedData.education || [],
-      skills: parsedData.skills || [],
-      languages: parsedData.languages || [],
-      references: parsedData.references || [],
-      certifications: parsedData.certifications || [],
-      projects: parsedData.projects || [],
-      hobbies: parsedData.hobbies || [],
-      websites: parsedData.websites || [],
-      accomplishments: parsedData.accomplishments || [],
+      workExperiences: (parsedData.workExperiences || []).map((exp: any) => ({
+        ...exp,
+        id: exp.id || generateId(),
+        achievements: Array.isArray(exp.achievements) ? exp.achievements : []
+      })),
+      workExp: (parsedData.workExperiences || []).map((exp: any) => ({
+        ...exp,
+        id: exp.id || generateId(),
+        achievements: Array.isArray(exp.achievements) ? exp.achievements : []
+      })),
+      education: (parsedData.education || []).map((edu: any) => ({
+        ...edu,
+        id: edu.id || generateId()
+      })),
+      skills: (parsedData.skills || []).map((skill: any) => {
+        if (typeof skill === 'string') {
+          return { id: generateId(), name: skill, level: 3 };
+        }
+        return {
+          ...skill,
+          id: skill.id || generateId(),
+          level: typeof skill.level === 'string' ? 3 : skill.level || 3
+        };
+      }),
+      languages: (parsedData.languages || []).map((lang: any) => ({
+        ...lang,
+        id: lang.id || generateId(),
+        proficiency: lang.proficiency || 'intermediate'
+      })),
+      references: (parsedData.references || []).map((ref: any) => ({
+        ...ref,
+        id: ref.id || generateId()
+      })),
+      certifications: (parsedData.certifications || []).map((cert: any) => ({
+        ...cert,
+        id: cert.id || generateId()
+      })),
+      projects: (parsedData.projects || []).map((proj: any) => ({
+        ...proj,
+        id: proj.id || generateId()
+      })),
+      hobbies: (parsedData.hobbies || []).map((hobby: any) => ({
+        ...hobby,
+        id: hobby.id || generateId()
+      })),
+      websites: (parsedData.websites || []).map((website: any) => ({
+        ...website,
+        id: website.id || generateId()
+      })),
+      accomplishments: (parsedData.accomplishments || []).map((acc: any) => ({
+        ...acc,
+        id: acc.id || generateId()
+      })),
     };
     
     setFormData(mappedData);

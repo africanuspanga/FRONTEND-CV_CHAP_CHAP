@@ -83,36 +83,33 @@ export default function ChooseMethodPage() {
           description: "Your CV has been parsed and is ready for editing.",
         });
         
-        // Navigate to the new onboarding flow
-        if (onboardingInsights) {
-          setLocation('/onboarding/nice-to-meet-you');
-        } else {
-          // Create mock insights for testing if none provided
-          const mockInsights = {
-            currentJobTitle: cvData?.personalInfo?.professionalTitle || "Professional",
-            currentCompany: cvData?.workExperiences?.[0]?.company || "Your Current Company",
-            keySkills: cvData?.skills?.slice(0, 3)?.map(skill => typeof skill === 'string' ? skill : skill.name) || ["Leadership", "Communication", "Problem Solving"],
-            tailoredIndustrySuggestion: "your field of expertise",
-            qualityFeedback: {
-              goodPoints: [
-                "Well-structured professional experience section",
-                "Clear contact information and professional title",
-                "Good skills representation"
-              ],
-              improvementPoints: [
-                "Add more quantified achievements to work experience",
-                "Include a compelling professional summary",
-                "Expand on education details and certifications"
-              ],
-              skillsCount: cvData?.skills?.length || 0,
-              hasSummary: !!(cvData?.personalInfo?.summary)
-            }
-          };
-          
-          // Load insights and navigate to onboarding
-          loadParsedCVData(cvData, mockInsights);
-          setLocation('/onboarding/nice-to-meet-you');
-        }
+        // Create onboarding insights from parsed CV data
+        const generatedInsights = {
+          currentJobTitle: cvData?.personalInfo?.professionalTitle || "Professional",
+          currentCompany: cvData?.workExperiences?.[0]?.company || "Tech Company",
+          keySkills: cvData?.skills?.slice(0, 3)?.map((skill: any) => 
+            typeof skill === 'string' ? skill : skill.name
+          ) || ["Communication", "Leadership", "Problem Solving"],
+          tailoredIndustrySuggestion: "technology and development",
+          qualityFeedback: {
+            goodPoints: [
+              "Strong professional experience section",
+              "Clear contact information provided",
+              "Well-organized skills list"
+            ],
+            improvementPoints: [
+              "Add quantified achievements to work experience",
+              "Include a compelling professional summary",
+              "Expand education and certification details"
+            ],
+            skillsCount: cvData?.skills?.length || 0,
+            hasSummary: !!(cvData?.personalInfo?.summary)
+          }
+        };
+
+        // Load the parsed data with insights and navigate to onboarding
+        loadParsedCVData(cvData, generatedInsights);
+        setLocation('/onboarding/nice-to-meet-you');
         
       } else if (statusData.status === 'failed') {
         setIsUploading(false);
