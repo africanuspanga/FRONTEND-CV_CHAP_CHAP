@@ -48,14 +48,17 @@ export default function ChooseMethodPage() {
       setParsingStatus(statusData.status);
       
       if (statusData.status === 'completed') {
-        // Fetch the parsed data
+        // Fetch the parsed data (now includes onboardingInsights)
         const dataResponse = await apiRequest('GET', `/api/get-parsed-cv-data/${jobId}`);
-        const parsedData = await dataResponse.json();
+        const response = await dataResponse.json();
         
-        console.log('Parsed CV data:', parsedData);
+        console.log('Enhanced parsed response:', response);
         
-        // Update CV form context with parsed data
-        loadParsedCVData(parsedData);
+        // Extract cvData and onboardingInsights from response
+        const { cvData, onboardingInsights } = response;
+        
+        // Update CV form context with parsed data and insights
+        loadParsedCVData(cvData, onboardingInsights);
         
         setIsUploading(false);
         toast({
@@ -63,8 +66,13 @@ export default function ChooseMethodPage() {
           description: "Your CV has been parsed and is ready for editing.",
         });
         
-        // Navigate to template selection
-        setLocation('/templates');
+        // Navigate to the new onboarding flow
+        if (onboardingInsights) {
+          setLocation('/onboarding/nice-to-meet-you');
+        } else {
+          // Fallback to templates if no insights
+          setLocation('/templates');
+        }
         
       } else if (statusData.status === 'failed') {
         setIsUploading(false);

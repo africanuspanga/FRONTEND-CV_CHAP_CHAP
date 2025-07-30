@@ -46,10 +46,24 @@ const initialFormData: CVFormData = {
   accomplishments: [],
 };
 
+interface OnboardingInsights {
+  currentJobTitle: string;
+  currentCompany: string;
+  keySkills: string[];
+  tailoredIndustrySuggestion: string;
+  qualityFeedback: {
+    goodPoints: string[];
+    improvementPoints: string[];
+    skillsCount: number;
+    hasSummary: boolean;
+  };
+}
+
 interface CVFormContextType {
   currentStep: number;
   setCurrentStep: (step: number) => void;
   formData: CVFormData;
+  onboardingInsights: OnboardingInsights | null;
   formSteps: {id: string, title: string}[];
   updateFormField: <K extends keyof CVFormData>(section: K, value: CVFormData[K]) => void;
   updateNestedArray: <K extends keyof CVFormData>(
@@ -65,7 +79,7 @@ interface CVFormContextType {
     toIndex: number
   ) => void;
   resetForm: () => void;
-  loadParsedCVData: (parsedData: any) => void;
+  loadParsedCVData: (parsedData: any, insights?: OnboardingInsights) => void;
   isFormValid: (step: number) => boolean;
   goToNextStep: () => void;
   goToPreviousStep: () => void;
@@ -89,6 +103,7 @@ const formSteps = [
 export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const [formData, setFormData] = useState<CVFormData>(initialFormData);
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const [onboardingInsights, setOnboardingInsights] = useState<OnboardingInsights | null>(null);
   const [storageWarningShown, setStorageWarningShown] = useState<boolean>(false);
   
   // Load saved data on initial mount with enhanced validation and recovery
@@ -492,8 +507,14 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
   };
 
   // Load parsed CV data from file upload
-  const loadParsedCVData = (parsedData: any) => {
+  const loadParsedCVData = (parsedData: any, insights?: OnboardingInsights) => {
     console.log('Loading parsed CV data:', parsedData);
+    
+    // If insights are provided, store them
+    if (insights) {
+      console.log('Loading onboarding insights:', insights);
+      setOnboardingInsights(insights);
+    }
     
     // Map parsed data to our form structure
     const mappedData: CVFormData = {
@@ -533,6 +554,7 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
     currentStep,
     setCurrentStep,
     formData,
+    onboardingInsights,
     formSteps,
     updateFormField,
     updateNestedArray,

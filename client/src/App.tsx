@@ -3,7 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { CVFormProvider } from "@/contexts/cv-form-context";
+import { CVFormProvider, useCVForm } from "@/contexts/cv-form-context";
 import { AuthProvider } from "@/contexts/auth-context";
 import { AdminAuthProvider } from "@/contexts/admin-auth-context";
 import { CVRequestProvider } from "@/contexts/cv-request-context";
@@ -52,6 +52,8 @@ import AccomplishmentsForm from "@/pages/AccomplishmentsForm";
 import HobbiesForm from "@/pages/HobbiesForm";
 import TemplateGallery from "@/pages/template-gallery";
 import CVSteps from "@/pages/CVSteps";
+import NiceToMeetYouPage from "@/pages/NiceToMeetYouPage";
+import GreatStartPage from "@/pages/GreatStartPage";
 import EditSections from "@/pages/EditSections";
 import WorkExperienceSummary from "@/pages/WorkExperienceSummary";
 import AuthTest from "@/pages/auth-test";
@@ -76,6 +78,31 @@ import ApiEndpointTest from "@/pages/api-endpoint-test";
 import CVScreenerTest from "@/pages/cv-screener-test";
 import ProxyTestPage from "@/pages/proxy-test-page";
 import USSDPaymentTest from "@/pages/ussd-payment-test";
+
+// Wrapper components for onboarding pages that need context
+function OnboardingNiceToMeetYou() {
+  const { onboardingInsights } = useCVForm();
+  
+  if (!onboardingInsights) {
+    // Fallback to templates if no insights
+    window.location.href = '/templates';
+    return null;
+  }
+  
+  return <NiceToMeetYouPage onboardingInsights={onboardingInsights} />;
+}
+
+function OnboardingGreatStart() {
+  const { onboardingInsights } = useCVForm();
+  
+  if (!onboardingInsights) {
+    // Fallback to templates if no insights
+    window.location.href = '/templates';
+    return null;
+  }
+  
+  return <GreatStartPage onboardingInsights={onboardingInsights} />;
+}
 
 function Router() {
   return (
@@ -123,7 +150,10 @@ function Router() {
                 <Route path="/" component={Home} />
                 <Route path="/cv-steps" component={CVSteps} />
                 <Route path="/cv-steps/choose" component={ChooseMethodPage} />
+                <Route path="/onboarding/nice-to-meet-you" component={OnboardingNiceToMeetYou} />
+                <Route path="/onboarding/great-start" component={OnboardingGreatStart} />
                 <Route path="/templates" component={TemplateSelection} />
+                <Route path="/cv-form/personal-info" component={PersonalInfoForm} />
                 {/* Redirect from old route to new CVSteps page */}
                 <Route path="/create/method">
                   {() => {
