@@ -1,0 +1,106 @@
+Got it! Frontend team, this is your complete directive for implementing the enhanced post-CV upload flow. Your primary goal is to bring the provided screenshots to life, adapting them perfectly to CV Chap Chap's brand colors and maintaining the specified user journey.
+
+**To:** Frontend Development Team
+**From:** CTO
+**Date:** July 30, 2025
+**Feature:** Enhanced "Upload Existing CV" - Personalized Onboarding Flow
+**Objective:** Implement the new sequence of personalized onboarding screens (`Nice to meet you!`, `You're off to a great start!`) after a successful CV upload and parsing, followed by the pre-populated multi-step CV creation forms. Replicate the attached screenshots precisely, applying CV Chap Chap's brand colors.
+
+**Backend Status:** The Backend team is actively working on enhancing the parsing to provide the necessary `onboardingInsights` data. You will receive an enriched JSON response from `GET /api/get-parsed-cv-data/:jobId` that contains both the core `cvData` for form pre-population and the new `onboardingInsights` for these screens.
+
+---
+
+### Frontend Instructions: Enhanced Post-CV Upload Flow
+
+Your core task is to create new UI components and orchestrate the navigation between them, displaying the data provided by the backend.
+
+**Phase 2: Data Consumption & New Screen Implementation**
+
+**1. Refine `GET /api/get-parsed-cv-data/:jobId` Handling**
+    * When `GET /api/parsing-status/:jobId` indicates `complete`, make the call to `GET /api/get-parsed-cv-data/:jobId`.
+    * **Crucial:** The response from this endpoint will now include the `onboardingInsights` object, in addition to the `cvData`.
+        * **Example of expected `onboardingInsights` (Backend will confirm exact structure):**
+            ```json
+            "onboardingInsights": {
+              "currentJobTitle": "Digital Marketing Executive",
+              "currentCompany": "LEON Bet",
+              "keySkills": ["SEO strategy", "copywriting", "data analytics"],
+              "tailoredIndustrySuggestion": "creative copywriting and digital marketing",
+              "qualityFeedback": {
+                "goodPoints": [
+                  "You included all the sections employers look for on a resume.",
+                  "You listed 7 skills. Great job! Employers like to see at least 6."
+                ],
+                "improvementPoints": [
+                  "We'll suggest section titles that match the ones employers scan for.",
+                  "Revise your experience section using AI writing help.",
+                  "AI-enhance your summary to align with best practices."
+                ],
+                "skillsCount": 7,
+                "hasSummary": true
+              }
+            }
+            ```
+    * **State Management:** Store *both* the `cvData` (for form pre-population) and the `onboardingInsights` in your global state (Context API).
+
+**2. Implement New Screen: "Nice to meet you!"**
+    * **Trigger:** Navigate to this screen immediately after successfully receiving the enriched data from `GET /api/get-parsed-cv-data/:jobId` and updating the state.
+    * **Screenshot Reference:** **`Screenshot 2025-07-30 at 11.15.57.png` (or `Screenshot 2025-07-25 at 00.42.08.jpg`)**
+    * **UI Design:** Replicate the layout and components as seen in the screenshot.
+        * **Illustrations:** Use similar style illustrations. If we don't have exact ones, use a placeholder or generic professional ones that fit our brand aesthetic.
+        * **Content Display:** Dynamically inject the `currentJobTitle`, `currentCompany`, `keySkills`, and `tailoredIndustrySuggestion` from `onboardingInsights` into the text. **Ensure bolding for key terms as shown.**
+        * **Button:** A primary "Continue" button.
+    * **Styling:** Apply CV Chap Chap brand colors instead of the blue/orange in the screenshot.
+        * **Primary Button:** `#034694` (CV Chap Chap Blue)
+        * **Text/Accent colors:** Use our brand palette (`#4D6FFF`, `#E5EAFF`) for highlights or background elements if appropriate, otherwise our standard black/grey text.
+    * **Navigation:** "Continue" button navigates to the "You're off to a great start!" screen.
+
+**3. Implement New Screen: "You're off to a great start!"**
+    * **Trigger:** Navigates to this screen from "Nice to meet you!".
+    * **Screenshot Reference:** **`Screenshot 2025-07-25 at 00.47.06.jpg`**
+    * **UI Design:** Replicate the layout, including:
+        * **Illustrations:** Similar trophy and lightbulb icons, or CV Chap Chap equivalents.
+        * **"You got it right" section:** Display bullet points from `onboardingInsights.qualityFeedback.goodPoints`. Use green checkmarks.
+        * **"How we'll help you improve" section:** Display bullet points from `onboardingInsights.qualityFeedback.improvementPoints`. Use orange star/lightbulb icons.
+    * **Styling:** Apply CV Chap Chap brand colors.
+        * **Backgrounds for sections:** Use subtle background colors from our brand palette (e.g., `#E5EAFF` or a very light grey).
+        * **Icons:** Green checkmark and a suitable orange/yellow for the improvement points.
+        * **Primary Button:** `#034694`.
+    * **Navigation:** "Continue" button navigates to the "Let's review the basics" screen.
+
+**4. Pre-populate Existing CV Creation Forms**
+    * **Trigger:** After navigating from "You're off to a great start!" to the "Let's review the basics" page.
+    * **Screenshot Reference:** **`Screenshot 2025-07-30 at 11.17.20.png` (or `Screenshot 2025-07-25 at 00.47.29.png`)**
+    * **Content:** Use the `cvData` part of the parsed response to **pre-populate the `React Hook Form` fields** on:
+        * **"Let's review the basics" (Personal Information):** First Name, Surname, Post Code, City, Country, Phone, Email.
+        * **"Let's review your experience" (Work Experience):** `Screenshot 2025-07-30 at 11.17.40.png` - Ensure work experience entries are pre-filled.
+        * **"Here's an overview of your education" (Education):** `Screenshot 2025-07-25 at 00.49.18.jpg` - Ensure education entries are pre-filled.
+        * **Subsequent Steps:** Continue pre-populating Skills, Summary, and Additional Details sections using the `cvData`.
+    * **Live Preview:** Ensure the live preview on the right side of the screen immediately updates to reflect all the pre-populated data.
+    * **UI/UX:** Maintain the green checkmarks for pre-filled valid fields.
+
+**5. Styling Consistency**
+    * **Global Colors:** Strictly use our primary (`#034694`), accent (`#4D6FFF`), and light (`#E5EAFF`) brand colors throughout all new components. Avoid using the competitor's specific blue, orange, or purple shades.
+    * **Typography:** Maintain our established font families, sizes, and weights for headings and body text.
+    * **Spacing & Layout:** Pay close attention to the visual hierarchy, padding, and margins to ensure the new screens feel integrated with the existing CV Chap Chap application.
+
+**6. Navigation and Back Button Logic**
+    * Ensure the "Back" buttons on all steps of the CV creation flow (including the new intro screens) navigate correctly to the previous logical step.
+    * The main `cv-steps` navigation (sidebar with Header, Experience, Education, etc.) should correctly reflect the user's progress through the pre-populated flow.
+
+### Frontend Checklist for this Phase:
+
+* [ ] Modify polling success handler to consume **enriched** backend response (`cvData` + `onboardingInsights`).
+* [ ] Create a new UI component/page for "Nice to meet you!" (`Screenshot 2025-07-30 at 11.15.57.png`).
+    * [ ] Dynamically inject `currentJobTitle`, `currentCompany`, `keySkills`, `tailoredIndustrySuggestion` from `onboardingInsights`.
+    * [ ] Style with CV Chap Chap brand colors.
+* [ ] Create a new UI component/page for "You're off to a great start!" (`Screenshot 2025-07-25 at 00.47.06.jpg`).
+    * [ ] Dynamically inject `goodPoints` and `improvementPoints` from `onboardingInsights.qualityFeedback`.
+    * [ ] Style with CV Chap Chap brand colors.
+* [ ] Ensure `React Hook Form` initialization logic correctly uses `cvData` to pre-populate all subsequent CV creation steps (Personal Info, Work Experience, Education, Skills, Summary, etc.).
+* [ ] Verify the Live Preview accurately reflects all imported and pre-populated data instantly.
+* [ ] Implement consistent navigation logic for "Continue" and "Back" buttons across all new and existing steps.
+* [ ] Perform comprehensive mobile responsiveness testing for all new screens.
+* [ ] Perform end-to-end testing with real CV files (once backend is fully deployed with AI).
+
+This is an exciting and visually impactful phase. Your attention to design detail and seamless data integration will make this a truly premium experience for our users.
