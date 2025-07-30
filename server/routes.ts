@@ -52,11 +52,140 @@ interface CVUploadJob {
   filename: string;
   status: 'uploading' | 'parsing' | 'completed' | 'failed';
   parsedData?: any;
+  onboardingInsights?: any;
   error?: string;
   createdAt: Date;
 }
 
 const cvUploadJobs: Record<string, CVUploadJob> = {};
+
+// Function to process uploaded CV using external API
+async function processUploadedCV(jobId: string, file: Express.Multer.File) {
+  const job = cvUploadJobs[jobId];
+  if (!job) return;
+
+  try {
+    // Convert file buffer to base64
+    const fileBase64 = file.buffer.toString('base64');
+    
+    // Call external CV parsing API
+    const parseResponse = await fetch('https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/upload-cv-file', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        file_content: fileBase64,
+        file_name: file.originalname,
+        file_type: file.mimetype
+      })
+    });
+
+    if (!parseResponse.ok) {
+      throw new Error(`CV parsing failed: ${parseResponse.statusText}`);
+    }
+
+    const parseResult = await parseResponse.json();
+    
+    if (parseResult.success && parseResult.cv_data) {
+      // Generate onboarding insights using OpenAI
+      const insights = await generateOnboardingInsights(parseResult.cv_data);
+      
+      job.parsedData = parseResult.cv_data;
+      job.onboardingInsights = insights;
+      job.status = 'completed';
+      
+      console.log(`CV parsing completed for job ${jobId}`);
+    } else {
+      throw new Error('Failed to parse CV: ' + (parseResult.error || 'Unknown error'));
+    }
+    
+  } catch (error: any) {
+    console.error(`CV parsing failed for job ${jobId}:`, error);
+    job.error = error.message;
+    job.status = 'failed';
+  }
+}
+
+// Function to generate onboarding insights using OpenAI
+async function generateOnboardingInsights(cvData: any) {
+  try {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OpenAI API key not configured');
+    }
+
+    const personalInfo = cvData.personalInfo || {};
+    const workExperiences = cvData.workExperiences || [];
+    const skills = cvData.skills || [];
+    
+    // Extract key information
+    const currentJob = workExperiences.find((exp: any) => exp.current) || workExperiences[0];
+    const currentJobTitle = currentJob?.jobTitle || personalInfo.professionalTitle || 'Professional';
+    const currentCompany = currentJob?.company || 'your current organization';
+    
+    // Extract skills (handle both string array and object array)
+    const keySkills = skills.slice(0, 3).map((skill: any) => 
+      typeof skill === 'string' ? skill : skill.name || skill
+    );
+    
+    // Generate insights using OpenAI
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a professional CV advisor. Generate personalized onboarding insights based on CV data. Respond with JSON format only.'
+          },
+          {
+            role: 'user',
+            content: `Analyze this CV data and provide insights: Job Title: ${currentJobTitle}, Company: ${currentCompany}, Skills: ${keySkills.join(', ')}. Return JSON with: currentJobTitle, currentCompany, keySkills (array), tailoredIndustrySuggestion, qualityFeedback (object with goodPoints and improvementPoints arrays)`
+          }
+        ],
+        response_format: { type: "json_object" }
+      })
+    });
+
+    if (!openaiResponse.ok) {
+      throw new Error('OpenAI API call failed');
+    }
+
+    const openaiResult = await openaiResponse.json();
+    const insights = JSON.parse(openaiResult.choices[0].message.content);
+    
+    // Ensure required structure
+    return {
+      currentJobTitle: insights.currentJobTitle || currentJobTitle,
+      currentCompany: insights.currentCompany || currentCompany,
+      keySkills: insights.keySkills || keySkills,
+      tailoredIndustrySuggestion: insights.tailoredIndustrySuggestion || 'your field',
+      qualityFeedback: {
+        goodPoints: insights.qualityFeedback?.goodPoints || ['Professional formatting', 'Clear contact information'],
+        improvementPoints: insights.qualityFeedback?.improvementPoints || ['Add more specific achievements', 'Include quantifiable results']
+      }
+    };
+    
+  } catch (error) {
+    console.error('Failed to generate onboarding insights:', error);
+    
+    // Fallback insights
+    return {
+      currentJobTitle: cvData.personalInfo?.professionalTitle || 'Professional',
+      currentCompany: 'your organization',
+      keySkills: ['Communication', 'Problem-solving', 'Leadership'],
+      tailoredIndustrySuggestion: 'your industry',
+      qualityFeedback: {
+        goodPoints: ['Professional formatting', 'Clear contact information'],
+        improvementPoints: ['Add more specific achievements', 'Include quantifiable results']
+      }
+    };
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
@@ -220,54 +349,8 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
 
       console.log(`File uploaded: ${req.file.originalname} (${req.file.size} bytes)`);
 
-      // Simulate parsing process (Phase 2 will implement actual parsing)
-      setTimeout(() => {
-        const job = cvUploadJobs[jobId];
-        if (job) {
-          // Mock parsed CV data for testing
-          job.parsedData = {
-            personalInfo: {
-              firstName: "John",
-              lastName: "Doe", 
-              email: "john.doe@example.com",
-              phone: "+255123456789",
-              address: "Dar es Salaam, Tanzania",
-              professionalTitle: "Software Developer",
-              summary: "Experienced software developer with 5+ years in web development and mobile applications."
-            },
-            workExperiences: [
-              {
-                jobTitle: "Senior Developer",
-                company: "Tech Solutions Ltd",
-                location: "Dar es Salaam",
-                startDate: "2020-01",
-                endDate: "",
-                current: true,
-                achievements: ["Led team of 5 developers", "Implemented new features that increased user engagement by 40%"]
-              }
-            ],
-            education: [
-              {
-                degree: "Bachelor of Computer Science",
-                institution: "University of Dar es Salaam",
-                location: "Dar es Salaam",
-                startDate: "2015-09",
-                endDate: "2019-06"
-              }
-            ],
-            skills: [
-              { name: "JavaScript", level: "expert" },
-              { name: "React", level: "advanced" },
-              { name: "Node.js", level: "advanced" }
-            ],
-            languages: [
-              { name: "English", proficiency: "fluent" },
-              { name: "Swahili", proficiency: "native" }
-            ]
-          };
-          job.status = 'completed';
-        }
-      }, 3000); // Simulate 3 second parsing time
+      // Process CV using external API
+      processUploadedCV(jobId, req.file);
 
       // Return immediate response with job ID
       res.status(202).json({
@@ -337,7 +420,8 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
 
       res.status(200).json({
         success: true,
-        cv_data: job.parsedData
+        cv_data: job.parsedData,
+        onboarding_insights: job.onboardingInsights
       });
 
     } catch (error: any) {

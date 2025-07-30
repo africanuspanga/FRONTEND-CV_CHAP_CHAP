@@ -19,61 +19,56 @@ const UploadProcessingPage: React.FC = () => {
       return;
     }
 
-    // Simulate processing for demo purposes
-    // In real implementation, this would poll the parsing status
-    const timer = setTimeout(() => {
-      // Mock successful processing
-      const mockCVData = {
-        personalInfo: {
-          firstName: 'AFRICANUS',
-          lastName: 'PANGA',
-          email: 'africanuspanga@gmail.com',
-          phone: '+255753003526',
-          city: 'Dar es salaam',
-          country: 'Tanzania',
-          professionalTitle: 'Digital Marketing Executive'
-        },
-        workExperiences: [{
-          jobTitle: 'Digital Marketing Executive',
-          company: 'LEON Bet',
-          location: 'Tanzania',
-          startDate: 'Jan 2024',
-          endDate: 'Current',
-          current: true,
-          achievements: []
-        }]
-      };
+    // Start polling for actual parsed data
+    const jobId = sessionStorage.getItem('uploadJobId');
+    if (!jobId) {
+      console.error('No job ID found for upload processing');
+      setLocation('/upload');
+      return;
+    }
 
-      const mockInsights = {
-        currentJobTitle: 'Digital Marketing Executive',
-        currentCompany: 'LEON Bet',
-        keySkills: ['SEO strategy', 'copywriting', 'data analytics'],
-        tailoredIndustrySuggestion: 'creative copywriting and digital marketing',
-        qualityFeedback: {
-          goodPoints: [
-            'Clear job titles and company names',
-            'Professional email format',
-            'Complete contact information'
-          ],
-          improvementPoints: [
-            'Add specific achievements and metrics',
-            'Include more detailed job descriptions',
-            'Add relevant certifications or training'
-          ]
+    const pollInterval = setInterval(async () => {
+      try {
+        // Check parsing status
+        const statusResponse = await fetch(`/api/parsing-status/${jobId}`);
+        const statusData = await statusResponse.json();
+
+        if (statusData.success && statusData.status === 'completed') {
+          // Get the parsed CV data
+          const dataResponse = await fetch(`/api/get-parsed-cv-data/${jobId}`);
+          const cvData = await dataResponse.json();
+
+          if (cvData.success && cvData.cv_data) {
+            // Store the real parsed data
+            sessionStorage.setItem('uploadedCVData', JSON.stringify(cvData.cv_data));
+            sessionStorage.setItem('uploadInsights', JSON.stringify(cvData.onboarding_insights));
+            
+            setProcessingStatus('completed');
+            clearInterval(pollInterval);
+            setTimeout(() => {
+              setLocation('/upload/nice-to-meet-you');
+            }, 1000);
+          }
+        } else if (statusData.status === 'failed') {
+          console.error('CV parsing failed:', statusData.error);
+          setProcessingStatus('failed');
+          clearInterval(pollInterval);
         }
-      };
+      } catch (error) {
+        console.error('Error polling parsing status:', error);
+      }
+    }, 2000); // Poll every 2 seconds
 
-      // Store in session storage
-      sessionStorage.setItem('uploadedCVData', JSON.stringify(mockCVData));
-      sessionStorage.setItem('uploadInsights', JSON.stringify(mockInsights));
-      
-      setProcessingStatus('completed');
-      setTimeout(() => {
-        setLocation('/upload/nice-to-meet-you');
-      }, 1000);
-    }, 3000);
+    const timeout = setTimeout(() => {
+      clearInterval(pollInterval);
+      console.error('Processing timeout - falling back to upload page');
+      setLocation('/upload');
+    }, 30000); // 30 second timeout
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearInterval(pollInterval);
+      clearTimeout(timeout);
+    };
   }, [setLocation]);
 
   return (
@@ -103,6 +98,18 @@ const UploadProcessingPage: React.FC = () => {
         
         {processingStatus === 'completed' && (
           <p className="text-green-600 font-medium mt-4">Analysis complete! Redirecting...</p>
+        )}
+        
+        {processingStatus === 'failed' && (
+          <div className="mt-4">
+            <p className="text-red-600 font-medium">Processing failed. Please try again.</p>
+            <button 
+              onClick={() => setLocation('/upload')}
+              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Try Again
+            </button>
+          </div>
         )}
       </div>
     </div>

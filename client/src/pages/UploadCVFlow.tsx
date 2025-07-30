@@ -35,7 +35,9 @@ const UploadCVFlow: React.FC<UploadCVFlowProps> = ({ onCVParsed }) => {
       console.log('File uploaded successfully. Job ID:', data.job_id);
       setJobId(data.job_id);
       setParsingStatus('parsing');
-      pollParsingStatus(data.job_id);
+      
+      // Store job ID for processing page
+      sessionStorage.setItem('uploadJobId', data.job_id);
     },
     onError: (error: any) => {
       console.error('Upload failed:', error);
@@ -169,7 +171,7 @@ const UploadCVFlow: React.FC<UploadCVFlowProps> = ({ onCVParsed }) => {
 
     // Upload the file
     const formData = new FormData();
-    formData.append('cv_file', file);
+    formData.append('cvFile', file);
 
     setIsUploading(true);
     setParsingStatus('uploading');
