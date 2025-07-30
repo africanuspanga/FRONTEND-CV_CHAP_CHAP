@@ -179,20 +179,19 @@ const UploadCVFlow: React.FC<UploadCVFlowProps> = ({ onCVParsed }) => {
     // Navigate to processing page immediately
     setLocation('/upload/processing');
     
-    // Use fetch directly to avoid multipart boundary issues
-    fetch('/api/upload-cv-file', {
+    // Call the external CV parsing API directly (more efficient)
+    fetch('https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/sync-upload-cv-file', {
       method: 'POST',
       body: formData
     })
     .then(response => response.json())
     .then(data => {
-      if (data.success) {
+      if (data.success && data.cvData) {
         // Store the parsed CV data and insights immediately (synchronous response)
-        if (data.cv_data) {
-          sessionStorage.setItem('uploadedCVData', JSON.stringify(data.cv_data));
-        }
-        if (data.onboarding_insights) {
-          sessionStorage.setItem('uploadInsights', JSON.stringify(data.onboarding_insights));
+        sessionStorage.setItem('uploadedCVData', JSON.stringify(data.cvData));
+        
+        if (data.onboardingInsights) {
+          sessionStorage.setItem('uploadInsights', JSON.stringify(data.onboardingInsights));
         }
         
         // Update status and navigate to onboarding
@@ -201,10 +200,13 @@ const UploadCVFlow: React.FC<UploadCVFlowProps> = ({ onCVParsed }) => {
           setLocation('/upload/nice-to-meet-you');
         }, 1000);
       } else {
-        uploadMutation.onError(new Error(data.error || 'Upload failed'));
+        uploadMutation.onError(new Error(data.error || 'CV parsing failed'));
       }
     })
-    .catch(error => uploadMutation.onError(error));
+    .catch(error => {
+      console.error('Upload error:', error);
+      uploadMutation.onError(error);
+    });
   };
 
   const getStatusMessage = () => {

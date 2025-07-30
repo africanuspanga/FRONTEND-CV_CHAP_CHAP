@@ -327,68 +327,7 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
     });
   });
 
-  // CV file upload endpoint (synchronous)
-  app.post("/api/upload-cv-file", upload.single('cvFile'), async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({
-          success: false,
-          error: 'No file uploaded'
-        });
-      }
 
-      console.log(`File uploaded: ${req.file.originalname} (${req.file.size} bytes)`);
-
-      // Call the synchronous external CV parsing API
-      const formData = new FormData();
-      formData.append('cvFile', req.file.buffer, req.file.originalname);
-
-      const parseResponse = await fetch('https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/sync-upload-cv-file', {
-        method: 'POST',
-        body: formData as any,
-        headers: {
-          ...formData.getHeaders()
-        }
-      });
-
-      if (!parseResponse.ok) {
-        throw new Error(`CV parsing failed: ${parseResponse.statusText}`);
-      }
-
-      const parseResult = await parseResponse.json();
-      
-      if (parseResult.success && parseResult.cvData) {
-        // Generate additional onboarding insights if not provided
-        let insights = parseResult.onboardingInsights;
-        if (!insights) {
-          insights = await generateOnboardingInsights(parseResult.cvData);
-        }
-
-        // Return the parsed data directly (synchronous response)
-        res.status(200).json({
-          success: true,
-          job_id: uuidv4(), // Generate ID for compatibility
-          status: 'completed',
-          cv_data: parseResult.cvData,
-          onboarding_insights: insights,
-          metadata: parseResult.metadata || {
-            filename: req.file.originalname,
-            processed_at: new Date().toISOString(),
-            file_size: req.file.size
-          }
-        });
-      } else {
-        throw new Error('Failed to parse CV: ' + (parseResult.error || 'Unknown error'));
-      }
-
-    } catch (error: any) {
-      console.error('Error uploading CV file:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Internal server error'
-      });
-    }
-  });
 
 
   // API route for initiating USSD payment

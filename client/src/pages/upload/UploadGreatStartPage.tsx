@@ -34,7 +34,22 @@ const UploadGreatStartPage: React.FC = () => {
   }, [setLocation]);
 
   const handleStartEditing = () => {
-    // Navigate to the personal info form with uploaded data
+    // Load the uploaded CV data into the form context first
+    const storedCVData = sessionStorage.getItem('uploadedCVData');
+    if (storedCVData) {
+      const cvData = JSON.parse(storedCVData);
+      
+      // Store in localStorage for the CV form context to load
+      localStorage.setItem('cv-form-data', JSON.stringify({
+        ...cvData,
+        templateId: 'brightDiamond' // Set default template
+      }));
+      
+      // Set step to template selection
+      localStorage.setItem('cv-current-step', '0');
+    }
+    
+    // Navigate to template selection
     setLocation('/cv/brightDiamond/personal');
   };
 

@@ -181,9 +181,9 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
               // If it's a valid object with all required properties
               if (site && 
                   typeof site === 'object' && 
-                  typeof site.url === 'string' && 
-                  typeof site.id === 'string' && 
-                  typeof site.name === 'string') {
+                  'url' in site && typeof site.url === 'string' && 
+                  'id' in site && typeof site.id === 'string' && 
+                  'name' in site && typeof site.name === 'string') {
                 
                 processedWebsites.push({
                   id: site.id,
@@ -207,7 +207,7 @@ export const CVFormProvider: React.FC<{children: React.ReactNode}> = ({ children
           }
           
           // Replace the websites array with properly typed array
-          safeData.websites = processedWebsites;
+          (safeData as any).websites = processedWebsites;
           
           setFormData(safeData);
           
