@@ -19,55 +19,27 @@ const UploadProcessingPage: React.FC = () => {
       return;
     }
 
-    // Start polling for actual parsed data
-    const jobId = sessionStorage.getItem('uploadJobId');
-    if (!jobId) {
-      console.error('No job ID found for upload processing');
-      setLocation('/upload');
+    // Check if CV data is already available (synchronous upload)
+    const uploadedData = sessionStorage.getItem('uploadedCVData');
+    const uploadInsights = sessionStorage.getItem('uploadInsights');
+    
+    if (uploadedData) {
+      // Data is already available, proceed to onboarding
+      setProcessingStatus('completed');
+      setTimeout(() => {
+        setLocation('/upload/nice-to-meet-you');
+      }, 2000); // Brief delay to show completion message
       return;
     }
 
-    const pollInterval = setInterval(async () => {
-      try {
-        // Check parsing status
-        const statusResponse = await fetch(`/api/parsing-status/${jobId}`);
-        const statusData = await statusResponse.json();
-
-        if (statusData.success && statusData.status === 'completed') {
-          // Get the parsed CV data
-          const dataResponse = await fetch(`/api/get-parsed-cv-data/${jobId}`);
-          const cvData = await dataResponse.json();
-
-          if (cvData.success && cvData.cv_data) {
-            // Store the real parsed data
-            sessionStorage.setItem('uploadedCVData', JSON.stringify(cvData.cv_data));
-            sessionStorage.setItem('uploadInsights', JSON.stringify(cvData.onboarding_insights));
-            
-            setProcessingStatus('completed');
-            clearInterval(pollInterval);
-            setTimeout(() => {
-              setLocation('/upload/nice-to-meet-you');
-            }, 1000);
-          }
-        } else if (statusData.status === 'failed') {
-          console.error('CV parsing failed:', statusData.error);
-          setProcessingStatus('failed');
-          clearInterval(pollInterval);
-        }
-      } catch (error) {
-        console.error('Error polling parsing status:', error);
-      }
-    }, 2000); // Poll every 2 seconds
-
-    const timeout = setTimeout(() => {
-      clearInterval(pollInterval);
-      console.error('Processing timeout - falling back to upload page');
+    // Fallback: redirect to upload if no data found
+    setTimeout(() => {
+      console.error('No CV data found - redirecting to upload');
       setLocation('/upload');
-    }, 30000); // 30 second timeout
+    }, 5000);
 
     return () => {
-      clearInterval(pollInterval);
-      clearTimeout(timeout);
+      // Cleanup if needed
     };
   }, [setLocation]);
 

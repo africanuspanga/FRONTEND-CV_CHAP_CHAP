@@ -185,7 +185,25 @@ const UploadCVFlow: React.FC<UploadCVFlowProps> = ({ onCVParsed }) => {
       body: formData
     })
     .then(response => response.json())
-    .then(data => uploadMutation.onSuccess(data))
+    .then(data => {
+      if (data.success) {
+        // Store the parsed CV data and insights immediately (synchronous response)
+        if (data.cv_data) {
+          sessionStorage.setItem('uploadedCVData', JSON.stringify(data.cv_data));
+        }
+        if (data.onboarding_insights) {
+          sessionStorage.setItem('uploadInsights', JSON.stringify(data.onboarding_insights));
+        }
+        
+        // Update status and navigate to onboarding
+        setParsingStatus('completed');
+        setTimeout(() => {
+          setLocation('/upload/nice-to-meet-you');
+        }, 1000);
+      } else {
+        uploadMutation.onError(new Error(data.error || 'Upload failed'));
+      }
+    })
     .catch(error => uploadMutation.onError(error));
   };
 

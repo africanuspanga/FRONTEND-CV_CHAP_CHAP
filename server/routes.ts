@@ -9,6 +9,7 @@ import { cvScreenerProxyHandler } from './cv-screener-proxy';
 import { setupAuth } from './auth-proxy';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import FormData from 'form-data';
 
 // In-memory storage for CV requests
 interface CVRequest {
@@ -326,7 +327,7 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
     });
   });
 
-  // CV file upload endpoint
+  // CV file upload endpoint (synchronous)
   app.post("/api/upload-cv-file", upload.single('cvFile'), async (req, res) => {
     try {
       if (!req.file) {
@@ -336,28 +337,49 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
         });
       }
 
-      // Generate unique job ID
-      const jobId = uuidv4();
-      
-      // Create job entry
-      cvUploadJobs[jobId] = {
-        id: jobId,
-        filename: req.file.originalname,
-        status: 'parsing',
-        createdAt: new Date()
-      };
-
       console.log(`File uploaded: ${req.file.originalname} (${req.file.size} bytes)`);
 
-      // Process CV using external API
-      processUploadedCV(jobId, req.file);
+      // Call the synchronous external CV parsing API
+      const formData = new FormData();
+      formData.append('cvFile', req.file.buffer, req.file.originalname);
 
-      // Return immediate response with job ID
-      res.status(202).json({
-        success: true,
-        job_id: jobId,
-        message: 'File uploaded successfully. Processing in progress.'
+      const parseResponse = await fetch('https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/sync-upload-cv-file', {
+        method: 'POST',
+        body: formData as any,
+        headers: {
+          ...formData.getHeaders()
+        }
       });
+
+      if (!parseResponse.ok) {
+        throw new Error(`CV parsing failed: ${parseResponse.statusText}`);
+      }
+
+      const parseResult = await parseResponse.json();
+      
+      if (parseResult.success && parseResult.cvData) {
+        // Generate additional onboarding insights if not provided
+        let insights = parseResult.onboardingInsights;
+        if (!insights) {
+          insights = await generateOnboardingInsights(parseResult.cvData);
+        }
+
+        // Return the parsed data directly (synchronous response)
+        res.status(200).json({
+          success: true,
+          job_id: uuidv4(), // Generate ID for compatibility
+          status: 'completed',
+          cv_data: parseResult.cvData,
+          onboarding_insights: insights,
+          metadata: parseResult.metadata || {
+            filename: req.file.originalname,
+            processed_at: new Date().toISOString(),
+            file_size: req.file.size
+          }
+        });
+      } else {
+        throw new Error('Failed to parse CV: ' + (parseResult.error || 'Unknown error'));
+      }
 
     } catch (error: any) {
       console.error('Error uploading CV file:', error);
@@ -368,70 +390,7 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
     }
   });
 
-  // Get parsing status endpoint
-  app.get("/api/parsing-status/:jobId", (req, res) => {
-    try {
-      const { jobId } = req.params;
-      const job = cvUploadJobs[jobId];
 
-      if (!job) {
-        return res.status(404).json({
-          success: false,
-          error: 'Job not found'
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        status: job.status,
-        filename: job.filename,
-        created_at: job.createdAt,
-        error: job.error
-      });
-
-    } catch (error: any) {
-      console.error('Error checking parsing status:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Internal server error'
-      });
-    }
-  });
-
-  // Get parsed CV data endpoint
-  app.get("/api/get-parsed-cv-data/:jobId", (req, res) => {
-    try {
-      const { jobId } = req.params;
-      const job = cvUploadJobs[jobId];
-
-      if (!job) {
-        return res.status(404).json({
-          success: false,
-          error: 'Job not found'
-        });
-      }
-
-      if (job.status !== 'completed') {
-        return res.status(400).json({
-          success: false,
-          error: 'Parsing not completed yet'
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        cv_data: job.parsedData,
-        onboarding_insights: job.onboardingInsights
-      });
-
-    } catch (error: any) {
-      console.error('Error retrieving parsed CV data:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Internal server error'
-      });
-    }
-  });
   // API route for initiating USSD payment
   app.post("/api/cv-pdf/anonymous/initiate-ussd", async (req, res) => {
     try {
