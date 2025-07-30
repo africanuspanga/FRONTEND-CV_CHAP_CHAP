@@ -34,10 +34,8 @@ const UploadGreatStartPage: React.FC = () => {
   }, [setLocation]);
 
   const handleStartEditing = () => {
-    // Clear the temporary session storage and proceed to templates
-    sessionStorage.removeItem('uploadedCVData');
-    sessionStorage.removeItem('uploadInsights');
-    setLocation('/templates');
+    // Navigate to the personal info form with uploaded data
+    setLocation('/cv/brightDiamond/personal');
   };
 
   if (!insights) {
@@ -57,7 +55,7 @@ const UploadGreatStartPage: React.FC = () => {
             <FileText className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            You're off to a great start! 🚀
+            You're off to a great start!
           </h1>
           <p className="text-lg text-gray-600 leading-relaxed">
             We've analyzed your CV and here's our feedback to help you create an even stronger version.
@@ -66,19 +64,19 @@ const UploadGreatStartPage: React.FC = () => {
 
         {/* Feedback Cards */}
         <div className="space-y-6 mb-8">
-          {/* Good Points Card */}
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+          {/* You got it right */}
+          <Card className="border-0 shadow-lg bg-white">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center text-xl font-semibold text-gray-900">
                 <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
-                What's working well
+                You got it right
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {insights.qualityFeedback.goodPoints.map((point, index) => (
                   <div key={index} className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                     <p className="text-gray-700">{point}</p>
                   </div>
                 ))}
@@ -86,19 +84,21 @@ const UploadGreatStartPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Improvement Points Card */}
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+          {/* How we'll help you improve */}
+          <Card className="border-0 shadow-lg bg-white">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center text-xl font-semibold text-gray-900">
-                <AlertCircle className="w-6 h-6 text-amber-600 mr-3" />
-                Areas for improvement
+                <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-white text-sm">💡</span>
+                </div>
+                How we'll help you improve
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {insights.qualityFeedback.improvementPoints.map((point, index) => (
                   <div key={index} className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-2 h-2 bg-amber-500 rounded-full mt-2"></div>
+                    <div className="w-4 h-4 bg-yellow-400 rounded-full mt-0.5 flex-shrink-0"></div>
                     <p className="text-gray-700">{point}</p>
                   </div>
                 ))}

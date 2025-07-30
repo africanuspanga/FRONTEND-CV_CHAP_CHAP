@@ -60,7 +60,7 @@ const UploadNiceToMeetYouPage: React.FC = () => {
             <Trophy className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Nice to meet you, {firstName}! 👋
+            Nice to meet you!
           </h1>
           <p className="text-lg text-gray-600 leading-relaxed">
             We've analyzed your CV and discovered some great insights about your professional journey.
@@ -76,59 +76,28 @@ const UploadNiceToMeetYouPage: React.FC = () => {
           </CardHeader>
           
           <CardContent className="space-y-6">
-            {/* Current Role */}
-            <div className="flex items-start space-x-4 p-4 bg-blue-50 rounded-lg">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Briefcase className="w-5 h-5 text-blue-600" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 mb-1">Current Role</h3>
-                <p className="text-gray-700">
-                  <span className="font-medium">{insights.currentJobTitle}</span>
-                  {insights.currentCompany && (
-                    <>
-                      {' at '}
-                      <span className="font-medium">{insights.currentCompany}</span>
-                    </>
-                  )}
-                </p>
+            {/* Character Illustration */}
+            <div className="flex justify-center mb-6">
+              <div className="w-32 h-32 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <div className="text-4xl">👩‍💼</div>
               </div>
             </div>
 
-            {/* Key Skills */}
-            <div className="flex items-start space-x-4 p-4 bg-green-50 rounded-lg">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-green-600" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 mb-2">Top Skills</h3>
-                <div className="flex flex-wrap gap-2">
-                  {insights.keySkills.map((skill, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="bg-green-100 text-green-800 border-green-200"
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Industry Insight */}
-            <div className="p-4 bg-purple-50 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-2">Perfect Fit</h3>
-              <p className="text-gray-700">
-                Your experience shows you're well-suited for opportunities in{' '}
-                <span className="font-semibold text-purple-700">
-                  {insights.tailoredIndustrySuggestion}
-                </span>.
-                We'll help you create a CV that highlights your strengths for these roles.
+            {/* Dynamic Content */}
+            <div className="text-center space-y-4">
+              <p className="text-lg text-gray-700">
+                You are currently a <strong>{insights.currentJobTitle}</strong> at <strong>{insights.currentCompany}</strong>.
+              </p>
+              
+              <p className="text-lg text-gray-700">
+                Your strong skills in{' '}
+                <strong>{insights.keySkills.slice(0, 3).join(', ')}</strong>{' '}
+                have consistently driven impressive results in your campaigns.
+              </p>
+              
+              <p className="text-lg text-gray-700">
+                We will tailor your resume-building experience to emphasize your expertise in{' '}
+                <strong>{insights.tailoredIndustrySuggestion}</strong> to attract potential employers.
               </p>
             </div>
           </CardContent>

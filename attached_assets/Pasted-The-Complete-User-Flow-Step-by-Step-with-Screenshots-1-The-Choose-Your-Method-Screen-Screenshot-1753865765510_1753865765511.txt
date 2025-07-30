@@ -1,0 +1,90 @@
+The Complete User Flow: Step-by-Step with Screenshots
+1. The "Choose Your Method" Screen
+
+Screenshot Reference: Screenshot 2025-07-25 at 00.40.48.png
+
+Your Role: This is the entry point you've already implemented. It presents two options: "Start with a new CV" and "Upload an existing CV".
+
+User Action: The user clicks "Upload an existing CV" and selects a file.
+
+2. The "Processing / Finding Some Good Stuff" Loading Screen
+
+Screenshot Reference: Screenshot 2025-07-25 at 00.41.40.png or Screenshot 2025-07-30 at 11.15.44.png (the trophy icon with "Finding some good stuff..")
+
+Your Role: Immediately after the user selects a file and you initiate the POST /api/upload-cv-file call to the backend, you must display this loading screen.
+
+User Action: User waits while the backend parses the CV.
+
+Transition Trigger: This screen persists until the backend completes parsing and you receive the complete status from GET /api/parsing-status/:jobId, followed by fetching the rich CVData and onboardingInsights from GET /api/get-parsed-cv-data/:jobId.
+
+3. The "Nice to meet you!" Personalized Introduction Screen
+
+Screenshot Reference: Screenshot 2025-07-30 at 11.15.57.png or Screenshot 2025-07-25 at 00.42.08.jpg
+
+Your Role: This is the first new screen after the loading state. You will navigate here immediately upon successful reception of the parsed data from the backend.
+
+Content Dynamicization: You must dynamically inject the currentJobTitle, currentCompany, keySkills, and tailoredIndustrySuggestion received in the onboardingInsights from the backend.
+
+Example: "You are currently a [currentJobTitle] at [currentCompany]."
+
+Example: "Your strong skills in [keySkill1], [keySkill2], and [keySkill3]..."
+
+Example: "...to emphasize your expertise in [tailoredIndustrySuggestion]."
+
+Styling: Replicate the layout, icons, and overall feel of the screenshot, but use CV Chap Chap's brand colors (#034694, #4D6FFF, #E5EAFF) for all elements (buttons, accents, text highlights).
+
+User Action: The user reads the personalized introduction and clicks "Continue".
+
+Transition Trigger: Clicking "Continue" on this screen.
+
+4. The "You're off to a great start!" CV Quality Analysis Screen
+
+Screenshot Reference: Screenshot 2025-07-25 at 00.47.06.jpg
+
+Your Role: This is the second new screen in the sequence. You will navigate here after the user clicks "Continue" on the "Nice to meet you!" screen.
+
+Content Dynamicization: You must dynamically inject the goodPoints (for "You got it right") and improvementPoints (for "How we'll help you improve") received in onboardingInsights.qualityFeedback from the backend.
+
+Ensure the green checkmarks for "You got it right" and appropriate icons (like the lightbulb or star) for "How we'll help you improve" are displayed.
+
+Styling: Replicate the layout, distinct sections, icons, and overall feel of the screenshot. Again, use CV Chap Chap's brand colors for all elements. The background colors for the "You got it right" and "How we'll help you improve" sections should be subtle shades from our brand palette (e.g., #E5EAFF or a very light gray).
+
+User Action: The user reviews the AI-powered feedback on their CV's quality and clicks "Continue".
+
+Transition Trigger: Clicking "Continue" on this screen.
+
+5. The "Let's review the basics" (Personal Information) Screen
+
+Screenshot Reference: Screenshot 2025-07-30 at 11.17.20.png or Screenshot 2025-07-25 at 00.47.29.png
+
+Your Role: This is the first standard CV creation step in the flow. You will navigate here after the user clicks "Continue" on the "You're off to a great start!" screen.
+
+Content Dynamicization: Crucially, all relevant form fields (First Name, Surname, Post Code, City, Country, Phone, Email) must be pre-populated with the data extracted from the cvData portion of the backend's response.
+
+Live Preview: The live CV preview on the right must immediately update to reflect this pre-populated personal information.
+
+Styling: Ensure the green checkmarks for pre-populated and valid fields are displayed as shown. Maintain our existing form styling.
+
+User Action: The user reviews their basic information, makes any necessary edits, and clicks "Continue".
+
+6. The "Let's review your experience" (Work Experience) Screen
+
+Screenshot Reference: Screenshot 2025-07-30 at 11.17.40.png
+
+Your Role: This is the next step in the standard CV creation flow.
+
+Content Dynamicization: All work experience entries must be pre-populated with data from the cvData portion of the backend's response.
+
+AI Prompt: The text "We'll help you refine this section with the perfect words. Add prewritten bullet points for any job title or write your own—then fine-tune the details with AI." should be displayed as shown.
+
+User Action: The user reviews, edits their work experience, and can use AI suggestions.
+
+7. The "Here's an overview of your education" (Education) Screen
+
+Screenshot Reference: Screenshot 2025-07-25 at 00.49.18.jpg
+
+Your Role: This is the subsequent step in the standard CV creation flow.
+
+Content Dynamicization: All education entries must be pre-populated with data from the cvData portion of the backend's response.
+
+User Action: The user reviews, edits their education entries, and clicks "Continue".

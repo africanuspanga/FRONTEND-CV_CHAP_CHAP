@@ -31,12 +31,6 @@ const UploadCVFlow: React.FC<UploadCVFlowProps> = ({ onCVParsed }) => {
   const { toast } = useToast();
 
   const uploadMutation = {
-    mutateAsync: async (formData: FormData) => {
-      const response = await apiRequest('POST', '/api/upload-cv-file', formData, {
-        'Content-Type': 'multipart/form-data'
-      });
-      return await response.json();
-    },
     onSuccess: (data: any) => {
       console.log('File uploaded successfully. Job ID:', data.job_id);
       setJobId(data.job_id);
@@ -179,7 +173,18 @@ const UploadCVFlow: React.FC<UploadCVFlowProps> = ({ onCVParsed }) => {
 
     setIsUploading(true);
     setParsingStatus('uploading');
-    uploadMutation.mutateAsync(formData);
+    
+    // Navigate to processing page immediately
+    setLocation('/upload/processing');
+    
+    // Use fetch directly to avoid multipart boundary issues
+    fetch('/api/upload-cv-file', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => uploadMutation.onSuccess(data))
+    .catch(error => uploadMutation.onError(error));
   };
 
   const getStatusMessage = () => {

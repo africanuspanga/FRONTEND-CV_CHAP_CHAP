@@ -1,3 +1,4 @@
+import React from 'react';
 import { Switch, Route } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
@@ -57,6 +58,9 @@ import GreatStartPage from "@/pages/GreatStartPage";
 import UploadCVFlow from "@/pages/UploadCVFlow";
 import UploadNiceToMeetYouPage from "@/pages/upload/UploadNiceToMeetYouPage";
 import UploadGreatStartPage from "@/pages/upload/UploadGreatStartPage";
+
+// Import UploadProcessingPage directly to avoid lazy loading issues
+import UploadProcessingPage from "@/pages/upload/UploadProcessingPage";
 import EditSections from "@/pages/EditSections";
 import WorkExperienceSummary from "@/pages/WorkExperienceSummary";
 import AuthTest from "@/pages/auth-test";
@@ -158,6 +162,7 @@ function Router() {
                 
                 {/* Upload CV Flow Routes */}
                 <Route path="/upload" component={UploadCVFlow} />
+                <Route path="/upload/processing" component={UploadProcessingPage} />
                 <Route path="/upload/nice-to-meet-you" component={UploadNiceToMeetYouPage} />
                 <Route path="/upload/great-start" component={UploadGreatStartPage} />
                 <Route path="/templates" component={TemplateSelection} />
