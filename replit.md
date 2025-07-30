@@ -206,3 +206,7 @@ interface CVData {
 - **Clean Interface**: Removed upload option from CreationMethod page, showing only CV creation
 - **Route Cleanup**: Commented out upload routes in App.tsx while preserving functionality
 - **Focus on Core Features**: MVP now focuses on core CV creation flow with templates
+- **Phone Number Updates**: 
+  - Removed automatic pre-filling of phone number (+255793166375) from personal info form
+  - Updated USSD payment support contact to +255793166375 with WhatsApp integration
+  - Phone collection now only happens during payment flow, not in CV creation

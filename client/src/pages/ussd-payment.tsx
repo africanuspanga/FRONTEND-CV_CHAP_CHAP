@@ -598,9 +598,14 @@ const USSDPaymentPage: React.FC = () => {
         <p className="text-base sm:text-lg text-gray-700 text-center mb-3 font-medium">Unahitaji msaada kwa malipo yako?</p>
         <div className="flex items-center justify-center gap-2 text-primary">
           <Phone className="h-5 w-5" />
-          <p className="text-center font-bold text-lg">
-            +255 682 152 148
-          </p>
+          <a 
+            href="https://wa.me/255793166375" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-center font-bold text-lg hover:underline cursor-pointer"
+          >
+            +255793166375
+          </a>
         </div>
       </div>
     </div>
