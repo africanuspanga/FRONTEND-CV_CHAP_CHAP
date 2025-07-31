@@ -7,6 +7,8 @@ import { useCVForm } from '@/contexts/cv-form-context';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Language } from '@shared/schema';
+import '../styles/mobile-form.css';
+import '../styles/android-optimizations.css';
 
 const LanguagesForm = () => {
   const [, navigate] = useLocation();
@@ -52,7 +54,7 @@ const LanguagesForm = () => {
     const newLanguageObj: Language = {
       id: Date.now().toString(),
       name,
-      level: 'Bilingual' // Default proficiency
+      proficiency: 'fluent' // Default proficiency
     };
 
     setSelectedLanguages([...selectedLanguages, newLanguageObj]);
@@ -65,7 +67,7 @@ const LanguagesForm = () => {
     const customLanguage: Language = {
       id: Date.now().toString(),
       name: newLanguage,
-      level: newProficiency
+      proficiency: newProficiency as "beginner" | "intermediate" | "advanced" | "fluent" | "native"
     };
 
     setSelectedLanguages([...selectedLanguages, customLanguage]);
@@ -219,7 +221,7 @@ const LanguagesForm = () => {
                   <div>
                     <div className="font-medium">{language.name}</div>
                     <div className="text-gray-500 text-sm">
-                      {getProficiencyDisplayName(language.level || '')}
+                      {getProficiencyDisplayName(language.proficiency || '')}
                     </div>
                   </div>
                   <Button

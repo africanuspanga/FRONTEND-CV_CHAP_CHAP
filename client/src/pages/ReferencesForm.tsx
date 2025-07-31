@@ -7,6 +7,8 @@ import LiveCVPreview from '@/components/LiveCVPreview';
 import { Input } from '@/components/ui/input';
 import { Reference } from '@shared/schema';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import '../styles/mobile-form.css';
+import '../styles/android-optimizations.css';
 
 const ReferencesForm = () => {
   const [, navigate] = useLocation();

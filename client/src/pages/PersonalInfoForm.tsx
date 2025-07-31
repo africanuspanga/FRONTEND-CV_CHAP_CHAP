@@ -10,6 +10,7 @@ import LocationInput from '@/components/LocationInput';
 import JobTitleInput from '@/components/JobTitleInput';
 import IconInput from '@/components/IconInput';
 import '../styles/mobile-form.css';
+import '../styles/android-optimizations.css';
 
 const PersonalInfoForm = () => {
   const [, navigate] = useLocation();

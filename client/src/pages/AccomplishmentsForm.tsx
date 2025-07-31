@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { Helmet } from 'react-helmet';
 import { Accomplishment } from '@shared/schema';
+import '../styles/mobile-form.css';
+import '../styles/android-optimizations.css';
 
 const AccomplishmentsForm = () => {
   const [, navigate] = useLocation();

@@ -14,6 +14,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Add CSS styles for improved mobile experience
 import '../styles/cvPreview.css';
+import '../styles/android-optimizations.css';
 
 // CV Preview Area Component with dynamic scaling
 interface CVPreviewAreaProps {
