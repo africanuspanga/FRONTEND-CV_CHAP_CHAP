@@ -877,6 +877,43 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
     }
   };
 
+  // Admin login endpoint
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      // For now, use hardcoded admin credentials
+      if (username === 'admin@cvchapchap.com' && password === 'admin123') {
+        // Create JWT token
+        const token = jwt.sign(
+          { 
+            id: '231a9a83-fcd0-4f51-aacc-b1578f1d7128',
+            username: 'admin',
+            email: 'admin@cvchapchap.com',
+            role: 'admin'
+          },
+          process.env.JWT_SECRET || 'your-secret-key',
+          { expiresIn: '24h' }
+        );
+        
+        res.json({
+          token,
+          user: {
+            id: '231a9a83-fcd0-4f51-aacc-b1578f1d7128',
+            username: 'admin',
+            email: 'admin@cvchapchap.com',
+            role: 'admin'
+          }
+        });
+      } else {
+        res.status(401).json({ message: 'Invalid credentials' });
+      }
+    } catch (error: any) {
+      console.error('Admin login error:', error);
+      res.status(500).json({ message: 'Login failed' });
+    }
+  });
+
   // Admin API endpoints
   app.get("/api/admin/stats", adminAuth, async (req, res) => {
     try {

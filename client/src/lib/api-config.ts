@@ -1,17 +1,17 @@
 // API configuration for admin backend integration
 
-// API base URL - adjust this to match your external API
-const API_BASE_URL = 'https://cv-screener-africanuspanga.replit.app';
+// API base URL - using local backend server
+const API_BASE_URL = '';
 
 // API endpoints for admin functionality
 export const ADMIN_API = {
   // Auth endpoints
-  LOGIN: '/api/admin/auth/login',
-  LOGOUT: '/api/admin/auth/logout',
-  CURRENT_USER: '/api/admin/auth/me',
+  LOGIN: '/api/admin/login',
+  LOGOUT: '/api/admin/logout',
+  CURRENT_USER: '/api/admin/me',
   
   // Dashboard endpoints
-  DASHBOARD: '/api/admin/dashboard',
+  DASHBOARD: '/api/admin/stats',
   
   // User management
   USERS: '/api/admin/users',
