@@ -1,0 +1,57 @@
+Admin Dashboard Data Integration - Questions for Frontend Team
+Current Issue
+The admin dashboard is showing data (127 users, TSH 1,250,000 revenue) that doesn't match the actual database records (2 users, 0 revenue).
+
+Critical Questions
+1. Data Source Connection
+Q1: Is the frontend dashboard calling our /api/admin/stats endpoint?
+Q2: If not, what data source is currently being used for the dashboard?
+Q3: Are you using mock/demo data for development? If so, where is it defined?
+2. API Integration Status
+Q4: Have you tested the admin API endpoints with the correct authentication?
+Q5: Are there any CORS or authentication errors when calling the backend API?
+Q6: Can you show us the network requests being made by the dashboard?
+3. Database Environment
+Q7: Is the frontend connecting to the same database as the backend?
+Q8: Are you using a different environment (staging vs production) for the frontend?
+Q9: Is there a separate database for testing that contains the demo data?
+4. Authentication Flow
+Q10: Is the admin login working correctly to get a valid JWT token?
+Q11: Are admin API calls including the proper Authorization header?
+Q12: Are there any token expiration or refresh issues?
+Current Backend Status ✅
+Working API Endpoints:
+POST /api/auth/login - Admin login (email: admin@cvchapchap.com, password: admin123)
+GET /api/admin/stats - Real dashboard statistics
+GET /api/admin/users - User management
+GET /api/admin/payments - Payment tracking
+GET /api/admin/templates - Template management
+Real Database Data:
+Users: 2 total
+CVs: 0 total  
+Payments: 0 total, 0 revenue
+Templates: Available but need CV/payment data for statistics
+Action Items for Frontend Team
+Immediate Steps:
+Test API Connection: Use browser developer tools to verify which endpoints the dashboard calls
+Check Authentication: Ensure admin JWT token is being passed correctly
+Verify Environment: Confirm frontend and backend are using the same database
+Remove Mock Data: Replace any hardcoded/demo data with real API calls
+Expected API Call Flow:
+// 1. Login to get JWT token
+POST /api/auth/login
+Body: { "email": "admin@cvchapchap.com", "password": "admin123" }
+// 2. Get dashboard stats with token
+GET /api/admin/stats
+Headers: { "Authorization": "Bearer <jwt_token>" }
+// 3. Response should show real data (currently 2 users, 0 revenue)
+Next Steps
+Once frontend team answers these questions, we can:
+
+Fix any API integration issues
+Set up proper data flow
+Add sample data if needed for testing
+Ensure real-time data updates work correctly
+Test URLs for Verification
+Auth test page: https://cv-screener-africanuspanga.replit.app/auth-test
+Direct API test: curl -X GET /api/admin/stats -H "Authorization: Bearer <token>"
