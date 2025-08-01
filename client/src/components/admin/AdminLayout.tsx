@@ -62,7 +62,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <div className="flex items-center justify-between h-16 px-6 border-b">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-white overflow-hidden">
-              <img src="/images/cv-logo.png" alt="CV Chap Chap Logo" className="object-cover h-full w-full" />
+              <img src="@assets/favicon_1754081811589.png" alt="CV Chap Chap Logo" className="object-cover h-full w-full" />
             </div>
             <h1 className="text-xl font-bold">CV Chap Chap</h1>
           </div>
@@ -108,7 +108,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative px-3 py-2 rounded-lg flex items-center gap-2 border border-gray-200 hover:bg-gray-50">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-white overflow-hidden">
-                        <img src="/images/cv-logo.png" alt="CV Chap Chap Logo" className="object-cover h-full w-full" />
+                        <img src="@assets/favicon_1754081811589.png" alt="CV Chap Chap Logo" className="object-cover h-full w-full" />
                       </div>
                       <span className="font-medium">Admin</span>
                     </Button>
@@ -116,7 +116,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-white overflow-hidden">
-                        <img src="/images/cv-logo.png" alt="CV Chap Chap Logo" className="object-cover h-full w-full" />
+                        <img src="@assets/favicon_1754081811589.png" alt="CV Chap Chap Logo" className="object-cover h-full w-full" />
                       </div>
                       <div className="flex flex-col space-y-0.5">
                         <p className="text-sm font-medium">{user.username}</p>

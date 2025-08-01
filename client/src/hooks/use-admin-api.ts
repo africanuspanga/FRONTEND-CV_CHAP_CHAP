@@ -13,7 +13,7 @@ export function useAdminApi() {
     }
     
     // Use the real API
-    const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+    const token = localStorage.getItem('admin_access_token');
     
     if (!token) {
       throw new Error('No authentication token found');
@@ -29,8 +29,7 @@ export function useAdminApi() {
     
     if (response.status === 401 || response.status === 403) {
       // Token expired or invalid
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('token');
+      localStorage.removeItem('admin_access_token');
       throw new Error('Authentication expired. Please login again.');
     }
     
@@ -65,7 +64,7 @@ export function useAdminApi() {
     }
     
     // Use the real API
-    const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+    const token = localStorage.getItem('admin_access_token');
     
     if (!token) {
       throw new Error('No authentication token found');
@@ -86,8 +85,7 @@ export function useAdminApi() {
     });
     
     if (response.status === 401 || response.status === 403) {
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('token');
+      localStorage.removeItem('admin_access_token');
       throw new Error('Authentication expired. Please login again.');
     }
     
@@ -103,7 +101,7 @@ export function useAdminApi() {
       throw new Error('Authentication required');
     }
     
-    const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+    const token = localStorage.getItem('admin_access_token');
     
     if (!token) {
       throw new Error('No authentication token found');
@@ -118,8 +116,7 @@ export function useAdminApi() {
     });
     
     if (response.status === 401 || response.status === 403) {
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('token');
+      localStorage.removeItem('admin_access_token');
       throw new Error('Authentication expired. Please login again.');
     }
     
@@ -137,7 +134,7 @@ export function useAdminApi() {
     }
     
     // Use the real API
-    const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+    const token = localStorage.getItem('admin_access_token');
     
     if (!token) {
       throw new Error('No authentication token found');
@@ -152,8 +149,7 @@ export function useAdminApi() {
     });
     
     if (response.status === 401 || response.status === 403) {
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('token');
+      localStorage.removeItem('admin_access_token');
       throw new Error('Authentication expired. Please login again.');
     }
     
