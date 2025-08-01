@@ -64,7 +64,20 @@ async function createDemoUsers() {
     updated_at: new Date()
   };
   
-  users.push(emailUser, lucaUser);
+  // Create the admin user
+  const adminUser: User = {
+    id: uuidv4(),
+    username: 'admin',
+    email: 'admin@cvchapchap.com',
+    password: await hashPassword('admin123'),
+    phone_number: '+255793166375',
+    full_name: 'Admin User',
+    role: 'admin',
+    created_at: new Date(),
+    updated_at: new Date()
+  };
+  
+  users.push(emailUser, lucaUser, adminUser);
   console.log('Created demo users:', users.map(u => u.email));
 }
 
@@ -517,3 +530,6 @@ export async function setupAuth(app: Express) {
     return res.status(500).json({ message: 'Internal server error' });
   });
 }
+
+// Export users array for admin access
+export { users };

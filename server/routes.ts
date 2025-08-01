@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import { openaiProxyHandler } from './openai-proxy';
 import { registerTemplateAPI } from './template-api';
 import { cvScreenerProxyHandler } from './cv-screener-proxy';
@@ -850,6 +851,200 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
       success: true,
       submissions: feedbackSubmissions,
       total: feedbackSubmissions.length
+    });
+  });
+
+  // Admin authentication middleware
+  const adminAuth = (req: any, res: any, next: any) => {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Authorization token required' });
+    }
+
+    try {
+      const token = authHeader.substring(7);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
+      
+      if (decoded.role !== 'admin') {
+        return res.status(403).json({ message: 'Admin access required' });
+      }
+      
+      req.user = decoded;
+      next();
+    } catch (error: any) {
+      return res.status(401).json({ message: 'Invalid or expired token' });
+    }
+  };
+
+  // Admin API endpoints
+  app.get("/api/admin/stats", adminAuth, async (req, res) => {
+    try {
+      // Get real statistics from the system
+      const { users } = await import('./auth-proxy');
+      const totalUsers = users?.length || 0;
+      const usersToday = users?.filter((u: any) => {
+        const today = new Date();
+        const userDate = new Date(u.created_at);
+        return userDate.toDateString() === today.toDateString();
+      }).length || 0;
+
+      // CV statistics (from current session data)
+      const totalCVs = cvRequests ? Object.keys(cvRequests).length : 0;
+      const cvsToday = totalCVs; // All CVs are from today in current session
+
+      // Payment statistics 
+      const totalPayments = feedbackSubmissions.length; // Using feedback as proxy for completed CVs
+      const paymentsToday = feedbackSubmissions.filter(f => {
+        const today = new Date();
+        const paymentDate = new Date(f.submissionDate);
+        return paymentDate.toDateString() === today.toDateString();
+      }).length;
+
+      // Revenue calculation (15,000 TZS per CV)
+      const revenuePerCV = 15000;
+      const totalRevenue = totalPayments * revenuePerCV;
+      const revenueToday = paymentsToday * revenuePerCV;
+
+      // Template usage statistics
+      const templateUsage = feedbackSubmissions.reduce((acc: any, submission: any) => {
+        const templateId = submission.templateId;
+        acc[templateId] = (acc[templateId] || 0) + 1;
+        return acc;
+      }, {});
+
+      const topTemplates = Object.entries(templateUsage)
+        .map(([id, usage]: [string, any]) => ({ id, usage, name: id }))
+        .sort((a, b) => b.usage - a.usage)
+        .slice(0, 5);
+
+      // Recent payments (from feedback submissions)
+      const recentPayments = feedbackSubmissions
+        .slice(-5)
+        .map((submission: any) => ({
+          id: submission.feedbackId,
+          amount: revenuePerCV,
+          currency: 'TZS',
+          status: 'completed',
+          created_at: submission.submissionDate,
+          user_name: submission.name
+        }));
+
+      const stats = {
+        users: {
+          total: totalUsers,
+          new_today: usersToday
+        },
+        cvs: {
+          total: totalCVs,
+          created_today: cvsToday,
+          completion_rate: totalCVs > 0 ? Math.round((totalPayments / totalCVs) * 100) : 0
+        },
+        payments: {
+          total: totalPayments,
+          success_rate: 100, // All feedback submissions represent successful completions
+          today: paymentsToday
+        },
+        revenue: {
+          total: totalRevenue,
+          today: revenueToday,
+          last_week: totalRevenue, // For now, same as total
+          last_month: totalRevenue
+        },
+        top_templates: topTemplates,
+        recent_payments: recentPayments,
+        recent_users: (users || []).slice(-5).map((u: any) => ({
+          id: u.id,
+          username: u.username,
+          created_at: u.created_at
+        }))
+      };
+
+
+
+      res.json(stats);
+    } catch (error: any) {
+      console.error('Error fetching admin stats:', error);
+      res.status(500).json({ 
+        message: 'Error fetching admin statistics',
+        error: error.message 
+      });
+    }
+  });
+
+  app.get("/api/admin/users", adminAuth, async (req, res) => {
+    try {
+      const { users } = await import('./auth-proxy');
+      const page = parseInt(req.query.page as string) || 1;
+      const perPage = parseInt(req.query.perPage as string) || 10;
+      const search = req.query.search as string || '';
+
+      let filteredUsers = users;
+      
+      if (search) {
+        filteredUsers = users.filter((u: any) => 
+          u.username.includes(search) || 
+          u.email.includes(search) || 
+          (u.full_name && u.full_name.includes(search))
+        );
+      }
+
+      const startIndex = (page - 1) * perPage;
+      const endIndex = startIndex + perPage;
+      const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+      res.json({
+        users: paginatedUsers.map((u: any) => ({
+          id: u.id,
+          username: u.username,
+          email: u.email,
+          fullName: u.full_name,
+          createdAt: u.created_at,
+          role: u.role,
+          isActive: true
+        })),
+        total: filteredUsers.length,
+        page,
+        perPage,
+        totalPages: Math.ceil(filteredUsers.length / perPage)
+      });
+    } catch (error: any) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ 
+        message: 'Error fetching users',
+        error: error.message 
+      });
+    }
+  });
+
+  app.get("/api/admin/templates", adminAuth, (req, res) => {
+    // Return static template data since templates are file-based
+    const templates = [
+      { id: 'brightDiamond', name: 'Bright Diamond', category: 'Professional', isActive: true },
+      { id: 'kaziFasta', name: 'Kazi Fasta', category: 'Professional', isActive: true },
+      { id: 'jijengeClassic', name: 'Jijenge Classic', category: 'Classic', isActive: true },
+      { id: 'kilimanjaro', name: 'Kilimanjaro', category: 'Modern', isActive: true },
+      { id: 'tanzanitePro', name: 'Tanzanite Pro', category: 'Professional', isActive: true },
+      { id: 'modernSerif', name: 'Modern Serif', category: 'Modern', isActive: true }
+    ];
+
+    // Add usage stats from feedback submissions
+    const templateStats = feedbackSubmissions.reduce((acc: any, submission: any) => {
+      const templateId = submission.templateId;
+      acc[templateId] = (acc[templateId] || 0) + 1;
+      return acc;
+    }, {});
+
+    const templatesWithStats = templates.map(template => ({
+      ...template,
+      usageCount: templateStats[template.id] || 0,
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: new Date().toISOString()
+    }));
+
+    res.json({
+      templates: templatesWithStats,
+      total: templates.length
     });
   });
 
