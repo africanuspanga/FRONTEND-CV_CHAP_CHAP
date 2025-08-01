@@ -1,0 +1,204 @@
+Frontend Integration Answers - CV Chap Chap Authentication
+✅ Immediate Implementation Complete
+NEW FEATURE ADDED: Self-service account deletion endpoint
+
+URL: DELETE /api/user/delete-account
+Requires: Password confirmation for security
+Result: Deletes user account and all associated CVs/payments
+🎯 Critical Questions Answered
+1. Anonymous CV Integration
+Q: How should we pass anonymous_id during registration?
+
+Frontend Implementation:
+
+const registrationData = {
+  email: userEmail,
+  password: userPassword,
+  username: optionalUsername,
+  phone_number: optionalPhone,
+  anonymous_id: localStorage.getItem('anonymous_cv_id') // Pass this!
+};
+const response = await fetch('/api/auth/register', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(registrationData)
+});
+Q: What happens to anonymous CVs when they expire?
+
+Backend Status: No automatic expiration currently - anonymous CVs persist until linked to accounts. Recommendation: Implement cleanup job for CVs older than 30 days.
+
+2. Password Reset Flow
+Q: Do you send actual emails/SMS?
+
+Current Status: Returns reset tokens directly in API response (development mode)
+
+{
+  "message": "Password reset instructions sent",
+  "reset_token": "jwt-token-here"
+}
+Production Implementation Needed:
+
+Replace direct token return with actual email/SMS sending
+Use services like SendGrid, Twilio, or AWS SES
+Q: Token expiry time?
+
+Answer: 1 hour (3600 seconds) for reset tokens
+
+3. Profile Management
+Q: Can users change email address?
+
+Answer: YES - via PUT /api/user/profile
+
+const updateProfile = {
+  email: "newemail@example.com",
+  username: "newusername",
+  phone_number: "+255123456789"
+};
+const response = await fetch('/api/user/profile', {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${jwtToken}`
+  },
+  body: JSON.stringify(updateProfile)
+});
+Q: Username validation rules?
+
+Current Status: Minimal validation (no length limits, no uniqueness requirement) Recommendation: Add username uniqueness and length validation
+
+4. Account Deletion (NEW FEATURE)
+Q: Should we add self-service account deletion?
+
+Answer: ✅ IMPLEMENTED NOW
+
+Frontend Implementation:
+
+const deleteAccount = async (password) => {
+  const response = await fetch('/api/user/delete-account', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${jwtToken}`
+    },
+    body: JSON.stringify({ password })
+  });
+  
+  if (response.ok) {
+    // Clear all local storage and redirect to homepage
+    localStorage.clear();
+    window.location.href = '/';
+  }
+};
+Q: What happens to user CVs?
+
+Answer: Cascade deletion - all CVs and payments automatically deleted
+
+5. Token Management
+Q: Token refresh vs force re-login?
+
+Current: Force re-login after 24 hours (no refresh tokens) Token Storage: Store JWT securely in localStorage/sessionStorage Header Format: Authorization: Bearer <jwt-token>
+
+Frontend Token Handling:
+
+// Store token after login/registration
+localStorage.setItem('jwt_token', response.access_token);
+// Include in API calls
+const headers = {
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+};
+// Handle token expiration (401 responses)
+if (response.status === 401) {
+  localStorage.removeItem('jwt_token');
+  window.location.href = '/login';
+}
+Q: Remember-me functionality?
+
+Current: Not implemented (all tokens expire in 24h)
+
+🔧 Complete API Reference for Frontend
+Authentication Endpoints
+// 1. REGISTRATION
+POST /api/auth/register
+{
+  "email": "required",
+  "password": "required",
+  "username": "optional", 
+  "phone_number": "optional",
+  "anonymous_id": "optional_for_cv_linking"
+}
+// 2. LOGIN (Email OR Phone)
+POST /api/auth/login  
+{
+  "email": "user@example.com", // OR use "phone_number" or "identifier"
+  "password": "password123"
+}
+// 3. LOGOUT
+POST /api/auth/logout
+// Headers: Authorization: Bearer <token>
+// 4. GET CURRENT USER
+GET /api/auth/me
+// Headers: Authorization: Bearer <token>
+// 5. FORGOT PASSWORD
+POST /api/auth/forgot-password
+{
+  "email": "user@example.com" // OR "phone_number"
+}
+// 6. RESET PASSWORD
+POST /api/auth/reset-password
+{
+  "token": "reset-token-from-previous-call",
+  "new_password": "newpassword123"
+}
+Profile Management Endpoints
+// 1. GET PROFILE
+GET /api/user/profile
+// Headers: Authorization: Bearer <token>
+// 2. UPDATE PROFILE
+PUT /api/user/profile
+{
+  "email": "optional",
+  "username": "optional", 
+  "phone_number": "optional",
+  "password": "optional"
+}
+// 3. CHANGE PASSWORD
+POST /api/user/change-password
+{
+  "current_password": "required",
+  "new_password": "required"
+}
+// 4. DELETE ACCOUNT (NEW!)
+DELETE /api/user/delete-account
+{
+  "password": "required_for_confirmation"
+}
+// 5. GET USER'S CVS
+GET /api/user/cvs?is_paid=true&template_id=jijenge
+// Headers: Authorization: Bearer <token>
+🚨 Frontend Integration Checklist
+✅ Must Implement:
+JWT Token Storage & Headers: Store tokens securely, include in all protected requests
+Anonymous CV Linking: Pass anonymous_id during registration
+Token Expiration Handling: Redirect to login on 401 responses
+Profile Management: Implement all profile update features
+Account Deletion: Add secure account deletion with password confirmation
+⚠️ Backend Improvements Needed:
+Email/SMS Integration: Replace direct token return with actual messaging
+Username Validation: Add uniqueness and length requirements
+Anonymous CV Cleanup: Implement automatic cleanup for old anonymous CVs
+Refresh Tokens: Consider implementing for better UX
+🧪 Testing Your Integration
+Test Accounts:
+
+Admin: admin@cvchapchap.com / admin123
+Create test users via registration endpoint
+Key Test Cases:
+
+Registration with anonymous CV linking
+Login with email vs phone number
+Profile updates (email change, password change)
+Account deletion flow
+Token expiration handling
+Password reset flow
+The backend authentication system is now complete with self-service account deletion. All endpoints are fully functional and ready for frontend integration.
