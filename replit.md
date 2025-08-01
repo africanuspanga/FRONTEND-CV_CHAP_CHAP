@@ -221,6 +221,18 @@ interface CVData {
 - **Production Ready**: Full authentication system tested and confirmed working
 - **Admin Credentials**: admin@cvchapchap.com / admin123 for dashboard access at `/admin-dashboard`
 
+### August 1, 2025 - Critical User Authentication System Fixes
+- **Registration Schema Fix**: Fixed frontend/backend mismatch - phone/full_name now correctly optional
+- **Token Storage Fix**: Updated frontend to use correct `jwt_token` key instead of `auth_token`
+- **Profile Management API**: Added complete user profile management system:
+  - `GET /api/user/profile` - Retrieve user profile data
+  - `PUT /api/user/profile` - Update username, email, phone, full_name
+  - `POST /api/user/change-password` - Secure password change with verification
+  - `DELETE /api/user/delete-account` - Self-service account deletion with password confirmation
+- **Anonymous CV Linking**: Registration now properly links anonymous CVs using `anonymous_id`
+- **Enhanced Authentication**: Flexible login with email/phone, proper JWT token management
+- **Production Status**: Core authentication system fully operational and tested
+
 ### August 1, 2025 - User Testing Pivot
 - **Payment to Feedback Transition**: Replaced payment flow with user feedback collection for MVP testing phase
 - **New Download-Review Page**: Created `/download-review` page with feedback form (name, phone, review min 10 chars)

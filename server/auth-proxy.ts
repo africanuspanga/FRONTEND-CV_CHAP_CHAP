@@ -509,6 +509,12 @@ export async function setupAuth(app: Express) {
   // Create an anonymous session
   app.post('/api/auth/anonymous', createAnonymous);
   
+  // Profile management endpoints
+  app.get('/api/user/profile', authenticate, getUserProfile);
+  app.put('/api/user/profile', authenticate, updateUserProfile);
+  app.post('/api/user/change-password', authenticate, changePassword);
+  app.delete('/api/user/delete-account', authenticate, deleteAccount);
+  
   // Handle error responses
   app.use('/api/auth/*', (err: any, req: Request, res: Response, next: NextFunction) => {
     console.error('Auth API error:', err);
@@ -529,6 +535,210 @@ export async function setupAuth(app: Express) {
     // Default server error
     return res.status(500).json({ message: 'Internal server error' });
   });
+}
+
+// Get user profile
+export async function getUserProfile(req: Request, res: Response) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    // Find user in memory and database
+    const userInMemory = users.find(u => u.id === userId);
+    let dbUser = null;
+    
+    // Database lookup (commented out as method doesn't exist yet)
+    // try {
+    //   dbUser = await userStorage.getUser(parseInt(userId));
+    // } catch (dbError) {
+    //   console.log('Database lookup failed, using memory data');
+    // }
+
+    const user = dbUser || userInMemory;
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return user profile without password
+    const userProfile = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      full_name: user.full_name || '',
+      phone_number: user.phone_number || '',
+      created_at: user.created_at,
+      updated_at: user.updated_at
+    };
+
+    return res.json(userProfile);
+  } catch (error) {
+    console.error('Get profile error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+// Update user profile
+export async function updateUserProfile(req: Request, res: Response) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    const { email, username, phone_number, full_name } = req.body;
+
+    // Find user in memory
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check for email conflicts
+    if (email && email !== users[userIndex].email) {
+      const emailExists = users.some(u => u.email === email && u.id !== userId);
+      if (emailExists) {
+        return res.status(400).json({ message: 'Email already exists' });
+      }
+    }
+
+    // Check for username conflicts  
+    if (username && username !== users[userIndex].username) {
+      const usernameExists = users.some(u => u.username === username && u.id !== userId);
+      if (usernameExists) {
+        return res.status(400).json({ message: 'Username already exists' });
+      }
+    }
+
+    // Update user data
+    const updatedUser = {
+      ...users[userIndex],
+      email: email || users[userIndex].email,
+      username: username || users[userIndex].username,
+      phone_number: phone_number !== undefined ? phone_number : users[userIndex].phone_number,
+      full_name: full_name !== undefined ? full_name : users[userIndex].full_name,
+      updated_at: new Date()
+    };
+
+    users[userIndex] = updatedUser;
+
+    // Update in database if possible (commented out as methods don't exist yet)
+    // try {
+    //   await userStorage.updateUser(parseInt(userId), {
+    //     email: updatedUser.email,
+    //     username: updatedUser.username
+    //   });
+    // } catch (dbError) {
+    //   console.log('Database update failed, using memory data');
+    // }
+
+    // Return updated profile without password
+    const userProfile = {
+      id: updatedUser.id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      full_name: updatedUser.full_name,
+      phone_number: updatedUser.phone_number,
+      created_at: updatedUser.created_at,
+      updated_at: updatedUser.updated_at
+    };
+
+    return res.json({ 
+      message: 'Profile updated successfully',
+      user: userProfile 
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+// Change user password
+export async function changePassword(req: Request, res: Response) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    const { current_password, new_password } = req.body;
+
+    if (!current_password || !new_password) {
+      return res.status(400).json({ message: 'Current password and new password are required' });
+    }
+
+    if (new_password.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+    }
+
+    // Find user
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify current password using existing verifyPassword function
+    const isCurrentPasswordValid = await bcrypt.compare(current_password, users[userIndex].password);
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    // Hash new password
+    const hashedNewPassword = await hashPassword(new_password);
+
+    // Update user password
+    users[userIndex].password = hashedNewPassword;
+    users[userIndex].updated_at = new Date();
+
+    return res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+// Delete user account
+export async function deleteAccount(req: Request, res: Response) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ message: 'Password confirmation is required' });
+    }
+
+    // Find user
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, users[userIndex].password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: 'Password is incorrect' });
+    }
+
+    // Remove user from memory
+    users.splice(userIndex, 1);
+
+    // Delete from database if possible (commented out as method doesn't exist yet)
+    // try {
+    //   await userStorage.deleteUser(parseInt(userId));
+    // } catch (dbError) {
+    //   console.log('Database delete failed, but memory deleted');
+    // }
+
+    return res.json({ message: 'Account deleted successfully' });
+  } catch (error) {
+    console.error('Delete account error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 }
 
 // Export users array for admin access

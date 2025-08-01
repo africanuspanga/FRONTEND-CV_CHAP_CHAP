@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ['user'],
     queryFn: async () => {
       try {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('jwt_token');
         if (!token) return null;
 
         // Create headers with authorization token
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         if (response.status === 401) {
-          localStorage.removeItem('auth_token');
+          localStorage.removeItem('jwt_token');
           return null;
         }
 
@@ -115,8 +115,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await response.json();
     },
     onSuccess: (data) => {
-      // Store token in localStorage
-      localStorage.setItem('auth_token', data.token);
+      // Store token in localStorage with correct key
+      localStorage.setItem('jwt_token', data.token);
       
       // Update user data
       queryClient.setQueryData(['user'], data.user);
@@ -155,8 +155,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await response.json();
     },
     onSuccess: (data) => {
-      // Store token in localStorage
-      localStorage.setItem('auth_token', data.token);
+      // Store token in localStorage with correct key
+      localStorage.setItem('jwt_token', data.token);
       
       // Update user data
       queryClient.setQueryData(['user'], data.user);
@@ -178,7 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('jwt_token');
       
       if (token) {
         const response = await fetch('/api/auth/logout', {
@@ -197,8 +197,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return null;
     },
     onSuccess: () => {
-      // Remove token from localStorage
-      localStorage.removeItem('auth_token');
+      // Remove token from localStorage with correct key
+      localStorage.removeItem('jwt_token');
       
       // Clear user data
       queryClient.setQueryData(['user'], null);
@@ -216,7 +216,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       // Clear local data anyway to prevent being stuck in a bad state
-      localStorage.removeItem('auth_token');
+      localStorage.removeItem('jwt_token');
       queryClient.setQueryData(['user'], null);
     },
   });

@@ -19,12 +19,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 
-// Define the registration form schema
+// Define the registration form schema - matching backend (phone/full_name optional)
 const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  full_name: z.string().min(1, "Full name is required"),
-  phone_number: z.string().min(1, "Phone number is required"),
+  full_name: z.string().optional(),
+  phone_number: z.string().optional(),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -51,14 +51,26 @@ export default function Register() {
       // Create username from email if not provided
       const username = values.email.split('@')[0];
       
-      // Prepare the form data
-      const formData = {
+      // Prepare the form data - only include optional fields if they have values
+      const formData: any = {
         username,
         email: values.email,
         password: values.password,
-        full_name: values.full_name,
-        phone_number: values.phone_number,
       };
+      
+      // Add anonymous CV linking if available
+      const anonymousId = localStorage.getItem('anonymous_cv_id');
+      if (anonymousId) {
+        formData.anonymous_id = anonymousId;
+      }
+      
+      // Only include optional fields if they have values
+      if (values.full_name && values.full_name.trim()) {
+        formData.full_name = values.full_name;
+      }
+      if (values.phone_number && values.phone_number.trim()) {
+        formData.phone_number = values.phone_number;
+      }
       
       await register(formData);
       // Navigate to home if registration is successful
