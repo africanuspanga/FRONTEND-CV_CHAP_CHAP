@@ -210,3 +210,13 @@ interface CVData {
   - Removed automatic pre-filling of phone number (+255793166375) from personal info form
   - Updated USSD payment support contact to +255793166375 with WhatsApp integration
   - Phone collection now only happens during payment flow, not in CV creation
+
+### August 1, 2025 - User Testing Pivot
+- **Payment to Feedback Transition**: Replaced payment flow with user feedback collection for MVP testing phase
+- **New Download-Review Page**: Created `/download-review` page with feedback form (name, phone, review min 10 chars)
+- **Backend API**: Added `/api/submit-feedback` endpoint for collecting user testing data
+- **USSD Payment Storage**: Moved complete USSD payment implementation to `/client/src/pages/payment-flow/ussd-payment-stored.tsx`
+- **Route Updates**: Final preview now redirects to `/download-review` instead of `/ussd-payment`
+- **In-Memory Storage**: Feedback submissions stored in memory with `/api/feedback-submissions` endpoint for retrieval
+- **Future Implementation**: USSD payment flow preserved with documentation for easy re-activation
+- **User Experience**: Seamless flow from CV creation → preview → feedback → PDF download

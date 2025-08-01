@@ -728,6 +728,77 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
     }
   });
 
+  // In-memory feedback storage (for testing phase)  
+  const feedbackSubmissions: any[] = [];
+
+  // Feedback submission endpoint for user testing
+  app.post("/api/submit-feedback", upload.none(), async (req, res) => {
+    console.log('Received feedback submission:', req.body);
+    
+    try {
+      const { name, phone, review, templateId, cvName, submissionDate } = req.body;
+      
+      // Validate required fields
+      if (!name || !phone || !review) {
+        return res.status(400).json({
+          success: false,
+          error: 'Name, phone, and review are required'
+        });
+      }
+      
+      // Validate review length
+      if (review.length < 10) {
+        return res.status(400).json({
+          success: false,
+          error: 'Review must be at least 10 characters long'
+        });
+      }
+      
+      // Create feedback entry
+      const feedbackEntry = {
+        id: uuidv4(),
+        name: name.trim(),
+        phone: phone.trim(),
+        review: review.trim(),
+        templateId: templateId || 'unknown',
+        cvName: cvName || 'Unknown User',
+        submissionDate: submissionDate || new Date().toISOString(),
+        submittedAt: new Date().toISOString()
+      };
+      
+      // Store in memory (for testing - later will store in Excel/database)
+      feedbackSubmissions.push(feedbackEntry);
+      
+      console.log(`Feedback submitted by ${name} for template ${templateId}:`);
+      console.log(`Review: ${review}`);
+      console.log(`Phone: ${phone}`);
+      console.log(`Total feedback entries: ${feedbackSubmissions.length}`);
+      
+      // Return success response
+      res.status(200).json({
+        success: true,
+        message: 'Feedback submitted successfully',
+        feedbackId: feedbackEntry.id
+      });
+      
+    } catch (error: any) {
+      console.error('Error submitting feedback:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error while submitting feedback'
+      });
+    }
+  });
+
+  // Endpoint to retrieve all feedback (for admin/testing purposes)
+  app.get("/api/feedback-submissions", (req, res) => {
+    res.json({
+      success: true,
+      submissions: feedbackSubmissions,
+      total: feedbackSubmissions.length
+    });
+  });
+
   // Create HTTP server
   const httpServer = createServer(app);
   

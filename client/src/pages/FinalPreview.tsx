@@ -292,7 +292,7 @@ const FinalPreview = () => {
     updateFormField('templateId', id);
   };
   
-  // Handle CV download (initiate payment and redirect to payment page)
+  // Handle CV download (redirect to review page for user testing)
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
@@ -300,12 +300,12 @@ const FinalPreview = () => {
         updateFormField('templateId', currentTemplateId);
       }
       sessionStorage.setItem('cv_template_id', currentTemplateId);
-      navigate('/ussd-payment');
+      navigate('/download-review');
     } catch (error) {
-      console.error("Error proceeding to payment:", error);
+      console.error("Error proceeding to download:", error);
       toast({
         title: "Error",
-        description: "There was a problem proceeding to payment.",
+        description: "There was a problem proceeding to download.",
         variant: "destructive"
       });
       setIsDownloading(false);
