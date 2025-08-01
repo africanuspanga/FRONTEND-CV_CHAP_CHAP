@@ -214,9 +214,23 @@ const DownloadReviewPage: React.FC = () => {
 
     } catch (error) {
       console.error('Submission/download error:', error);
+      
+      // Show user-friendly error message
+      let errorMessage = "There was a problem creating your CV. Please try again.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes('500')) {
+          errorMessage = "Our CV generation service is temporarily unavailable. Please try again in a few moments.";
+        } else if (error.message.includes('400')) {
+          errorMessage = "There was an issue with your CV data. Please check your information and try again.";
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = "Network connection issue. Please check your internet and try again.";
+        }
+      }
+      
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "There was a problem processing your request. Please try again.",
+        title: "CV Download Failed",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

@@ -657,8 +657,37 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
         });
       }
       
-      // Make sure cv_data has the minimum required fields
-      if (!cv_data.name || !cv_data.email || !cv_data.personalInfo) {
+      // Clean and validate cv_data to prevent API errors
+      const cleanedCVData = {
+        ...cv_data,
+        // Ensure all required fields exist and are properly formatted
+        name: cv_data.name || `${cv_data.personalInfo?.firstName || ''} ${cv_data.personalInfo?.lastName || ''}`.trim() || 'Unknown',
+        email: cv_data.email || cv_data.personalInfo?.email || 'example@email.com',
+        personalInfo: {
+          firstName: cv_data.personalInfo?.firstName || '',
+          lastName: cv_data.personalInfo?.lastName || '',
+          email: cv_data.personalInfo?.email || cv_data.email || 'example@email.com',
+          phone: cv_data.personalInfo?.phone || '',
+          professionalTitle: cv_data.personalInfo?.professionalTitle || 'Professional',
+          address: cv_data.personalInfo?.address || '',
+          summary: cv_data.personalInfo?.summary || '',
+          ...cv_data.personalInfo
+        },
+        // Ensure arrays exist
+        workExperiences: Array.isArray(cv_data.workExperiences) ? cv_data.workExperiences : [],
+        workExp: Array.isArray(cv_data.workExp) ? cv_data.workExp : [],
+        education: Array.isArray(cv_data.education) ? cv_data.education : [],
+        skills: Array.isArray(cv_data.skills) ? cv_data.skills : [],
+        languages: Array.isArray(cv_data.languages) ? cv_data.languages : [],
+        references: Array.isArray(cv_data.references) ? cv_data.references : [],
+        certifications: Array.isArray(cv_data.certifications) ? cv_data.certifications : [],
+        projects: Array.isArray(cv_data.projects) ? cv_data.projects : [],
+        websites: Array.isArray(cv_data.websites) ? cv_data.websites : [],
+        accomplishments: Array.isArray(cv_data.accomplishments) ? cv_data.accomplishments : []
+      };
+
+      // Final validation
+      if (!cleanedCVData.name || !cleanedCVData.email || !cleanedCVData.personalInfo) {
         return res.status(400).json({
           success: false,
           error: 'cv_data must include name, email, and personalInfo'
@@ -666,11 +695,12 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
       }
       
       console.log(`Generating PDF for template: ${template_id}`);
+      console.log('Cleaned CV data keys:', Object.keys(cleanedCVData));
       
       // Use the new simplified API endpoint
       const apiUrl = `https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/generate-and-download`;
       
-      // Make the request to the PDF API
+      // Make the request to the PDF API with cleaned data
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -680,7 +710,7 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
         },
         body: JSON.stringify({
           template_id,
-          cv_data
+          cv_data: cleanedCVData
         })
       });
       
