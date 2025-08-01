@@ -220,5 +220,10 @@ interface CVData {
 - **Google Sheets Integration**: Feedback submissions automatically sent to Google Sheets via Apps Script web app
 - **Dual Storage**: Feedback stored both in Google Sheets (permanent) and in-memory (backup)
 - **Apps Script URL**: `https://script.google.com/macros/s/AKfycbw1jI1tdqrLfG9XnHGBgXr946MyHzGjvBQwIAqv7nbOL7MsQZPiu3PJj3WVUi38XAG1/exec`
+- **Android Mobile Layout Fix**: Fixed Final Preview page layout issues on Android devices (Infinix, etc.)
+  - Changed container positioning from fixed to relative with proper scrolling
+  - Added responsive spacing and safe area handling for Android navigation bars
+  - Improved download button visibility and touch responsiveness
+  - Enhanced viewport meta tag and touch optimization
 - **Future Implementation**: USSD payment flow preserved with documentation for easy re-activation
 - **User Experience**: Seamless flow from CV creation → preview → feedback → PDF download

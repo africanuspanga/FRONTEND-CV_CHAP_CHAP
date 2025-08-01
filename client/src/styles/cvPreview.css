@@ -82,24 +82,23 @@ html, body {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    overflow: hidden;
-    position: fixed;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
+    overflow-y: auto; /* Allow vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    position: relative; /* Changed from fixed to relative */
+    padding-bottom: 2rem; /* Add bottom padding for safe area */
   }
 
   .mobile-cv-header {
     width: 100%;
-    padding: 1.5rem 1rem;
+    padding: 1rem 1rem 0.5rem 1rem; /* Reduced padding */
     text-align: center;
+    flex-shrink: 0; /* Prevent header from shrinking */
   }
 
   .mobile-cv-header h2 {
-    font-size: 2rem;
+    font-size: 1.75rem; /* Slightly smaller */
     font-weight: 800;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem; /* Reduced margin */
     background: linear-gradient(to right, #ffffff, #e2e8f0);
     -webkit-background-clip: text;
     background-clip: text;
@@ -110,22 +109,24 @@ html, body {
   .action-buttons {
     display: flex;
     justify-content: center;
+    gap: 0.5rem; /* Add gap between buttons */
     width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem; /* Reduced margin */
     padding: 0 1rem;
+    flex-shrink: 0; /* Prevent buttons from shrinking */
   }
 
   .action-buttons button {
-    width: 80%;
-    padding: 0.85rem;
+    flex: 1; /* Make buttons equal width */
+    max-width: 140px; /* Limit button width */
+    padding: 0.75rem 0.5rem; /* Adjusted padding */
     border-radius: 999px;
-    font-size: 1.1rem;
+    font-size: 0.95rem; /* Slightly smaller font */
     font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    /* Improved gradient styling */
+    gap: 0.25rem; /* Smaller gap */
     background: linear-gradient(135deg, #2563eb, #1e40af);
     color: white;
     border: none;
@@ -140,25 +141,26 @@ html, body {
 
   .mobile-cv-card {
     width: 90%;
+    max-width: 350px; /* Limit maximum width */
     aspect-ratio: 794 / 1123;
     background: white;
     position: relative;
     overflow: hidden;
-    margin: 1rem 0;
+    margin: 0.5rem 0; /* Reduced margin */
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    max-width: 100%;
+    flex-shrink: 0; /* Prevent card from shrinking */
   }
 
   .scaled-preview {
     transform: scale(0.35);
-    transform-origin: top center; /* Changed from top left to top center for better centering */
+    transform-origin: top center;
     width: 794px;
     height: 1123px;
     position: absolute;
     top: 0;
-    left: 50%; /* Center the template */
-    margin-left: -397px; /* Half of the width to center properly */
+    left: 50%;
+    margin-left: -397px;
   }
 
   .mobile-cv-watermark {
@@ -175,9 +177,11 @@ html, body {
   }
 
   .download-button {
-    margin-top: auto;
-    margin-bottom: 1.5rem;
     width: 90%;
+    max-width: 350px; /* Match card width */
+    margin-top: 1rem; /* Fixed margin instead of auto */
+    margin-bottom: 2rem; /* Safe area for bottom */
+    flex-shrink: 0; /* Prevent button from shrinking */
   }
 
   .download-button button {
@@ -195,10 +199,62 @@ html, body {
     font-size: 1.1rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s, box-shadow 0.2s;
+    min-height: 52px; /* Ensure minimum touch target */
   }
   
   .download-button button:active {
     transform: translateY(1px);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .download-button button:disabled {
+    opacity: 0.7;
+    transform: none;
+  }
+}
+
+/* Specific fixes for Android devices with soft navigation bars */
+@media (max-width: 768px) and (max-height: 900px) {
+  .mobile-cv-wrapper {
+    padding-bottom: 3rem; /* Extra padding for devices with navigation bars */
+  }
+  
+  .download-button {
+    margin-bottom: 3rem; /* Extra margin for safe area */
+  }
+}
+
+/* Additional fixes for very small screens (like older Android phones) */
+@media (max-width: 768px) and (max-height: 700px) {
+  .mobile-cv-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .mobile-cv-card {
+    margin: 0.25rem 0;
+  }
+  
+  .action-buttons button {
+    padding: 0.65rem 0.4rem;
+    font-size: 0.85rem;
+  }
+  
+  .download-button {
+    margin-top: 0.75rem;
+    margin-bottom: 4rem; /* Even more space for very small screens */
+  }
+}
+
+/* Ensure download button is always visible and clickable */
+@media (max-width: 768px) {
+  .download-button {
+    position: relative;
+    z-index: 1000;
+  }
+  
+  .download-button button {
+    touch-action: manipulation; /* Improve touch responsiveness on Android */
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
   }
 }
