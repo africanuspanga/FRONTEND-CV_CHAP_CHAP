@@ -756,18 +756,42 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
       
       // Create feedback entry
       const feedbackEntry = {
-        id: uuidv4(),
+        feedbackId: uuidv4(),
         name: name.trim(),
         phone: phone.trim(),
         review: review.trim(),
         templateId: templateId || 'unknown',
         cvName: cvName || 'Unknown User',
-        submissionDate: submissionDate || new Date().toISOString(),
-        submittedAt: new Date().toISOString()
+        submissionDate: submissionDate || new Date().toISOString()
       };
       
-      // Store in memory (for testing - later will store in Excel/database)
+      // Store in memory (backup)
       feedbackSubmissions.push(feedbackEntry);
+      
+      // Send to Google Sheets via Apps Script
+      const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbw1jI1tdqrLfG9XnHGBgXr946MyHzGjvBQwIAqv7nbOL7MsQZPiu3PJj3WVUi38XAG1/exec';
+      
+      try {
+        const googleResponse = await fetch(googleAppsScriptUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(feedbackEntry)
+        });
+        
+        const googleResult = await googleResponse.json();
+        console.log('Google Sheets response:', googleResult);
+        
+        if (googleResult.success) {
+          console.log(`✅ Feedback sent to Google Sheets successfully for ${name}`);
+        } else {
+          console.warn('⚠️ Google Sheets submission failed:', googleResult.error);
+        }
+      } catch (googleError: any) {
+        console.error('❌ Error sending to Google Sheets:', googleError.message);
+        // Continue with local storage even if Google Sheets fails
+      }
       
       console.log(`Feedback submitted by ${name} for template ${templateId}:`);
       console.log(`Review: ${review}`);
@@ -778,7 +802,7 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
       res.status(200).json({
         success: true,
         message: 'Feedback submitted successfully',
-        feedbackId: feedbackEntry.id
+        feedbackId: feedbackEntry.feedbackId
       });
       
     } catch (error: any) {

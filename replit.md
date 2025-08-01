@@ -217,6 +217,8 @@ interface CVData {
 - **Backend API**: Added `/api/submit-feedback` endpoint for collecting user testing data
 - **USSD Payment Storage**: Moved complete USSD payment implementation to `/client/src/pages/payment-flow/ussd-payment-stored.tsx`
 - **Route Updates**: Final preview now redirects to `/download-review` instead of `/ussd-payment`
-- **In-Memory Storage**: Feedback submissions stored in memory with `/api/feedback-submissions` endpoint for retrieval
+- **Google Sheets Integration**: Feedback submissions automatically sent to Google Sheets via Apps Script web app
+- **Dual Storage**: Feedback stored both in Google Sheets (permanent) and in-memory (backup)
+- **Apps Script URL**: `https://script.google.com/macros/s/AKfycbw1jI1tdqrLfG9XnHGBgXr946MyHzGjvBQwIAqv7nbOL7MsQZPiu3PJj3WVUi38XAG1/exec`
 - **Future Implementation**: USSD payment flow preserved with documentation for easy re-activation
 - **User Experience**: Seamless flow from CV creation → preview → feedback → PDF download
