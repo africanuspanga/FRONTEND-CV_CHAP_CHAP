@@ -1,100 +1,158 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
-
-interface ErrorBoundaryProps {
-  children: ReactNode;
-  fallback?: ReactNode;
-  onReset?: () => void;
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
-}
+import React, { Component, ReactNode } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertTriangle, RefreshCw, Home, Bug } from "lucide-react";
 
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
+  errorInfo: string | null;
 }
 
-/**
- * ErrorBoundary component to catch JavaScript errors anywhere in the child component tree.
- * It displays a fallback UI instead of crashing the whole app.
- */
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+}
+
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
-      error: null
+      error: null,
+      errorInfo: null,
     };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    // Update state so the next render will show the fallback UI
     return {
       hasError: true,
-      error
+      error,
+      errorInfo: null,
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log the error to console and call onError callback if provided
-    console.error('Error caught by ErrorBoundary:', error, errorInfo);
-    
-    // Report error to monitoring service or custom handler
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    this.setState({
+      error,
+      errorInfo: errorInfo.componentStack || null,
+    });
+
+    // Call custom error handler if provided
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
-  }
 
-  resetErrorBoundary = (): void => {
-    // Reset the error state
-    this.setState({
-      hasError: false,
-      error: null
-    });
-    
-    // Call the onReset callback if provided
-    if (this.props.onReset) {
-      this.props.onReset();
+    // Log error to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
   }
 
-  render(): ReactNode {
+  handleRetry = () => {
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null,
+    });
+  };
+
+  handleGoHome = () => {
+    window.location.href = '/';
+  };
+
+  handleReload = () => {
+    window.location.reload();
+  };
+
+  render() {
     if (this.state.hasError) {
-      // If a custom fallback is provided, use it
+      // Custom fallback if provided
       if (this.props.fallback) {
         return this.props.fallback;
       }
-      
-      // Otherwise, use the default error UI
+
+      // Default error UI
       return (
-        <div className="p-6 max-w-md mx-auto bg-white rounded-lg shadow-md dark:bg-gray-800">
-          <div className="flex flex-col items-center text-center">
-            <AlertTriangle className="h-12 w-12 text-yellow-500 mb-4" />
-            <h2 className="text-xl font-bold mb-2 dark:text-white">Something went wrong</h2>
-            
-            <div className="mt-2 mb-4 p-3 bg-gray-100 dark:bg-gray-700 rounded text-left overflow-auto max-h-60 w-full">
-              <p className="text-sm text-gray-800 dark:text-gray-300 font-mono">
-                {this.state.error?.message || 'Unknown error occurred'}
-              </p>
-            </div>
-            
-            <Button 
-              onClick={this.resetErrorBoundary}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Try Again
-            </Button>
-            
-            <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-              If this problem persists, try reloading the page or clearing your browser storage.
-            </p>
-          </div>
+        <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-2xl shadow-xl">
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto mb-4 p-3 bg-red-100 rounded-full w-fit">
+                <AlertTriangle className="h-8 w-8 text-red-600" />
+              </div>
+              <CardTitle className="text-2xl text-red-800">Something went wrong</CardTitle>
+              <CardDescription className="text-red-600">
+                We encountered an unexpected error. Don't worry, your data is safe.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Error Details (Development only) */}
+              {process.env.NODE_ENV === 'development' && this.state.error && (
+                <div className="bg-gray-100 p-4 rounded-lg border">
+                  <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <Bug className="h-4 w-4" />
+                    Error Details (Development Mode)
+                  </h4>
+                  <div className="text-sm text-gray-700 space-y-2">
+                    <div>
+                      <strong>Error:</strong> {this.state.error.message}
+                    </div>
+                    {this.state.errorInfo && (
+                      <div>
+                        <strong>Component Stack:</strong>
+                        <pre className="text-xs mt-1 bg-gray-200 p-2 rounded overflow-auto">
+                          {this.state.errorInfo}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Recovery Actions */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <Button 
+                  onClick={this.handleRetry}
+                  variant="default"
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Try Again
+                </Button>
+                
+                <Button 
+                  onClick={this.handleReload}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Reload Page
+                </Button>
+                
+                <Button 
+                  onClick={this.handleGoHome}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Home className="h-4 w-4" />
+                  Go Home
+                </Button>
+              </div>
+
+              {/* Help Text */}
+              <div className="text-center text-sm text-gray-600 pt-4 border-t">
+                <p>If this problem persists, please contact our support team.</p>
+                <p className="mt-1">
+                  WhatsApp: <a href="https://wa.me/255793166375" className="text-blue-600 hover:underline">+255 793 166 375</a>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       );
     }
 
-    // If there's no error, render children normally
     return this.props.children;
   }
 }

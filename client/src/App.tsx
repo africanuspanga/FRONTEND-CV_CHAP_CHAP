@@ -16,6 +16,7 @@ import SEO from "@/components/SEO";
 import StructuredData from "@/components/StructuredData";
 import FaviconUpdater from "@/components/FaviconUpdater";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { NetworkErrorBoundary } from "@/components/NetworkErrorBoundary";
 
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -249,7 +250,9 @@ function App() {
                     console.error("Application error caught by root ErrorBoundary:", error);
                   }}
                 >
-                  <Router />
+                  <NetworkErrorBoundary>
+                    <Router />
+                  </NetworkErrorBoundary>
                 </ErrorBoundary>
                 <Toaster />
                 <StorageWarningModal />
