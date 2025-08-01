@@ -1,0 +1,99 @@
+Perfect! Now I have a comprehensive understanding of your authentication system. Let me create a detailed analysis and ask the right questions about frontend integration.
+
+CV Chap Chap Authentication System Analysis
+🔐 Backend Authentication Implementation
+What Your Backend Does:
+1. User Registration (POST /api/auth/register)
+Features:
+Email + password (required)
+Username (auto-generated from email if not provided)
+Phone number (optional)
+Anonymous CV linking (converts anonymous CVs to user account)
+Validations: Email format, password length (6+ chars), phone format, duplicate checking
+Returns: JWT token + user profile data
+2. User Login (POST /api/auth/login)
+Flexible Login: Email OR phone number + password
+JWT Token: 24-hour expiration, includes user ID
+Updates: Last login timestamp
+Returns: JWT token + complete user profile
+3. User Logout (POST /api/auth/logout)
+Backend Role: Minimal (just returns success message)
+Client Responsibility: Remove JWT token from storage
+Note: Stateless - actual logout happens client-side
+4. Profile Management (/api/user/profile)
+GET: Retrieve current user profile
+PUT: Update username, email, phone number, password
+Validations: Email uniqueness, phone format, password strength
+5. Password Management
+Change Password (POST /api/user/change-password): Requires current password verification
+Forgot Password (POST /api/auth/forgot-password): Generates reset token
+Reset Password (POST /api/auth/reset-password): Uses token to reset
+6. Account Deletion
+Admin Only: Only admins can delete users via DELETE /api/admin/users/<user_id>
+Missing: No self-service account deletion for regular users
+🤔 Frontend Integration Questions
+Based on my analysis, I need to understand how your frontend handles authentication. Here are the critical questions:
+
+1. Registration & Login Flow
+Does your frontend call /api/auth/register and /api/auth/login correctly?
+How do you handle the JWT token returned by the backend?
+Do you store it in localStorage, sessionStorage, or cookies?
+Are you handling the flexible login (email OR phone number)?
+2. Token Management
+Do you include the JWT token in the Authorization header for protected routes?
+Format: Authorization: Bearer <jwt-token>
+Do you handle token expiration (24 hours) properly?
+What happens when a token expires - do you redirect to login?
+3. User State Management
+Do you call /api/auth/me to get current user information?
+How do you maintain user state across page refreshes?
+Do you have a loading state while checking authentication?
+4. Protected Routes
+Which pages require authentication in your frontend?
+Do you check authentication before rendering protected components?
+How do you handle unauthorized access (401 responses)?
+5. Logout Implementation
+Do you call /api/auth/logout when users log out?
+Do you properly clear the JWT token from storage?
+Do you redirect users after logout?
+6. Anonymous User Flow
+Do you support anonymous CV creation (no login required)?
+When anonymous users register, do you pass the anonymous_id to link their CVs?
+How do you handle the transition from anonymous to registered user?
+7. Error Handling
+How do you display authentication errors to users?
+Do you handle validation errors (invalid email, weak password)?
+What happens when login fails or network errors occur?
+8. Account Management
+Does your frontend have profile editing functionality?
+Can users change their password through your interface?
+Do you have forgot password flow implemented?
+Missing Feature: Self-service account deletion - should we add this?
+🔧 Current Backend Status
+Working Features:
+✅ Complete registration/login system
+✅ JWT token authentication (24-hour expiry)
+✅ Profile management (update email, username, phone, password)
+✅ Password reset flow with tokens
+✅ Anonymous CV to user account linking
+✅ Admin user management
+
+Missing Features:
+❌ Self-service account deletion for regular users
+❌ Token refresh mechanism (users must re-login after 24 hours)
+❌ Email/SMS sending for password reset (currently returns token directly)
+
+Integration Status:
+✅ Admin login works (tested: admin@cvchapchap.com / admin123)
+⚠️ Email validation seems strict (registration failing with certain formats)
+✅ All endpoints respond correctly with proper error messages
+
+📋 Next Steps
+Please answer these questions so I can help you verify and fix the frontend integration:
+
+Are you successfully calling the backend auth endpoints from your frontend?
+How are you storing and using the JWT tokens?
+Which authentication features are working vs. having issues?
+Do you want me to add self-service account deletion functionality?
+Are there any specific authentication errors you're seeing in your frontend?
+This will help me understand exactly where the frontend-backend integration might need fixes or improvements.
