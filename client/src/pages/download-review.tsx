@@ -362,7 +362,7 @@ const DownloadReviewPage: React.FC = () => {
             ) : (
               <>
                 <Download className="h-5 w-5 mr-2" />
-                Submit Feedback & Download CV
+                Submit & Download CV
               </>
             )}
           </Button>
