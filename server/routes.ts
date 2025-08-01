@@ -914,6 +914,27 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
     }
   });
 
+  // Admin current user endpoint
+  app.get("/api/admin/me", adminAuth, async (req, res) => {
+    try {
+      // Return the decoded user from the JWT token (set by adminAuth middleware)
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: 'User not found in token' });
+      }
+      
+      res.json({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      });
+    } catch (error: any) {
+      console.error('Admin current user error:', error);
+      res.status(500).json({ message: 'Failed to get current user' });
+    }
+  });
+
   // Admin API endpoints
   app.get("/api/admin/stats", adminAuth, async (req, res) => {
     try {

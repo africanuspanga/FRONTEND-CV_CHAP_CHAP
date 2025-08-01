@@ -51,21 +51,7 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
           return;
         }
         
-        // Check if it's our mock admin token
-        if (token.startsWith('mock-admin-token-')) {
-          // Create a mock admin user
-          const mockUser = {
-            id: '1',
-            username: 'admin',
-            email: 'admin@cvchapchap.com',
-            role: 'administrator'
-          };
-          setUser(mockUser);
-          setIsLoading(false);
-          return;
-        }
-        
-        // If not our mock token, use the API
+        // Validate token with the API
         try {
           const userData = await makeAdminApiCall(ADMIN_API.CURRENT_USER);
           if (userData) {
@@ -96,50 +82,32 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
       setError(null);
       setIsLoading(true);
       
-      // Check for the special admin credentials
-      if (username === 'admin@cvchapchap.com' && password === 'admin123') {
-        // Create a mock admin user and token
-        const mockToken = 'mock-admin-token-' + Date.now();
-        const mockUser = {
-          id: '1',
-          username: 'admin',
-          email: 'admin@cvchapchap.com',
-          role: 'administrator'
-        };
-        
-        // Store the token and user data
-        localStorage.setItem('admin_access_token', mockToken);
-        setUser(mockUser);
-        
-        toast({
-          title: 'Login successful',
-          description: `Welcome back, Admin!`,
-        });
-        return true;
+      // Use the real API to login
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.message || 'Login failed');
+        return false;
       }
+
+      const data = await response.json();
       
-      // If not the special admin, try the regular API
-      try {
-        const response = await makeAdminApiCall(ADMIN_API.LOGIN, {
-          method: 'POST',
-          body: JSON.stringify({ username, password }),
-        });
-        
-        if (response && response.token) {
-          localStorage.setItem('admin_access_token', response.token);
-          setUser(response.user);
-          toast({
-            title: 'Login successful',
-            description: `Welcome back, ${response.user.username}!`,
-          });
-          return true;
-        } else {
-          throw new Error('Invalid login response');
-        }
-      } catch (error) {
-        // If both admin login and API login fail, throw error
-        throw new Error('Invalid credentials');
-      }
+      // Store the real token and user data
+      localStorage.setItem('admin_access_token', data.token);
+      setUser(data.user);
+      
+      toast({
+        title: 'Login successful',
+        description: `Welcome back, ${data.user.username}!`,
+      });
+      return true;
     } catch (error) {
       console.error('Login error:', error);
       setError(error instanceof Error ? error.message : 'Login failed');
