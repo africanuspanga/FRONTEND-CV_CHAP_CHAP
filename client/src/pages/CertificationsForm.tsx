@@ -8,8 +8,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useCVForm } from '@/contexts/cv-form-context';
 import { Helmet } from 'react-helmet';
 import { Certification } from '@shared/schema';
-import '../styles/mobile-form.css';
-import '../styles/android-optimizations.css';
 
 const CertificationsForm = () => {
   const [, navigate] = useLocation();

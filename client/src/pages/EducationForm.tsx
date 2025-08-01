@@ -22,8 +22,6 @@ import LocationInput from '@/components/LocationInput';
 import UniversityInput from '@/components/UniversityInput';
 import FieldOfStudyInput from '@/components/FieldOfStudyInput';
 import ReactConfetti from 'react-confetti';
-import '../styles/mobile-form.css';
-import '../styles/android-optimizations.css';
 
 const EducationForm = () => {
   const [, navigate] = useLocation();

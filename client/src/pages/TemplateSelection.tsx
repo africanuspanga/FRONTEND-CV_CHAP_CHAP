@@ -5,7 +5,6 @@ import { useCVData } from '@/hooks/useCVData';
 import TemplateSelectionGrid from '@/components/TemplateSelectionGrid';
 import { getAllTemplates } from '@/lib/templates-registry';
 import { sortTemplatesByPriority } from '@/lib/template-priority';
-import '../styles/android-optimizations.css';
 
 const TemplateSelection = () => {
   const [, navigate] = useLocation();

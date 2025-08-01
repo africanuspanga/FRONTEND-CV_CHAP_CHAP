@@ -21,7 +21,6 @@ import JobTitleInput from '@/components/JobTitleInput';
 import LocationInput from '@/components/LocationInput';
 import { navigateWithScrollReset } from '@/lib/navigation-utils';
 import '../styles/mobile-form.css';
-import '../styles/android-optimizations.css';
 
 const WorkExperienceForm = () => {
   const [, navigate] = useLocation();

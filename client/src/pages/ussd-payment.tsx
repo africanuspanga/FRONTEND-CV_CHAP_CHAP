@@ -8,7 +8,6 @@ import { useCVRequest } from '@/contexts/cv-request-context';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import ReactConfetti from 'react-confetti';
-import '../styles/android-optimizations.css';
 
 const USSDPaymentPage: React.FC = () => {
   // State for SMS input and verification
@@ -418,7 +417,7 @@ const USSDPaymentPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto py-3 sm:py-5 px-2 sm:px-4 max-w-lg android-optimized">
+    <div className="container mx-auto py-3 sm:py-5 px-2 sm:px-4 max-w-lg">
       {/* Confetti effect when payment is verified */}
       {showConfetti && (
         <ReactConfetti
@@ -575,24 +574,22 @@ const USSDPaymentPage: React.FC = () => {
               </Alert>
             )}
             
-            <div className="ussd-verify-button">
-              <Button 
-                onClick={handleVerifyPayment} 
-                className="w-full bg-primary hover:bg-primary/90 py-6 text-lg font-semibold rounded-md"
-                disabled={isVerifying || 
-                  // Always verify SMS for any request ID - disabled bypass completely
-                  (paymentReference.length < 140 || paymentReference.length > 170) || 
-                  isLoading || 
-                  isPending}
-              >
+            <Button 
+              onClick={handleVerifyPayment} 
+              className="w-full bg-primary hover:bg-primary/90 py-6 text-lg font-semibold rounded-md"
+              disabled={isVerifying || 
+                // Always verify SMS for any request ID - disabled bypass completely
+                (paymentReference.length < 140 || paymentReference.length > 170) || 
+                isLoading || 
+                isPending}
+            >
               {isVerifying ? (
                 <>
                   <div className="h-5 w-5 border-2 border-white/50 border-t-white rounded-full animate-spin mr-3"></div>
                   <span className="text-lg">Inahakiki Malipo...</span>
                 </>
               ) : <span className="text-lg font-medium flex items-center"><CheckCircle2 className="h-5 w-5 mr-2" /> Hakiki Malipo</span>}
-              </Button>
-            </div>
+            </Button>
           </>
         )}
       </div>
