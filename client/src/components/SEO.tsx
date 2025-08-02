@@ -35,6 +35,11 @@ const pageMeta: Record<string, MetaData> = {
     title: 'CV Templates – Choose Modern Resume Designs | CV Chap Chap',
     description: 'Explore beautiful, job-ready CV templates for every profession. Tailored for East African job markets. Just fill in your info and download in seconds!'
   },
+  // How to Write a CV Guide
+  '/how-to-write-cv': {
+    title: 'How to Write a CV in 2025 – Complete Guide with Examples | CV Chap Chap',
+    description: 'Learn how to write a professional CV with our step-by-step guide. Includes CV examples, templates, and tips for Tanzania, Kenya, and Uganda job seekers.'
+  },
   // Admin Dashboard (no-index)
   '/admin-dashboard': {
     title: 'Admin Dashboard | CV Chap Chap',
