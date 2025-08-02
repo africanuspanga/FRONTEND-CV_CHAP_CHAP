@@ -45,6 +45,9 @@ const Footer: React.FC = () => {
             <h3 className="font-medium text-darkText mb-4">Support</h3>
             <ul className="space-y-2 text-sm">
               <li>
+                <Link href="/how-to-write-cv" className="text-lightText hover:text-primary">How to Write a CV</Link>
+              </li>
+              <li>
                 <Link href="/faq" className="text-lightText hover:text-primary">FAQ</Link>
               </li>
               <li>

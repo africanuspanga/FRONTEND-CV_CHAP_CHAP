@@ -46,6 +46,7 @@ import About from "@/pages/About";
 import WhyUs from "@/pages/WhyUs";
 import Contact from "@/pages/Contact";
 import FAQ from "@/pages/FAQ";
+import HowToWriteCV from "@/pages/HowToWriteCV";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import UserProfile from "@/pages/UserProfile";
@@ -205,6 +206,7 @@ function Router() {
                 <Route path="/why-us" component={WhyUs} />
                 <Route path="/contact" component={Contact} />
                 <Route path="/faq" component={FAQ} />
+                <Route path="/how-to-write-cv" component={HowToWriteCV} />
                 <Route path="/login" component={Login} />
                 <Route path="/register" component={Register} />
                 <ProtectedRoute path="/profile" component={UserProfile} />
