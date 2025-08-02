@@ -1,0 +1,105 @@
+Great — here’s a **Next.js-specific favicon checklist and implementation guide** your frontend engineer can follow to make sure the favicon appears both in the browser tab **and eventually in Google search results**.
+
+---
+
+## ✅ Favicon Setup Checklist for **Next.js**
+
+### 📁 1. **Place the favicon file correctly**
+
+* [ ] Add your favicon file (`favicon.ico` or `favicon.png`) to the `/public` folder.
+
+  ```
+  /public/favicon.ico
+  ```
+
+This ensures it’s served from:
+
+```
+https://cvchapchap.com/favicon.ico
+```
+
+---
+
+### 🧠 2. **Add favicon to `<Head>` in `_app.js`**
+
+In `pages/_app.js` or if using a custom `_document.js`, include this inside the `<Head>` tag:
+
+```jsx
+// pages/_app.js
+import Head from 'next/head';
+
+function MyApp({ Component, pageProps }) {
+  return (
+    <>
+      <Head>
+        <link rel="icon" href="/favicon.ico" />
+        {/* Optional: Add PNG or Apple icon support */}
+        {/* <link rel="icon" type="image/png" href="/favicon.png" /> */}
+        {/* <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" /> */}
+      </Head>
+      <Component {...pageProps} />
+    </>
+  );
+}
+
+export default MyApp;
+```
+
+---
+
+### 🚫 3. **robots.txt — Do NOT block the favicon**
+
+In `public/robots.txt`, make sure there is **no disallow** for the favicon path:
+
+```txt
+User-agent: *
+Allow: /favicon.ico
+```
+
+If you don’t have a `robots.txt` file, you can skip this step — Google will assume access is allowed.
+
+---
+
+### 🧪 4. **Test in browser**
+
+* [ ] Run the site: `npm run dev` or deploy
+* [ ] Visit `http://localhost:3000` or production URL
+* [ ] Confirm the favicon appears in the browser tab
+* [ ] Also visit: `https://cvchapchap.com/favicon.ico` — it should open/download the image
+
+---
+
+### 🧠 5. **Ask Google to Reindex**
+
+* [ ] Go to [Google Search Console](https://search.google.com/search-console)
+* [ ] Use the **URL Inspection** tool
+* [ ] Enter your homepage: `https://cvchapchap.com`
+* [ ] Click **Request Indexing**
+
+---
+
+### 🧼 6. **Clear cache if needed**
+
+If the favicon doesn’t update:
+
+* [ ] Clear browser cache
+* [ ] Hard refresh (`Cmd + Shift + R` on Mac or `Ctrl + F5` on Windows)
+* [ ] Invalidate CDN or Vercel cache (if deployed there)
+
+---
+
+### ✅ Bonus: Optional extended icons
+
+If you want your site to look great on all devices:
+
+```html
+<link rel="icon" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" sizes="192x192" href="/android-chrome-192x192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+```
+
+These can also go in `<Head>` in `_app.js`.
+
+---
+
+Let me know if you’d like a Vercel deployment cache-clear tip or if you want me to generate the favicon files from your logo.
