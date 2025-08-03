@@ -33,6 +33,7 @@ The application emphasizes **frontend-independent CV creation** for optimal perf
 *   **OpenAI API**: For AI-enhanced CV content suggestions.
 *   **Selcom API**: For mobile money payment processing (currently replaced by feedback collection for MVP testing).
 *   **Google Sheets**: For collecting user feedback via Apps Script web app.
+*   **Google Analytics**: GA4 tracking (G-GWFZGCYSJG) for comprehensive user behavior analytics.
 *   **Stripe**: An alternative payment processing integration (optional).
 *   **Neon Database**: Serverless PostgreSQL option (optional).
 *   **Replit Database**: For development environment storage (optional).
