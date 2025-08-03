@@ -13,7 +13,7 @@ const pageMeta: Record<string, MetaData> = {
   // Home Page
   '/': {
     title: 'CV Chap Chap – Make a CV Fast and Get Hired even Faster',
-    description: 'Create a professional CV in minutes! CV Chap Chap helps job seekers across Tanzania, Kenya, and Uganda build and download modern, job-ready CVs instantly.'
+    description: 'Create a professional CV in minutes with CV Chap Chap! The leading CV builder for job seekers across Tanzania, Kenya, and Uganda. Build modern, job-ready CVs instantly with our expert templates and guided process.'
   },
   // About Page
   '/about': {

@@ -35,9 +35,9 @@ export default function GreatStartPage({ onboardingInsights }: GreatStartPagePro
           <div className="w-16 h-16 bg-[#E5EAFF] rounded-full flex items-center justify-center mx-auto mb-4">
             <Trophy className="w-8 h-8 text-[#034694]" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
             You're off to a great start!
-          </h1>
+          </h2>
           <p className="text-lg text-gray-600">
             Here's what we found in your CV and how we'll help you improve
           </p>

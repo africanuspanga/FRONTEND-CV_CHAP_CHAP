@@ -29,9 +29,9 @@ export default function ChooseMethodPage() {
 
         {/* Main Heading */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Let's Create Your Professional CV
-          </h1>
+          </h2>
           <p className="text-lg text-gray-600">
             Choose from our expertly designed templates and get step-by-step guidance
           </p>

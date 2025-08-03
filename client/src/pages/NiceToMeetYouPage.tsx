@@ -55,9 +55,9 @@ export default function NiceToMeetYouPage({ onboardingInsights }: NiceToMeetYouP
 
               {/* Content Section */}
               <div className="flex-1 text-center md:text-left">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                   Nice to meet you!
-                </h1>
+                </h2>
 
                 <div className="space-y-4 text-lg text-gray-700 mb-8">
                   <p>
