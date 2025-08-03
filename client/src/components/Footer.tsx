@@ -67,17 +67,17 @@ const Footer: React.FC = () => {
             <h3 className="font-medium text-darkText mb-4">Connect</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#" className="text-lightText hover:text-primary flex items-center">
-                  <FiTwitter className="mr-2" /> Twitter
+                <a href="https://x.com/africanusz" target="_blank" rel="noopener noreferrer" className="text-lightText hover:text-primary flex items-center">
+                  <FiTwitter className="mr-2" /> X (Twitter)
                 </a>
               </li>
               <li>
-                <a href="#" className="text-lightText hover:text-primary flex items-center">
+                <a href="https://www.instagram.com/driftmark_labs/" target="_blank" rel="noopener noreferrer" className="text-lightText hover:text-primary flex items-center">
                   <FiInstagram className="mr-2" /> Instagram
                 </a>
               </li>
               <li>
-                <a href="#" className="text-lightText hover:text-primary flex items-center">
+                <a href="https://www.linkedin.com/company/driftmark-technologies/" target="_blank" rel="noopener noreferrer" className="text-lightText hover:text-primary flex items-center">
                   <FiLinkedin className="mr-2" /> LinkedIn
                 </a>
               </li>
