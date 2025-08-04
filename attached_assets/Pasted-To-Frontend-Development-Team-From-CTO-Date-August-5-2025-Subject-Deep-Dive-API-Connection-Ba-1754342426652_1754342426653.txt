@@ -1,0 +1,34 @@
+To: Frontend Development Team
+From: CTO
+Date: August 5, 2025
+Subject: Deep Dive: API Connection & Backend Integration
+
+Team,
+
+To clear up some confusion regarding our API connections and backend stability, I need you to do a deep dive and provide me with a very detailed, technical explanation of how the frontend communicates with the backend APIs. This will help me and the backend team troubleshoot issues more effectively.
+
+Please answer the following questions in as much detail as possible, with code snippets, configuration files, or logs where appropriate.
+
+1. API Endpoint Configuration
+Primary Backend URL: Where is the primary backend API URL stored in the frontend codebase? Is it a hardcoded string, an environment variable (e.g., .env), a configuration file, or something else? Please provide the exact path and file name.
+
+Fallback/Development URLs: Are there any secondary or fallback API URLs configured? If so, what are they and under what conditions does the frontend switch to using them? This is especially important for understanding why the Replit backend might be used sometimes.
+
+2. API Request Logic
+Fetch/Axios Configuration: What library are we using to make API calls (e.g., fetch, axios)? Please provide an example of a core API call function (e.g., for uploading a CV or downloading a PDF).
+
+Error Handling: Please detail the full error handling logic for API calls. When a request fails, what information is logged, and what does the user see?
+
+Request/Response Interceptors: Are there any global interceptors or middleware on API requests or responses? What do they do (e.g., adding authentication headers, handling generic errors)?
+
+3. PDF Download Process
+Endpoint: What is the exact API endpoint URL that the frontend calls to initiate a PDF download?
+
+Request Method: What HTTP method is used (e.g., GET, POST)?
+
+Download Method: How is the downloaded file handled on the frontend? Is it using a standard browser download, a blob, or something else? Please provide a code snippet of this process.
+
+4. Environment Variables
+Deployment Environment: For our production deployment (which appears to be on Railway), what environment variables are used to set the backend URL, and how are they configured on the hosting platform?
+
+I need this information to ensure that our troubleshooting efforts are focused on the correct backend and that our frontend is resilient to potential backend downtime. Thank you for your detailed and prompt response.
