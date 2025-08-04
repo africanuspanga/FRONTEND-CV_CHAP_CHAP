@@ -179,8 +179,8 @@ const UploadCVFlow: React.FC<UploadCVFlowProps> = ({ onCVParsed }) => {
     // Navigate to processing page immediately
     setLocation('/upload/processing');
     
-    // Call the external CV parsing API directly (more efficient)
-    fetch('https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/sync-upload-cv-file', {
+    // Call the production CV parsing API directly (more efficient)
+    fetch('https://cv-screener-africanuspanga.replit.app/api/sync-upload-cv-file', {
       method: 'POST',
       body: formData
     })

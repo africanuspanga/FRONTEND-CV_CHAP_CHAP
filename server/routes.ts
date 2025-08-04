@@ -70,8 +70,8 @@ async function processUploadedCV(jobId: string, file: Express.Multer.File) {
     // Convert file buffer to base64
     const fileBase64 = file.buffer.toString('base64');
     
-    // Call external CV parsing API
-    const parseResponse = await fetch('https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/upload-cv-file', {
+    // Call production CV parsing API
+    const parseResponse = await fetch('https://cv-screener-africanuspanga.replit.app/api/upload-cv-file', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
