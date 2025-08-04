@@ -39,7 +39,7 @@ import SummaryEditor from "@/pages/SummaryEditor";
 import ReferencesForm from "@/pages/ReferencesForm";
 import AdditionalSectionsForm from "@/pages/AdditionalSectionsForm";
 import FinalPreview from "@/pages/FinalPreview";
-import DownloadReviewPage from "@/pages/download-review";
+
 import PaymentPage from "@/pages/payment-page";
 import USSDPaymentPage from "@/pages/ussd-payment";
 import About from "@/pages/About";
@@ -146,11 +146,7 @@ function Router() {
             <USSDPaymentPage />
           </div>
         </Route>
-        <Route path="/download-review">
-          <div className="container">
-            <DownloadReviewPage />
-          </div>
-        </Route>
+
         
         {/* All other routes with navbar and footer */}
         <Route>
