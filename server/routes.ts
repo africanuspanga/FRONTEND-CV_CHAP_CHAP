@@ -719,12 +719,17 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
       if (!response.ok) {
         let errorText = '';
         try {
-          // Try to parse as JSON first
-          const errorJson = await response.json();
-          errorText = errorJson.error || response.statusText;
-        } catch {
-          // If not JSON, get as text
-          errorText = await response.text();
+          // Try to get error details from response
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const errorJson = await response.json();
+            errorText = errorJson.error || errorJson.message || response.statusText;
+          } else {
+            errorText = await response.text();
+          }
+        } catch (parseError) {
+          // If we can't parse the error, use status text
+          errorText = response.statusText || `HTTP ${response.status}`;
         }
         
         console.error(`PDF generation API error (${response.status}): ${errorText}`);
