@@ -31,9 +31,14 @@ The application emphasizes **frontend-independent CV creation** for optimal perf
 
 *   **PostgreSQL**: Primary database.
 *   **OpenAI API**: For AI-enhanced CV content suggestions.
-*   **Selcom API**: For mobile money payment processing (currently replaced by feedback collection for MVP testing).
+*   **Selcom API**: For mobile money payment processing via USSD/SMS validation.
 *   **Google Sheets**: For collecting user feedback via Apps Script web app.
 *   **Google Analytics**: GA4 tracking (G-GWFZGCYSJG) for comprehensive user behavior analytics.
 *   **Stripe**: An alternative payment processing integration (optional).
 *   **Neon Database**: Serverless PostgreSQL option (optional).
 *   **Replit Database**: For development environment storage (optional).
+
+## Recent Changes
+
+*   **August 5, 2025**: Restored USSD payment flow - removed download-review testing page and returned to payment-required model where users must pay via SMS before downloading CVs.
+*   **August 5, 2025**: Created comprehensive CV Template Developer Guide with complete data structure documentation and live data injection specifications for future template development.
