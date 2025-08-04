@@ -698,8 +698,8 @@ Sitemap: https://cvchapchap.com/sitemap.xml`;
       console.log(`Generating PDF for template: ${template_id}`);
       console.log('Cleaned CV data keys:', Object.keys(cleanedCVData));
       
-      // Use the new simplified API endpoint
-      const apiUrl = `https://d04ef60e-f3c3-48d8-b8be-9ad9e052ce72-00-2mxe1kvkj9bcx.picard.replit.dev/api/generate-and-download`;
+      // Use the production API endpoint
+      const apiUrl = `https://cv-screener-africanuspanga.replit.app/api/generate-and-download`;
       
       // Make the request to the PDF API with cleaned data
       const response = await fetch(apiUrl, {
