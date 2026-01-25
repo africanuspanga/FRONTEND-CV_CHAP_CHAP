@@ -1,0 +1,979 @@
+This is excellent. Now I have full clarity. Let me revise the strategy based on what you've told me.
+
+---
+
+# 🎯 Revised Strategy: CV Chap Chap V2
+
+## Key Decisions Based on Your Answers
+
+| Question | Answer | Impact on Build |
+|----------|--------|-----------------|
+| Live users? | No | ✅ Clean slate - no migration needed |
+| External API yours? | Yes (Flask/WeasyPrint) | ✅ We have the PDF logic - just port it |
+| Templates | Create new ones | ✅ Faster - no conversion work |
+| Supabase ready | Yes | ✅ Can start immediately |
+| CV Upload | Can wait | ✅ Reduces scope for MVP |
+| Selcom webhook | Have instructions | ✅ Proper payment flow possible |
+
+## New Architecture (Simplified)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    CV CHAP CHAP V2                          │
+│                  (Single Vercel Project)                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│   Next.js 14 App                                            │
+│   ├── Marketing Pages (Landing, Pricing)                    │
+│   ├── CV Builder (Multi-step form)                          │
+│   ├── API Routes                                            │
+│   │   ├── /api/ai/* (OpenAI proxy)                         │
+│   │   ├── /api/cv/* (CRUD)                                 │
+│   │   ├── /api/pdf/generate (WeasyPrint or React-PDF)      │
+│   │   └── /api/payment/* (Selcom integration)              │
+│   └── Auth (Supabase)                                       │
+│                                                              │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│   Supabase                                                  │
+│   ├── Auth (Email, Phone, OAuth)                           │
+│   ├── PostgreSQL (Users, CVs, Payments)                    │
+│   └── Storage (Generated PDFs)                              │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## PDF Generation Decision
+
+Your Flask backend uses **WeasyPrint** - which is Python-only and won't run on Vercel's Node.js serverless functions.
+
+**Options:**
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **A. React-PDF** | Pure JS, runs on Vercel | Need to rebuild templates |
+| **B. Puppeteer + HTML** | Can reuse HTML template structure | Heavy, needs workaround for Vercel |
+| **C. External PDF microservice** | Use existing Flask, proven | Another service to maintain |
+
+**My Recommendation:** Option A (React-PDF) since you want new templates anyway. It's cleaner, faster, and everything stays in one codebase.
+
+---
+
+# 📋 Build Plan: 2-Week Sprint to Launch
+
+## Week 1: Core Infrastructure
+
+### Day 1-2: Project Setup + Database
+### Day 3-4: Auth + CV Form
+### Day 5-7: Templates + PDF Generation
+
+## Week 2: Payments + Polish
+
+### Day 8-9: Selcom Payment Integration
+### Day 10-11: Testing + Bug Fixes
+### Day 12-14: Deploy + Launch
+
+---
+
+# 🚀 SPRINT STARTS NOW
+
+## Day 1: Project Foundation
+
+### Task 1: Create the Next.js Project
+
+Engineer should run:
+
+```bash
+# Create project
+npx create-next-app@latest cv-chap-chap-v2 \
+  --typescript \
+  --tailwind \
+  --eslint \
+  --app \
+  --src-dir \
+  --import-alias "@/*"
+
+cd cv-chap-chap-v2
+
+# Core dependencies
+npm install @supabase/supabase-js @supabase/ssr
+npm install @react-pdf/renderer @react-pdf/font
+npm install openai
+npm install zod react-hook-form @hookform/resolvers
+npm install framer-motion
+npm install lucide-react
+npm install date-fns uuid nanoid
+npm install zustand  # Simpler than Context for this use case
+
+# Dev dependencies
+npm install -D @types/uuid
+
+# shadcn/ui setup
+npx shadcn@latest init
+```
+
+When shadcn prompts:
+- Style: **New York**
+- Base color: **Zinc**
+- CSS variables: **Yes**
+
+Then add components:
+```bash
+npx shadcn@latest add button input label card dialog select toast form tabs progress badge separator skeleton textarea
+```
+
+---
+
+### Task 2: Create Environment File
+
+Create `.env.local`:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# OpenAI
+OPENAI_API_KEY=your_openai_key
+
+# Selcom (add these later)
+SELCOM_API_KEY=
+SELCOM_API_SECRET=
+SELCOM_VENDOR_ID=
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+---
+
+### Task 3: Create Folder Structure
+
+```bash
+cd cv-chap-chap-v2
+
+# Create all directories
+mkdir -p src/app/\(marketing\)
+mkdir -p src/app/\(builder\)/template
+mkdir -p src/app/\(builder\)/personal
+mkdir -p src/app/\(builder\)/experience
+mkdir -p src/app/\(builder\)/education
+mkdir -p src/app/\(builder\)/skills
+mkdir -p src/app/\(builder\)/summary
+mkdir -p src/app/\(builder\)/preview
+mkdir -p src/app/\(builder\)/payment
+mkdir -p src/app/api/ai/summary
+mkdir -p src/app/api/ai/enhance-job
+mkdir -p src/app/api/ai/suggest-skills
+mkdir -p src/app/api/cv
+mkdir -p src/app/api/cv/\[id\]
+mkdir -p src/app/api/pdf
+mkdir -p src/app/api/payment/initiate
+mkdir -p src/app/api/payment/verify
+mkdir -p src/app/api/payment/webhook
+mkdir -p src/app/auth/login
+mkdir -p src/app/auth/register
+mkdir -p src/app/auth/callback
+mkdir -p src/components/ui
+mkdir -p src/components/forms
+mkdir -p src/components/templates/preview
+mkdir -p src/components/templates/pdf
+mkdir -p src/lib/supabase
+mkdir -p src/lib/pdf
+mkdir -p src/lib/ai
+mkdir -p src/lib/payment
+mkdir -p src/stores
+mkdir -p src/types
+mkdir -p src/hooks
+```
+
+---
+
+### Task 4: Core Type Definitions
+
+Create `src/types/cv.ts`:
+
+```typescript
+// src/types/cv.ts
+
+export interface PersonalInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  professionalTitle: string;
+  location: string;
+  linkedin?: string;
+  website?: string;
+}
+
+export interface WorkExperience {
+  id: string;
+  jobTitle: string;
+  company: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  isCurrent: boolean;
+  achievements: string[];
+}
+
+export interface Education {
+  id: string;
+  degree: string;
+  institution: string;
+  fieldOfStudy: string;
+  graduationDate: string;
+}
+
+export interface Skill {
+  id: string;
+  name: string;
+  level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+}
+
+export interface Language {
+  id: string;
+  name: string;
+  proficiency: 'basic' | 'conversational' | 'fluent' | 'native';
+}
+
+export interface Reference {
+  id: string;
+  name: string;
+  title: string;
+  company: string;
+  phone: string;
+  email: string;
+}
+
+export interface CVData {
+  personalInfo: PersonalInfo;
+  summary: string;
+  workExperiences: WorkExperience[];
+  education: Education[];
+  skills: Skill[];
+  languages: Language[];
+  references: Reference[];
+}
+
+export interface CVDocument {
+  id: string;
+  userId: string | null;
+  anonymousId: string | null;
+  templateId: string;
+  data: CVData;
+  status: 'draft' | 'pending_payment' | 'paid' | 'downloaded';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Payment {
+  id: string;
+  cvId: string;
+  requestId: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  paymentMethod: string | null;
+  transactionId: string | null;
+  selcomReference: string | null;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+// Template configuration
+export interface TemplateConfig {
+  id: string;
+  name: string;
+  description: string;
+  previewImage: string;
+  category: 'professional' | 'modern' | 'creative' | 'simple';
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
+}
+
+export const TEMPLATES: TemplateConfig[] = [
+  {
+    id: 'classic-professional',
+    name: 'Classic Professional',
+    description: 'Clean, traditional layout perfect for corporate roles',
+    previewImage: '/templates/classic-professional.png',
+    category: 'professional',
+    colors: { primary: '#1a365d', secondary: '#2d3748', accent: '#3182ce' },
+  },
+  {
+    id: 'modern-minimal',
+    name: 'Modern Minimal',
+    description: 'Sleek design with plenty of white space',
+    previewImage: '/templates/modern-minimal.png',
+    category: 'modern',
+    colors: { primary: '#000000', secondary: '#4a5568', accent: '#667eea' },
+  },
+  {
+    id: 'kilimanjaro',
+    name: 'Kilimanjaro',
+    description: 'Bold East African inspired design',
+    previewImage: '/templates/kilimanjaro.png',
+    category: 'creative',
+    colors: { primary: '#744210', secondary: '#975a16', accent: '#d69e2e' },
+  },
+  {
+    id: 'serengeti',
+    name: 'Serengeti',
+    description: 'Warm, inviting layout with natural tones',
+    previewImage: '/templates/serengeti.png',
+    category: 'creative',
+    colors: { primary: '#652B19', secondary: '#7B341E', accent: '#C05621' },
+  },
+  {
+    id: 'dar-skyline',
+    name: 'Dar Skyline',
+    description: 'Modern urban design for tech professionals',
+    previewImage: '/templates/dar-skyline.png',
+    category: 'modern',
+    colors: { primary: '#1a202c', secondary: '#2d3748', accent: '#38b2ac' },
+  },
+  {
+    id: 'zanzibar',
+    name: 'Zanzibar',
+    description: 'Fresh, coastal-inspired professional template',
+    previewImage: '/templates/zanzibar.png',
+    category: 'professional',
+    colors: { primary: '#234E52', secondary: '#285E61', accent: '#319795' },
+  },
+];
+
+// Form step definitions
+export const CV_FORM_STEPS = [
+  { id: 'template', title: 'Choose Template', path: '/template' },
+  { id: 'personal', title: 'Personal Info', path: '/personal' },
+  { id: 'experience', title: 'Work Experience', path: '/experience' },
+  { id: 'education', title: 'Education', path: '/education' },
+  { id: 'skills', title: 'Skills', path: '/skills' },
+  { id: 'summary', title: 'Summary', path: '/summary' },
+  { id: 'preview', title: 'Preview', path: '/preview' },
+  { id: 'payment', title: 'Download', path: '/payment' },
+] as const;
+
+export type CVFormStep = typeof CV_FORM_STEPS[number]['id'];
+```
+
+---
+
+### Task 5: Supabase Client Setup
+
+Create `src/lib/supabase/client.ts`:
+
+```typescript
+import { createBrowserClient } from '@supabase/ssr';
+
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
+```
+
+Create `src/lib/supabase/server.ts`:
+
+```typescript
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+
+export async function createClient() {
+  const cookieStore = await cookies();
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Called from a Server Component
+          }
+        },
+      },
+    }
+  );
+}
+```
+
+Create `src/middleware.ts`:
+
+```typescript
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
+
+export async function middleware(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  // Refresh session if expired
+  await supabase.auth.getUser();
+
+  return supabaseResponse;
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+};
+```
+
+---
+
+### Task 6: CV Store (Zustand - simpler than Context)
+
+Create `src/stores/cv-store.ts`:
+
+```typescript
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { nanoid } from 'nanoid';
+import type { CVData, WorkExperience, Education, Skill, Language, Reference, CVFormStep } from '@/types/cv';
+
+// Default empty CV
+const defaultCVData: CVData = {
+  personalInfo: {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    professionalTitle: '',
+    location: '',
+    linkedin: '',
+    website: '',
+  },
+  summary: '',
+  workExperiences: [],
+  education: [],
+  skills: [],
+  languages: [],
+  references: [],
+};
+
+interface CVStore {
+  // Data
+  cvId: string | null;
+  templateId: string;
+  cvData: CVData;
+  currentStep: CVFormStep;
+  
+  // Actions - Navigation
+  setCurrentStep: (step: CVFormStep) => void;
+  
+  // Actions - Template
+  setTemplateId: (id: string) => void;
+  
+  // Actions - Personal Info
+  updatePersonalInfo: (data: Partial<CVData['personalInfo']>) => void;
+  
+  // Actions - Summary
+  setSummary: (summary: string) => void;
+  
+  // Actions - Work Experience
+  addWorkExperience: (exp?: Partial<WorkExperience>) => void;
+  updateWorkExperience: (id: string, data: Partial<WorkExperience>) => void;
+  removeWorkExperience: (id: string) => void;
+  reorderWorkExperiences: (startIndex: number, endIndex: number) => void;
+  
+  // Actions - Education
+  addEducation: (edu?: Partial<Education>) => void;
+  updateEducation: (id: string, data: Partial<Education>) => void;
+  removeEducation: (id: string) => void;
+  
+  // Actions - Skills
+  addSkill: (skill?: Partial<Skill>) => void;
+  updateSkill: (id: string, data: Partial<Skill>) => void;
+  removeSkill: (id: string) => void;
+  setSkills: (skills: Skill[]) => void;
+  
+  // Actions - Languages
+  addLanguage: (lang?: Partial<Language>) => void;
+  updateLanguage: (id: string, data: Partial<Language>) => void;
+  removeLanguage: (id: string) => void;
+  
+  // Actions - References
+  addReference: (ref?: Partial<Reference>) => void;
+  updateReference: (id: string, data: Partial<Reference>) => void;
+  removeReference: (id: string) => void;
+  
+  // Actions - Utility
+  resetCV: () => void;
+  loadCV: (data: Partial<CVData>, templateId?: string) => void;
+  setCVId: (id: string) => void;
+}
+
+export const useCVStore = create<CVStore>()(
+  persist(
+    (set, get) => ({
+      cvId: null,
+      templateId: 'classic-professional',
+      cvData: defaultCVData,
+      currentStep: 'template',
+
+      setCurrentStep: (step) => set({ currentStep: step }),
+
+      setTemplateId: (id) => set({ templateId: id }),
+
+      updatePersonalInfo: (data) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            personalInfo: { ...state.cvData.personalInfo, ...data },
+          },
+        })),
+
+      setSummary: (summary) =>
+        set((state) => ({
+          cvData: { ...state.cvData, summary },
+        })),
+
+      // Work Experience
+      addWorkExperience: (exp) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            workExperiences: [
+              ...state.cvData.workExperiences,
+              {
+                id: nanoid(),
+                jobTitle: '',
+                company: '',
+                location: '',
+                startDate: '',
+                endDate: '',
+                isCurrent: false,
+                achievements: [],
+                ...exp,
+              },
+            ],
+          },
+        })),
+
+      updateWorkExperience: (id, data) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            workExperiences: state.cvData.workExperiences.map((exp) =>
+              exp.id === id ? { ...exp, ...data } : exp
+            ),
+          },
+        })),
+
+      removeWorkExperience: (id) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            workExperiences: state.cvData.workExperiences.filter(
+              (exp) => exp.id !== id
+            ),
+          },
+        })),
+
+      reorderWorkExperiences: (startIndex, endIndex) =>
+        set((state) => {
+          const result = Array.from(state.cvData.workExperiences);
+          const [removed] = result.splice(startIndex, 1);
+          result.splice(endIndex, 0, removed);
+          return {
+            cvData: { ...state.cvData, workExperiences: result },
+          };
+        }),
+
+      // Education
+      addEducation: (edu) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            education: [
+              ...state.cvData.education,
+              {
+                id: nanoid(),
+                degree: '',
+                institution: '',
+                fieldOfStudy: '',
+                graduationDate: '',
+                ...edu,
+              },
+            ],
+          },
+        })),
+
+      updateEducation: (id, data) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            education: state.cvData.education.map((edu) =>
+              edu.id === id ? { ...edu, ...data } : edu
+            ),
+          },
+        })),
+
+      removeEducation: (id) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            education: state.cvData.education.filter((edu) => edu.id !== id),
+          },
+        })),
+
+      // Skills
+      addSkill: (skill) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            skills: [
+              ...state.cvData.skills,
+              {
+                id: nanoid(),
+                name: '',
+                level: 'intermediate' as const,
+                ...skill,
+              },
+            ],
+          },
+        })),
+
+      updateSkill: (id, data) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            skills: state.cvData.skills.map((skill) =>
+              skill.id === id ? { ...skill, ...data } : skill
+            ),
+          },
+        })),
+
+      removeSkill: (id) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            skills: state.cvData.skills.filter((skill) => skill.id !== id),
+          },
+        })),
+
+      setSkills: (skills) =>
+        set((state) => ({
+          cvData: { ...state.cvData, skills },
+        })),
+
+      // Languages
+      addLanguage: (lang) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            languages: [
+              ...state.cvData.languages,
+              {
+                id: nanoid(),
+                name: '',
+                proficiency: 'conversational' as const,
+                ...lang,
+              },
+            ],
+          },
+        })),
+
+      updateLanguage: (id, data) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            languages: state.cvData.languages.map((lang) =>
+              lang.id === id ? { ...lang, ...data } : lang
+            ),
+          },
+        })),
+
+      removeLanguage: (id) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            languages: state.cvData.languages.filter((lang) => lang.id !== id),
+          },
+        })),
+
+      // References
+      addReference: (ref) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            references: [
+              ...state.cvData.references,
+              {
+                id: nanoid(),
+                name: '',
+                title: '',
+                company: '',
+                phone: '',
+                email: '',
+                ...ref,
+              },
+            ],
+          },
+        })),
+
+      updateReference: (id, data) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            references: state.cvData.references.map((ref) =>
+              ref.id === id ? { ...ref, ...data } : ref
+            ),
+          },
+        })),
+
+      removeReference: (id) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            references: state.cvData.references.filter((ref) => ref.id !== id),
+          },
+        })),
+
+      // Utility
+      resetCV: () =>
+        set({
+          cvId: null,
+          templateId: 'classic-professional',
+          cvData: defaultCVData,
+          currentStep: 'template',
+        }),
+
+      loadCV: (data, templateId) =>
+        set((state) => ({
+          cvData: { ...state.cvData, ...data },
+          templateId: templateId || state.templateId,
+        })),
+
+      setCVId: (id) => set({ cvId: id }),
+    }),
+    {
+      name: 'cv-chap-chap-storage',
+      partialize: (state) => ({
+        cvId: state.cvId,
+        templateId: state.templateId,
+        cvData: state.cvData,
+        currentStep: state.currentStep,
+      }),
+    }
+  )
+);
+```
+
+---
+
+### Task 7: Database Schema (Run in Supabase SQL Editor)
+
+Go to your Supabase project → SQL Editor → New Query → Run this:
+
+```sql
+-- CV Chap Chap Database Schema
+-- Run this in Supabase SQL Editor
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Profiles table (extends Supabase Auth)
+CREATE TABLE public.profiles (
+  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  phone TEXT,
+  full_name TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- CVs table
+CREATE TABLE public.cvs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  anonymous_id TEXT, -- For non-logged-in users
+  template_id TEXT NOT NULL,
+  data JSONB NOT NULL DEFAULT '{}',
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'pending_payment', 'paid', 'downloaded')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Payments table
+CREATE TABLE public.payments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  cv_id UUID REFERENCES public.cvs(id) ON DELETE CASCADE,
+  request_id TEXT UNIQUE NOT NULL, -- UUID shown to user for payment
+  amount INTEGER NOT NULL, -- Amount in smallest unit (cents/shilingi)
+  currency TEXT NOT NULL DEFAULT 'TZS',
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
+  payment_method TEXT, -- MPESA-TZ, TIGOPESA-TZ, etc.
+  transaction_id TEXT,
+  selcom_reference TEXT,
+  phone_number TEXT,
+  raw_callback JSONB, -- Store raw Selcom webhook for audit
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  completed_at TIMESTAMPTZ
+);
+
+-- Generated PDFs storage reference
+CREATE TABLE public.generated_pdfs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  cv_id UUID REFERENCES public.cvs(id) ON DELETE CASCADE,
+  storage_path TEXT NOT NULL, -- Path in Supabase Storage
+  file_size INTEGER,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for performance
+CREATE INDEX idx_cvs_user_id ON public.cvs(user_id);
+CREATE INDEX idx_cvs_anonymous_id ON public.cvs(anonymous_id);
+CREATE INDEX idx_cvs_status ON public.cvs(status);
+CREATE INDEX idx_payments_request_id ON public.payments(request_id);
+CREATE INDEX idx_payments_cv_id ON public.payments(cv_id);
+CREATE INDEX idx_payments_status ON public.payments(status);
+
+-- Row Level Security
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cvs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.generated_pdfs ENABLE ROW LEVEL SECURITY;
+
+-- Profiles: Users can only access their own profile
+CREATE POLICY "Users can view own profile" ON public.profiles
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile" ON public.profiles
+  FOR UPDATE USING (auth.uid() = id);
+
+-- CVs: Users can access their own CVs or anonymous CVs they created
+CREATE POLICY "Users can view own CVs" ON public.cvs
+  FOR SELECT USING (
+    auth.uid() = user_id OR 
+    (user_id IS NULL AND anonymous_id IS NOT NULL)
+  );
+
+CREATE POLICY "Users can insert CVs" ON public.cvs
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Users can update own CVs" ON public.cvs
+  FOR UPDATE USING (
+    auth.uid() = user_id OR 
+    (user_id IS NULL AND anonymous_id IS NOT NULL)
+  );
+
+-- Payments: Users can view payments for their CVs
+CREATE POLICY "Users can view own payments" ON public.payments
+  FOR SELECT USING (
+    cv_id IN (SELECT id FROM public.cvs WHERE user_id = auth.uid())
+  );
+
+-- Allow service role full access (for API routes)
+CREATE POLICY "Service role full access profiles" ON public.profiles
+  FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role full access cvs" ON public.cvs
+  FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role full access payments" ON public.payments
+  FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role full access pdfs" ON public.generated_pdfs
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- Function to auto-update updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Triggers for updated_at
+CREATE TRIGGER update_profiles_updated_at
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_cvs_updated_at
+  BEFORE UPDATE ON public.cvs
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Function to create profile on user signup
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, full_name)
+  VALUES (NEW.id, NEW.raw_user_meta_data->>'full_name');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to auto-create profile
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Create storage bucket for PDFs
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('cvs', 'cvs', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage policies
+CREATE POLICY "Users can upload PDFs" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'cvs');
+
+CREATE POLICY "Users can view own PDFs" ON storage.objects
+  FOR SELECT USING (bucket_id = 'cvs');
+```
+
+---
+
+## ✅ Day 1 Checklist for Engineer
+
+When complete, engineer should confirm:
+
+- [ ] Next.js project created and `npm run dev` works
+- [ ] All dependencies installed without errors
+- [ ] Folder structure created
+- [ ] `src/types/cv.ts` file in place
+- [ ] `src/lib/supabase/client.ts` and `server.ts` in place
+- [ ] `src/middleware.ts` in place
+- [ ] `src/stores/cv-store.ts` in place
+- [ ] Supabase SQL schema executed successfully
+- [ ] `.env.local` created with Supabase credentials
+
+---
+
+**Engineer: Complete these 7 tasks and report back. Once confirmed, I'll send Day 2 instructions: Building the CV Form UI + Template Selection.**
