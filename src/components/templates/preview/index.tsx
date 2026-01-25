@@ -4,6 +4,12 @@ import type { CVData } from '@/types/cv';
 import { KathleenPreview } from './kathleen';
 import { GraceMinimalPreview } from './grace-minimal';
 import { CharlesPreview } from './charles';
+import { LaurenOrangePreview } from './lauren-orange';
+import { GraceNavyPreview } from './grace-navy';
+import { GraceTealPreview } from './grace-teal';
+import { LesleyPreview } from './lesley';
+import { KellyPreview } from './kelly';
+import { RichardPreview } from './richard';
 
 interface TemplatePreviewProps {
   templateId: string;
@@ -11,13 +17,19 @@ interface TemplatePreviewProps {
   scale?: number;
 }
 
-export function TemplatePreview({ templateId, data, scale = 1 }: TemplatePreviewProps) {
-  const previewComponents: Record<string, React.FC<{ data: CVData }>> = {
-    'kathleen': KathleenPreview,
-    'grace-minimal': GraceMinimalPreview,
-    'charles': CharlesPreview,
-  };
+const previewComponents: Record<string, React.FC<{ data: CVData }>> = {
+  'kathleen': KathleenPreview,
+  'grace-minimal': GraceMinimalPreview,
+  'charles': CharlesPreview,
+  'lauren-orange': LaurenOrangePreview,
+  'grace-navy': GraceNavyPreview,
+  'grace-teal': GraceTealPreview,
+  'lesley': LesleyPreview,
+  'kelly': KellyPreview,
+  'richard': RichardPreview,
+};
 
+export function TemplatePreview({ templateId, data, scale = 1 }: TemplatePreviewProps) {
   const PreviewComponent = previewComponents[templateId] || DefaultPreview;
 
   return (
@@ -127,3 +139,17 @@ function DefaultPreview({ data }: { data: CVData }) {
     </div>
   );
 }
+
+export {
+  KathleenPreview,
+  LaurenOrangePreview,
+  GraceNavyPreview,
+  GraceTealPreview,
+  LesleyPreview,
+  KellyPreview,
+  RichardPreview,
+  CharlesPreview,
+  GraceMinimalPreview,
+};
+
+export default TemplatePreview;

@@ -1,0 +1,1310 @@
+Excellent progress. Now let me deliver the remaining templates and complete the core system.
+
+---
+
+# Day 2 Completion + Day 3: Complete Templates & PDF Generation
+
+Given the scope (21 templates × 2 versions each = 42 components), I'll provide a **systematic approach** that's maintainable:
+
+## Architecture Decision: Shared Template Components
+
+Instead of 42 separate files, we'll use a **component composition pattern**:
+
+1. **Shared building blocks** (header, sections, skills display, etc.)
+2. **Template layouts** that compose these blocks with different styles
+3. **One source of truth** for both Preview and PDF
+
+---
+
+## Task 1: Create Shared Template Building Blocks
+
+Create **`src/components/templates/shared/types.ts`**:
+
+```typescript
+import type { CVData, WorkExperience, Education, Skill, Language, Reference } from '@/types/cv';
+
+export interface TemplateProps {
+  data: CVData;
+}
+
+export interface TemplateColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  text: string;
+  lightText: string;
+  background: string;
+  sidebarBg?: string;
+}
+
+export interface TemplateStyles {
+  colors: TemplateColors;
+  fontFamily: string;
+  headerStyle: 'centered' | 'left' | 'sidebar';
+  sectionStyle: 'underline' | 'background' | 'border-left' | 'badge' | 'minimal';
+  skillStyle: 'list' | 'badges' | 'bars' | 'circles' | 'dots';
+  layout: 'single' | 'two-column' | 'sidebar-left' | 'sidebar-right';
+}
+```
+
+---
+
+Create **`src/components/templates/shared/colors.ts`**:
+
+```typescript
+import type { TemplateColors } from './types';
+
+export const templateColors: Record<string, TemplateColors> = {
+  kathleen: {
+    primary: '#E5B94E',
+    secondary: '#4B5563',
+    accent: '#E5B94E',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#F5F7FA',
+  },
+  'lauren-orange': {
+    primary: '#E07A38',
+    secondary: '#FFFFFF',
+    accent: '#E07A38',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+    sidebarBg: '#E07A38',
+  },
+  'grace-mint': {
+    primary: '#6BBFAB',
+    secondary: '#4B5563',
+    accent: '#6BBFAB',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  'grace-navy': {
+    primary: '#1E4A6D',
+    secondary: '#1E4A6D',
+    accent: '#1E4A6D',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  'grace-coral': {
+    primary: '#E85A5A',
+    secondary: '#4B5563',
+    accent: '#E85A5A',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  'grace-minimal': {
+    primary: '#6B7280',
+    secondary: '#9CA3AF',
+    accent: '#6B7280',
+    text: '#1F2937',
+    lightText: '#9CA3AF',
+    background: '#FFFFFF',
+  },
+  'grace-teal': {
+    primary: '#2AAA9E',
+    secondary: '#4B5563',
+    accent: '#2AAA9E',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  'nelly-mint': {
+    primary: '#3EB489',
+    secondary: '#4B5563',
+    accent: '#3EB489',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  'nelly-gray': {
+    primary: '#4B5563',
+    secondary: '#6B7280',
+    accent: '#4B5563',
+    text: '#1F2937',
+    lightText: '#9CA3AF',
+    background: '#FFFFFF',
+  },
+  'nelly-sidebar': {
+    primary: '#374151',
+    secondary: '#6B7280',
+    accent: '#374151',
+    text: '#1F2937',
+    lightText: '#9CA3AF',
+    background: '#FFFFFF',
+  },
+  lesley: {
+    primary: '#2B4764',
+    secondary: '#2B4764',
+    accent: '#2B4764',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  kelly: {
+    primary: '#1F2937',
+    secondary: '#4B5563',
+    accent: '#1F2937',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  'lauren-icons': {
+    primary: '#374151',
+    secondary: '#6B7280',
+    accent: '#374151',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  richard: {
+    primary: '#111827',
+    secondary: '#4B5563',
+    accent: '#111827',
+    text: '#111827',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  charles: {
+    primary: '#0891B2',
+    secondary: '#FFFFFF',
+    accent: '#0891B2',
+    text: '#1F2937',
+    lightText: '#FFFFFF',
+    background: '#FFFFFF',
+    sidebarBg: '#0891B2',
+  },
+  denice: {
+    primary: '#9B7B7B',
+    secondary: '#7B6B6B',
+    accent: '#9B7B7B',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  oliver: {
+    primary: '#E07A38',
+    secondary: '#4B5563',
+    accent: '#E07A38',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  thomas: {
+    primary: '#8ECFC8',
+    secondary: '#4B5563',
+    accent: '#8ECFC8',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+  'nelly-purple': {
+    primary: '#8B7BB5',
+    secondary: '#6B5B9A',
+    accent: '#8B7BB5',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+    sidebarBg: '#6B5B9A',
+  },
+  'aparna-dark': {
+    primary: '#1E3A5F',
+    secondary: '#2563EB',
+    accent: '#3B82F6',
+    text: '#FFFFFF',
+    lightText: '#93C5FD',
+    background: '#1E3A5F',
+  },
+  'aparna-gold': {
+    primary: '#D4A056',
+    secondary: '#92400E',
+    accent: '#D4A056',
+    text: '#1F2937',
+    lightText: '#6B7280',
+    background: '#FFFFFF',
+  },
+};
+```
+
+---
+
+## Task 2: Create All Preview Templates
+
+I'll now provide complete, pixel-perfect preview templates. Create each file:
+
+---
+
+### **`src/components/templates/preview/lauren-orange.tsx`**
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+export function LaurenOrangePreview({ data }: { data: CVData }) {
+  const { personalInfo, summary, workExperiences, education, skills } = data;
+  const color = '#E07A38';
+
+  return (
+    <div className="w-[210mm] min-h-[297mm] bg-white flex font-sans">
+      {/* Left Sidebar - Orange */}
+      <div className="w-[35%] text-white p-8" style={{ backgroundColor: color }}>
+        {/* Name */}
+        <h1 className="text-3xl font-bold leading-tight mb-1">
+          {personalInfo.firstName?.toUpperCase() || 'NOELA'}
+        </h1>
+        <h1 className="text-3xl font-bold leading-tight mb-4">
+          {personalInfo.lastName?.toUpperCase() || 'BWEMERO'}
+        </h1>
+        
+        {/* Title */}
+        <p className="text-sm font-semibold tracking-wide border-b border-white/30 pb-4 mb-6">
+          {personalInfo.professionalTitle?.toUpperCase() || 'PROFESSIONAL TITLE'}
+        </p>
+
+        {/* Contact */}
+        <div className="mb-8">
+          <h2 className="text-xs font-bold tracking-widest mb-4 border-b border-white/30 pb-2">
+            CONTACT
+          </h2>
+          <div className="space-y-2 text-sm">
+            {personalInfo.phone && (
+              <div className="flex gap-2">
+                <span className="opacity-70">[P]</span>
+                <span>{personalInfo.phone}</span>
+              </div>
+            )}
+            {personalInfo.email && (
+              <div className="flex gap-2">
+                <span className="opacity-70">[E]</span>
+                <span className="break-all">{personalInfo.email}</span>
+              </div>
+            )}
+            {personalInfo.location && (
+              <div className="flex gap-2">
+                <span className="opacity-70">[A]</span>
+                <span>{personalInfo.location}</span>
+              </div>
+            )}
+            {personalInfo.linkedin && (
+              <div className="flex gap-2">
+                <span className="opacity-70">[L]</span>
+                <span className="break-all">{personalInfo.linkedin}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Summary in Sidebar */}
+        {summary && (
+          <div className="mb-8">
+            <h2 className="text-xs font-bold tracking-widest mb-4 border-b border-white/30 pb-2">
+              SUMMARY
+            </h2>
+            <p className="text-sm leading-relaxed opacity-90">{summary}</p>
+          </div>
+        )}
+
+        {/* Education */}
+        {education.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xs font-bold tracking-widest mb-4 border-b border-white/30 pb-2">
+              EDUCATION
+            </h2>
+            {education.map((edu) => (
+              <div key={edu.id} className="mb-4">
+                <p className="text-xs opacity-70">{edu.graduationDate}</p>
+                <p className="font-semibold text-sm">{edu.degree}</p>
+                <p className="text-sm">{edu.institution}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Right Content */}
+      <div className="w-[65%] p-8">
+        {/* Professional Experience */}
+        <div className="mb-8">
+          <h2 
+            className="text-sm font-bold tracking-widest mb-4 pb-2 border-b-2"
+            style={{ color, borderColor: color }}
+          >
+            PROFESSIONAL EXPERIENCE
+          </h2>
+          
+          {workExperiences.map((exp) => (
+            <div key={exp.id} className="mb-6">
+              <p className="text-xs text-gray-500 mb-1">
+                {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
+              </p>
+              <h3 className="font-bold text-base" style={{ color }}>
+                {exp.jobTitle}
+              </h3>
+              <p className="text-sm text-gray-600 mb-2">
+                {exp.company}, {exp.location}
+              </p>
+              <ul className="space-y-1">
+                {exp.achievements.map((achievement, idx) => (
+                  <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                    <span className="text-gray-400 mt-0.5">•</span>
+                    <span>{achievement}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Skills */}
+        {skills.length > 0 && (
+          <div>
+            <h2 
+              className="text-sm font-bold tracking-widest mb-4 pb-2 border-b-2"
+              style={{ color, borderColor: color }}
+            >
+              SKILLS
+            </h2>
+            <div className="grid grid-cols-2 gap-2">
+              {skills.map((skill) => (
+                <div key={skill.id} className="text-sm flex items-center gap-2">
+                  <span className="text-gray-400">•</span>
+                  <span>{skill.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### **`src/components/templates/preview/grace-navy.tsx`**
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+export function GraceNavyPreview({ data }: { data: CVData }) {
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
+  const color = '#1E4A6D';
+
+  return (
+    <div className="w-[210mm] min-h-[297mm] bg-white font-sans p-10">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold tracking-wide mb-2" style={{ color }}>
+          {personalInfo.firstName?.toUpperCase() || 'NOELA'}{' '}
+          {personalInfo.lastName?.toUpperCase() || 'BWEMERO'}
+        </h1>
+        <p className="text-sm text-gray-600">
+          {personalInfo.location} | {personalInfo.phone} | {personalInfo.email}
+        </p>
+      </div>
+
+      {/* Professional Summary */}
+      {summary && (
+        <div className="mb-6">
+          <h2 className="text-lg font-bold mb-3" style={{ color }}>
+            Professional Summary
+          </h2>
+          <p className="text-sm leading-relaxed text-gray-700">{summary}</p>
+        </div>
+      )}
+
+      {/* Skills */}
+      {skills.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-lg font-bold mb-3" style={{ color }}>
+            Skills
+          </h2>
+          <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+            {skills.map((skill) => (
+              <div key={skill.id} className="text-sm flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
+                <span>{skill.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Work History */}
+      {workExperiences.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-lg font-bold mb-3" style={{ color }}>
+            Work History
+          </h2>
+          {workExperiences.map((exp) => (
+            <div key={exp.id} className="mb-5">
+              <div className="flex justify-between items-start mb-1">
+                <h3 className="font-bold" style={{ color }}>{exp.jobTitle}</h3>
+                <span className="text-sm" style={{ color }}>
+                  {exp.startDate} - {exp.isCurrent ? 'Current' : exp.endDate}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 mb-2">
+                {exp.company} — {exp.location}
+              </p>
+              <ul className="space-y-1">
+                {exp.achievements.map((achievement, idx) => (
+                  <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                    <span className="mt-1.5 w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                    <span>{achievement}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Education */}
+      {education.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-lg font-bold mb-3" style={{ color }}>
+            Education
+          </h2>
+          {education.map((edu) => (
+            <div key={edu.id} className="flex justify-between items-start mb-2">
+              <div>
+                <p className="font-bold">{edu.degree}</p>
+                <p className="text-sm text-gray-600">{edu.institution}</p>
+              </div>
+              <span className="text-sm" style={{ color }}>{edu.graduationDate}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Languages */}
+      {languages.length > 0 && (
+        <div>
+          <h2 className="text-lg font-bold mb-3" style={{ color }}>
+            Languages
+          </h2>
+          <div className="space-y-2">
+            {languages.map((lang) => (
+              <div key={lang.id} className="flex items-center gap-4">
+                <span className="font-semibold text-sm w-24">{lang.name}</span>
+                <span className="text-xs text-gray-500 capitalize">{lang.proficiency}</span>
+                <div className="flex-1 flex gap-1">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
+                      className="h-2 flex-1 rounded-sm"
+                      style={{
+                        backgroundColor: i <= (lang.proficiency === 'native' ? 5 : lang.proficiency === 'fluent' ? 4 : lang.proficiency === 'conversational' ? 3 : 2)
+                          ? color
+                          : '#E5E7EB',
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+### **`src/components/templates/preview/grace-teal.tsx`**
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+export function GraceTealPreview({ data }: { data: CVData }) {
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
+  const color = '#2AAA9E';
+
+  return (
+    <div className="w-[210mm] min-h-[297mm] bg-white font-sans">
+      {/* Left Border */}
+      <div className="flex">
+        <div className="w-1" style={{ backgroundColor: color }} />
+        
+        <div className="flex-1 p-8">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-3xl font-black tracking-wide text-gray-800">
+              {personalInfo.firstName?.toUpperCase() || 'NOELA'}
+            </h1>
+            <h1 className="text-3xl font-black tracking-wide text-gray-800 mb-2">
+              {personalInfo.lastName?.toUpperCase() || 'BWEMERO'}
+            </h1>
+            <p className="text-sm text-gray-600">
+              {personalInfo.email} | {personalInfo.phone}
+            </p>
+            <p className="text-sm text-gray-600">{personalInfo.location}</p>
+          </div>
+
+          {/* Professional Summary */}
+          {summary && (
+            <div className="mb-6 flex">
+              <div className="flex items-start gap-3">
+                <div className="w-3 h-3 rounded-full mt-1 flex-shrink-0" style={{ backgroundColor: color }} />
+                <div>
+                  <h2 className="text-sm font-bold tracking-widest mb-2" style={{ color }}>
+                    PROFESSIONAL SUMMARY
+                  </h2>
+                  <p className="text-sm leading-relaxed text-gray-700">{summary}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Skills */}
+          {skills.length > 0 && (
+            <div className="mb-6 flex">
+              <div className="flex items-start gap-3">
+                <div className="w-3 h-3 rounded-full mt-1 flex-shrink-0" style={{ backgroundColor: color }} />
+                <div>
+                  <h2 className="text-sm font-bold tracking-widest mb-2" style={{ color }}>
+                    SKILLS
+                  </h2>
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+                    {skills.map((skill) => (
+                      <div key={skill.id} className="text-sm flex items-center gap-2">
+                        <span>•</span>
+                        <span>{skill.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Work History */}
+          {workExperiences.length > 0 && (
+            <div className="mb-6 flex">
+              <div className="flex items-start gap-3">
+                <div className="w-3 h-3 rounded-full mt-1 flex-shrink-0" style={{ backgroundColor: color }} />
+                <div className="flex-1">
+                  <h2 className="text-sm font-bold tracking-widest mb-3" style={{ color }}>
+                    WORK HISTORY
+                  </h2>
+                  {workExperiences.map((exp) => (
+                    <div key={exp.id} className="mb-5">
+                      <div className="flex justify-between items-start mb-1">
+                        <h3 className="font-bold">{exp.jobTitle}</h3>
+                        <span className="text-sm text-gray-500 italic">
+                          {exp.startDate} - {exp.isCurrent ? 'Current' : exp.endDate}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {exp.company} - {exp.location}
+                      </p>
+                      <ul className="space-y-1">
+                        {exp.achievements.map((achievement, idx) => (
+                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                            <span className="mt-1">•</span>
+                            <span>{achievement}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Education */}
+          {education.length > 0 && (
+            <div className="mb-6 flex">
+              <div className="flex items-start gap-3">
+                <div className="w-3 h-3 rounded-full mt-1 flex-shrink-0" style={{ backgroundColor: color }} />
+                <div>
+                  <h2 className="text-sm font-bold tracking-widest mb-2" style={{ color }}>
+                    EDUCATION
+                  </h2>
+                  {education.map((edu) => (
+                    <div key={edu.id} className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="font-semibold">{edu.degree}</p>
+                        <p className="text-sm text-gray-600">{edu.institution}</p>
+                      </div>
+                      <span className="text-sm text-gray-500 italic">{edu.graduationDate}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Languages */}
+          {languages.length > 0 && (
+            <div className="flex">
+              <div className="flex items-start gap-3">
+                <div className="w-3 h-3 rounded-full mt-1 flex-shrink-0" style={{ backgroundColor: color }} />
+                <div>
+                  <h2 className="text-sm font-bold tracking-widest mb-2" style={{ color }}>
+                    LANGUAGES
+                  </h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    {languages.map((lang) => (
+                      <div key={lang.id}>
+                        <p className="font-semibold text-sm">{lang.name}</p>
+                        <div className="flex gap-1 mt-1">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <div
+                              key={i}
+                              className="h-1.5 w-6 rounded-sm"
+                              style={{
+                                backgroundColor: i <= (lang.proficiency === 'native' ? 5 : lang.proficiency === 'fluent' ? 4 : 3)
+                                  ? color
+                                  : '#E5E7EB',
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-xs text-gray-500 capitalize mt-1">{lang.proficiency}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### **`src/components/templates/preview/lesley.tsx`**
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+export function LesleyPreview({ data }: { data: CVData }) {
+  const { personalInfo, summary, workExperiences, education, skills, certifications } = data;
+  const color = '#2B4764';
+
+  return (
+    <div className="w-[210mm] min-h-[297mm] bg-white font-sans p-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold tracking-wide mb-2" style={{ color }}>
+          {personalInfo.firstName?.toUpperCase() || 'NOELA'} {personalInfo.lastName?.toUpperCase() || 'BWEMERO'}
+        </h1>
+        <p className="text-sm text-gray-600">
+          {personalInfo.email} | H: {personalInfo.phone} | {personalInfo.location}
+        </p>
+      </div>
+
+      {/* Professional Summary */}
+      {summary && (
+        <div className="flex mb-8">
+          <div 
+            className="w-40 flex-shrink-0 px-4 py-2 text-white text-xs font-bold tracking-wider"
+            style={{ backgroundColor: color }}
+          >
+            PROFESSIONAL<br />SUMMARY
+          </div>
+          <div className="flex-1 pl-6">
+            <p className="text-sm leading-relaxed text-gray-700">{summary}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Skills */}
+      {skills.length > 0 && (
+        <div className="flex mb-8">
+          <div 
+            className="w-40 flex-shrink-0 px-4 py-2 text-white text-xs font-bold tracking-wider"
+            style={{ backgroundColor: color }}
+          >
+            SKILLS
+          </div>
+          <div className="flex-1 pl-6">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+              {skills.map((skill) => (
+                <div key={skill.id} className="text-sm flex items-center gap-2">
+                  <span className="text-gray-400">•</span>
+                  <span>{skill.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Work History */}
+      {workExperiences.length > 0 && (
+        <div className="flex mb-8">
+          <div 
+            className="w-40 flex-shrink-0 px-4 py-2 text-white text-xs font-bold tracking-wider"
+            style={{ backgroundColor: color }}
+          >
+            WORK HISTORY
+          </div>
+          <div className="flex-1 pl-6">
+            {workExperiences.map((exp) => (
+              <div key={exp.id} className="mb-6">
+                <div className="flex justify-between items-start mb-1">
+                  <div>
+                    <span className="font-bold">{exp.jobTitle}</span>
+                    <span className="text-gray-600"> / {exp.company} - {exp.location}</span>
+                  </div>
+                  <span className="text-sm" style={{ color }}>
+                    {exp.startDate} - {exp.isCurrent ? 'Current' : exp.endDate}
+                  </span>
+                </div>
+                <ul className="mt-2 space-y-1">
+                  {exp.achievements.map((achievement, idx) => (
+                    <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                      <span className="text-gray-400 mt-0.5">•</span>
+                      <span>{achievement}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Education */}
+      {education.length > 0 && (
+        <div className="flex mb-8">
+          <div 
+            className="w-40 flex-shrink-0 px-4 py-2 text-white text-xs font-bold tracking-wider"
+            style={{ backgroundColor: color }}
+          >
+            EDUCATION
+          </div>
+          <div className="flex-1 pl-6">
+            {education.map((edu) => (
+              <div key={edu.id} className="mb-2">
+                <p className="text-sm text-gray-600">{edu.institution} - {edu.fieldOfStudy}</p>
+                <p className="font-bold">{edu.degree}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Certifications */}
+      {certifications && certifications.length > 0 && (
+        <div className="flex">
+          <div 
+            className="w-40 flex-shrink-0 px-4 py-2 text-white text-xs font-bold tracking-wider"
+            style={{ backgroundColor: color }}
+          >
+            CERTIFICATIONS
+          </div>
+          <div className="flex-1 pl-6">
+            {certifications.map((cert) => (
+              <div key={cert.id} className="text-sm flex items-center gap-2">
+                <span className="text-gray-400">•</span>
+                <span>{cert.name} ({cert.date})</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+### **`src/components/templates/preview/kelly.tsx`**
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+export function KellyPreview({ data }: { data: CVData }) {
+  const { personalInfo, summary, workExperiences, education, skills } = data;
+
+  return (
+    <div className="w-[210mm] min-h-[297mm] bg-white font-sans p-10">
+      {/* Header */}
+      <div className="text-center mb-6 border-b border-red-700 pb-4">
+        <h1 className="text-4xl font-bold text-gray-900 mb-1">
+          {personalInfo.firstName?.toUpperCase() || 'NOELA'} {personalInfo.lastName?.toUpperCase() || 'BWEMERO'}
+        </h1>
+        <p className="text-sm tracking-widest text-gray-600 uppercase">
+          {personalInfo.professionalTitle || 'Professional Title'}
+        </p>
+        <p className="text-sm text-gray-600 mt-2">
+          {personalInfo.phone} • {personalInfo.email} • {personalInfo.location}
+        </p>
+      </div>
+
+      {/* Summary */}
+      {summary && (
+        <p className="text-sm text-gray-700 leading-relaxed mb-6 border-b pb-4">
+          {summary}
+        </p>
+      )}
+
+      {/* Skills */}
+      {skills.length > 0 && (
+        <div className="mb-6">
+          <div className="inline-block bg-gray-100 px-3 py-1 mb-3">
+            <h2 className="text-xs font-bold tracking-widest text-gray-700">SKILLS</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+            {skills.map((skill) => (
+              <div key={skill.id} className="text-sm flex items-center gap-2">
+                <span className="text-gray-400">•</span>
+                <span>{skill.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Experience */}
+      {workExperiences.length > 0 && (
+        <div className="mb-6">
+          <div className="inline-block bg-gray-100 px-3 py-1 mb-3">
+            <h2 className="text-xs font-bold tracking-widest text-gray-700">EXPERIENCE</h2>
+          </div>
+          {workExperiences.map((exp) => (
+            <div key={exp.id} className="mb-5">
+              <div className="flex justify-between items-start mb-1">
+                <div>
+                  <h3 className="font-bold italic">{exp.jobTitle}</h3>
+                  <p className="text-sm text-gray-600 uppercase">{exp.company}, {exp.location}</p>
+                </div>
+                <span className="text-sm text-gray-500">
+                  {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
+                </span>
+              </div>
+              <ul className="mt-2 space-y-1">
+                {exp.achievements.map((achievement, idx) => (
+                  <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                    <span className="text-gray-400 mt-0.5">•</span>
+                    <span>{achievement}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Education */}
+      {education.length > 0 && (
+        <div>
+          <div className="inline-block bg-gray-100 px-3 py-1 mb-3">
+            <h2 className="text-xs font-bold tracking-widest text-gray-700">EDUCATION</h2>
+          </div>
+          {education.map((edu) => (
+            <div key={edu.id} className="flex justify-between items-start mb-2">
+              <div>
+                <h3 className="font-bold italic">{edu.degree}</h3>
+                <p className="text-sm text-gray-600">{edu.institution}, {edu.fieldOfStudy}</p>
+              </div>
+              <span className="text-sm text-gray-500">{edu.graduationDate}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+### **`src/components/templates/preview/richard.tsx`**
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+export function RichardPreview({ data }: { data: CVData }) {
+  const { personalInfo, summary, workExperiences, education, skills } = data;
+
+  return (
+    <div className="w-[210mm] min-h-[297mm] bg-white font-serif p-10">
+      {/* Header */}
+      <div className="text-center mb-6">
+        <h1 className="text-4xl mb-2">
+          {personalInfo.firstName || 'Noela'} {personalInfo.lastName || 'Bwemero'}
+        </h1>
+        <p className="text-sm tracking-[0.3em] text-gray-500 uppercase mb-4">
+          {personalInfo.professionalTitle || 'Professional Title'}
+        </p>
+        <div className="flex justify-center items-center gap-8 text-sm text-gray-600 flex-wrap">
+          <span>{personalInfo.phone}</span>
+          <span>{personalInfo.email}</span>
+          <span>{personalInfo.location}</span>
+        </div>
+        {personalInfo.linkedin && (
+          <div className="flex justify-center items-center gap-8 text-sm text-gray-600 mt-1">
+            <span>{personalInfo.linkedin}</span>
+            {personalInfo.website && <span>{personalInfo.website}</span>}
+          </div>
+        )}
+      </div>
+
+      <div className="border-t border-gray-300 my-6" />
+
+      {/* Summary */}
+      {summary && (
+        <p className="text-sm text-gray-700 leading-relaxed text-center mb-6 italic">
+          {summary}
+        </p>
+      )}
+
+      <div className="border-t border-gray-300 my-6" />
+
+      {/* Professional Experience */}
+      {workExperiences.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-sm tracking-[0.2em] text-gray-800 mb-4 font-sans font-semibold">
+            PROFESSIONAL EXPERIENCE
+          </h2>
+          {workExperiences.map((exp) => (
+            <div key={exp.id} className="mb-5">
+              <div className="flex justify-between items-start mb-1">
+                <h3 className="font-bold uppercase text-sm">{exp.company}</h3>
+                <span className="text-sm text-gray-500">
+                  {exp.location}
+                </span>
+              </div>
+              <div className="flex justify-between items-start mb-2">
+                <p className="text-sm italic">{exp.jobTitle}</p>
+                <span className="text-sm text-gray-500">
+                  {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
+                </span>
+              </div>
+              <ul className="space-y-1">
+                {exp.achievements.map((achievement, idx) => (
+                  <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                    <span className="text-gray-400 mt-0.5">•</span>
+                    <span>{achievement}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="border-t border-gray-300 my-6" />
+
+      {/* Education */}
+      {education.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-sm tracking-[0.2em] text-gray-800 mb-4 font-sans font-semibold">
+            EDUCATION
+          </h2>
+          {education.map((edu) => (
+            <div key={edu.id} className="flex justify-between items-start mb-2">
+              <div>
+                <h3 className="font-bold uppercase text-sm">{edu.degree}</h3>
+                <p className="text-sm text-gray-600">{edu.institution}</p>
+              </div>
+              <div className="text-right">
+                <span className="text-sm text-gray-500">GPA: 3.7 / 4.0</span>
+                <p className="text-sm text-gray-500">{edu.graduationDate}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="border-t border-gray-300 my-6" />
+
+      {/* Skills */}
+      {skills.length > 0 && (
+        <div>
+          <h2 className="text-sm tracking-[0.2em] text-gray-800 mb-4 font-sans font-semibold">
+            SKILLS
+          </h2>
+          <div className="flex flex-wrap gap-x-8 gap-y-1">
+            {skills.map((skill) => (
+              <span key={skill.id} className="text-sm flex items-center gap-2">
+                <span className="text-gray-400">•</span>
+                {skill.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+### **`src/components/templates/preview/charles.tsx`** (WITH PHOTO)
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+export function CharlesPreview({ data }: { data: CVData }) {
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
+  const color = '#0891B2';
+
+  return (
+    <div className="w-[210mm] min-h-[297mm] bg-white font-sans flex">
+      {/* Left Sidebar - Teal */}
+      <div className="w-[35%] text-white p-6" style={{ backgroundColor: color }}>
+        {/* Photo Placeholder */}
+        <div className="w-32 h-32 bg-white/20 rounded-lg mx-auto mb-6 flex items-center justify-center">
+          <span className="text-white/50 text-xs">Photo</span>
+        </div>
+
+        {/* Contact */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs">📍</span>
+            <span className="text-sm">{personalInfo.location || 'Location'}</span>
+          </div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs">📞</span>
+            <span className="text-sm">{personalInfo.phone || 'Phone'}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs">✉️</span>
+            <span className="text-sm break-all">{personalInfo.email || 'Email'}</span>
+          </div>
+        </div>
+
+        {/* Professional Summary */}
+        {summary && (
+          <div className="mb-6">
+            <h2 className="text-sm font-bold tracking-wider border-b border-white/30 pb-2 mb-3">
+              PROFESSIONAL SUMMARY
+            </h2>
+            <p className="text-xs leading-relaxed opacity-90">{summary}</p>
+          </div>
+        )}
+
+        {/* Skills */}
+        {skills.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-sm font-bold tracking-wider border-b border-white/30 pb-2 mb-3">
+              SKILLS
+            </h2>
+            <ul className="space-y-1">
+              {skills.map((skill) => (
+                <li key={skill.id} className="text-xs flex items-center gap-2">
+                  <span>•</span>
+                  {skill.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Languages */}
+        {languages.length > 0 && (
+          <div>
+            <h2 className="text-sm font-bold tracking-wider border-b border-white/30 pb-2 mb-3">
+              LANGUAGES
+            </h2>
+            {languages.map((lang) => (
+              <div key={lang.id} className="mb-2">
+                <p className="text-xs font-semibold">{lang.name}</p>
+                <p className="text-xs opacity-70 capitalize">{lang.proficiency}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Right Content */}
+      <div className="w-[65%] p-6">
+        {/* Name & Title */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold" style={{ color }}>
+            {personalInfo.firstName || 'Noela'} {personalInfo.lastName || 'Bwemero'}
+          </h1>
+          <p className="text-sm text-gray-600 uppercase tracking-wider">
+            {personalInfo.professionalTitle || 'Professional Title'}
+          </p>
+        </div>
+
+        {/* Work History */}
+        {workExperiences.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-sm font-bold tracking-wider mb-4 pb-2 border-b" style={{ color, borderColor: color }}>
+              WORK HISTORY
+            </h2>
+            {workExperiences.map((exp) => (
+              <div key={exp.id} className="mb-5">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-xs text-gray-500">
+                      {exp.startDate} - {exp.isCurrent ? 'Current' : exp.endDate}
+                    </p>
+                    <h3 className="font-bold text-sm">{exp.jobTitle}</h3>
+                    <p className="text-sm" style={{ color }}>{exp.company} | {exp.location}</p>
+                  </div>
+                </div>
+                <ul className="mt-2 space-y-1">
+                  {exp.achievements.map((achievement, idx) => (
+                    <li key={idx} className="text-xs text-gray-700 flex items-start gap-2">
+                      <span className="mt-0.5">•</span>
+                      <span>{achievement}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Education */}
+        {education.length > 0 && (
+          <div>
+            <h2 className="text-sm font-bold tracking-wider mb-4 pb-2 border-b" style={{ color, borderColor: color }}>
+              EDUCATION
+            </h2>
+            {education.map((edu) => (
+              <div key={edu.id} className="mb-3">
+                <p className="text-xs text-gray-500">{edu.graduationDate}</p>
+                <h3 className="font-bold text-sm">{edu.degree}</h3>
+                <p className="text-sm text-gray-600">{edu.institution}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## Task 3: Update Preview Index
+
+Update **`src/components/templates/preview/index.tsx`**:
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+// Import all templates
+import { KathleenPreview } from './kathleen';
+import { LaurenOrangePreview } from './lauren-orange';
+import { GraceNavyPreview } from './grace-navy';
+import { GraceTealPreview } from './grace-teal';
+import { LesleyPreview } from './lesley';
+import { KellyPreview } from './kelly';
+import { RichardPreview } from './richard';
+import { CharlesPreview } from './charles';
+// Add remaining imports as you create them...
+
+interface TemplatePreviewProps {
+  templateId: string;
+  data: CVData;
+  scale?: number;
+}
+
+const templateComponents: Record<string, React.FC<{ data: CVData }>> = {
+  'kathleen': KathleenPreview,
+  'lauren-orange': LaurenOrangePreview,
+  'grace-navy': GraceNavyPreview,
+  'grace-teal': GraceTealPreview,
+  'lesley': LesleyPreview,
+  'kelly': KellyPreview,
+  'richard': RichardPreview,
+  'charles': CharlesPreview,
+  // Default fallbacks for templates not yet created
+  'grace-mint': GraceNavyPreview,
+  'grace-coral': GraceTealPreview,
+  'grace-minimal': KellyPreview,
+  'nelly-mint': GraceNavyPreview,
+  'nelly-gray': KellyPreview,
+  'nelly-sidebar': LesleyPreview,
+  'lauren-icons': RichardPreview,
+  'denice': CharlesPreview,
+  'oliver': CharlesPreview,
+  'thomas': CharlesPreview,
+  'nelly-purple': CharlesPreview,
+  'aparna-dark': CharlesPreview,
+  'aparna-gold': CharlesPreview,
+};
+
+export function TemplatePreview({ templateId, data, scale = 0.5 }: TemplatePreviewProps) {
+  const Template = templateComponents[templateId] || KathleenPreview;
+
+  return (
+    <div 
+      className="origin-top-left bg-white shadow-xl overflow-hidden"
+      style={{ 
+        transform: `scale(${scale})`,
+        width: '210mm',
+        minHeight: '297mm',
+      }}
+    >
+      <Template data={data} />
+    </div>
+  );
+}
+
+export {
+  KathleenPreview,
+  LaurenOrangePreview,
+  GraceNavyPreview,
+  GraceTealPreview,
+  LesleyPreview,
+  KellyPreview,
+  RichardPreview,
+  CharlesPreview,
+};
+
+export default TemplatePreview;
+```
+
+---
+
+# ✅ Day 2-3 Task Checklist for Engineer
+
+## Immediate Tasks:
+1. ✅ Create `src/components/templates/shared/types.ts`
+2. ✅ Create `src/components/templates/shared/colors.ts`
+3. ✅ Create all 8 preview templates above
+4. ✅ Update `src/components/templates/preview/index.tsx`
+5. ✅ Test preview rendering on `/preview` page
+
+## Verify:
+- Templates render with live data as user types
+- All 21 templates show in template selector
+- Preview scales correctly on mobile
+
+---
+
+**Confirm these are done, then I'll provide:**
+1. Remaining 13 preview templates
+2. Complete React-PDF implementation for all 21 templates
+3. Final Preview page with download functionality
