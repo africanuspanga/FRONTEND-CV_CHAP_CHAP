@@ -1,7 +1,4 @@
 {
   "/page": "app/page.js",
-  "/api/ai/summary/route": "app/api/ai/summary/route.js",
-  "/api/payment/initiate/route": "app/api/payment/initiate/route.js",
-  "/(builder)/template/page": "app/(builder)/template/page.js",
-  "/(builder)/personal/page": "app/(builder)/personal/page.js"
+  "/(builder)/template/page": "app/(builder)/template/page.js"
 }

@@ -2,12 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TEMPLATES, type TemplateConfig } from "@/types/cv";
+import { TEMPLATES, type TemplateConfig } from "@/types/templates";
 import { useCVStore } from "@/stores/cv-store";
-import { CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
+import { CheckCircle, ArrowLeft, ArrowRight, Camera, FileText } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useState } from "react";
+
+type FilterType = 'all' | 'with-photo' | 'without-photo';
+type CategoryType = 'all' | 'professional' | 'modern' | 'creative' | 'minimal';
 
 function TemplateCard({ template, isSelected, onSelect }: { 
   template: TemplateConfig; 
@@ -33,12 +37,18 @@ function TemplateCard({ template, isSelected, onSelect }: {
           <div 
             className="h-48 rounded-t-lg flex items-center justify-center relative"
             style={{ 
-              background: `linear-gradient(135deg, ${template.colors.primary}, ${template.colors.accent})` 
+              background: `linear-gradient(135deg, ${template.primaryColor}, ${template.primaryColor}88)` 
             }}
           >
             {isSelected && (
               <div className="absolute top-3 right-3">
                 <CheckCircle className="h-8 w-8 text-white" />
+              </div>
+            )}
+            {template.hasPhoto && (
+              <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1">
+                <Camera className="h-3 w-3 text-white" />
+                <span className="text-xs text-white">Photo</span>
               </div>
             )}
             <div className="text-white text-center p-4">
@@ -49,7 +59,7 @@ function TemplateCard({ template, isSelected, onSelect }: {
         </CardHeader>
         <CardContent className="pt-4">
           <CardTitle className="text-lg mb-2">{template.name}</CardTitle>
-          <CardDescription>{template.description}</CardDescription>
+          <CardDescription className="line-clamp-2">{template.description}</CardDescription>
         </CardContent>
       </Card>
     </motion.div>
@@ -59,6 +69,21 @@ function TemplateCard({ template, isSelected, onSelect }: {
 export default function TemplatePage() {
   const router = useRouter();
   const { templateId, setTemplateId, setCurrentStep } = useCVStore();
+  const [photoFilter, setPhotoFilter] = useState<FilterType>('all');
+  const [categoryFilter, setCategoryFilter] = useState<CategoryType>('all');
+
+  const filteredTemplates = TEMPLATES.filter(template => {
+    const photoMatch = 
+      photoFilter === 'all' ||
+      (photoFilter === 'with-photo' && template.hasPhoto) ||
+      (photoFilter === 'without-photo' && !template.hasPhoto);
+    
+    const categoryMatch = 
+      categoryFilter === 'all' || 
+      template.category === categoryFilter;
+    
+    return photoMatch && categoryMatch;
+  });
 
   const handleSelectTemplate = (id: string) => {
     setTemplateId(id);
@@ -86,10 +111,10 @@ export default function TemplatePage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Select a Professional Template
+              Select from 21 Professional Templates
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Choose a design that best represents your professional style. 
@@ -97,8 +122,52 @@ export default function TemplatePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {TEMPLATES.map((template) => (
+          <div className="flex flex-wrap gap-4 justify-center mb-8">
+            <div className="flex gap-2 items-center">
+              <span className="text-sm text-gray-600">Photo:</span>
+              <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+                {(['all', 'with-photo', 'without-photo'] as FilterType[]).map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setPhotoFilter(filter)}
+                    className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                      photoFilter === filter
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    {filter === 'all' ? 'All' : filter === 'with-photo' ? 'With Photo' : 'No Photo'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-2 items-center">
+              <span className="text-sm text-gray-600">Style:</span>
+              <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+                {(['all', 'professional', 'modern', 'creative', 'minimal'] as CategoryType[]).map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setCategoryFilter(cat)}
+                    className={`px-3 py-1.5 text-sm rounded-md transition-colors capitalize ${
+                      categoryFilter === cat
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <p className="text-center text-sm text-gray-500 mb-6">
+            Showing {filteredTemplates.length} of {TEMPLATES.length} templates
+          </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            {filteredTemplates.map((template) => (
               <TemplateCard
                 key={template.id}
                 template={template}

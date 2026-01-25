@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useCVStore } from "@/stores/cv-store";
-import { TEMPLATES } from "@/types/cv";
+import { TEMPLATES } from "@/types/templates";
 import { ArrowLeft, ArrowRight, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -63,17 +63,16 @@ export default function PreviewPage() {
             <div style={{ fontFamily: 'Georgia, serif' }}>
               <div 
                 className="border-b-4 pb-6 mb-6"
-                style={{ borderColor: template.colors.primary }}
+                style={{ borderColor: template.primaryColor }}
               >
                 <h1 
                   className="text-3xl font-bold mb-1"
-                  style={{ color: template.colors.primary }}
+                  style={{ color: template.primaryColor }}
                 >
                   {cvData.personalInfo.firstName} {cvData.personalInfo.lastName}
                 </h1>
                 <h2 
-                  className="text-xl mb-3"
-                  style={{ color: template.colors.secondary }}
+                  className="text-xl mb-3 text-gray-600"
                 >
                   {cvData.personalInfo.professionalTitle}
                 </h2>
@@ -88,7 +87,7 @@ export default function PreviewPage() {
                 <div className="mb-6">
                   <h3 
                     className="text-lg font-bold mb-2 uppercase tracking-wide"
-                    style={{ color: template.colors.primary }}
+                    style={{ color: template.primaryColor }}
                   >
                     Professional Summary
                   </h3>
@@ -100,7 +99,7 @@ export default function PreviewPage() {
                 <div className="mb-6">
                   <h3 
                     className="text-lg font-bold mb-3 uppercase tracking-wide"
-                    style={{ color: template.colors.primary }}
+                    style={{ color: template.primaryColor }}
                   >
                     Work Experience
                   </h3>
@@ -133,7 +132,7 @@ export default function PreviewPage() {
                 <div className="mb-6">
                   <h3 
                     className="text-lg font-bold mb-3 uppercase tracking-wide"
-                    style={{ color: template.colors.primary }}
+                    style={{ color: template.primaryColor }}
                   >
                     Education
                   </h3>
@@ -157,7 +156,7 @@ export default function PreviewPage() {
                 <div className="mb-6">
                   <h3 
                     className="text-lg font-bold mb-3 uppercase tracking-wide"
-                    style={{ color: template.colors.primary }}
+                    style={{ color: template.primaryColor }}
                   >
                     Skills
                   </h3>
@@ -167,8 +166,8 @@ export default function PreviewPage() {
                         key={skill.id}
                         className="px-3 py-1 rounded-full text-sm"
                         style={{ 
-                          backgroundColor: template.colors.accent + '20',
-                          color: template.colors.primary
+                          backgroundColor: template.primaryColor + '20',
+                          color: template.primaryColor
                         }}
                       >
                         {skill.name}

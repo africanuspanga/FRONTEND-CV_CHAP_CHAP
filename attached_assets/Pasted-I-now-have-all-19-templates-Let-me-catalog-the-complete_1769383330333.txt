@@ -1,0 +1,711 @@
+I now have all 19 templates. Let me catalog the complete set:
+
+---
+
+# Complete Template Catalog (19 Templates)
+
+## WITH PHOTO (5 Templates)
+| # | Name | Color | Key Features |
+|---|------|-------|--------------|
+| 1 | **Charles** | Teal (#0891B2) | Photo in left sidebar, contact below photo |
+| 2 | **Denice** | Rose (#9B7B7B) | Photo top-left, skill progress bars with % |
+| 3 | **Oliver** | Orange (#E07A38) | Centered photo in header, clean layout |
+| 4 | **Thomas** | Mint (#8ECFC8) | Photo center-top, timeline dots |
+| 5 | **Nelly Purple** | Purple (#8B7BB5) | Photo top-left, circular skill charts |
+| 6 | **Aparna Dark** | Navy (#1E3A5F) | Dark theme, photo left, blue accents |
+| 7 | **Aparna Gold** | Gold/Orange (#D4A056) | Photo top-left, gold section badges |
+
+## WITHOUT PHOTO (12 Templates)
+| # | Name | Color | Key Features |
+|---|------|-------|--------------|
+| 8 | **Kathleen** | Yellow (#E5B94E) | Large quote marks, two-column |
+| 9 | **Lauren Orange** | Orange (#E07A38) | Full left sidebar, bold name |
+| 10 | **Grace Mint** | Mint (#6BBFAB) | Script font, top banner |
+| 11 | **Grace Navy** | Navy (#1E4A6D) | Single column, bold uppercase |
+| 12 | **Grace Coral** | Coral/Red (#E85A5A) | Red left border, italic name |
+| 13 | **Grace Minimal** | Gray | Clean sections, gray bars |
+| 14 | **Grace Teal** | Teal (#2AAA9E) | Timeline circles left border |
+| 15 | **Nelly Mint** | Mint (#3EB489) | Clean, 3-column skills |
+| 16 | **Nelly Gray** | Gray | Skill bars, minimal color |
+| 17 | **Nelly Sidebar** | Gray | Left sidebar contact/skills |
+| 18 | **Lesley** | Navy (#2B4764) | Section label boxes on left |
+| 19 | **Kelly** | Gray | Boxed section headers, clean |
+| 20 | **Lauren Icons** | Gray | Section icons, two-column |
+| 21 | **Richard** | Black | Elegant, horizontal lines |
+
+---
+
+# 🚀 FINAL BUILD PLAN
+
+I'll now provide the complete code. Due to the size, I'll break it into organized files.
+
+---
+
+## Task 1: Engineer Runs Supabase Schema
+
+**Go to Supabase Dashboard → SQL Editor → Run this:**
+
+```sql
+-- ============================================
+-- CV CHAP CHAP V2 - DATABASE SCHEMA
+-- ============================================
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- PROFILES
+CREATE TABLE public.profiles (
+  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  email TEXT,
+  phone TEXT,
+  full_name TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- CVS
+CREATE TABLE public.cvs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  anonymous_id TEXT,
+  template_id TEXT NOT NULL,
+  data JSONB NOT NULL DEFAULT '{}',
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'pending_payment', 'paid', 'downloaded')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- PAYMENTS
+CREATE TABLE public.payments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  cv_id UUID REFERENCES public.cvs(id) ON DELETE CASCADE NOT NULL,
+  request_id TEXT UNIQUE NOT NULL,
+  amount INTEGER NOT NULL DEFAULT 5000,
+  currency TEXT NOT NULL DEFAULT 'TZS',
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
+  payment_method TEXT,
+  phone_number TEXT,
+  transaction_id TEXT,
+  selcom_reference TEXT,
+  raw_callback JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  completed_at TIMESTAMPTZ
+);
+
+-- INDEXES
+CREATE INDEX idx_cvs_user_id ON public.cvs(user_id);
+CREATE INDEX idx_cvs_anonymous_id ON public.cvs(anonymous_id);
+CREATE INDEX idx_payments_request_id ON public.payments(request_id);
+CREATE INDEX idx_payments_cv_id ON public.payments(cv_id);
+
+-- ROW LEVEL SECURITY
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cvs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
+
+-- POLICIES
+CREATE POLICY "Public insert CVs" ON public.cvs FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public select CVs" ON public.cvs FOR SELECT USING (true);
+CREATE POLICY "Public update CVs" ON public.cvs FOR UPDATE USING (true);
+CREATE POLICY "Public insert payments" ON public.payments FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public select payments" ON public.payments FOR SELECT USING (true);
+CREATE POLICY "Public update payments" ON public.payments FOR UPDATE USING (true);
+
+-- AUTO PROFILE ON SIGNUP
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name)
+  VALUES (NEW.id, NEW.email, NEW.raw_user_meta_data->>'full_name');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+```
+
+---
+
+## Task 2: Create Database Utilities
+
+Create **`src/lib/supabase/database.ts`**:
+
+```typescript
+import { createClient } from './server';
+import type { CVData } from '@/types/cv';
+
+export async function createCV(data: {
+  templateId: string;
+  cvData: CVData;
+  anonymousId?: string;
+}) {
+  const supabase = await createClient();
+  
+  const { data: cv, error } = await supabase
+    .from('cvs')
+    .insert({
+      template_id: data.templateId,
+      data: data.cvData,
+      anonymous_id: data.anonymousId || crypto.randomUUID(),
+      status: 'draft',
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return cv;
+}
+
+export async function updateCV(id: string, cvData: CVData, templateId?: string) {
+  const supabase = await createClient();
+  
+  const updateData: Record<string, unknown> = { data: cvData };
+  if (templateId) updateData.template_id = templateId;
+
+  const { data: cv, error } = await supabase
+    .from('cvs')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return cv;
+}
+
+export async function getCV(id: string) {
+  const supabase = await createClient();
+  
+  const { data: cv, error } = await supabase
+    .from('cvs')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) throw error;
+  return cv;
+}
+
+export async function createPayment(cvId: string, requestId: string) {
+  const supabase = await createClient();
+  
+  const { data: payment, error } = await supabase
+    .from('payments')
+    .insert({
+      cv_id: cvId,
+      request_id: requestId,
+      amount: 5000,
+      currency: 'TZS',
+      status: 'pending',
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return payment;
+}
+
+export async function updatePaymentStatus(
+  requestId: string,
+  status: 'completed' | 'failed',
+  transactionId?: string
+) {
+  const supabase = await createClient();
+  
+  const { data: payment, error } = await supabase
+    .from('payments')
+    .update({
+      status,
+      transaction_id: transactionId,
+      completed_at: status === 'completed' ? new Date().toISOString() : null,
+    })
+    .eq('request_id', requestId)
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  // Update CV status if payment completed
+  if (status === 'completed') {
+    await supabase
+      .from('cvs')
+      .update({ status: 'paid' })
+      .eq('id', payment.cv_id);
+  }
+
+  return payment;
+}
+
+export async function getPaymentByRequestId(requestId: string) {
+  const supabase = await createClient();
+  
+  const { data: payment, error } = await supabase
+    .from('payments')
+    .select('*, cvs(*)')
+    .eq('request_id', requestId)
+    .single();
+
+  if (error) throw error;
+  return payment;
+}
+```
+
+---
+
+## Task 3: Template Registry & Types
+
+Create **`src/types/templates.ts`**:
+
+```typescript
+export interface TemplateConfig {
+  id: string;
+  name: string;
+  description: string;
+  category: 'professional' | 'modern' | 'creative' | 'minimal';
+  hasPhoto: boolean;
+  primaryColor: string;
+  previewImage: string;
+}
+
+export const TEMPLATES: TemplateConfig[] = [
+  // WITH PHOTO
+  {
+    id: 'charles',
+    name: 'Charles',
+    description: 'Modern teal sidebar with photo - perfect for tech professionals',
+    category: 'modern',
+    hasPhoto: true,
+    primaryColor: '#0891B2',
+    previewImage: '/templates/charles.png',
+  },
+  {
+    id: 'denice',
+    name: 'Denice',
+    description: 'Elegant rose theme with skill progress bars',
+    category: 'creative',
+    hasPhoto: true,
+    primaryColor: '#9B7B7B',
+    previewImage: '/templates/denice.png',
+  },
+  {
+    id: 'oliver',
+    name: 'Oliver',
+    description: 'Clean centered layout with orange accents',
+    category: 'professional',
+    hasPhoto: true,
+    primaryColor: '#E07A38',
+    previewImage: '/templates/oliver.png',
+  },
+  {
+    id: 'thomas',
+    name: 'Thomas',
+    description: 'Fresh mint design with timeline dots',
+    category: 'modern',
+    hasPhoto: true,
+    primaryColor: '#8ECFC8',
+    previewImage: '/templates/thomas.png',
+  },
+  {
+    id: 'nelly-purple',
+    name: 'Nelly Purple',
+    description: 'Creative purple theme with circular skill charts',
+    category: 'creative',
+    hasPhoto: true,
+    primaryColor: '#8B7BB5',
+    previewImage: '/templates/nelly-purple.png',
+  },
+  {
+    id: 'aparna-dark',
+    name: 'Aparna Dark',
+    description: 'Bold dark navy theme for executives',
+    category: 'professional',
+    hasPhoto: true,
+    primaryColor: '#1E3A5F',
+    previewImage: '/templates/aparna-dark.png',
+  },
+  {
+    id: 'aparna-gold',
+    name: 'Aparna Gold',
+    description: 'Warm gold accents with modern layout',
+    category: 'modern',
+    hasPhoto: true,
+    primaryColor: '#D4A056',
+    previewImage: '/templates/aparna-gold.png',
+  },
+  // WITHOUT PHOTO
+  {
+    id: 'kathleen',
+    name: 'Kathleen',
+    description: 'Bold yellow with decorative quote marks',
+    category: 'creative',
+    hasPhoto: false,
+    primaryColor: '#E5B94E',
+    previewImage: '/templates/kathleen.png',
+  },
+  {
+    id: 'lauren-orange',
+    name: 'Lauren Orange',
+    description: 'Vibrant orange sidebar - great for marketing',
+    category: 'creative',
+    hasPhoto: false,
+    primaryColor: '#E07A38',
+    previewImage: '/templates/lauren-orange.png',
+  },
+  {
+    id: 'grace-mint',
+    name: 'Grace Mint',
+    description: 'Fresh mint banner with elegant script name',
+    category: 'modern',
+    hasPhoto: false,
+    primaryColor: '#6BBFAB',
+    previewImage: '/templates/grace-mint.png',
+  },
+  {
+    id: 'grace-navy',
+    name: 'Grace Navy',
+    description: 'Professional navy with bold headings',
+    category: 'professional',
+    hasPhoto: false,
+    primaryColor: '#1E4A6D',
+    previewImage: '/templates/grace-navy.png',
+  },
+  {
+    id: 'grace-coral',
+    name: 'Grace Coral',
+    description: 'Striking coral red with left border accent',
+    category: 'creative',
+    hasPhoto: false,
+    primaryColor: '#E85A5A',
+    previewImage: '/templates/grace-coral.png',
+  },
+  {
+    id: 'grace-minimal',
+    name: 'Grace Minimal',
+    description: 'Clean grayscale with section dividers',
+    category: 'minimal',
+    hasPhoto: false,
+    primaryColor: '#6B7280',
+    previewImage: '/templates/grace-minimal.png',
+  },
+  {
+    id: 'grace-teal',
+    name: 'Grace Teal',
+    description: 'Teal timeline design with left border',
+    category: 'modern',
+    hasPhoto: false,
+    primaryColor: '#2AAA9E',
+    previewImage: '/templates/grace-teal.png',
+  },
+  {
+    id: 'nelly-mint',
+    name: 'Nelly Mint',
+    description: 'Clean mint headers with three-column skills',
+    category: 'modern',
+    hasPhoto: false,
+    primaryColor: '#3EB489',
+    previewImage: '/templates/nelly-mint.png',
+  },
+  {
+    id: 'nelly-gray',
+    name: 'Nelly Gray',
+    description: 'Minimal grayscale with horizontal skill bars',
+    category: 'minimal',
+    hasPhoto: false,
+    primaryColor: '#4B5563',
+    previewImage: '/templates/nelly-gray.png',
+  },
+  {
+    id: 'nelly-sidebar',
+    name: 'Nelly Sidebar',
+    description: 'Clean left sidebar for contact and skills',
+    category: 'minimal',
+    hasPhoto: false,
+    primaryColor: '#374151',
+    previewImage: '/templates/nelly-sidebar.png',
+  },
+  {
+    id: 'lesley',
+    name: 'Lesley',
+    description: 'Navy section labels in left column',
+    category: 'professional',
+    hasPhoto: false,
+    primaryColor: '#2B4764',
+    previewImage: '/templates/lesley.png',
+  },
+  {
+    id: 'kelly',
+    name: 'Kelly',
+    description: 'Classic with boxed section headers',
+    category: 'professional',
+    hasPhoto: false,
+    primaryColor: '#1F2937',
+    previewImage: '/templates/kelly.png',
+  },
+  {
+    id: 'lauren-icons',
+    name: 'Lauren Icons',
+    description: 'Modern two-column with section icons',
+    category: 'modern',
+    hasPhoto: false,
+    primaryColor: '#374151',
+    previewImage: '/templates/lauren-icons.png',
+  },
+  {
+    id: 'richard',
+    name: 'Richard',
+    description: 'Elegant executive style with fine lines',
+    category: 'professional',
+    hasPhoto: false,
+    primaryColor: '#111827',
+    previewImage: '/templates/richard.png',
+  },
+];
+
+export const getTemplateById = (id: string): TemplateConfig | undefined => {
+  return TEMPLATES.find(t => t.id === id);
+};
+
+export const getTemplatesByCategory = (category: TemplateConfig['category']): TemplateConfig[] => {
+  return TEMPLATES.filter(t => t.category === category);
+};
+
+export const getTemplatesWithPhoto = (): TemplateConfig[] => {
+  return TEMPLATES.filter(t => t.hasPhoto);
+};
+
+export const getTemplatesWithoutPhoto = (): TemplateConfig[] => {
+  return TEMPLATES.filter(t => !t.hasPhoto);
+};
+```
+
+---
+
+## Task 4: Live Preview Templates (React Components)
+
+Now I'll create the **live preview templates** that render in the browser as users fill out the form. These use regular React + Tailwind.
+
+Create **`src/components/templates/preview/index.tsx`**:
+
+```typescript
+'use client';
+
+import type { CVData } from '@/types/cv';
+import { KathleenPreview } from './kathleen';
+import { LaurenOrangePreview } from './lauren-orange';
+import { GraceNavyPreview } from './grace-navy';
+import { GraceTealPreview } from './grace-teal';
+import { KellyPreview } from './kelly';
+import { RichardPreview } from './richard';
+import { LesleyPreview } from './lesley';
+// Import all other templates...
+
+interface TemplatePreviewProps {
+  templateId: string;
+  data: CVData;
+  scale?: number;
+}
+
+const templateComponents: Record<string, React.FC<{ data: CVData }>> = {
+  'kathleen': KathleenPreview,
+  'lauren-orange': LaurenOrangePreview,
+  'grace-navy': GraceNavyPreview,
+  'grace-teal': GraceTealPreview,
+  'kelly': KellyPreview,
+  'richard': RichardPreview,
+  'lesley': LesleyPreview,
+  // Add all templates...
+};
+
+export function TemplatePreview({ templateId, data, scale = 0.5 }: TemplatePreviewProps) {
+  const Template = templateComponents[templateId] || KathleenPreview;
+
+  return (
+    <div 
+      className="origin-top-left bg-white shadow-lg"
+      style={{ 
+        transform: `scale(${scale})`,
+        width: '210mm',
+        minHeight: '297mm',
+      }}
+    >
+      <Template data={data} />
+    </div>
+  );
+}
+
+export default TemplatePreview;
+```
+
+---
+
+Now let me create the first batch of **pixel-perfect live preview templates**. I'll start with the most distinct designs:
+
+Create **`src/components/templates/preview/kathleen.tsx`**:
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+export function KathleenPreview({ data }: { data: CVData }) {
+  const { personalInfo, summary, workExperiences, education, skills } = data;
+
+  return (
+    <div className="w-[210mm] min-h-[297mm] bg-[#f5f7fa] p-0 font-sans text-gray-800">
+      {/* Light blue top bar */}
+      <div className="h-3 bg-[#d4e5f7]" />
+      
+      <div className="flex">
+        {/* Left Column */}
+        <div className="w-[35%] p-8">
+          {/* Name */}
+          <h1 className="text-4xl font-bold text-gray-800 leading-tight">
+            {personalInfo.firstName || 'NOELA'}
+          </h1>
+          <h1 className="text-4xl font-bold text-gray-800 leading-tight mb-6">
+            {personalInfo.lastName || 'BWEMERO'}
+          </h1>
+
+          {/* Yellow Quote Mark */}
+          <div className="absolute right-[45%] top-16">
+            <span className="text-[120px] text-[#E5B94E] font-serif leading-none">"</span>
+          </div>
+
+          {/* Contact Section */}
+          <div className="mt-8">
+            <h2 className="text-sm font-semibold tracking-widest text-gray-700 mb-4 border-b border-gray-300 pb-2">
+              CONTACT
+            </h2>
+            <div className="space-y-3 text-sm">
+              {personalInfo.email && (
+                <div className="flex items-start gap-2">
+                  <span className="text-[#E5B94E] font-bold">e</span>
+                  <span className="text-[#E5B94E]">{personalInfo.email}</span>
+                </div>
+              )}
+              {personalInfo.phone && (
+                <div className="flex items-start gap-2">
+                  <span className="text-[#E5B94E] font-bold">t</span>
+                  <span className="text-[#E5B94E]">{personalInfo.phone}</span>
+                </div>
+              )}
+              {personalInfo.location && (
+                <div className="flex items-start gap-2">
+                  <span className="text-[#E5B94E] font-bold">a</span>
+                  <span className="text-[#E5B94E]">{personalInfo.location}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Education */}
+          {education.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-sm font-semibold tracking-widest text-gray-700 mb-4 border-b border-gray-300 pb-2">
+                EDUCATION
+              </h2>
+              {education.map((edu) => (
+                <div key={edu.id} className="mb-4">
+                  <p className="text-sm text-gray-600">{edu.graduationDate}</p>
+                  <p className="font-bold text-sm">{edu.degree}</p>
+                  <p className="text-sm text-gray-600">{edu.institution}</p>
+                  <p className="text-sm text-[#E5B94E] italic">{edu.fieldOfStudy}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Skills */}
+          {skills.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-sm font-semibold tracking-widest text-gray-700 mb-4 border-b border-gray-300 pb-2">
+                SKILLS
+              </h2>
+              <ul className="space-y-1">
+                {skills.map((skill) => (
+                  <li key={skill.id} className="text-sm flex items-start gap-2">
+                    <span className="text-gray-400">·</span>
+                    {skill.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* Right Column */}
+        <div className="w-[65%] p-8 bg-white">
+          {/* Professional Summary */}
+          <div className="mb-8">
+            <h2 className="text-sm font-semibold tracking-widest text-[#E5B94E] mb-4 border-b border-[#E5B94E] pb-2">
+              PROFESSIONAL SUMMARY
+            </h2>
+            <p className="text-sm leading-relaxed text-gray-700">
+              {summary || 'Motivated professional with extensive experience delivering exceptional results...'}
+            </p>
+          </div>
+
+          {/* Work Experience */}
+          {workExperiences.length > 0 && (
+            <div>
+              <h2 className="text-sm font-semibold tracking-widest text-[#E5B94E] mb-4 border-b border-[#E5B94E] pb-2">
+                WORK EXPERIENCE
+              </h2>
+              {workExperiences.map((exp) => (
+                <div key={exp.id} className="mb-6">
+                  <div className="flex justify-between items-start mb-1">
+                    <h3 className="font-bold text-sm">{exp.jobTitle}</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {exp.company} | {exp.location}
+                  </p>
+                  <p className="text-sm text-gray-500 mb-2">
+                    {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
+                  </p>
+                  <ul className="space-y-1">
+                    {exp.achievements.map((achievement, idx) => (
+                      <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                        <span className="text-gray-400 mt-1">·</span>
+                        <span>{achievement}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+Due to the message length, I need to continue in the next response. But let me give you the **immediate action items**:
+
+---
+
+# ✅ IMMEDIATE TASKS FOR ENGINEER
+
+## Task 1: Run Supabase Schema
+Copy the SQL above → Supabase SQL Editor → Execute
+
+## Task 2: Create Files
+1. `src/lib/supabase/database.ts` - copy code above
+2. `src/types/templates.ts` - copy code above  
+3. `src/components/templates/preview/index.tsx` - copy code above
+4. `src/components/templates/preview/kathleen.tsx` - copy code above
+
+## Task 3: Confirm Completion
+Reply with:
+- "Schema executed ✅"
+- "Files created ✅"
+- "Ready for remaining templates"
+
+---
+
+**Once confirmed, I'll send the remaining 18 preview templates + all PDF templates in one comprehensive batch.**
