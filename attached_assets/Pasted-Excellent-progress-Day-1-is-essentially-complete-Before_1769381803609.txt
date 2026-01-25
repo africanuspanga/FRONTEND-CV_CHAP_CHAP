@@ -1,0 +1,106 @@
+Excellent progress. Day 1 is essentially complete. Before I issue Day 2 instructions, I need to verify the codebase is clean.
+
+---
+
+# Pre-Day 2 Verification Questions
+
+**Engineer, please confirm the following:**
+
+## 1. Clean Slate Check
+
+```bash
+# Run these commands and share the output:
+
+# Check for any old Express/Vite remnants
+ls -la | grep -E "(vite.config|express|server/)"
+
+# Check package.json for old dependencies
+cat package.json | grep -E "(express|vite|wouter|drizzle)"
+
+# Check if old folders exist
+ls -la client/ 2>/dev/null || echo "No client folder (good)"
+ls -la server/ 2>/dev/null || echo "No server folder (good)"
+
+# Confirm Next.js structure
+ls -la src/app/
+```
+
+## 2. Current File Structure
+
+Please paste the output of:
+```bash
+find src -type f -name "*.ts" -o -name "*.tsx" | head -50
+```
+
+## 3. Environment Variables
+
+Confirm these are set (don't share values, just yes/no):
+- [ ] `NEXT_PUBLIC_SUPABASE_URL` - set?
+- [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY` - set?
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` - set? (needed for API routes)
+- [ ] `OPENAI_API_KEY` - set?
+- [ ] `SELCOM_API_KEY` - set?
+- [ ] `SELCOM_API_SECRET` - set?
+- [ ] `SELCOM_VENDOR_ID` - set?
+
+## 4. Supabase Database Status
+
+Did you run the SQL schema I provided in Day 1? Check by running this in Supabase SQL Editor:
+
+```sql
+SELECT table_name FROM information_schema.tables 
+WHERE table_schema = 'public';
+```
+
+Expected tables:
+- `profiles`
+- `cvs`
+- `payments`
+- `generated_pdfs`
+
+## 5. Quick Functionality Test
+
+```bash
+# Start dev server
+npm run dev
+
+# In another terminal, test these:
+curl http://localhost:5000/api/ai/summary -X POST -H "Content-Type: application/json" -d '{"test": true}'
+
+curl http://localhost:5000/api/payment/initiate -X POST -H "Content-Type: application/json" -d '{"test": true}'
+```
+
+What responses do you get?
+
+---
+
+# Once Verified, Day 2 Focus Areas
+
+Based on the progress report, here's the priority order:
+
+## Day 2 (Today): Database + PDF Templates
+
+### Priority 1: Supabase Database Schema
+If not already done, run the full schema from Day 1 instructions.
+
+### Priority 2: React-PDF Full Implementation
+Build out all 6 templates properly. This is critical for the core product.
+
+### Priority 3: Connect CV Builder to Database
+Save CVs to Supabase instead of just localStorage.
+
+---
+
+## Day 3: Auth + Payments
+
+### Priority 1: Supabase Auth Pages
+- `/auth/login`
+- `/auth/register`
+- `/auth/callback`
+
+### Priority 2: Selcom Integration
+Real USSD payment initiation and webhook handling.
+
+---
+
+**Engineer: Answer the 5 verification questions above, then I'll send detailed Day 2 implementation code.**
