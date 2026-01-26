@@ -1,0 +1,1270 @@
+I've reviewed the Selcom API documentation. For CV Chap Chap, we'll use the **Checkout API** (specifically `create-order-minimal` and `wallet-payment`) since we want to:
+
+1. Create a payment order when user clicks "Download"
+2. Push USSD to user's phone for M-Pesa/Airtel Money payment
+3. Receive webhook callback when payment completes
+4. Generate and deliver the PDF
+
+Let me provide the complete implementation:
+
+---
+
+# Day 3: Payment Integration + PDF Generation
+
+## Payment Flow for CV Chap Chap
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        CV CHAP CHAP PAYMENT FLOW                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1. USER CLICKS "DOWNLOAD PDF" (TZS 5,000)
+   │
+   ▼
+2. FRONTEND: Collects phone number (255XXXXXXXXX)
+   │
+   ▼
+3. API ROUTE: POST /api/payment/initiate
+   │
+   ├── Save CV to Supabase (if not saved)
+   ├── Call Selcom: POST /v1/checkout/create-order-minimal
+   │   └── Returns: order_id, payment_token, payment_gateway_url
+   ├── Save payment record to Supabase
+   └── Return order details to frontend
+   │
+   ▼
+4. API ROUTE: POST /api/payment/push-ussd
+   │
+   ├── Call Selcom: POST /v1/checkout/wallet-payment
+   │   └── Triggers USSD push to user's phone
+   └── User sees: "Enter M-Pesa PIN to pay TZS 5,000 to CV CHAP CHAP"
+   │
+   ▼
+5. USER CONFIRMS PAYMENT ON PHONE
+   │
+   ▼
+6. SELCOM WEBHOOK: POST /api/payment/webhook
+   │
+   ├── Verify payment (resultcode === "000")
+   ├── Update payment status in Supabase
+   ├── Update CV status to "paid"
+   └── Return success to Selcom
+   │
+   ▼
+7. FRONTEND: Polls /api/payment/status OR receives real-time update
+   │
+   ▼
+8. API ROUTE: GET /api/pdf/generate?cvId=xxx
+   │
+   ├── Fetch CV data from Supabase
+   ├── Generate PDF using React-PDF
+   └── Return PDF file for download
+```
+
+---
+
+## Task 1: Selcom API Client
+
+Create **`src/lib/selcom/client.ts`**:
+
+```typescript
+import crypto from 'crypto';
+
+const SELCOM_BASE_URL = process.env.SELCOM_BASE_URL || 'https://apigw.selcommobile.com';
+const SELCOM_API_KEY = process.env.SELCOM_API_KEY!;
+const SELCOM_API_SECRET = process.env.SELCOM_API_SECRET!;
+const SELCOM_VENDOR = process.env.SELCOM_VENDOR_ID!;
+
+interface SelcomHeaders {
+  'Content-Type': string;
+  'Authorization': string;
+  'Digest-Method': string;
+  'Digest': string;
+  'Timestamp': string;
+  'Signed-Fields': string;
+}
+
+function generateTimestamp(): string {
+  return new Date().toISOString().replace(/\.\d{3}Z$/, '+03:00');
+}
+
+function generateDigest(timestamp: string, data: Record<string, unknown>, signedFields: string[]): string {
+  // Build the string to sign: timestamp=xxx&field1=value1&field2=value2...
+  const parts = [`timestamp=${timestamp}`];
+  
+  for (const field of signedFields) {
+    const value = data[field];
+    if (value !== undefined && value !== null) {
+      parts.push(`${field}=${value}`);
+    }
+  }
+  
+  const stringToSign = parts.join('&');
+  
+  // Create HMAC SHA256 signature
+  const hmac = crypto.createHmac('sha256', SELCOM_API_SECRET);
+  hmac.update(stringToSign);
+  return hmac.digest('base64');
+}
+
+function generateAuthHeader(): string {
+  const encoded = Buffer.from(SELCOM_API_KEY).toString('base64');
+  return `SELCOM ${encoded}`;
+}
+
+function buildHeaders(data: Record<string, unknown>, signedFields: string[]): SelcomHeaders {
+  const timestamp = generateTimestamp();
+  const digest = generateDigest(timestamp, data, signedFields);
+  
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': generateAuthHeader(),
+    'Digest-Method': 'HS256',
+    'Digest': digest,
+    'Timestamp': timestamp,
+    'Signed-Fields': signedFields.join(','),
+  };
+}
+
+export interface CreateOrderResponse {
+  reference: string;
+  resultcode: string;
+  result: string;
+  message: string;
+  data: Array<{
+    gateway_buyer_uuid?: string;
+    payment_token: string;
+    qr?: string;
+    payment_gateway_url: string;
+  }>;
+}
+
+export interface WalletPaymentResponse {
+  reference: string;
+  resultcode: string;
+  result: string;
+  message: string;
+  data: unknown[];
+}
+
+export interface OrderStatusResponse {
+  reference: string;
+  resultcode: string;
+  result: string;
+  message: string;
+  data: Array<{
+    order_id: string;
+    creation_date: string;
+    amount: string;
+    payment_status: 'PENDING' | 'COMPLETED' | 'CANCELLED' | 'USERCANCELLED' | 'REJECTED' | 'INPROGRESS';
+    transid?: string;
+    channel?: string;
+    reference?: string;
+    phone?: string;
+  }>;
+}
+
+/**
+ * Create a minimal order for mobile money payment
+ */
+export async function createOrderMinimal(params: {
+  orderId: string;
+  buyerEmail: string;
+  buyerName: string;
+  buyerPhone: string;
+  amount: number;
+  webhookUrl: string;
+  redirectUrl?: string;
+  cancelUrl?: string;
+}): Promise<CreateOrderResponse> {
+  const data = {
+    vendor: SELCOM_VENDOR,
+    order_id: params.orderId,
+    buyer_email: params.buyerEmail,
+    buyer_name: params.buyerName,
+    buyer_phone: params.buyerPhone,
+    amount: params.amount,
+    currency: 'TZS',
+    webhook: Buffer.from(params.webhookUrl).toString('base64'),
+    redirect_url: params.redirectUrl ? Buffer.from(params.redirectUrl).toString('base64') : undefined,
+    cancel_url: params.cancelUrl ? Buffer.from(params.cancelUrl).toString('base64') : undefined,
+    buyer_remarks: 'CV Download Payment',
+    merchant_remarks: 'CV CHAP CHAP',
+    no_of_items: 1,
+    expiry: 30, // 30 minutes
+  };
+
+  const signedFields = [
+    'vendor', 'order_id', 'buyer_email', 'buyer_name', 'buyer_phone',
+    'amount', 'currency', 'webhook', 'buyer_remarks', 'merchant_remarks', 'no_of_items'
+  ];
+
+  const headers = buildHeaders(data, signedFields);
+
+  const response = await fetch(`${SELCOM_BASE_URL}/v1/checkout/create-order-minimal`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+  
+  if (!response.ok) {
+    console.error('Selcom create order error:', result);
+    throw new Error(result.message || 'Failed to create order');
+  }
+
+  return result as CreateOrderResponse;
+}
+
+/**
+ * Trigger wallet push USSD for payment
+ */
+export async function triggerWalletPayment(params: {
+  transId: string;
+  orderId: string;
+  msisdn: string;
+}): Promise<WalletPaymentResponse> {
+  const data = {
+    transid: params.transId,
+    order_id: params.orderId,
+    msisdn: params.msisdn,
+  };
+
+  const signedFields = ['transid', 'order_id', 'msisdn'];
+  const headers = buildHeaders(data, signedFields);
+
+  const response = await fetch(`${SELCOM_BASE_URL}/v1/checkout/wallet-payment`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+  
+  if (!response.ok) {
+    console.error('Selcom wallet payment error:', result);
+    throw new Error(result.message || 'Failed to trigger wallet payment');
+  }
+
+  return result as WalletPaymentResponse;
+}
+
+/**
+ * Get order status
+ */
+export async function getOrderStatus(orderId: string): Promise<OrderStatusResponse> {
+  const data = { order_id: orderId };
+  const signedFields = ['order_id'];
+  const headers = buildHeaders(data, signedFields);
+
+  const response = await fetch(
+    `${SELCOM_BASE_URL}/v1/checkout/order-status?order_id=${orderId}`,
+    {
+      method: 'GET',
+      headers,
+    }
+  );
+
+  const result = await response.json();
+  
+  if (!response.ok) {
+    console.error('Selcom order status error:', result);
+    throw new Error(result.message || 'Failed to get order status');
+  }
+
+  return result as OrderStatusResponse;
+}
+
+/**
+ * Verify webhook signature from Selcom
+ */
+export function verifyWebhookSignature(
+  timestamp: string,
+  digest: string,
+  data: Record<string, unknown>,
+  signedFieldsHeader: string
+): boolean {
+  const signedFields = signedFieldsHeader.split(',');
+  const expectedDigest = generateDigest(timestamp, data, signedFields);
+  return digest === expectedDigest;
+}
+```
+
+---
+
+## Task 2: Payment API Routes
+
+### Create **`src/app/api/payment/initiate/route.ts`**:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { createOrderMinimal } from '@/lib/selcom/client';
+import { createCV, createPayment } from '@/lib/supabase/database';
+import { CVData } from '@/types/cv';
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { 
+      cvData, 
+      templateId, 
+      phone, 
+      email, 
+      name,
+      anonymousId 
+    } = body as {
+      cvData: CVData;
+      templateId: string;
+      phone: string;
+      email: string;
+      name: string;
+      anonymousId?: string;
+    };
+
+    // Validate phone number (Tanzania format)
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (!cleanPhone.match(/^255\d{9}$/) && !cleanPhone.match(/^0\d{9}$/)) {
+      return NextResponse.json(
+        { error: 'Invalid phone number. Use format: 255XXXXXXXXX or 0XXXXXXXXX' },
+        { status: 400 }
+      );
+    }
+
+    // Format phone to international format
+    const msisdn = cleanPhone.startsWith('0') 
+      ? `255${cleanPhone.slice(1)}` 
+      : cleanPhone;
+
+    // 1. Save CV to database
+    const cv = await createCV({
+      templateId,
+      cvData,
+      anonymousId,
+    });
+
+    // 2. Generate unique order ID
+    const orderId = `CV-${cv.id.slice(0, 8)}-${Date.now()}`;
+
+    // 3. Get webhook URL (your server's public URL)
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://cvchapchap.co.tz';
+    const webhookUrl = `${baseUrl}/api/payment/webhook`;
+
+    // 4. Create Selcom order
+    const selcomOrder = await createOrderMinimal({
+      orderId,
+      buyerEmail: email || `${msisdn}@cvchapchap.co.tz`,
+      buyerName: name || `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`,
+      buyerPhone: msisdn,
+      amount: 5000, // TZS 5,000
+      webhookUrl,
+      redirectUrl: `${baseUrl}/payment/success?order=${orderId}`,
+      cancelUrl: `${baseUrl}/payment/cancelled?order=${orderId}`,
+    });
+
+    if (selcomOrder.resultcode !== '000') {
+      console.error('Selcom order creation failed:', selcomOrder);
+      return NextResponse.json(
+        { error: selcomOrder.message || 'Failed to create payment order' },
+        { status: 400 }
+      );
+    }
+
+    // 5. Save payment record
+    const paymentToken = selcomOrder.data[0]?.payment_token;
+    await createPayment(cv.id, orderId);
+
+    // 6. Update payment with Selcom reference
+    // (We'll do this in webhook, but store what we can now)
+
+    return NextResponse.json({
+      success: true,
+      orderId,
+      cvId: cv.id,
+      paymentToken,
+      paymentGatewayUrl: selcomOrder.data[0]?.payment_gateway_url 
+        ? Buffer.from(selcomOrder.data[0].payment_gateway_url, 'base64').toString('utf-8')
+        : null,
+      msisdn,
+      amount: 5000,
+      currency: 'TZS',
+    });
+
+  } catch (error) {
+    console.error('Payment initiation error:', error);
+    return NextResponse.json(
+      { error: 'Failed to initiate payment' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+### Create **`src/app/api/payment/push-ussd/route.ts`**:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { triggerWalletPayment } from '@/lib/selcom/client';
+
+export async function POST(request: NextRequest) {
+  try {
+    const { orderId, msisdn } = await request.json();
+
+    if (!orderId || !msisdn) {
+      return NextResponse.json(
+        { error: 'orderId and msisdn are required' },
+        { status: 400 }
+      );
+    }
+
+    // Format phone
+    const cleanPhone = msisdn.replace(/\D/g, '');
+    const formattedMsisdn = cleanPhone.startsWith('0') 
+      ? `255${cleanPhone.slice(1)}` 
+      : cleanPhone;
+
+    // Generate transaction ID
+    const transId = `PUSH-${orderId}-${Date.now()}`;
+
+    // Trigger USSD push
+    const result = await triggerWalletPayment({
+      transId,
+      orderId,
+      msisdn: formattedMsisdn,
+    });
+
+    // Result code 111 = PENDING (USSD sent, waiting for user)
+    if (result.resultcode === '111' || result.resultcode === '000') {
+      return NextResponse.json({
+        success: true,
+        message: 'Payment request sent to your phone. Please enter your PIN to confirm.',
+        reference: result.reference,
+        status: 'pending',
+      });
+    }
+
+    return NextResponse.json({
+      success: false,
+      message: result.message || 'Failed to send payment request',
+      resultcode: result.resultcode,
+    }, { status: 400 });
+
+  } catch (error) {
+    console.error('Push USSD error:', error);
+    return NextResponse.json(
+      { error: 'Failed to send payment request' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+### Create **`src/app/api/payment/webhook/route.ts`**:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { updatePaymentStatus, getPaymentByRequestId } from '@/lib/supabase/database';
+import { verifyWebhookSignature } from '@/lib/selcom/client';
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    
+    console.log('Selcom webhook received:', JSON.stringify(body, null, 2));
+
+    // Extract webhook data
+    const {
+      order_id,
+      transid,
+      reference,
+      result,
+      resultcode,
+      payment_status,
+      channel,
+      amount,
+      phone,
+    } = body;
+
+    // Verify webhook signature (optional but recommended)
+    const timestamp = request.headers.get('Timestamp');
+    const digest = request.headers.get('Digest');
+    const signedFields = request.headers.get('Signed-Fields');
+
+    if (timestamp && digest && signedFields) {
+      const isValid = verifyWebhookSignature(timestamp, digest, body, signedFields);
+      if (!isValid) {
+        console.error('Invalid webhook signature');
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      }
+    }
+
+    // Check if payment was successful
+    if (resultcode === '000' && payment_status === 'COMPLETED') {
+      // Update payment status to completed
+      await updatePaymentStatus(order_id, 'completed', transid);
+      
+      console.log(`Payment completed: Order ${order_id}, Transaction ${transid}, Channel ${channel}`);
+
+      return NextResponse.json({
+        resultcode: '000',
+        result: 'SUCCESS',
+        message: 'Payment notification processed',
+      });
+    }
+
+    // Handle failed/cancelled payments
+    if (payment_status === 'CANCELLED' || payment_status === 'USERCANCELLED' || payment_status === 'REJECTED') {
+      await updatePaymentStatus(order_id, 'failed', transid);
+      
+      console.log(`Payment failed/cancelled: Order ${order_id}, Status ${payment_status}`);
+    }
+
+    return NextResponse.json({
+      resultcode: '000',
+      result: 'SUCCESS',
+      message: 'Notification received',
+    });
+
+  } catch (error) {
+    console.error('Webhook processing error:', error);
+    return NextResponse.json(
+      { resultcode: '500', result: 'FAIL', message: 'Internal error' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+### Create **`src/app/api/payment/status/route.ts`**:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { getOrderStatus } from '@/lib/selcom/client';
+import { getPaymentByRequestId } from '@/lib/supabase/database';
+
+export async function GET(request: NextRequest) {
+  const orderId = request.nextUrl.searchParams.get('orderId');
+
+  if (!orderId) {
+    return NextResponse.json({ error: 'orderId is required' }, { status: 400 });
+  }
+
+  try {
+    // First check our database
+    const payment = await getPaymentByRequestId(orderId);
+    
+    if (payment?.status === 'completed') {
+      return NextResponse.json({
+        status: 'completed',
+        cvId: payment.cv_id,
+        message: 'Payment successful! Your CV is ready for download.',
+      });
+    }
+
+    // If not completed in our DB, check Selcom
+    const selcomStatus = await getOrderStatus(orderId);
+    
+    const orderData = selcomStatus.data[0];
+    
+    return NextResponse.json({
+      status: orderData?.payment_status?.toLowerCase() || 'pending',
+      cvId: payment?.cv_id,
+      message: orderData?.payment_status === 'COMPLETED' 
+        ? 'Payment successful!' 
+        : 'Waiting for payment confirmation...',
+      channel: orderData?.channel,
+    });
+
+  } catch (error) {
+    console.error('Status check error:', error);
+    return NextResponse.json(
+      { error: 'Failed to check payment status' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+---
+
+## Task 3: PDF Generation with React-PDF
+
+Create **`src/lib/pdf/generator.ts`**:
+
+```typescript
+import ReactPDF from '@react-pdf/renderer';
+import { CVData } from '@/types/cv';
+
+// Import all PDF templates
+import { KathleenPDF } from '@/components/templates/pdf/kathleen';
+import { CharlesPDF } from '@/components/templates/pdf/charles';
+import { GraceNavyPDF } from '@/components/templates/pdf/grace-navy';
+import { GraceTealPDF } from '@/components/templates/pdf/grace-teal';
+import { KellyPDF } from '@/components/templates/pdf/kelly';
+import { RichardPDF } from '@/components/templates/pdf/richard';
+// ... import all 21 PDF templates
+
+const pdfTemplates: Record<string, React.FC<{ data: CVData; colorOverride?: string }>> = {
+  'kathleen': KathleenPDF,
+  'charles': CharlesPDF,
+  'grace-navy': GraceNavyPDF,
+  'grace-teal': GraceTealPDF,
+  'kelly': KellyPDF,
+  'richard': RichardPDF,
+  // Add all 21 templates...
+  // For now, use fallbacks
+  'grace-minimal': GraceNavyPDF,
+  'lauren-orange': KathleenPDF,
+  'grace-mint': GraceNavyPDF,
+  'grace-coral': GraceTealPDF,
+  'nelly-mint': GraceNavyPDF,
+  'nelly-gray': KellyPDF,
+  'nelly-sidebar': KellyPDF,
+  'lesley': KellyPDF,
+  'lauren-icons': RichardPDF,
+  'oliver': CharlesPDF,
+  'thomas': CharlesPDF,
+  'denice': CharlesPDF,
+  'nelly-purple': CharlesPDF,
+  'aparna-dark': CharlesPDF,
+  'aparna-gold': CharlesPDF,
+};
+
+export async function generatePDF(
+  data: CVData,
+  templateId: string,
+  colorOverride?: string
+): Promise<Buffer> {
+  const Template = pdfTemplates[templateId] || pdfTemplates['kathleen'];
+  
+  // Create the PDF document
+  const document = <Template data={data} colorOverride={colorOverride} />;
+  
+  // Render to buffer
+  const pdfBuffer = await ReactPDF.renderToBuffer(document);
+  
+  return Buffer.from(pdfBuffer);
+}
+
+export function getFileName(data: CVData): string {
+  const firstName = data.personalInfo.firstName || 'CV';
+  const lastName = data.personalInfo.lastName || '';
+  const cleanName = `${firstName}_${lastName}`.replace(/[^a-zA-Z0-9_]/g, '');
+  return `${cleanName}_CV_${Date.now()}.pdf`;
+}
+```
+
+---
+
+## Task 4: PDF API Route
+
+Create **`src/app/api/pdf/generate/route.ts`**:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { getCV, getPaymentByCVId } from '@/lib/supabase/database';
+import { generatePDF, getFileName } from '@/lib/pdf/generator';
+
+export async function GET(request: NextRequest) {
+  const cvId = request.nextUrl.searchParams.get('cvId');
+  const colorOverride = request.nextUrl.searchParams.get('color');
+
+  if (!cvId) {
+    return NextResponse.json({ error: 'cvId is required' }, { status: 400 });
+  }
+
+  try {
+    // 1. Get CV from database
+    const cv = await getCV(cvId);
+    
+    if (!cv) {
+      return NextResponse.json({ error: 'CV not found' }, { status: 404 });
+    }
+
+    // 2. Check payment status
+    const payment = await getPaymentByCVId(cvId);
+    
+    if (!payment || payment.status !== 'completed') {
+      return NextResponse.json(
+        { error: 'Payment required. Please complete payment to download your CV.' },
+        { status: 402 }
+      );
+    }
+
+    // 3. Generate PDF
+    const pdfBuffer = await generatePDF(
+      cv.data,
+      cv.template_id,
+      colorOverride || undefined
+    );
+
+    // 4. Generate filename
+    const fileName = getFileName(cv.data);
+
+    // 5. Return PDF
+    return new NextResponse(pdfBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+        'Content-Length': pdfBuffer.length.toString(),
+      },
+    });
+
+  } catch (error) {
+    console.error('PDF generation error:', error);
+    return NextResponse.json(
+      { error: 'Failed to generate PDF' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+---
+
+## Task 5: Sample React-PDF Template
+
+Create **`src/components/templates/pdf/kathleen.tsx`**:
+
+```tsx
+import React from 'react';
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Font,
+} from '@react-pdf/renderer';
+import { CVData } from '@/types/cv';
+
+// Register fonts (optional - uses Helvetica by default)
+// Font.register({
+//   family: 'Inter',
+//   src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2',
+// });
+
+interface Props {
+  data: CVData;
+  colorOverride?: string;
+}
+
+export function KathleenPDF({ data, colorOverride }: Props) {
+  const color = colorOverride || '#E5B94E';
+  const { personalInfo, summary, workExperiences, education, skills } = data;
+
+  const styles = StyleSheet.create({
+    page: {
+      flexDirection: 'row',
+      backgroundColor: '#F5F7FA',
+      fontFamily: 'Helvetica',
+    },
+    leftColumn: {
+      width: '35%',
+      padding: 30,
+      backgroundColor: '#F5F7FA',
+    },
+    rightColumn: {
+      width: '65%',
+      padding: 30,
+      backgroundColor: '#FFFFFF',
+    },
+    name: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: '#1F2937',
+      marginBottom: 2,
+    },
+    sectionTitle: {
+      fontSize: 10,
+      fontWeight: 'bold',
+      letterSpacing: 1,
+      color: '#374151',
+      marginBottom: 8,
+      paddingBottom: 4,
+      borderBottomWidth: 1,
+      borderBottomColor: '#D1D5DB',
+    },
+    sectionTitleAccent: {
+      fontSize: 10,
+      fontWeight: 'bold',
+      letterSpacing: 1,
+      color: color,
+      marginBottom: 8,
+      paddingBottom: 4,
+      borderBottomWidth: 1,
+      borderBottomColor: color,
+    },
+    contactItem: {
+      fontSize: 9,
+      color: color,
+      marginBottom: 4,
+    },
+    contactLabel: {
+      fontWeight: 'bold',
+      color: color,
+      marginRight: 4,
+    },
+    bodyText: {
+      fontSize: 9,
+      lineHeight: 1.5,
+      color: '#374151',
+    },
+    jobTitle: {
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: '#1F2937',
+      marginBottom: 2,
+    },
+    company: {
+      fontSize: 9,
+      color: '#6B7280',
+      marginBottom: 2,
+    },
+    date: {
+      fontSize: 8,
+      color: '#9CA3AF',
+      marginBottom: 4,
+    },
+    bulletPoint: {
+      fontSize: 9,
+      color: '#374151',
+      marginBottom: 2,
+      paddingLeft: 10,
+    },
+    bullet: {
+      color: '#9CA3AF',
+    },
+    skillItem: {
+      fontSize: 9,
+      color: '#374151',
+      marginBottom: 2,
+    },
+    experienceBlock: {
+      marginBottom: 12,
+    },
+    educationBlock: {
+      marginBottom: 8,
+    },
+    degree: {
+      fontSize: 10,
+      fontWeight: 'bold',
+      color: '#1F2937',
+    },
+    institution: {
+      fontSize: 9,
+      color: '#6B7280',
+    },
+    quoteMarkContainer: {
+      position: 'absolute',
+      right: 140,
+      top: 40,
+    },
+    quoteMark: {
+      fontSize: 100,
+      color: color,
+      fontFamily: 'Times-Roman',
+    },
+  });
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Left Column */}
+        <View style={styles.leftColumn}>
+          {/* Name */}
+          <Text style={styles.name}>{personalInfo.firstName || 'NOELA'}</Text>
+          <Text style={styles.name}>{personalInfo.lastName || 'BWEMERO'}</Text>
+
+          {/* Quote Mark */}
+          <View style={styles.quoteMarkContainer}>
+            <Text style={styles.quoteMark}>"</Text>
+          </View>
+
+          {/* Contact */}
+          <View style={{ marginTop: 30 }}>
+            <Text style={styles.sectionTitle}>CONTACT</Text>
+            {personalInfo.email && (
+              <View style={{ flexDirection: 'row', marginBottom: 4 }}>
+                <Text style={styles.contactLabel}>e</Text>
+                <Text style={styles.contactItem}>{personalInfo.email}</Text>
+              </View>
+            )}
+            {personalInfo.phone && (
+              <View style={{ flexDirection: 'row', marginBottom: 4 }}>
+                <Text style={styles.contactLabel}>t</Text>
+                <Text style={styles.contactItem}>{personalInfo.phone}</Text>
+              </View>
+            )}
+            {personalInfo.location && (
+              <View style={{ flexDirection: 'row', marginBottom: 4 }}>
+                <Text style={styles.contactLabel}>a</Text>
+                <Text style={styles.contactItem}>{personalInfo.location}</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Education */}
+          {education.length > 0 && (
+            <View style={{ marginTop: 20 }}>
+              <Text style={styles.sectionTitle}>EDUCATION</Text>
+              {education.map((edu) => (
+                <View key={edu.id} style={styles.educationBlock}>
+                  <Text style={styles.date}>{edu.graduationDate}</Text>
+                  <Text style={styles.degree}>{edu.degree}</Text>
+                  <Text style={styles.institution}>{edu.institution}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Skills */}
+          {skills.length > 0 && (
+            <View style={{ marginTop: 20 }}>
+              <Text style={styles.sectionTitle}>SKILLS</Text>
+              {skills.map((skill) => (
+                <Text key={skill.id} style={styles.skillItem}>
+                  • {skill.name}
+                </Text>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Right Column */}
+        <View style={styles.rightColumn}>
+          {/* Professional Summary */}
+          {summary && (
+            <View style={{ marginBottom: 20 }}>
+              <Text style={styles.sectionTitleAccent}>PROFESSIONAL SUMMARY</Text>
+              <Text style={styles.bodyText}>{summary}</Text>
+            </View>
+          )}
+
+          {/* Work Experience */}
+          {workExperiences.length > 0 && (
+            <View>
+              <Text style={styles.sectionTitleAccent}>WORK EXPERIENCE</Text>
+              {workExperiences.map((exp) => (
+                <View key={exp.id} style={styles.experienceBlock}>
+                  <Text style={styles.jobTitle}>{exp.jobTitle}</Text>
+                  <Text style={styles.company}>
+                    {exp.company} | {exp.location}
+                  </Text>
+                  <Text style={styles.date}>
+                    {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
+                  </Text>
+                  {exp.achievements.map((achievement, idx) => (
+                    <Text key={idx} style={styles.bulletPoint}>
+                      • {achievement}
+                    </Text>
+                  ))}
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+      </Page>
+    </Document>
+  );
+}
+```
+
+---
+
+## Task 6: Payment Page UI
+
+Create **`src/app/(builder)/payment/page.tsx`**:
+
+```tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCVStore } from '@/stores/cv-store';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+export default function PaymentPage() {
+  const router = useRouter();
+  const { cvData, templateId, selectedColor, cvId, setCVId } = useCVStore();
+  
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState(cvData.personalInfo.email || '');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'pending' | 'polling' | 'completed' | 'failed'>('idle');
+  const [statusMessage, setStatusMessage] = useState('');
+
+  // Poll for payment status
+  useEffect(() => {
+    if (paymentStatus !== 'polling' || !orderId) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/payment/status?orderId=${orderId}`);
+        const data = await res.json();
+        
+        if (data.status === 'completed') {
+          setPaymentStatus('completed');
+          setStatusMessage('Payment successful! Preparing your CV...');
+          clearInterval(pollInterval);
+          
+          // Redirect to download
+          setTimeout(() => {
+            window.location.href = `/api/pdf/generate?cvId=${data.cvId}${selectedColor ? `&color=${encodeURIComponent(selectedColor)}` : ''}`;
+          }, 1500);
+        } else if (data.status === 'failed' || data.status === 'cancelled') {
+          setPaymentStatus('failed');
+          setStatusMessage('Payment was not completed. Please try again.');
+          clearInterval(pollInterval);
+        }
+      } catch (err) {
+        console.error('Status poll error:', err);
+      }
+    }, 3000); // Poll every 3 seconds
+
+    // Stop polling after 5 minutes
+    const timeout = setTimeout(() => {
+      clearInterval(pollInterval);
+      if (paymentStatus === 'polling') {
+        setPaymentStatus('failed');
+        setStatusMessage('Payment timeout. Please try again.');
+      }
+    }, 5 * 60 * 1000);
+
+    return () => {
+      clearInterval(pollInterval);
+      clearTimeout(timeout);
+    };
+  }, [paymentStatus, orderId, selectedColor]);
+
+  const handleInitiatePayment = async () => {
+    if (!phone) {
+      setError('Please enter your phone number');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      // 1. Initiate payment
+      const initRes = await fetch('/api/payment/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cvData,
+          templateId,
+          phone,
+          email,
+          name: `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`,
+          anonymousId: cvId || undefined,
+        }),
+      });
+
+      const initData = await initRes.json();
+
+      if (!initRes.ok) {
+        throw new Error(initData.error || 'Failed to initiate payment');
+      }
+
+      setOrderId(initData.orderId);
+      setCVId(initData.cvId);
+
+      // 2. Trigger USSD push
+      const pushRes = await fetch('/api/payment/push-ussd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: initData.orderId,
+          msisdn: initData.msisdn,
+        }),
+      });
+
+      const pushData = await pushRes.json();
+
+      if (pushData.success) {
+        setPaymentStatus('polling');
+        setStatusMessage('Check your phone! Enter your M-Pesa PIN to complete payment.');
+      } else {
+        throw new Error(pushData.message || 'Failed to send payment request');
+      }
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Payment failed');
+      setPaymentStatus('failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Download Your CV</CardTitle>
+          <p className="text-gray-600 mt-2">
+            Complete payment to download your professional CV
+          </p>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          {/* Price */}
+          <div className="text-center p-4 bg-green-50 rounded-lg">
+            <p className="text-sm text-green-700">Total Amount</p>
+            <p className="text-3xl font-bold text-green-600">TZS 5,000</p>
+          </div>
+
+          {paymentStatus === 'idle' && (
+            <>
+              {/* Phone Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  M-Pesa / Airtel Money Number
+                </label>
+                <Input
+                  type="tel"
+                  placeholder="0712 345 678"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="text-lg"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  You'll receive a USSD prompt to confirm payment
+                </p>
+              </div>
+
+              {/* Email (optional) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email (optional - for receipt)
+                </label>
+                <Input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              {error && (
+                <p className="text-red-600 text-sm text-center">{error}</p>
+              )}
+
+              <Button
+                onClick={handleInitiatePayment}
+                disabled={loading}
+                className="w-full h-12 text-lg bg-green-600 hover:bg-green-700"
+              >
+                {loading ? 'Processing...' : 'Pay with Mobile Money'}
+              </Button>
+
+              <p className="text-xs text-center text-gray-500">
+                Secure payment powered by Selcom
+              </p>
+            </>
+          )}
+
+          {paymentStatus === 'polling' && (
+            <div className="text-center py-8">
+              <div className="animate-spin w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full mx-auto mb-4" />
+              <p className="text-lg font-medium text-gray-800">{statusMessage}</p>
+              <p className="text-sm text-gray-500 mt-2">
+                Waiting for confirmation...
+              </p>
+            </div>
+          )}
+
+          {paymentStatus === 'completed' && (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p className="text-lg font-medium text-green-600">{statusMessage}</p>
+            </div>
+          )}
+
+          {paymentStatus === 'failed' && (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <p className="text-lg font-medium text-red-600 mb-4">{statusMessage}</p>
+              <Button onClick={() => setPaymentStatus('idle')} variant="outline">
+                Try Again
+              </Button>
+            </div>
+          )}
+
+          {/* Back to Preview */}
+          {paymentStatus === 'idle' && (
+            <button
+              onClick={() => router.push('/preview')}
+              className="w-full text-center text-sm text-gray-500 hover:text-gray-700"
+            >
+              ← Back to Preview
+            </button>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+```
+
+---
+
+## Task 7: Environment Variables
+
+Add to **`.env.local`**:
+
+```env
+# Selcom API Configuration
+SELCOM_BASE_URL=https://apigw.selcommobile.com
+SELCOM_API_KEY=your_api_key_here
+SELCOM_API_SECRET=your_api_secret_here
+SELCOM_VENDOR_ID=your_vendor_id_here
+
+# App Configuration
+NEXT_PUBLIC_BASE_URL=https://cvchapchap.co.tz
+```
+
+---
+
+# ✅ Day 3 Checklist for Engineer
+
+## Create these files:
+
+1. **`src/lib/selcom/client.ts`** - Selcom API client
+2. **`src/app/api/payment/initiate/route.ts`** - Create order
+3. **`src/app/api/payment/push-ussd/route.ts`** - Trigger USSD
+4. **`src/app/api/payment/webhook/route.ts`** - Receive callback
+5. **`src/app/api/payment/status/route.ts`** - Check status
+6. **`src/lib/pdf/generator.ts`** - PDF generation
+7. **`src/app/api/pdf/generate/route.ts`** - PDF download endpoint
+8. **`src/components/templates/pdf/kathleen.tsx`** - First PDF template
+9. **`src/app/(builder)/payment/page.tsx`** - Payment UI
+
+## Update:
+
+1. **`.env.local`** with Selcom credentials
+2. **`src/lib/supabase/database.ts`** - add `getPaymentByCVId` function
+
+## Test:
+
+1. Payment initiation flow
+2. USSD push to phone
+3. Webhook receives callback
+4. PDF generates after payment
+
+---
+
+**Once you have Selcom credentials, we can test the full flow. Let me know when ready for the remaining 20 PDF templates!**

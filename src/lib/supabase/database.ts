@@ -159,3 +159,43 @@ export async function markCVDownloaded(cvId: string) {
 
   if (error) throw error;
 }
+
+export async function getCVById(id: string) {
+  const supabase = await createClient();
+  
+  const { data: cv, error } = await supabase
+    .from('cvs')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return cv;
+}
+
+export async function getPaymentByOrderId(orderId: string) {
+  const supabase = await createClient();
+  
+  const { data: payment, error } = await supabase
+    .from('payments')
+    .select('*')
+    .eq('request_id', orderId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return payment;
+}
+
+export async function updateCVStatus(id: string, status: string) {
+  const supabase = await createClient();
+  
+  const { data: cv, error } = await supabase
+    .from('cvs')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return cv;
+}
