@@ -10,6 +10,18 @@ import { GraceTealPreview } from './grace-teal';
 import { LesleyPreview } from './lesley';
 import { KellyPreview } from './kelly';
 import { RichardPreview } from './richard';
+import { GraceMintPreview } from './grace-mint';
+import { GraceCoralPreview } from './grace-coral';
+import { NellyMintPreview } from './nelly-mint';
+import { NellyGrayPreview } from './nelly-gray';
+import { NellySidebarPreview } from './nelly-sidebar';
+import { LaurenIconsPreview } from './lauren-icons';
+import { OliverPreview } from './oliver';
+import { ThomasPreview } from './thomas';
+import { DenicePreview } from './denice';
+import { NellyPurplePreview } from './nelly-purple';
+import { AparnaDarkPreview } from './aparna-dark';
+import { AparnaGoldPreview } from './aparna-gold';
 
 interface TemplatePreviewProps {
   templateId: string;
@@ -27,6 +39,18 @@ const previewComponents: Record<string, React.FC<{ data: CVData }>> = {
   'lesley': LesleyPreview,
   'kelly': KellyPreview,
   'richard': RichardPreview,
+  'grace-mint': GraceMintPreview,
+  'grace-coral': GraceCoralPreview,
+  'nelly-mint': NellyMintPreview,
+  'nelly-gray': NellyGrayPreview,
+  'nelly-sidebar': NellySidebarPreview,
+  'lauren-icons': LaurenIconsPreview,
+  'oliver': OliverPreview,
+  'thomas': ThomasPreview,
+  'denice': DenicePreview,
+  'nelly-purple': NellyPurplePreview,
+  'aparna-dark': AparnaDarkPreview,
+  'aparna-gold': AparnaGoldPreview,
 };
 
 export function TemplatePreview({ templateId, data, scale = 1 }: TemplatePreviewProps) {
@@ -150,6 +174,18 @@ export {
   RichardPreview,
   CharlesPreview,
   GraceMinimalPreview,
+  GraceMintPreview,
+  GraceCoralPreview,
+  NellyMintPreview,
+  NellyGrayPreview,
+  NellySidebarPreview,
+  LaurenIconsPreview,
+  OliverPreview,
+  ThomasPreview,
+  DenicePreview,
+  NellyPurplePreview,
+  AparnaDarkPreview,
+  AparnaGoldPreview,
 };
 
 export default TemplatePreview;

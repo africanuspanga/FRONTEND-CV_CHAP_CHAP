@@ -7,6 +7,7 @@ export interface PersonalInfo {
   location: string;
   linkedin?: string;
   website?: string;
+  photoUrl?: string;
 }
 
 export interface WorkExperience {
@@ -26,6 +27,7 @@ export interface Education {
   institution: string;
   fieldOfStudy: string;
   graduationDate: string;
+  location?: string;
 }
 
 export interface Skill {
@@ -44,9 +46,17 @@ export interface Reference {
   id: string;
   name: string;
   title: string;
+  position?: string;
   company: string;
   phone: string;
   email: string;
+}
+
+export interface Certification {
+  id: string;
+  name: string;
+  issuer: string;
+  date: string;
 }
 
 export interface CVData {
@@ -57,6 +67,7 @@ export interface CVData {
   skills: Skill[];
   languages: Language[];
   references: Reference[];
+  certifications?: Certification[];
 }
 
 export interface CVDocument {
