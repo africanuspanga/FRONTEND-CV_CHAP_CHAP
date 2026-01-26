@@ -1,0 +1,694 @@
+Excellent questions! Let me address both:
+
+---
+
+## Question 1: Template Thumbnails & Color Switching
+
+### The Problem:
+- If we use static PNG screenshots for template selection, they can't change color dynamically
+- User selects a template, then later changes color - the thumbnail won't reflect this
+
+### The Solution: **Live Mini-Previews (Not Static Images)**
+
+Instead of PNG thumbnails, we render actual **mini live previews** of each template using the same React components, just scaled down. This way:
+
+1. Thumbnails show the actual template design
+2. When user changes color, ALL thumbnails update instantly
+3. No need to maintain 21 × 8 colors = 168 static images!
+
+Here's how to build it:
+
+---
+
+### **`src/app/(builder)/template/page.tsx`** - Template Selection with Live Thumbnails
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCVStore } from '@/stores/cv-store';
+import { TEMPLATES } from '@/types/templates';
+import { TemplatePreview } from '@/components/templates/preview';
+
+// Sample data for thumbnails
+const sampleData = {
+  personalInfo: {
+    firstName: 'Noela',
+    lastName: 'Bwemero',
+    email: 'noela@email.com',
+    phone: '+255 712 345 678',
+    location: 'Dar es Salaam, Tanzania',
+    professionalTitle: 'Marketing Manager',
+    linkedin: 'linkedin.com/in/noela',
+    website: '',
+    photoUrl: '',
+  },
+  summary: 'Motivated professional with 5+ years of experience in marketing and brand management.',
+  workExperiences: [
+    {
+      id: '1',
+      jobTitle: 'Marketing Manager',
+      company: 'ABC Company',
+      location: 'Dar es Salaam',
+      startDate: 'Jan 2020',
+      endDate: '',
+      isCurrent: true,
+      achievements: ['Increased sales by 40%', 'Led team of 5 marketers'],
+    },
+  ],
+  education: [
+    {
+      id: '1',
+      degree: 'Bachelor of Business',
+      institution: 'University of Dar es Salaam',
+      fieldOfStudy: 'Marketing',
+      graduationDate: '2019',
+      location: 'Dar es Salaam',
+    },
+  ],
+  skills: [
+    { id: '1', name: 'Digital Marketing', level: 'expert' },
+    { id: '2', name: 'Brand Strategy', level: 'advanced' },
+    { id: '3', name: 'Social Media', level: 'expert' },
+  ],
+  languages: [
+    { id: '1', name: 'Swahili', proficiency: 'native' },
+    { id: '2', name: 'English', proficiency: 'fluent' },
+  ],
+  references: [],
+  certifications: [],
+};
+
+const colorOptions = [
+  { name: 'Default', value: null },
+  { name: 'Teal', value: '#0891B2' },
+  { name: 'Navy', value: '#1E3A5F' },
+  { name: 'Forest', value: '#166534' },
+  { name: 'Orange', value: '#E07A38' },
+  { name: 'Purple', value: '#7C3AED' },
+  { name: 'Rose', value: '#BE185D' },
+  { name: 'Gold', value: '#D4A056' },
+];
+
+export default function TemplateSelectionPage() {
+  const router = useRouter();
+  const { setTemplateId, setSelectedColor, templateId: currentTemplate } = useCVStore();
+  
+  const [filter, setFilter] = useState<'all' | 'photo' | 'no-photo'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [previewColor, setPreviewColor] = useState<string | null>(null);
+  const [hoveredTemplate, setHoveredTemplate] = useState<string | null>(null);
+
+  const filteredTemplates = TEMPLATES.filter((t) => {
+    if (filter === 'photo' && !t.hasPhoto) return false;
+    if (filter === 'no-photo' && t.hasPhoto) return false;
+    if (categoryFilter !== 'all' && t.category !== categoryFilter) return false;
+    return true;
+  });
+
+  const handleSelectTemplate = (id: string) => {
+    setTemplateId(id);
+    setSelectedColor(previewColor);
+    router.push('/personal');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-white border-b sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <h1 className="text-2xl font-bold text-gray-900">Choose Your Template</h1>
+          <p className="text-gray-600 mt-1">Select a design that matches your style</p>
+          
+          {/* Filters */}
+          <div className="flex flex-wrap gap-4 mt-4 items-center justify-between">
+            {/* Photo Filter */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-3 py-1.5 rounded-full text-sm ${
+                  filter === 'all' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                All ({TEMPLATES.length})
+              </button>
+              <button
+                onClick={() => setFilter('photo')}
+                className={`px-3 py-1.5 rounded-full text-sm ${
+                  filter === 'photo' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                With Photo ({TEMPLATES.filter(t => t.hasPhoto).length})
+              </button>
+              <button
+                onClick={() => setFilter('no-photo')}
+                className={`px-3 py-1.5 rounded-full text-sm ${
+                  filter === 'no-photo' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                No Photo ({TEMPLATES.filter(t => !t.hasPhoto).length})
+              </button>
+            </div>
+
+            {/* Color Selector */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Preview color:</span>
+              <div className="flex gap-1">
+                {colorOptions.map((opt) => (
+                  <button
+                    key={opt.name}
+                    onClick={() => setPreviewColor(opt.value)}
+                    className={`w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 ${
+                      previewColor === opt.value 
+                        ? 'border-gray-900 scale-110' 
+                        : 'border-gray-300'
+                    }`}
+                    style={{ backgroundColor: opt.value || '#666' }}
+                    title={opt.name}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Template Grid */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <p className="text-sm text-gray-500 mb-4">
+          Showing {filteredTemplates.length} of {TEMPLATES.length} templates
+        </p>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          {filteredTemplates.map((template) => (
+            <div
+              key={template.id}
+              className={`group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer ${
+                currentTemplate === template.id ? 'ring-2 ring-blue-500' : ''
+              }`}
+              onClick={() => handleSelectTemplate(template.id)}
+              onMouseEnter={() => setHoveredTemplate(template.id)}
+              onMouseLeave={() => setHoveredTemplate(null)}
+            >
+              {/* Live Mini Preview */}
+              <div className="relative aspect-[210/297] overflow-hidden bg-gray-50">
+                <div 
+                  className="absolute top-0 left-0 origin-top-left"
+                  style={{ 
+                    transform: 'scale(0.2)', 
+                    width: '210mm',
+                    height: '297mm',
+                  }}
+                >
+                  <TemplatePreview
+                    templateId={template.id}
+                    data={sampleData}
+                    colorOverride={previewColor}
+                    scale={1}
+                  />
+                </div>
+                
+                {/* Hover Overlay */}
+                <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity ${
+                  hoveredTemplate === template.id ? 'opacity-100' : 'opacity-0'
+                }`}>
+                  <span className="px-4 py-2 bg-white text-gray-900 rounded-lg font-medium text-sm">
+                    Use This Template
+                  </span>
+                </div>
+
+                {/* Photo Badge */}
+                {template.hasPhoto && (
+                  <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                    📷 Photo
+                  </div>
+                )}
+              </div>
+
+              {/* Template Info */}
+              <div className="p-3">
+                <h3 className="font-semibold text-gray-900">{template.name}</h3>
+                <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+                  {template.description}
+                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <span 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: previewColor || template.primaryColor }}
+                  />
+                  <span className="text-xs text-gray-400 capitalize">{template.category}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## Question 2: Mobile-Friendly Live Preview in Multi-Step Form
+
+The screenshot you shared shows the ideal layout - **split view on desktop, stacked on mobile**. Here's how to build it:
+
+---
+
+### **`src/components/builder/builder-layout.tsx`** - Responsive Builder Layout
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { useCVStore } from '@/stores/cv-store';
+import { TemplatePreview } from '@/components/templates/preview';
+import { Button } from '@/components/ui/button';
+
+interface BuilderLayoutProps {
+  children: React.ReactNode;
+  currentStep: number;
+  totalSteps: number;
+  stepTitle: string;
+  onNext?: () => void;
+  onBack?: () => void;
+  showNext?: boolean;
+  showBack?: boolean;
+  nextLabel?: string;
+}
+
+export function BuilderLayout({
+  children,
+  currentStep,
+  totalSteps,
+  stepTitle,
+  onNext,
+  onBack,
+  showNext = true,
+  showBack = true,
+  nextLabel = 'Continue',
+}: BuilderLayoutProps) {
+  const { cvData, templateId, selectedColor } = useCVStore();
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Mobile Header with Preview Toggle */}
+      <div className="lg:hidden sticky top-0 z-20 bg-white border-b">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div>
+            <p className="text-xs text-gray-500">Step {currentStep} of {totalSteps}</p>
+            <h1 className="font-semibold text-gray-900">{stepTitle}</h1>
+          </div>
+          <button
+            onClick={() => setShowMobilePreview(!showMobilePreview)}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg text-sm font-medium"
+          >
+            {showMobilePreview ? '✏️ Edit' : '👁️ Preview'}
+          </button>
+        </div>
+        
+        {/* Progress Bar */}
+        <div className="h-1 bg-gray-200">
+          <div 
+            className="h-1 bg-blue-600 transition-all"
+            style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Desktop Layout: Side by Side */}
+      <div className="hidden lg:flex h-screen">
+        {/* Left: Form */}
+        <div className="w-1/2 overflow-y-auto">
+          <div className="max-w-xl mx-auto p-8">
+            {/* Desktop Header */}
+            <div className="mb-6">
+              <p className="text-sm text-gray-500">Step {currentStep} of {totalSteps}</p>
+              <h1 className="text-2xl font-bold text-gray-900">{stepTitle}</h1>
+            </div>
+
+            {/* Form Content */}
+            <div className="space-y-6">
+              {children}
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex gap-4 mt-8 pt-6 border-t">
+              {showBack && onBack && (
+                <Button variant="outline" onClick={onBack} className="flex-1">
+                  ← Back
+                </Button>
+              )}
+              {showNext && onNext && (
+                <Button onClick={onNext} className="flex-1 bg-blue-600 hover:bg-blue-700">
+                  {nextLabel} →
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Live Preview (Fixed) */}
+        <div className="w-1/2 bg-gray-200 p-6 overflow-hidden flex items-start justify-center">
+          <div className="sticky top-6">
+            <div className="bg-white shadow-2xl rounded-lg overflow-hidden">
+              {/* Preview Container - Scaled to fit */}
+              <div 
+                className="origin-top-left overflow-hidden"
+                style={{ 
+                  transform: 'scale(0.6)',
+                  width: '210mm',
+                  height: '297mm',
+                  transformOrigin: 'top left',
+                }}
+              >
+                <TemplatePreview
+                  templateId={templateId}
+                  data={cvData}
+                  colorOverride={selectedColor}
+                  scale={1}
+                />
+              </div>
+            </div>
+            
+            {/* Template/Color Quick Switch */}
+            <div className="mt-4 flex items-center justify-center gap-4">
+              <button className="text-sm text-gray-600 hover:text-gray-900 underline">
+                Change Template
+              </button>
+              <span className="text-gray-300">|</span>
+              <button className="text-sm text-gray-600 hover:text-gray-900 underline">
+                Change Color
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Layout: Stacked with Toggle */}
+      <div className="lg:hidden">
+        {showMobilePreview ? (
+          /* Mobile Preview View */
+          <div className="p-4">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-auto" style={{ maxWidth: '350px' }}>
+              {/* Scrollable Preview */}
+              <div 
+                className="overflow-y-auto"
+                style={{ 
+                  maxHeight: 'calc(100vh - 180px)',
+                }}
+              >
+                <div 
+                  className="origin-top-left"
+                  style={{ 
+                    transform: 'scale(0.45)',
+                    width: '210mm',
+                    transformOrigin: 'top left',
+                  }}
+                >
+                  <TemplatePreview
+                    templateId={templateId}
+                    data={cvData}
+                    colorOverride={selectedColor}
+                    scale={1}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Color Swatches for Mobile */}
+            <div className="flex justify-center gap-2 mt-4">
+              {['#0891B2', '#1E3A5F', '#166534', '#E07A38', '#7C3AED', '#BE185D', '#D4A056'].map((color) => (
+                <button
+                  key={color}
+                  className={`w-8 h-8 rounded-full border-2 ${
+                    selectedColor === color ? 'border-gray-900' : 'border-gray-300'
+                  }`}
+                  style={{ backgroundColor: color }}
+                  onClick={() => useCVStore.getState().setSelectedColor(color)}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          /* Mobile Form View */
+          <div className="p-4 pb-32">
+            <div className="space-y-6">
+              {children}
+            </div>
+          </div>
+        )}
+
+        {/* Mobile Bottom Navigation (Fixed) */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 flex gap-3">
+          {showBack && onBack && (
+            <Button variant="outline" onClick={onBack} className="flex-1">
+              ← Back
+            </Button>
+          )}
+          {showNext && onNext && (
+            <Button onClick={onNext} className="flex-1 bg-blue-600 hover:bg-blue-700">
+              {nextLabel} →
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### **`src/app/(builder)/personal/page.tsx`** - Example Form Page Using Layout
+
+```tsx
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useCVStore } from '@/stores/cv-store';
+import { BuilderLayout } from '@/components/builder/builder-layout';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
+export default function PersonalInfoPage() {
+  const router = useRouter();
+  const { cvData, updatePersonalInfo } = useCVStore();
+  const { personalInfo } = cvData;
+
+  return (
+    <BuilderLayout
+      currentStep={1}
+      totalSteps={7}
+      stepTitle="Personal Information"
+      onBack={() => router.push('/template')}
+      onNext={() => router.push('/experience')}
+      nextLabel="Continue to Experience"
+    >
+      {/* First Name */}
+      <div>
+        <Label htmlFor="firstName">First Name *</Label>
+        <Input
+          id="firstName"
+          value={personalInfo.firstName}
+          onChange={(e) => updatePersonalInfo({ firstName: e.target.value })}
+          placeholder="Noela"
+          className="mt-1"
+        />
+      </div>
+
+      {/* Last Name */}
+      <div>
+        <Label htmlFor="lastName">Last Name *</Label>
+        <Input
+          id="lastName"
+          value={personalInfo.lastName}
+          onChange={(e) => updatePersonalInfo({ lastName: e.target.value })}
+          placeholder="Bwemero"
+          className="mt-1"
+        />
+      </div>
+
+      {/* Professional Title */}
+      <div>
+        <Label htmlFor="title">Professional Title</Label>
+        <Input
+          id="title"
+          value={personalInfo.professionalTitle}
+          onChange={(e) => updatePersonalInfo({ professionalTitle: e.target.value })}
+          placeholder="Marketing Manager"
+          className="mt-1"
+        />
+      </div>
+
+      {/* Email */}
+      <div>
+        <Label htmlFor="email">Email *</Label>
+        <Input
+          id="email"
+          type="email"
+          value={personalInfo.email}
+          onChange={(e) => updatePersonalInfo({ email: e.target.value })}
+          placeholder="noela@example.com"
+          className="mt-1"
+        />
+      </div>
+
+      {/* Phone */}
+      <div>
+        <Label htmlFor="phone">Phone Number *</Label>
+        <Input
+          id="phone"
+          type="tel"
+          value={personalInfo.phone}
+          onChange={(e) => updatePersonalInfo({ phone: e.target.value })}
+          placeholder="+255 712 345 678"
+          className="mt-1"
+        />
+      </div>
+
+      {/* Location */}
+      <div>
+        <Label htmlFor="location">Location</Label>
+        <Input
+          id="location"
+          value={personalInfo.location}
+          onChange={(e) => updatePersonalInfo({ location: e.target.value })}
+          placeholder="Dar es Salaam, Tanzania"
+          className="mt-1"
+        />
+      </div>
+
+      {/* LinkedIn */}
+      <div>
+        <Label htmlFor="linkedin">LinkedIn Profile</Label>
+        <Input
+          id="linkedin"
+          value={personalInfo.linkedin}
+          onChange={(e) => updatePersonalInfo({ linkedin: e.target.value })}
+          placeholder="linkedin.com/in/noela"
+          className="mt-1"
+        />
+      </div>
+    </BuilderLayout>
+  );
+}
+```
+
+---
+
+## Visual Comparison: Desktop vs Mobile
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              DESKTOP VIEW                                   │
+│                           (Side by Side)                                    │
+├─────────────────────────────────┬───────────────────────────────────────────┤
+│                                 │                                           │
+│   Step 1 of 7                   │     ┌───────────────────────────┐         │
+│   Personal Information          │     │                           │         │
+│                                 │     │   NOELA BWEMERO           │         │
+│   ┌─────────────────────────┐   │     │   Marketing Manager       │         │
+│   │ First Name              │   │     │                           │         │
+│   │ [Noela            ]     │   │     │   noela@example.com       │         │
+│   └─────────────────────────┘   │     │   +255 712 345 678        │         │
+│                                 │     │                           │         │
+│   ┌─────────────────────────┐   │     │   PROFESSIONAL SUMMARY    │         │
+│   │ Last Name               │   │     │   Motivated professional  │         │
+│   │ [Bwemero          ]     │   │     │   with 5+ years...        │         │
+│   └─────────────────────────┘   │     │                           │         │
+│                                 │     │   SKILLS                  │         │
+│   ┌─────────────────────────┐   │     │   • Digital Marketing     │         │
+│   │ Professional Title      │   │     │   • Brand Strategy        │         │
+│   │ [Marketing Manager]     │   │     │                           │         │
+│   └─────────────────────────┘   │     └───────────────────────────┘         │
+│                                 │                                           │
+│   [← Back]        [Continue →]  │     Change Template | Change Color        │
+│                                 │                                           │
+└─────────────────────────────────┴───────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              MOBILE VIEW                                    │
+│                     (Stacked with Toggle Button)                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │ Step 1 of 7                                         [👁️ Preview]      │  │
+│  │ Personal Information                                                   │  │
+│  │ ▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  (progress bar)     │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  FORM MODE (default):                PREVIEW MODE (when toggled):           │
+│  ┌───────────────────────────┐       ┌───────────────────────────┐          │
+│  │                           │       │     ┌─────────────────┐   │          │
+│  │   First Name *            │       │     │ NOELA BWEMERO   │   │          │
+│  │   ┌─────────────────────┐ │       │     │                 │   │          │
+│  │   │ Noela               │ │       │     │ Marketing Mgr   │   │          │
+│  │   └─────────────────────┘ │       │     │                 │   │          │
+│  │                           │       │     │ +255 712...     │   │          │
+│  │   Last Name *             │       │     │                 │   │          │
+│  │   ┌─────────────────────┐ │       │     │ SUMMARY         │   │          │
+│  │   │ Bwemero             │ │       │     │ Motivated...    │   │          │
+│  │   └─────────────────────┘ │       │     │                 │   │          │
+│  │                           │       │     └─────────────────┘   │          │
+│  │   Email *                 │       │                           │          │
+│  │   ┌─────────────────────┐ │       │   🔵 🟢 🟠 🟣 🟤 🔴 🟡     │          │
+│  │   │ noela@example.com   │ │       │      (color swatches)     │          │
+│  │   └─────────────────────┘ │       └───────────────────────────┘          │
+│  │                           │                                              │
+│  └───────────────────────────┘                                              │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │              [← Back]                    [Continue →]                  │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Summary of Answers
+
+### Q1: Where do template thumbnails come from?
+**Answer:** We DON'T use static PNG images. Instead, we render **live mini-previews** using the same React template components, scaled down to thumbnail size (20% scale). This means:
+- Thumbnails always match the actual template
+- Color changes apply to ALL thumbnails instantly
+- No need to maintain hundreds of static images
+- User sees exactly what they'll get
+
+### Q2: How does mobile preview work?
+**Answer:** We use a **toggle approach** on mobile:
+- By default, user sees the form (full screen)
+- Top-right button toggles between "✏️ Edit" and "👁️ Preview"
+- Preview mode shows the CV at 45% scale with color swatches below
+- Fixed bottom navigation bar for Back/Continue buttons
+- On desktop, both are visible side-by-side (50/50 split)
+
+---
+
+## Files to Create/Update
+
+1. **`src/components/builder/builder-layout.tsx`** - Responsive layout component
+2. **`src/app/(builder)/template/page.tsx`** - Template selection with live thumbnails
+3. Update all form pages to use `<BuilderLayout>` wrapper
+4. **`src/stores/cv-store.ts`** - Add `selectedColor` to store
+
+### Add to CV Store:
+
+```typescript
+// In src/stores/cv-store.ts, add:
+interface CVStore {
+  // ... existing fields
+  selectedColor: string | null;
+  setSelectedColor: (color: string | null) => void;
+}
+
+// In the store:
+selectedColor: null,
+setSelectedColor: (color) => set({ selectedColor: color }),
+```
+
+---
+
+**Would you like me to provide the complete updated code for all 7 builder step pages using this responsive layout?**

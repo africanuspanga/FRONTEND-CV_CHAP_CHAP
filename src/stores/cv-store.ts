@@ -25,11 +25,13 @@ const defaultCVData: CVData = {
 interface CVStore {
   cvId: string | null;
   templateId: string;
+  selectedColor: string | null;
   cvData: CVData;
   currentStep: CVFormStep;
   
   setCurrentStep: (step: CVFormStep) => void;
   setTemplateId: (id: string) => void;
+  setSelectedColor: (color: string | null) => void;
   updatePersonalInfo: (data: Partial<CVData['personalInfo']>) => void;
   setSummary: (summary: string) => void;
   
@@ -64,12 +66,14 @@ export const useCVStore = create<CVStore>()(
   persist(
     (set) => ({
       cvId: null,
-      templateId: 'classic-professional',
+      templateId: 'charles',
+      selectedColor: null,
       cvData: defaultCVData,
       currentStep: 'template',
 
       setCurrentStep: (step) => set({ currentStep: step }),
       setTemplateId: (id) => set({ templateId: id }),
+      setSelectedColor: (color) => set({ selectedColor: color }),
 
       updatePersonalInfo: (data) =>
         set((state) => ({
@@ -284,7 +288,8 @@ export const useCVStore = create<CVStore>()(
       resetCV: () =>
         set({
           cvId: null,
-          templateId: 'classic-professional',
+          templateId: 'charles',
+          selectedColor: null,
           cvData: defaultCVData,
           currentStep: 'template',
         }),

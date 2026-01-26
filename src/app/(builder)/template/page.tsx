@@ -1,92 +1,176 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TEMPLATES, type TemplateConfig } from "@/types/templates";
 import { useCVStore } from "@/stores/cv-store";
-import { CheckCircle, ArrowLeft, ArrowRight, Camera, FileText } from "lucide-react";
+import { CheckCircle, ArrowLeft, ArrowRight, Camera } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { TemplatePreview } from "@/components/templates/preview";
+import type { CVData } from "@/types/cv";
 
 type FilterType = 'all' | 'with-photo' | 'without-photo';
 type CategoryType = 'all' | 'professional' | 'modern' | 'creative' | 'minimal';
 
-function TemplateCard({ template, isSelected, onSelect }: { 
+const sampleData: CVData = {
+  personalInfo: {
+    firstName: 'Noela',
+    lastName: 'Bwemero',
+    email: 'noela@email.com',
+    phone: '+255 712 345 678',
+    location: 'Dar es Salaam, Tanzania',
+    professionalTitle: 'Marketing Manager',
+    linkedin: 'linkedin.com/in/noela',
+    website: '',
+  },
+  summary: 'Motivated professional with 5+ years of experience in marketing and brand management.',
+  workExperiences: [
+    {
+      id: '1',
+      jobTitle: 'Marketing Manager',
+      company: 'ABC Company',
+      location: 'Dar es Salaam',
+      startDate: 'Jan 2020',
+      endDate: '',
+      isCurrent: true,
+      achievements: ['Increased sales by 40%', 'Led team of 5 marketers'],
+    },
+  ],
+  education: [
+    {
+      id: '1',
+      degree: 'Bachelor of Business',
+      institution: 'University of Dar es Salaam',
+      fieldOfStudy: 'Marketing',
+      graduationDate: '2019',
+    },
+  ],
+  skills: [
+    { id: '1', name: 'Digital Marketing', level: 'expert' },
+    { id: '2', name: 'Brand Strategy', level: 'advanced' },
+    { id: '3', name: 'Social Media', level: 'expert' },
+  ],
+  languages: [
+    { id: '1', name: 'Swahili', proficiency: 'native' },
+    { id: '2', name: 'English', proficiency: 'fluent' },
+  ],
+  references: [],
+};
+
+const colorOptions = [
+  { name: 'Default', value: null },
+  { name: 'Teal', value: '#0891B2' },
+  { name: 'Navy', value: '#1E3A5F' },
+  { name: 'Forest', value: '#166534' },
+  { name: 'Orange', value: '#E07A38' },
+  { name: 'Purple', value: '#7C3AED' },
+  { name: 'Rose', value: '#BE185D' },
+  { name: 'Gold', value: '#D4A056' },
+];
+
+function LiveTemplateCard({ 
+  template, 
+  isSelected, 
+  onSelect,
+  previewColor,
+}: { 
   template: TemplateConfig; 
   isSelected: boolean;
   onSelect: () => void;
+  previewColor: string | null;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.2 }}
+    <div
+      className={`group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer ${
+        isSelected ? 'ring-2 ring-blue-500' : ''
+      }`}
+      onClick={onSelect}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <Card 
-        className={`cursor-pointer transition-all ${
-          isSelected 
-            ? 'ring-2 ring-primary border-primary' 
-            : 'hover:shadow-lg'
-        }`}
-        onClick={onSelect}
-      >
-        <CardHeader className="p-0">
-          <div 
-            className="h-48 rounded-t-lg flex items-center justify-center relative"
-            style={{ 
-              background: `linear-gradient(135deg, ${template.primaryColor}, ${template.primaryColor}88)` 
-            }}
-          >
-            {isSelected && (
-              <div className="absolute top-3 right-3">
-                <CheckCircle className="h-8 w-8 text-white" />
-              </div>
-            )}
-            {template.hasPhoto && (
-              <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1">
-                <Camera className="h-3 w-3 text-white" />
-                <span className="text-xs text-white">Photo</span>
-              </div>
-            )}
-            <div className="text-white text-center p-4">
-              <div className="text-2xl font-bold mb-2">{template.name}</div>
-              <div className="text-sm opacity-90 capitalize">{template.category}</div>
-            </div>
+      <div className="relative aspect-[210/297] overflow-hidden bg-gray-50">
+        <div 
+          className="absolute top-0 left-0 origin-top-left pointer-events-none"
+          style={{ 
+            transform: 'scale(0.18)', 
+            width: '210mm',
+            height: '297mm',
+          }}
+        >
+          <TemplatePreview
+            templateId={template.id}
+            data={sampleData}
+            scale={1}
+          />
+        </div>
+        
+        {isSelected && (
+          <div className="absolute top-2 left-2 bg-blue-500 rounded-full p-1">
+            <CheckCircle className="h-5 w-5 text-white" />
           </div>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <CardTitle className="text-lg mb-2">{template.name}</CardTitle>
-          <CardDescription className="line-clamp-2">{template.description}</CardDescription>
-        </CardContent>
-      </Card>
-    </motion.div>
+        )}
+
+        <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity ${
+          isHovered ? 'opacity-100' : 'opacity-0'
+        }`}>
+          <span className="px-4 py-2 bg-white text-gray-900 rounded-lg font-medium text-sm">
+            Use This Template
+          </span>
+        </div>
+
+        {template.hasPhoto && (
+          <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+            <Camera className="h-3 w-3" />
+            Photo
+          </div>
+        )}
+      </div>
+
+      <div className="p-3">
+        <h3 className="font-semibold text-gray-900">{template.name}</h3>
+        <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+          {template.description}
+        </p>
+        <div className="flex items-center gap-2 mt-2">
+          <span 
+            className="w-3 h-3 rounded-full border border-gray-200" 
+            style={{ backgroundColor: previewColor || template.primaryColor }}
+          />
+          <span className="text-xs text-gray-400 capitalize">{template.category}</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
 export default function TemplatePage() {
   const router = useRouter();
-  const { templateId, setTemplateId, setCurrentStep } = useCVStore();
+  const { templateId, setTemplateId, setSelectedColor, setCurrentStep } = useCVStore();
   const [photoFilter, setPhotoFilter] = useState<FilterType>('all');
   const [categoryFilter, setCategoryFilter] = useState<CategoryType>('all');
+  const [previewColor, setPreviewColor] = useState<string | null>(null);
 
-  const filteredTemplates = TEMPLATES.filter(template => {
-    const photoMatch = 
-      photoFilter === 'all' ||
-      (photoFilter === 'with-photo' && template.hasPhoto) ||
-      (photoFilter === 'without-photo' && !template.hasPhoto);
-    
-    const categoryMatch = 
-      categoryFilter === 'all' || 
-      template.category === categoryFilter;
-    
-    return photoMatch && categoryMatch;
-  });
+  const filteredTemplates = useMemo(() => {
+    return TEMPLATES.filter(template => {
+      const photoMatch = 
+        photoFilter === 'all' ||
+        (photoFilter === 'with-photo' && template.hasPhoto) ||
+        (photoFilter === 'without-photo' && !template.hasPhoto);
+      
+      const categoryMatch = 
+        categoryFilter === 'all' || 
+        template.category === categoryFilter;
+      
+      return photoMatch && categoryMatch;
+    });
+  }, [photoFilter, categoryFilter]);
 
   const handleSelectTemplate = (id: string) => {
     setTemplateId(id);
+    setSelectedColor(previewColor);
   };
 
   const handleContinue = () => {
@@ -95,55 +179,43 @@ export default function TemplatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
-            <ArrowLeft className="h-5 w-5" />
-            <span>Back to Home</span>
-          </Link>
-          <div className="text-center">
-            <h1 className="text-xl font-bold">Choose Your Template</h1>
-            <p className="text-sm text-gray-500">Step 1 of 8</p>
-          </div>
-          <div className="w-32"></div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Select from 21 Professional Templates
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Choose a design that best represents your professional style. 
-              All templates are optimized for ATS systems and hiring managers.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-4 justify-center mb-8">
-            <div className="flex gap-2 items-center">
-              <span className="text-sm text-gray-600">Photo:</span>
-              <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
-                {(['all', 'with-photo', 'without-photo'] as FilterType[]).map((filter) => (
-                  <button
-                    key={filter}
-                    onClick={() => setPhotoFilter(filter)}
-                    className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                      photoFilter === filter
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    {filter === 'all' ? 'All' : filter === 'with-photo' ? 'With Photo' : 'No Photo'}
-                  </button>
-                ))}
-              </div>
+    <div className="min-h-screen bg-gray-100">
+      <div className="bg-white border-b sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
+              <ArrowLeft className="h-5 w-5" />
+              <span className="hidden sm:inline">Back to Home</span>
+            </Link>
+            <div className="text-center">
+              <h1 className="text-xl font-bold text-gray-900">Choose Your Template</h1>
+              <p className="text-sm text-gray-500">Step 1 of 8</p>
             </div>
+            <div className="w-24"></div>
+          </div>
 
-            <div className="flex gap-2 items-center">
-              <span className="text-sm text-gray-600">Style:</span>
+          <div className="flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex flex-wrap gap-4">
+              <div className="flex gap-2 items-center">
+                <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+                  {(['all', 'with-photo', 'without-photo'] as FilterType[]).map((filter) => (
+                    <button
+                      key={filter}
+                      onClick={() => setPhotoFilter(filter)}
+                      className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                        photoFilter === filter
+                          ? 'bg-white text-gray-900 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      {filter === 'all' ? `All (${TEMPLATES.length})` : 
+                       filter === 'with-photo' ? `Photo (${TEMPLATES.filter(t => t.hasPhoto).length})` : 
+                       `No Photo (${TEMPLATES.filter(t => !t.hasPhoto).length})`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
                 {(['all', 'professional', 'modern', 'creative', 'minimal'] as CategoryType[]).map((cat) => (
                   <button
@@ -160,36 +232,61 @@ export default function TemplatePage() {
                 ))}
               </div>
             </div>
-          </div>
 
-          <p className="text-center text-sm text-gray-500 mb-6">
-            Showing {filteredTemplates.length} of {TEMPLATES.length} templates
-          </p>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-            {filteredTemplates.map((template) => (
-              <TemplateCard
-                key={template.id}
-                template={template}
-                isSelected={templateId === template.id}
-                onSelect={() => handleSelectTemplate(template.id)}
-              />
-            ))}
-          </div>
-
-          <div className="flex justify-center">
-            <Button 
-              size="lg" 
-              onClick={handleContinue}
-              disabled={!templateId}
-              className="px-8"
-            >
-              Continue to Personal Info
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600 hidden sm:inline">Color:</span>
+              <div className="flex gap-1">
+                {colorOptions.map((opt) => (
+                  <button
+                    key={opt.name}
+                    onClick={() => {
+                      setPreviewColor(opt.value);
+                      setSelectedColor(opt.value);
+                    }}
+                    className={`w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 ${
+                      previewColor === opt.value 
+                        ? 'border-gray-900 scale-110' 
+                        : 'border-gray-300'
+                    }`}
+                    style={{ backgroundColor: opt.value || '#666' }}
+                    title={opt.name}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </main>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <p className="text-sm text-gray-500 mb-4">
+          Showing {filteredTemplates.length} of {TEMPLATES.length} templates
+        </p>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+          {filteredTemplates.map((template) => (
+            <LiveTemplateCard
+              key={template.id}
+              template={template}
+              isSelected={templateId === template.id}
+              onSelect={() => handleSelectTemplate(template.id)}
+              previewColor={previewColor}
+            />
+          ))}
+        </div>
+
+        <div className="flex justify-center sticky bottom-4">
+          <Button 
+            size="lg" 
+            onClick={handleContinue}
+            disabled={!templateId}
+            className="px-8 shadow-lg"
+          >
+            Continue to Personal Info
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
