@@ -6,7 +6,7 @@ import { useCVStore } from "@/stores/cv-store";
 import { CheckCircle, ArrowLeft, ArrowRight, Camera } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { TemplatePreview } from "@/components/templates/preview";
 import { sampleCVData } from "@/lib/sample-data";
 
@@ -36,6 +36,23 @@ function LiveTemplateCard({
   previewColor: string | null;
 }) {
   const [isHovered, setIsHovered] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0.45);
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const templateWidth = 794;
+        const newScale = containerWidth / templateWidth;
+        setScale(newScale);
+      }
+    };
+    
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
 
   return (
     <div
@@ -47,24 +64,24 @@ function LiveTemplateCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div 
-        className="relative overflow-hidden bg-gray-50"
+        ref={containerRef}
+        className="relative overflow-hidden bg-white"
         style={{ paddingBottom: '141.4%' }}
       >
         <div 
-          className="absolute inset-0 flex items-start justify-center"
+          className="absolute top-0 left-0 origin-top-left pointer-events-none"
           style={{ 
-            transform: 'scale(0.28)',
-            transformOrigin: 'top center',
+            transform: `scale(${scale})`,
+            width: '794px',
+            height: '1123px',
           }}
         >
-          <div style={{ width: '794px', minHeight: '1123px' }}>
-            <TemplatePreview
-              templateId={template.id}
-              data={sampleCVData}
-              scale={1}
-              colorOverride={previewColor}
-            />
-          </div>
+          <TemplatePreview
+            templateId={template.id}
+            data={sampleCVData}
+            scale={1}
+            colorOverride={previewColor}
+          />
         </div>
         
         {isSelected && (
