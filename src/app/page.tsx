@@ -26,6 +26,9 @@ import airtelLogo from "@/assets/logos/airtel.png";
 import azamPesaLogo from "@/assets/logos/azam-pesa.png";
 import nmbLogo from "@/assets/logos/nmb.png";
 import sportpesaLogo from "@/assets/logos/sportpesa.webp";
+import amsonsLogo from "@/assets/logos/amsons.png";
+import tanzaniaGovtLogo from "@/assets/logos/tanzania-govt.png";
+import metlLogo from "@/assets/logos/metl.png";
 
 const templates = [
   { name: 'Professional', color: 'from-blue-500 to-cyan-400', category: 'Corporate' },
@@ -141,6 +144,9 @@ const trustedCompanies = [
   { name: 'Azam Pesa', logo: azamPesaLogo },
   { name: 'NMB Bank', logo: nmbLogo },
   { name: 'SportPesa', logo: sportpesaLogo },
+  { name: 'Amsons Group', logo: amsonsLogo },
+  { name: 'Tanzania Government', logo: tanzaniaGovtLogo },
+  { name: 'MeTL Group', logo: metlLogo },
 ];
 
 export default function HomePage() {
@@ -397,7 +403,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
             {trustedCompanies.map((company) => (
-              <div key={company.name} className="grayscale hover:grayscale-0 transition-all opacity-60 hover:opacity-100">
+              <div key={company.name} className="hover:scale-110 transition-all">
                 <Image
                   src={company.logo}
                   alt={company.name}
