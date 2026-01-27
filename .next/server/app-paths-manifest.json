@@ -1,4 +1,5 @@
 {
   "/create/page": "app/create/page.js",
-  "/create/intro/page": "app/create/intro/page.js"
+  "/create/intro/page": "app/create/intro/page.js",
+  "/(builder)/experience/page": "app/(builder)/experience/page.js"
 }
