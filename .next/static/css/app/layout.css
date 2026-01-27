@@ -615,9 +615,6 @@ video {
     max-width: 1400px;
   }
 }
-.pointer-events-none {
-  pointer-events: none;
-}
 .pointer-events-auto {
   pointer-events: auto;
 }
@@ -778,9 +775,6 @@ video {
 }
 .hidden {
   display: none;
-}
-.aspect-\[210\/297\] {
-  aspect-ratio: 210/297;
 }
 .h-0\.5 {
   height: 0.125rem;

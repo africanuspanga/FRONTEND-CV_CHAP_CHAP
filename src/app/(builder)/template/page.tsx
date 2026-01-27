@@ -46,30 +46,34 @@ function LiveTemplateCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative aspect-[210/297] overflow-hidden bg-gray-50">
+      <div 
+        className="relative overflow-hidden bg-gray-50"
+        style={{ paddingBottom: '141.4%' }}
+      >
         <div 
-          className="absolute top-0 left-0 origin-top-left pointer-events-none"
+          className="absolute inset-0 flex items-start justify-center"
           style={{ 
-            transform: 'scale(0.18)', 
-            width: '210mm',
-            height: '297mm',
+            transform: 'scale(0.28)',
+            transformOrigin: 'top center',
           }}
         >
-          <TemplatePreview
-            templateId={template.id}
-            data={sampleCVData}
-            scale={1}
-            colorOverride={previewColor}
-          />
+          <div style={{ width: '794px', minHeight: '1123px' }}>
+            <TemplatePreview
+              templateId={template.id}
+              data={sampleCVData}
+              scale={1}
+              colorOverride={previewColor}
+            />
+          </div>
         </div>
         
         {isSelected && (
-          <div className="absolute top-2 left-2 bg-blue-500 rounded-full p-1">
+          <div className="absolute top-2 left-2 bg-blue-500 rounded-full p-1 z-10">
             <CheckCircle className="h-5 w-5 text-white" />
           </div>
         )}
 
-        <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity ${
+        <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity z-10 ${
           isHovered ? 'opacity-100' : 'opacity-0'
         }`}>
           <span className="px-4 py-2 bg-white text-gray-900 rounded-lg font-medium text-sm">
@@ -78,7 +82,7 @@ function LiveTemplateCard({
         </div>
 
         {template.hasPhoto && (
-          <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+          <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded flex items-center gap-1 z-10">
             <Camera className="h-3 w-3" />
             Photo
           </div>

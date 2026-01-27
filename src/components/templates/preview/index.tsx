@@ -64,8 +64,8 @@ export function TemplatePreview({ templateId, data, scale = 1, colorOverride }: 
       className="bg-white shadow-lg origin-top-left"
       style={{ 
         transform: scale !== 1 ? `scale(${scale})` : undefined,
-        width: '210mm',
-        minHeight: '297mm',
+        width: '794px',
+        minHeight: '1123px',
       }}
     >
       <Template data={data} colorOverride={colorOverride} />
