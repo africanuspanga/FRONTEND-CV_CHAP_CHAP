@@ -29,6 +29,7 @@ import sportpesaLogo from "@/assets/logos/sportpesa.webp";
 import amsonsLogo from "@/assets/logos/amsons.png";
 import tanzaniaGovtLogo from "@/assets/logos/tanzania-govt.png";
 import metlLogo from "@/assets/logos/metl.png";
+import heroCvImage from "@/assets/hero-cv.png";
 
 const templates = [
   { name: 'Professional', color: 'from-blue-500 to-cyan-400', category: 'Corporate' },
@@ -302,7 +303,7 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* Right Content - CV Preview */}
+            {/* Right Content - Hero Image */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -310,44 +311,18 @@ export default function HomePage() {
               className="relative hidden lg:block"
             >
               <div className="relative animate-float">
-                {/* Main CV Preview */}
-                <div className="relative bg-white rounded-2xl shadow-2xl shadow-cv-blue-500/20 p-8 transform rotate-2 hover:rotate-0 transition-transform duration-500">
-                  <div className="absolute -top-3 -right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                {/* Hero Image */}
+                <div className="relative">
+                  <Image
+                    src={heroCvImage}
+                    alt="Professional CV Example - Create your own CV"
+                    width={550}
+                    height={550}
+                    className="w-full h-auto rounded-2xl"
+                    priority
+                  />
+                  <div className="absolute -top-3 -right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                     ATS-Ready
-                  </div>
-                  
-                  {/* CV Content Preview */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-gradient-to-br from-cv-blue-500 to-cyan-400 rounded-full" />
-                      <div>
-                        <div className="h-4 w-32 bg-gray-800 rounded" />
-                        <div className="h-3 w-24 bg-cv-blue-500 rounded mt-2" />
-                      </div>
-                    </div>
-                    
-                    <div className="border-t pt-4 space-y-2">
-                      <div className="h-3 w-full bg-gray-200 rounded" />
-                      <div className="h-3 w-5/6 bg-gray-200 rounded" />
-                      <div className="h-3 w-4/6 bg-gray-200 rounded" />
-                    </div>
-                    
-                    <div className="border-t pt-4">
-                      <div className="h-4 w-24 bg-cv-blue-500 rounded mb-3" />
-                      <div className="space-y-2">
-                        <div className="h-3 w-full bg-gray-100 rounded" />
-                        <div className="h-3 w-5/6 bg-gray-100 rounded" />
-                      </div>
-                    </div>
-                    
-                    <div className="border-t pt-4">
-                      <div className="h-4 w-20 bg-cv-blue-500 rounded mb-3" />
-                      <div className="flex gap-2 flex-wrap">
-                        <div className="h-6 w-16 bg-cv-blue-100 rounded-full" />
-                        <div className="h-6 w-20 bg-cv-blue-100 rounded-full" />
-                        <div className="h-6 w-14 bg-cv-blue-100 rounded-full" />
-                      </div>
-                    </div>
                   </div>
                 </div>
 
