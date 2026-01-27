@@ -2,9 +2,16 @@
 
 import type { CVData } from '@/types/cv';
 
-export function GraceMintPreview({ data }: { data: CVData }) {
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#6BBFAB';
+
+export function GraceMintPreview({ data, colorOverride }: Props) {
   const { personalInfo, summary, workExperiences, education, skills, languages } = data;
-  const color = '#6BBFAB';
+  const color = colorOverride || DEFAULT_COLOR;
 
   return (
     <div className="w-full min-h-full bg-white font-sans">

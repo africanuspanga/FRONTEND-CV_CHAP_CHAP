@@ -2,9 +2,16 @@
 
 import type { CVData } from '@/types/cv';
 
-export function NellySidebarPreview({ data }: { data: CVData }) {
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#374151';
+
+export function NellySidebarPreview({ data, colorOverride }: Props) {
   const { personalInfo, summary, workExperiences, education, skills, languages } = data;
-  const color = '#374151';
+  const color = colorOverride || DEFAULT_COLOR;
 
   return (
     <div className="w-full min-h-full bg-white font-sans flex">

@@ -2,9 +2,16 @@
 
 import type { CVData } from '@/types/cv';
 
-export function DenicePreview({ data }: { data: CVData }) {
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#9B7B7B';
+
+export function DenicePreview({ data, colorOverride }: Props) {
   const { personalInfo, summary, workExperiences, education, skills, languages } = data;
-  const color = '#9B7B7B';
+  const color = colorOverride || DEFAULT_COLOR;
 
   return (
     <div className="w-full min-h-full bg-white font-serif">

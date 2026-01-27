@@ -2,11 +2,19 @@
 
 import type { CVData } from '@/types/cv';
 
-export function AparnaDarkPreview({ data }: { data: CVData }) {
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#1E3A5F';
+
+export function AparnaDarkPreview({ data, colorOverride }: Props) {
   const { personalInfo, summary, workExperiences, education, skills } = data;
+  const color = colorOverride || DEFAULT_COLOR;
 
   return (
-    <div className="w-full min-h-full font-sans text-white" style={{ backgroundColor: '#1E3A5F' }}>
+    <div className="w-full min-h-full font-sans text-white" style={{ backgroundColor: color }}>
       <div className="p-10">
         <div className="flex items-start justify-between mb-8">
           <div>

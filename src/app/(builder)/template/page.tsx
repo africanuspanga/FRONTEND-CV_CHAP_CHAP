@@ -8,55 +8,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import { TemplatePreview } from "@/components/templates/preview";
-import type { CVData } from "@/types/cv";
+import { sampleCVData } from "@/lib/sample-data";
 
 type FilterType = 'all' | 'with-photo' | 'without-photo';
 type CategoryType = 'all' | 'professional' | 'modern' | 'creative' | 'minimal';
-
-const sampleData: CVData = {
-  personalInfo: {
-    firstName: 'Noela',
-    lastName: 'Bwemero',
-    email: 'noela@email.com',
-    phone: '+255 712 345 678',
-    location: 'Dar es Salaam, Tanzania',
-    professionalTitle: 'Marketing Manager',
-    linkedin: 'linkedin.com/in/noela',
-    website: '',
-  },
-  summary: 'Motivated professional with 5+ years of experience in marketing and brand management.',
-  workExperiences: [
-    {
-      id: '1',
-      jobTitle: 'Marketing Manager',
-      company: 'ABC Company',
-      location: 'Dar es Salaam',
-      startDate: 'Jan 2020',
-      endDate: '',
-      isCurrent: true,
-      achievements: ['Increased sales by 40%', 'Led team of 5 marketers'],
-    },
-  ],
-  education: [
-    {
-      id: '1',
-      degree: 'Bachelor of Business',
-      institution: 'University of Dar es Salaam',
-      fieldOfStudy: 'Marketing',
-      graduationDate: '2019',
-    },
-  ],
-  skills: [
-    { id: '1', name: 'Digital Marketing', level: 'expert' },
-    { id: '2', name: 'Brand Strategy', level: 'advanced' },
-    { id: '3', name: 'Social Media', level: 'expert' },
-  ],
-  languages: [
-    { id: '1', name: 'Swahili', proficiency: 'native' },
-    { id: '2', name: 'English', proficiency: 'fluent' },
-  ],
-  references: [],
-};
 
 const colorOptions = [
   { name: 'Default', value: null },
@@ -102,8 +57,9 @@ function LiveTemplateCard({
         >
           <TemplatePreview
             templateId={template.id}
-            data={sampleData}
+            data={sampleCVData}
             scale={1}
+            colorOverride={previewColor}
           />
         </div>
         

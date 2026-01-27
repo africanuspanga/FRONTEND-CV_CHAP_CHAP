@@ -23,13 +23,16 @@ import { NellyPurplePreview } from './nelly-purple';
 import { AparnaDarkPreview } from './aparna-dark';
 import { AparnaGoldPreview } from './aparna-gold';
 
-interface TemplatePreviewProps {
+export interface TemplatePreviewProps {
   templateId: string;
   data: CVData;
   scale?: number;
+  colorOverride?: string | null;
 }
 
-const previewComponents: Record<string, React.FC<{ data: CVData }>> = {
+type TemplateComponent = React.FC<{ data: CVData; colorOverride?: string | null }>;
+
+const templateComponents: Record<string, TemplateComponent> = {
   'kathleen': KathleenPreview,
   'grace-minimal': GraceMinimalPreview,
   'charles': CharlesPreview,
@@ -53,31 +56,33 @@ const previewComponents: Record<string, React.FC<{ data: CVData }>> = {
   'aparna-gold': AparnaGoldPreview,
 };
 
-export function TemplatePreview({ templateId, data, scale = 1 }: TemplatePreviewProps) {
-  const PreviewComponent = previewComponents[templateId] || DefaultPreview;
+export function TemplatePreview({ templateId, data, scale = 1, colorOverride }: TemplatePreviewProps) {
+  const Template = templateComponents[templateId] || DefaultPreview;
 
   return (
     <div 
       className="bg-white shadow-lg origin-top-left"
       style={{ 
-        transform: `scale(${scale})`,
+        transform: scale !== 1 ? `scale(${scale})` : undefined,
         width: '210mm',
         minHeight: '297mm',
       }}
     >
-      <PreviewComponent data={data} />
+      <Template data={data} colorOverride={colorOverride} />
     </div>
   );
 }
 
-function DefaultPreview({ data }: { data: CVData }) {
+function DefaultPreview({ data, colorOverride }: { data: CVData; colorOverride?: string | null }) {
+  const primaryColor = colorOverride || '#0891B2';
+  
   return (
     <div className="p-8 font-sans">
-      <div className="border-b-4 border-blue-600 pb-4 mb-6">
+      <div className="border-b-4 pb-4 mb-6" style={{ borderColor: primaryColor }}>
         <h1 className="text-3xl font-bold text-gray-900">
           {data.personalInfo.firstName} {data.personalInfo.lastName}
         </h1>
-        <p className="text-xl text-blue-600 mt-1">
+        <p className="text-xl mt-1" style={{ color: primaryColor }}>
           {data.personalInfo.professionalTitle}
         </p>
         <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600">
@@ -113,7 +118,7 @@ function DefaultPreview({ data }: { data: CVData }) {
                 </p>
                 {exp.achievements.length > 0 && (
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                    {exp.achievements.map((achievement, idx) => (
+                    {exp.achievements.slice(0, 3).map((achievement, idx) => (
                       <li key={idx}>{achievement}</li>
                     ))}
                   </ul>
@@ -133,7 +138,7 @@ function DefaultPreview({ data }: { data: CVData }) {
             {data.education.map((edu) => (
               <div key={edu.id}>
                 <h3 className="font-bold text-gray-900">
-                  {edu.degree} in {edu.fieldOfStudy}
+                  {edu.degree} {edu.fieldOfStudy && `in ${edu.fieldOfStudy}`}
                 </h3>
                 <p className="text-gray-600">{edu.institution}</p>
                 <p className="text-sm text-gray-500">{edu.graduationDate}</p>
@@ -152,7 +157,8 @@ function DefaultPreview({ data }: { data: CVData }) {
             {data.skills.map((skill) => (
               <span
                 key={skill.id}
-                className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                className="px-3 py-1 rounded-full text-sm text-white"
+                style={{ backgroundColor: primaryColor }}
               >
                 {skill.name}
               </span>

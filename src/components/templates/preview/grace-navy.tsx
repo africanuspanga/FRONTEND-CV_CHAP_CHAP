@@ -2,9 +2,16 @@
 
 import type { CVData } from '@/types/cv';
 
-export function GraceNavyPreview({ data }: { data: CVData }) {
-  const { personalInfo, summary, workExperiences, education, skills } = data;
-  const color = '#1E4A6D';
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#1E4A6D';
+
+export function GraceNavyPreview({ data, colorOverride }: Props) {
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
+  const color = colorOverride || DEFAULT_COLOR;
 
   return (
     <div className="w-full min-h-full bg-white font-sans p-10">
@@ -60,7 +67,7 @@ export function GraceNavyPreview({ data }: { data: CVData }) {
                 {exp.company} — {exp.location}
               </p>
               <ul className="space-y-1">
-                {exp.achievements.map((achievement, idx) => (
+                {exp.achievements.slice(0, 3).map((achievement, idx) => (
                   <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
                     <span className="mt-1.5 w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
                     <span>{achievement}</span>
@@ -80,12 +87,27 @@ export function GraceNavyPreview({ data }: { data: CVData }) {
           {education.map((edu) => (
             <div key={edu.id} className="flex justify-between items-start mb-2">
               <div>
-                <h3 className="font-medium">{edu.degree} in {edu.fieldOfStudy}</h3>
+                <h3 className="font-medium">{edu.degree} {edu.fieldOfStudy && `in ${edu.fieldOfStudy}`}</h3>
                 <p className="text-sm text-gray-600">{edu.institution}</p>
               </div>
               <span className="text-sm text-gray-500">{edu.graduationDate}</span>
             </div>
           ))}
+        </div>
+      )}
+
+      {languages && languages.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-lg font-bold mb-3" style={{ color }}>
+            Languages
+          </h2>
+          <div className="flex flex-wrap gap-4">
+            {languages.map((lang) => (
+              <span key={lang.id} className="text-sm">
+                {lang.name} ({lang.proficiency})
+              </span>
+            ))}
+          </div>
         </div>
       )}
     </div>

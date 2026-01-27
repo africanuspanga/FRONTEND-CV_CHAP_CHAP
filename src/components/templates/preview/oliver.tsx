@@ -2,9 +2,16 @@
 
 import type { CVData } from '@/types/cv';
 
-export function OliverPreview({ data }: { data: CVData }) {
-  const { personalInfo, summary, workExperiences, education, skills, references } = data;
-  const color = '#E07A38';
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#E07A38';
+
+export function OliverPreview({ data, colorOverride }: Props) {
+  const { personalInfo, summary, workExperiences, education, skills, references, languages } = data;
+  const color = colorOverride || DEFAULT_COLOR;
 
   return (
     <div className="w-full min-h-full bg-white font-sans p-10">
@@ -46,7 +53,7 @@ export function OliverPreview({ data }: { data: CVData }) {
                 </span>
               </div>
               <ul className="mt-2 space-y-1">
-                {exp.achievements.map((achievement, idx) => (
+                {exp.achievements.slice(0, 3).map((achievement, idx) => (
                   <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
                     <span style={{ color }}>▸</span>
                     <span>{achievement}</span>
@@ -80,7 +87,7 @@ export function OliverPreview({ data }: { data: CVData }) {
               Skills
             </h2>
             <div className="flex flex-wrap gap-2">
-              {skills.map((skill) => (
+              {skills.slice(0, 8).map((skill) => (
                 <span 
                   key={skill.id} 
                   className="px-3 py-1 text-sm rounded text-white"
@@ -94,6 +101,21 @@ export function OliverPreview({ data }: { data: CVData }) {
         )}
       </div>
 
+      {languages && languages.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-lg font-bold mb-3" style={{ color }}>
+            Languages
+          </h2>
+          <div className="flex flex-wrap gap-4">
+            {languages.map((lang) => (
+              <span key={lang.id} className="text-sm">
+                {lang.name} ({lang.proficiency})
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {references && references.length > 0 && (
         <div className="mt-6">
           <h2 className="text-lg font-bold mb-3" style={{ color }}>
@@ -103,7 +125,7 @@ export function OliverPreview({ data }: { data: CVData }) {
             {references.map((ref) => (
               <div key={ref.id} className="text-sm">
                 <p className="font-bold">{ref.name}</p>
-                <p className="text-gray-600">{ref.position}</p>
+                <p className="text-gray-600">{ref.title}</p>
                 <p className="text-gray-600">{ref.company}</p>
                 <p className="text-gray-500">{ref.email}</p>
               </div>

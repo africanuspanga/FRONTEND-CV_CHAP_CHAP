@@ -2,9 +2,16 @@
 
 import type { CVData } from '@/types/cv';
 
-export function GraceCoralPreview({ data }: { data: CVData }) {
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#E85A5A';
+
+export function GraceCoralPreview({ data, colorOverride }: Props) {
   const { personalInfo, summary, workExperiences, education, skills, languages } = data;
-  const color = '#E85A5A';
+  const color = colorOverride || DEFAULT_COLOR;
 
   return (
     <div className="w-full min-h-full bg-white font-sans flex">

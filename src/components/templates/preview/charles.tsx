@@ -2,8 +2,15 @@
 
 import type { CVData } from '@/types/cv';
 
-export function CharlesPreview({ data }: { data: CVData }) {
-  const primaryColor = '#0891B2';
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#0891B2';
+
+export function CharlesPreview({ data, colorOverride }: Props) {
+  const primaryColor = colorOverride || DEFAULT_COLOR;
 
   return (
     <div className="flex min-h-full">
@@ -45,7 +52,7 @@ export function CharlesPreview({ data }: { data: CVData }) {
               Skills
             </h3>
             <div className="space-y-3">
-              {data.skills.map((skill) => (
+              {data.skills.slice(0, 8).map((skill) => (
                 <div key={skill.id}>
                   <p className="text-sm mb-1">{skill.name}</p>
                   <div className="w-full h-1.5 bg-white/20 rounded-full">
@@ -58,6 +65,22 @@ export function CharlesPreview({ data }: { data: CVData }) {
                       }}
                     ></div>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {data.languages.length > 0 && (
+          <div className="mb-6">
+            <h3 className="text-sm font-bold uppercase tracking-wide mb-3 border-b border-white/30 pb-2">
+              Languages
+            </h3>
+            <div className="space-y-2 text-sm">
+              {data.languages.map((lang) => (
+                <div key={lang.id} className="flex justify-between">
+                  <span>{lang.name}</span>
+                  <span className="text-white/70 capitalize">{lang.proficiency}</span>
                 </div>
               ))}
             </div>
@@ -104,7 +127,7 @@ export function CharlesPreview({ data }: { data: CVData }) {
             >
               About Me
             </h2>
-            <p className="text-gray-700 leading-relaxed">{data.summary}</p>
+            <p className="text-gray-700 leading-relaxed text-sm">{data.summary}</p>
           </div>
         )}
 
@@ -134,7 +157,7 @@ export function CharlesPreview({ data }: { data: CVData }) {
                   </p>
                   {exp.achievements.length > 0 && (
                     <ul className="space-y-1">
-                      {exp.achievements.map((achievement, idx) => (
+                      {exp.achievements.slice(0, 3).map((achievement, idx) => (
                         <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
                           <span style={{ color: primaryColor }}>•</span>
                           <span>{achievement}</span>

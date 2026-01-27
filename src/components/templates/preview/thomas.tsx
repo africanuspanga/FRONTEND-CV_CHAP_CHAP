@@ -2,9 +2,16 @@
 
 import type { CVData } from '@/types/cv';
 
-export function ThomasPreview({ data }: { data: CVData }) {
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#8ECFC8';
+
+export function ThomasPreview({ data, colorOverride }: Props) {
   const { personalInfo, summary, workExperiences, education, skills } = data;
-  const color = '#8ECFC8';
+  const color = colorOverride || DEFAULT_COLOR;
 
   return (
     <div className="w-full min-h-full bg-white font-sans">

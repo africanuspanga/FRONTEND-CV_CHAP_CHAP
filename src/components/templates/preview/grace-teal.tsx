@@ -2,9 +2,16 @@
 
 import type { CVData } from '@/types/cv';
 
-export function GraceTealPreview({ data }: { data: CVData }) {
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#2AAA9E';
+
+export function GraceTealPreview({ data, colorOverride }: Props) {
   const { personalInfo, summary, workExperiences, education, skills } = data;
-  const color = '#2AAA9E';
+  const color = colorOverride || DEFAULT_COLOR;
 
   return (
     <div className="w-full min-h-full bg-white font-sans p-10">

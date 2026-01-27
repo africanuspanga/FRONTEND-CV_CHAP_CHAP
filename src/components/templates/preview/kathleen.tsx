@@ -2,8 +2,15 @@
 
 import type { CVData } from '@/types/cv';
 
-export function KathleenPreview({ data }: { data: CVData }) {
-  const primaryColor = '#E5B94E';
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#E5B94E';
+
+export function KathleenPreview({ data, colorOverride }: Props) {
+  const primaryColor = colorOverride || DEFAULT_COLOR;
 
   return (
     <div className="p-8 font-sans">
@@ -67,6 +74,24 @@ export function KathleenPreview({ data }: { data: CVData }) {
               </div>
             </div>
           )}
+
+          {data.languages.length > 0 && (
+            <div className="mb-6">
+              <h3 
+                className="text-sm font-bold uppercase tracking-wide mb-3 pb-1 border-b-2"
+                style={{ borderColor: primaryColor, color: primaryColor }}
+              >
+                Languages
+              </h3>
+              <div className="space-y-2">
+                {data.languages.map((lang) => (
+                  <div key={lang.id} className="text-sm text-gray-700">
+                    {lang.name} - {lang.proficiency}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="w-2/3">
@@ -109,7 +134,7 @@ export function KathleenPreview({ data }: { data: CVData }) {
                     </div>
                     {exp.achievements.length > 0 && (
                       <ul className="mt-2 space-y-1">
-                        {exp.achievements.map((achievement, idx) => (
+                        {exp.achievements.slice(0, 3).map((achievement, idx) => (
                           <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
                             <span style={{ color: primaryColor }}>•</span>
                             <span>{achievement}</span>
@@ -136,7 +161,7 @@ export function KathleenPreview({ data }: { data: CVData }) {
                   <div key={edu.id} className="flex justify-between items-start">
                     <div>
                       <h3 className="font-bold text-gray-900">
-                        {edu.degree} in {edu.fieldOfStudy}
+                        {edu.degree} {edu.fieldOfStudy && `in ${edu.fieldOfStudy}`}
                       </h3>
                       <p className="text-sm text-gray-600">{edu.institution}</p>
                     </div>

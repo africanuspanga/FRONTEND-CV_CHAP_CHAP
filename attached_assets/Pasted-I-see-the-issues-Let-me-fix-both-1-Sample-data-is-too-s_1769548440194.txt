@@ -1,0 +1,941 @@
+I see the issues. Let me fix both:
+
+1. **Sample data is too sparse** - templates look empty
+2. **Color override not working** - templates not responding to color changes
+
+---
+
+## Fix 1: Rich Sample Data for Noela Bwemero (Lawyer)
+
+Create **`src/lib/sample-data.ts`**:
+
+```typescript
+import type { CVData } from '@/types/cv';
+
+export const sampleCVData: CVData = {
+  personalInfo: {
+    firstName: 'Noela',
+    lastName: 'Bwemero',
+    email: 'noela.bwemero@lexchambers.co.tz',
+    phone: '+255 754 892 341',
+    location: 'Dar es Salaam, Tanzania',
+    professionalTitle: 'Senior Corporate Lawyer',
+    linkedin: 'linkedin.com/in/noelabwemero',
+    website: 'www.noelabwemero.com',
+    photoUrl: '',
+  },
+  summary: 'Accomplished Senior Corporate Lawyer with 8+ years of experience specializing in commercial law, mergers & acquisitions, and corporate governance across East Africa. Successfully closed over TZS 50 billion in M&A transactions and advised Fortune 500 companies on market entry strategies. Known for meticulous contract drafting, strategic negotiation skills, and deep understanding of Tanzanian regulatory frameworks. Admitted to the Tanganyika Law Society and certified mediator.',
+  workExperiences: [
+    {
+      id: '1',
+      jobTitle: 'Senior Corporate Lawyer',
+      company: 'Mkono & Co. Advocates',
+      location: 'Dar es Salaam, Tanzania',
+      startDate: 'March 2022',
+      endDate: '',
+      isCurrent: true,
+      achievements: [
+        'Lead counsel on TZS 28 billion acquisition of Tanzanian fintech startup by international payment processor, managing due diligence and regulatory approvals',
+        'Advise multinational corporations including Vodacom, TotalEnergies, and Barrick Gold on corporate restructuring and compliance matters',
+        'Drafted and negotiated 150+ commercial contracts including joint ventures, shareholder agreements, and supply chain agreements',
+        'Mentor team of 4 junior associates, conducting weekly training sessions on corporate law best practices',
+        'Achieved 95% success rate in commercial arbitration cases before the Tanzania Arbitration Centre',
+      ],
+    },
+    {
+      id: '2',
+      jobTitle: 'Corporate Legal Counsel',
+      company: 'CRDB Bank Plc',
+      location: 'Dar es Salaam, Tanzania',
+      startDate: 'June 2019',
+      endDate: 'February 2022',
+      isCurrent: false,
+      achievements: [
+        'Provided legal support for bank\'s TZS 180 billion corporate lending portfolio, ensuring regulatory compliance with BOT guidelines',
+        'Structured and documented syndicated loan facilities for major infrastructure projects including Dar es Salaam Bus Rapid Transit',
+        'Led legal workstream for bank\'s core banking system migration, negotiating vendor contracts worth TZS 12 billion',
+        'Reduced contract turnaround time by 40% through implementation of standardized template library',
+        'Represented bank in 25+ debt recovery proceedings, recovering over TZS 8 billion in non-performing loans',
+      ],
+    },
+    {
+      id: '3',
+      jobTitle: 'Associate Lawyer',
+      company: 'Rex Attorneys',
+      location: 'Dar es Salaam, Tanzania',
+      startDate: 'September 2016',
+      endDate: 'May 2019',
+      isCurrent: false,
+      achievements: [
+        'Handled corporate registrations, annual compliance filings, and regulatory submissions for 80+ client companies',
+        'Assisted senior partners in landmark TZS 15 billion cross-border acquisition in telecommunications sector',
+        'Conducted legal due diligence for private equity investments across mining, agriculture, and manufacturing sectors',
+        'Drafted employment contracts and HR policies for multinational clients entering Tanzanian market',
+        'Published 3 articles on East African corporate law developments in Tanzania Lawyer Journal',
+      ],
+    },
+  ],
+  education: [
+    {
+      id: '1',
+      degree: 'Master of Laws (LL.M)',
+      institution: 'University of Cape Town',
+      fieldOfStudy: 'International Commercial Law',
+      graduationDate: '2020',
+      location: 'Cape Town, South Africa',
+      gpa: 'Distinction',
+      achievements: ['Dissertation: Cross-Border M&A Regulations in East African Community'],
+    },
+    {
+      id: '2',
+      degree: 'Bachelor of Laws (LL.B)',
+      institution: 'University of Dar es Salaam',
+      fieldOfStudy: 'Law',
+      graduationDate: '2016',
+      location: 'Dar es Salaam, Tanzania',
+      gpa: 'First Class Honours',
+      achievements: ['Moot Court Champion 2015', 'Dean\'s List 2014-2016'],
+    },
+  ],
+  skills: [
+    { id: '1', name: 'Corporate Law & Governance', level: 'expert', category: 'legal' },
+    { id: '2', name: 'Mergers & Acquisitions', level: 'expert', category: 'legal' },
+    { id: '3', name: 'Contract Drafting & Negotiation', level: 'expert', category: 'legal' },
+    { id: '4', name: 'Legal Due Diligence', level: 'expert', category: 'legal' },
+    { id: '5', name: 'Commercial Arbitration', level: 'advanced', category: 'legal' },
+    { id: '6', name: 'Banking & Finance Law', level: 'advanced', category: 'legal' },
+    { id: '7', name: 'Regulatory Compliance', level: 'advanced', category: 'legal' },
+    { id: '8', name: 'Employment Law', level: 'intermediate', category: 'legal' },
+    { id: '9', name: 'Legal Research (LexisNexis, Westlaw)', level: 'expert', category: 'technical' },
+    { id: '10', name: 'Microsoft Office Suite', level: 'advanced', category: 'technical' },
+    { id: '11', name: 'Client Relationship Management', level: 'expert', category: 'soft' },
+    { id: '12', name: 'Strategic Negotiation', level: 'expert', category: 'soft' },
+  ],
+  languages: [
+    { id: '1', name: 'Swahili', proficiency: 'native' },
+    { id: '2', name: 'English', proficiency: 'fluent' },
+    { id: '3', name: 'French', proficiency: 'conversational' },
+  ],
+  references: [
+    {
+      id: '1',
+      name: 'Advocate James Mwakasege',
+      position: 'Managing Partner',
+      company: 'Mkono & Co. Advocates',
+      email: 'jmwakasege@mkono.com',
+      phone: '+255 222 116 692',
+      relationship: 'Direct Supervisor',
+    },
+    {
+      id: '2',
+      name: 'Dr. Grace Kamuzora',
+      position: 'General Counsel',
+      company: 'CRDB Bank Plc',
+      email: 'grace.kamuzora@crdbbank.co.tz',
+      phone: '+255 222 117 442',
+      relationship: 'Former Supervisor',
+    },
+  ],
+  certifications: [
+    { id: '1', name: 'Admitted Advocate - Tanganyika Law Society', date: '2016', issuer: 'Tanganyika Law Society' },
+    { id: '2', name: 'Certified Mediator', date: '2021', issuer: 'Tanzania Arbitration Centre' },
+    { id: '3', name: 'Anti-Money Laundering Specialist', date: '2020', issuer: 'ACAMS' },
+    { id: '4', name: 'Project Management Professional (PMP)', date: '2022', issuer: 'PMI' },
+  ],
+};
+```
+
+---
+
+## Fix 2: Color Override for ALL Templates
+
+The issue is that templates use hardcoded colors. We need to pass `colorOverride` prop and use it throughout.
+
+### Update **`src/components/templates/preview/index.tsx`**:
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+// Import all templates
+import { KathleenPreview } from './kathleen';
+import { CharlesPreview } from './charles';
+import { GraceMinimalPreview } from './grace-minimal';
+import { LaurenOrangePreview } from './lauren-orange';
+import { GraceNavyPreview } from './grace-navy';
+import { GraceTealPreview } from './grace-teal';
+import { LesleyPreview } from './lesley';
+import { KellyPreview } from './kelly';
+import { RichardPreview } from './richard';
+import { GraceMintPreview } from './grace-mint';
+import { GraceCoralPreview } from './grace-coral';
+import { NellyMintPreview } from './nelly-mint';
+import { NellyGrayPreview } from './nelly-gray';
+import { NellySidebarPreview } from './nelly-sidebar';
+import { LaurenIconsPreview } from './lauren-icons';
+import { OliverPreview } from './oliver';
+import { ThomasPreview } from './thomas';
+import { DenicePreview } from './denice';
+import { NellyPurplePreview } from './nelly-purple';
+import { AparnaDarkPreview } from './aparna-dark';
+import { AparnaGoldPreview } from './aparna-gold';
+
+export interface TemplatePreviewProps {
+  templateId: string;
+  data: CVData;
+  scale?: number;
+  colorOverride?: string | null;
+}
+
+// Template component type - all templates must accept colorOverride
+type TemplateComponent = React.FC<{ data: CVData; colorOverride?: string | null }>;
+
+const templateComponents: Record<string, TemplateComponent> = {
+  'kathleen': KathleenPreview,
+  'charles': CharlesPreview,
+  'grace-minimal': GraceMinimalPreview,
+  'lauren-orange': LaurenOrangePreview,
+  'grace-navy': GraceNavyPreview,
+  'grace-teal': GraceTealPreview,
+  'lesley': LesleyPreview,
+  'kelly': KellyPreview,
+  'richard': RichardPreview,
+  'grace-mint': GraceMintPreview,
+  'grace-coral': GraceCoralPreview,
+  'nelly-mint': NellyMintPreview,
+  'nelly-gray': NellyGrayPreview,
+  'nelly-sidebar': NellySidebarPreview,
+  'lauren-icons': LaurenIconsPreview,
+  'oliver': OliverPreview,
+  'thomas': ThomasPreview,
+  'denice': DenicePreview,
+  'nelly-purple': NellyPurplePreview,
+  'aparna-dark': AparnaDarkPreview,
+  'aparna-gold': AparnaGoldPreview,
+};
+
+export function TemplatePreview({ templateId, data, scale = 1, colorOverride }: TemplatePreviewProps) {
+  const Template = templateComponents[templateId] || KathleenPreview;
+
+  return (
+    <div 
+      className="origin-top-left bg-white shadow-xl overflow-hidden"
+      style={{ 
+        transform: scale !== 1 ? `scale(${scale})` : undefined,
+        width: '210mm',
+        minHeight: '297mm',
+      }}
+    >
+      <Template data={data} colorOverride={colorOverride} />
+    </div>
+  );
+}
+
+export default TemplatePreview;
+```
+
+---
+
+### Now update EACH template to accept and use `colorOverride`. Here's the pattern for ALL templates:
+
+### **`src/components/templates/preview/kathleen.tsx`** (Updated)
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+// Default color for this template
+const DEFAULT_COLOR = '#E5B94E';
+
+export function KathleenPreview({ data, colorOverride }: Props) {
+  // Use override if provided, otherwise use default
+  const primaryColor = colorOverride || DEFAULT_COLOR;
+  
+  const { personalInfo, summary, workExperiences, education, skills, languages, certifications } = data;
+
+  return (
+    <div className="w-[210mm] min-h-[297mm] bg-[#f5f7fa] p-0 font-sans text-gray-800">
+      {/* Light colored top bar - uses primary color */}
+      <div className="h-3" style={{ backgroundColor: `${primaryColor}33` }} />
+      
+      <div className="flex">
+        {/* Left Column */}
+        <div className="w-[35%] p-8 relative">
+          {/* Name */}
+          <h1 className="text-3xl font-bold text-gray-800 leading-tight">
+            {personalInfo.firstName || 'NOELA'}
+          </h1>
+          <h1 className="text-3xl font-bold text-gray-800 leading-tight mb-2">
+            {personalInfo.lastName || 'BWEMERO'}
+          </h1>
+          <p className="text-sm text-gray-600 mb-6">
+            {personalInfo.professionalTitle || 'Professional Title'}
+          </p>
+
+          {/* Quote Mark - uses primary color */}
+          <div className="absolute right-0 top-8">
+            <span 
+              className="text-[100px] font-serif leading-none opacity-80"
+              style={{ color: primaryColor }}
+            >
+              "
+            </span>
+          </div>
+
+          {/* Contact Section */}
+          <div className="mt-6">
+            <h2 className="text-xs font-semibold tracking-widest text-gray-700 mb-3 border-b border-gray-300 pb-2">
+              CONTACT
+            </h2>
+            <div className="space-y-2 text-sm">
+              {personalInfo.email && (
+                <div className="flex items-start gap-2">
+                  <span className="font-bold" style={{ color: primaryColor }}>e</span>
+                  <span style={{ color: primaryColor }}>{personalInfo.email}</span>
+                </div>
+              )}
+              {personalInfo.phone && (
+                <div className="flex items-start gap-2">
+                  <span className="font-bold" style={{ color: primaryColor }}>t</span>
+                  <span style={{ color: primaryColor }}>{personalInfo.phone}</span>
+                </div>
+              )}
+              {personalInfo.location && (
+                <div className="flex items-start gap-2">
+                  <span className="font-bold" style={{ color: primaryColor }}>a</span>
+                  <span style={{ color: primaryColor }}>{personalInfo.location}</span>
+                </div>
+              )}
+              {personalInfo.linkedin && (
+                <div className="flex items-start gap-2">
+                  <span className="font-bold" style={{ color: primaryColor }}>in</span>
+                  <span style={{ color: primaryColor }}>{personalInfo.linkedin}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Education */}
+          {education.length > 0 && (
+            <div className="mt-6">
+              <h2 className="text-xs font-semibold tracking-widest text-gray-700 mb-3 border-b border-gray-300 pb-2">
+                EDUCATION
+              </h2>
+              {education.map((edu) => (
+                <div key={edu.id} className="mb-4">
+                  <p className="text-xs text-gray-500">{edu.graduationDate}</p>
+                  <p className="font-bold text-sm">{edu.degree}</p>
+                  <p className="text-sm text-gray-600">{edu.institution}</p>
+                  <p className="text-sm italic" style={{ color: primaryColor }}>{edu.fieldOfStudy}</p>
+                  {edu.gpa && <p className="text-xs text-gray-500">GPA: {edu.gpa}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Skills */}
+          {skills.length > 0 && (
+            <div className="mt-6">
+              <h2 className="text-xs font-semibold tracking-widest text-gray-700 mb-3 border-b border-gray-300 pb-2">
+                SKILLS
+              </h2>
+              <ul className="space-y-1">
+                {skills.slice(0, 10).map((skill) => (
+                  <li key={skill.id} className="text-sm flex items-start gap-2">
+                    <span style={{ color: primaryColor }}>•</span>
+                    {skill.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Languages */}
+          {languages && languages.length > 0 && (
+            <div className="mt-6">
+              <h2 className="text-xs font-semibold tracking-widest text-gray-700 mb-3 border-b border-gray-300 pb-2">
+                LANGUAGES
+              </h2>
+              {languages.map((lang) => (
+                <div key={lang.id} className="mb-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-semibold">{lang.name}</span>
+                    <span className="text-gray-500 capitalize text-xs">{lang.proficiency}</span>
+                  </div>
+                  <div className="flex gap-1 mt-1">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div
+                        key={i}
+                        className="h-1 flex-1 rounded-sm"
+                        style={{
+                          backgroundColor: i <= (lang.proficiency === 'native' ? 5 : lang.proficiency === 'fluent' ? 4 : lang.proficiency === 'conversational' ? 3 : 2)
+                            ? primaryColor
+                            : '#E5E7EB',
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right Column */}
+        <div className="w-[65%] p-8 bg-white">
+          {/* Professional Summary */}
+          {summary && (
+            <div className="mb-6">
+              <h2 
+                className="text-xs font-semibold tracking-widest mb-3 pb-2 border-b-2"
+                style={{ color: primaryColor, borderColor: primaryColor }}
+              >
+                PROFESSIONAL SUMMARY
+              </h2>
+              <p className="text-sm leading-relaxed text-gray-700">{summary}</p>
+            </div>
+          )}
+
+          {/* Work Experience */}
+          {workExperiences.length > 0 && (
+            <div className="mb-6">
+              <h2 
+                className="text-xs font-semibold tracking-widest mb-3 pb-2 border-b-2"
+                style={{ color: primaryColor, borderColor: primaryColor }}
+              >
+                WORK EXPERIENCE
+              </h2>
+              {workExperiences.map((exp) => (
+                <div key={exp.id} className="mb-5">
+                  <div className="flex justify-between items-start mb-1">
+                    <h3 className="font-bold text-sm">{exp.jobTitle}</h3>
+                    <span className="text-xs text-gray-500">
+                      {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {exp.company} | {exp.location}
+                  </p>
+                  <ul className="space-y-1">
+                    {exp.achievements.slice(0, 4).map((achievement, idx) => (
+                      <li key={idx} className="text-xs text-gray-700 flex items-start gap-2">
+                        <span className="mt-0.5" style={{ color: primaryColor }}>•</span>
+                        <span>{achievement}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Certifications */}
+          {certifications && certifications.length > 0 && (
+            <div>
+              <h2 
+                className="text-xs font-semibold tracking-widest mb-3 pb-2 border-b-2"
+                style={{ color: primaryColor, borderColor: primaryColor }}
+              >
+                CERTIFICATIONS
+              </h2>
+              <div className="grid grid-cols-2 gap-2">
+                {certifications.map((cert) => (
+                  <div key={cert.id} className="text-xs flex items-start gap-2">
+                    <span style={{ color: primaryColor }}>•</span>
+                    <span>{cert.name} ({cert.date})</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### **`src/components/templates/preview/charles.tsx`** (Updated - With Photo)
+
+```tsx
+'use client';
+
+import type { CVData } from '@/types/cv';
+
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#0891B2';
+
+export function CharlesPreview({ data, colorOverride }: Props) {
+  const primaryColor = colorOverride || DEFAULT_COLOR;
+  const { personalInfo, summary, workExperiences, education, skills, languages, certifications } = data;
+
+  return (
+    <div className="w-[210mm] min-h-[297mm] bg-white font-sans flex">
+      {/* Left Sidebar - Uses primary color */}
+      <div 
+        className="w-[35%] text-white p-6"
+        style={{ backgroundColor: primaryColor }}
+      >
+        {/* Photo Placeholder */}
+        <div className="w-28 h-28 bg-white/20 rounded-lg mx-auto mb-4 flex items-center justify-center overflow-hidden">
+          {personalInfo.photoUrl ? (
+            <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            <div className="text-center">
+              <span className="text-4xl">📷</span>
+              <p className="text-xs mt-1 opacity-70">Photo</p>
+            </div>
+          )}
+        </div>
+
+        {/* Contact */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-2 text-sm">
+            <span>📍</span>
+            <span>{personalInfo.location || 'Location'}</span>
+          </div>
+          <div className="flex items-center gap-2 mb-2 text-sm">
+            <span>📞</span>
+            <span>{personalInfo.phone || 'Phone'}</span>
+          </div>
+          <div className="flex items-center gap-2 mb-2 text-sm">
+            <span>✉️</span>
+            <span className="break-all text-xs">{personalInfo.email || 'Email'}</span>
+          </div>
+          {personalInfo.linkedin && (
+            <div className="flex items-center gap-2 text-sm">
+              <span>🔗</span>
+              <span className="break-all text-xs">{personalInfo.linkedin}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Professional Summary */}
+        {summary && (
+          <div className="mb-6">
+            <h2 className="text-xs font-bold tracking-wider border-b border-white/30 pb-2 mb-3">
+              ABOUT ME
+            </h2>
+            <p className="text-xs leading-relaxed opacity-90">{summary}</p>
+          </div>
+        )}
+
+        {/* Skills */}
+        {skills.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-xs font-bold tracking-wider border-b border-white/30 pb-2 mb-3">
+              SKILLS
+            </h2>
+            <ul className="space-y-1">
+              {skills.slice(0, 8).map((skill) => (
+                <li key={skill.id} className="text-xs flex items-center gap-2">
+                  <span className="opacity-70">•</span>
+                  {skill.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Languages */}
+        {languages && languages.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-xs font-bold tracking-wider border-b border-white/30 pb-2 mb-3">
+              LANGUAGES
+            </h2>
+            {languages.map((lang) => (
+              <div key={lang.id} className="mb-2">
+                <div className="flex justify-between text-xs">
+                  <span>{lang.name}</span>
+                  <span className="opacity-70 capitalize">{lang.proficiency}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Certifications */}
+        {certifications && certifications.length > 0 && (
+          <div>
+            <h2 className="text-xs font-bold tracking-wider border-b border-white/30 pb-2 mb-3">
+              CERTIFICATIONS
+            </h2>
+            {certifications.slice(0, 4).map((cert) => (
+              <div key={cert.id} className="mb-2 text-xs">
+                <p className="font-semibold">{cert.name}</p>
+                <p className="opacity-70">{cert.date}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Right Content */}
+      <div className="w-[65%] p-6">
+        {/* Name & Title */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold" style={{ color: primaryColor }}>
+            {personalInfo.firstName || 'Noela'} {personalInfo.lastName || 'Bwemero'}
+          </h1>
+          <p className="text-sm text-gray-500 uppercase tracking-wider mt-1">
+            {personalInfo.professionalTitle || 'Professional Title'}
+          </p>
+        </div>
+
+        {/* Work Experience */}
+        {workExperiences.length > 0 && (
+          <div className="mb-6">
+            <h2 
+              className="text-xs font-bold tracking-wider mb-4 pb-2 border-b-2"
+              style={{ color: primaryColor, borderColor: primaryColor }}
+            >
+              WORK EXPERIENCE
+            </h2>
+            {workExperiences.map((exp) => (
+              <div key={exp.id} className="mb-5">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-sm">{exp.jobTitle}</h3>
+                    <p className="text-sm" style={{ color: primaryColor }}>{exp.company}</p>
+                    <p className="text-xs text-gray-500">{exp.location}</p>
+                  </div>
+                  <span className="text-xs text-gray-500 whitespace-nowrap">
+                    {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
+                  </span>
+                </div>
+                <ul className="mt-2 space-y-1">
+                  {exp.achievements.slice(0, 3).map((achievement, idx) => (
+                    <li key={idx} className="text-xs text-gray-600 flex items-start gap-2">
+                      <span className="mt-0.5" style={{ color: primaryColor }}>•</span>
+                      <span>{achievement}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Education */}
+        {education.length > 0 && (
+          <div>
+            <h2 
+              className="text-xs font-bold tracking-wider mb-4 pb-2 border-b-2"
+              style={{ color: primaryColor, borderColor: primaryColor }}
+            >
+              EDUCATION
+            </h2>
+            {education.map((edu) => (
+              <div key={edu.id} className="mb-3 flex justify-between">
+                <div>
+                  <h3 className="font-bold text-sm">{edu.degree}</h3>
+                  <p className="text-sm text-gray-600">{edu.institution}</p>
+                  <p className="text-xs text-gray-500">{edu.fieldOfStudy}</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs text-gray-500">{edu.graduationDate}</span>
+                  {edu.gpa && <p className="text-xs" style={{ color: primaryColor }}>{edu.gpa}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### **Pattern for ALL Other Templates**
+
+Apply this same pattern to every template:
+
+1. **Add Props interface with `colorOverride`**:
+```tsx
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+```
+
+2. **Define DEFAULT_COLOR at top**:
+```tsx
+const DEFAULT_COLOR = '#XXXXXX'; // Template's original color
+```
+
+3. **Use colorOverride or default**:
+```tsx
+const primaryColor = colorOverride || DEFAULT_COLOR;
+```
+
+4. **Replace ALL hardcoded color values with `primaryColor`**:
+```tsx
+// Before:
+style={{ color: '#0891B2' }}
+style={{ backgroundColor: '#0891B2' }}
+style={{ borderColor: '#0891B2' }}
+
+// After:
+style={{ color: primaryColor }}
+style={{ backgroundColor: primaryColor }}
+style={{ borderColor: primaryColor }}
+```
+
+---
+
+## Fix 3: Update Template Selection Page
+
+Update **`src/app/(builder)/template/page.tsx`** to use rich sample data:
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCVStore } from '@/stores/cv-store';
+import { TEMPLATES } from '@/types/templates';
+import { TemplatePreview } from '@/components/templates/preview';
+import { sampleCVData } from '@/lib/sample-data'; // Import rich sample data
+
+const colorOptions = [
+  { name: 'Default', value: null },
+  { name: 'Teal', value: '#0891B2' },
+  { name: 'Navy', value: '#1E3A5F' },
+  { name: 'Forest', value: '#166534' },
+  { name: 'Orange', value: '#E07A38' },
+  { name: 'Purple', value: '#7C3AED' },
+  { name: 'Rose', value: '#BE185D' },
+  { name: 'Gold', value: '#D4A056' },
+  { name: 'Coral', value: '#E85A5A' },
+];
+
+export default function TemplateSelectionPage() {
+  const router = useRouter();
+  const { setTemplateId, setSelectedColor, templateId: currentTemplate } = useCVStore();
+  
+  const [filter, setFilter] = useState<'all' | 'photo' | 'no-photo'>('all');
+  const [previewColor, setPreviewColor] = useState<string | null>(null);
+  const [hoveredTemplate, setHoveredTemplate] = useState<string | null>(null);
+
+  const filteredTemplates = TEMPLATES.filter((t) => {
+    if (filter === 'photo' && !t.hasPhoto) return false;
+    if (filter === 'no-photo' && t.hasPhoto) return false;
+    return true;
+  });
+
+  const handleSelectTemplate = (id: string) => {
+    setTemplateId(id);
+    setSelectedColor(previewColor);
+    router.push('/personal');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-white border-b sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <h1 className="text-2xl font-bold text-gray-900">Choose Your Template</h1>
+          <p className="text-gray-600 mt-1">Select a design that matches your professional style</p>
+          
+          {/* Filters */}
+          <div className="flex flex-wrap gap-4 mt-4 items-center justify-between">
+            {/* Photo Filter */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  filter === 'all' 
+                    ? 'bg-gray-900 text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                All ({TEMPLATES.length})
+              </button>
+              <button
+                onClick={() => setFilter('photo')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  filter === 'photo' 
+                    ? 'bg-gray-900 text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                📷 With Photo ({TEMPLATES.filter(t => t.hasPhoto).length})
+              </button>
+              <button
+                onClick={() => setFilter('no-photo')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  filter === 'no-photo' 
+                    ? 'bg-gray-900 text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                No Photo ({TEMPLATES.filter(t => !t.hasPhoto).length})
+              </button>
+            </div>
+
+            {/* Color Selector */}
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-600 font-medium">Preview color:</span>
+              <div className="flex gap-1.5">
+                {colorOptions.map((opt) => (
+                  <button
+                    key={opt.name}
+                    onClick={() => setPreviewColor(opt.value)}
+                    className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${
+                      previewColor === opt.value 
+                        ? 'border-gray-900 scale-110 ring-2 ring-gray-900 ring-offset-2' 
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    style={{ backgroundColor: opt.value || '#888' }}
+                    title={opt.name}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Template Grid */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <p className="text-sm text-gray-500 mb-4">
+          Showing {filteredTemplates.length} of {TEMPLATES.length} templates
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredTemplates.map((template) => (
+            <div
+              key={template.id}
+              className={`group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer ${
+                currentTemplate === template.id ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+              }`}
+              onClick={() => handleSelectTemplate(template.id)}
+              onMouseEnter={() => setHoveredTemplate(template.id)}
+              onMouseLeave={() => setHoveredTemplate(null)}
+            >
+              {/* Live Mini Preview */}
+              <div className="relative aspect-[210/297] overflow-hidden bg-gray-50">
+                {/* Container for scaled preview */}
+                <div 
+                  className="absolute top-0 left-0 pointer-events-none"
+                  style={{ 
+                    transform: 'scale(0.18)', 
+                    transformOrigin: 'top left',
+                    width: '210mm',
+                    height: '297mm',
+                  }}
+                >
+                  <TemplatePreview
+                    templateId={template.id}
+                    data={sampleCVData}
+                    colorOverride={previewColor}
+                    scale={1}
+                  />
+                </div>
+                
+                {/* Hover Overlay */}
+                <div className={`absolute inset-0 bg-black/60 flex items-center justify-center transition-opacity duration-200 ${
+                  hoveredTemplate === template.id ? 'opacity-100' : 'opacity-0'
+                }`}>
+                  <span className="px-6 py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm shadow-lg">
+                    Use This Template
+                  </span>
+                </div>
+
+                {/* Photo Badge */}
+                {template.hasPhoto && (
+                  <div className="absolute top-3 right-3 bg-blue-500 text-white text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
+                    <span>📷</span> Photo
+                  </div>
+                )}
+
+                {/* Selected Indicator */}
+                {currentTemplate === template.id && (
+                  <div className="absolute top-3 left-3 bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center">
+                    ✓
+                  </div>
+                )}
+              </div>
+
+              {/* Template Info */}
+              <div className="p-4">
+                <h3 className="font-bold text-gray-900">{template.name}</h3>
+                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                  {template.description}
+                </p>
+                <div className="flex items-center gap-2 mt-3">
+                  <span 
+                    className="w-4 h-4 rounded-full border border-gray-200" 
+                    style={{ backgroundColor: previewColor || template.primaryColor }}
+                  />
+                  <span className="text-xs text-gray-400 capitalize">{template.category}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## Summary: Files to Update
+
+### Create:
+1. **`src/lib/sample-data.ts`** - Rich sample data for Noela Bwemero (Lawyer)
+
+### Update ALL 21 Templates:
+Add `colorOverride` prop and use `primaryColor` variable for all color styling:
+
+| Template | Default Color |
+|----------|---------------|
+| kathleen | #E5B94E |
+| charles | #0891B2 |
+| grace-minimal | #6B7280 |
+| lauren-orange | #E07A38 |
+| grace-navy | #1E4A6D |
+| grace-teal | #2AAA9E |
+| lesley | #2B4764 |
+| kelly | #1F2937 |
+| richard | #111827 |
+| grace-mint | #6BBFAB |
+| grace-coral | #E85A5A |
+| nelly-mint | #3EB489 |
+| nelly-gray | #4B5563 |
+| nelly-sidebar | #374151 |
+| lauren-icons | #374151 |
+| oliver | #E07A38 |
+| thomas | #8ECFC8 |
+| denice | #9B7B7B |
+| nelly-purple | #8B7BB5 |
+| aparna-dark | #1E3A5F |
+| aparna-gold | #D4A056 |
+
+### Update:
+- **`src/components/templates/preview/index.tsx`** - Pass colorOverride to templates
+- **`src/app/(builder)/template/page.tsx`** - Use `sampleCVData` instead of sparse data
+
+---
+
+**Once the engineer applies these changes, the templates will:**
+1. ✅ Look fully filled with rich legal professional data
+2. ✅ Change colors dynamically when user selects a color
+3. ✅ Show consistent previews across all 21 templates

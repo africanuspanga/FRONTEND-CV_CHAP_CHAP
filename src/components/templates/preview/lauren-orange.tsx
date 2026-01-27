@@ -2,9 +2,16 @@
 
 import type { CVData } from '@/types/cv';
 
-export function LaurenOrangePreview({ data }: { data: CVData }) {
-  const { personalInfo, summary, workExperiences, education, skills } = data;
-  const color = '#E07A38';
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#E07A38';
+
+export function LaurenOrangePreview({ data, colorOverride }: Props) {
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
+  const color = colorOverride || DEFAULT_COLOR;
 
   return (
     <div className="w-full min-h-full bg-white flex font-sans">
@@ -69,6 +76,19 @@ export function LaurenOrangePreview({ data }: { data: CVData }) {
             ))}
           </div>
         )}
+
+        {languages && languages.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xs font-bold tracking-widest mb-4 border-b border-white/30 pb-2">
+              LANGUAGES
+            </h2>
+            {languages.map((lang) => (
+              <div key={lang.id} className="text-sm mb-1">
+                {lang.name} - {lang.proficiency}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="w-[65%] p-8">
@@ -92,7 +112,7 @@ export function LaurenOrangePreview({ data }: { data: CVData }) {
                 {exp.company}, {exp.location}
               </p>
               <ul className="space-y-1">
-                {exp.achievements.map((achievement, idx) => (
+                {exp.achievements.slice(0, 3).map((achievement, idx) => (
                   <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
                     <span className="text-gray-400 mt-0.5">•</span>
                     <span>{achievement}</span>
@@ -114,7 +134,7 @@ export function LaurenOrangePreview({ data }: { data: CVData }) {
             <div className="grid grid-cols-2 gap-2">
               {skills.map((skill) => (
                 <div key={skill.id} className="text-sm flex items-center gap-2">
-                  <span className="text-gray-400">•</span>
+                  <span style={{ color }}>•</span>
                   <span>{skill.name}</span>
                 </div>
               ))}

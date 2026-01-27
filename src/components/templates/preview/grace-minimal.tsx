@@ -2,14 +2,23 @@
 
 import type { CVData } from '@/types/cv';
 
-export function GraceMinimalPreview({ data }: { data: CVData }) {
+interface Props {
+  data: CVData;
+  colorOverride?: string | null;
+}
+
+const DEFAULT_COLOR = '#6B7280';
+
+export function GraceMinimalPreview({ data, colorOverride }: Props) {
+  const primaryColor = colorOverride || DEFAULT_COLOR;
+
   return (
     <div className="p-10 font-sans">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-light text-gray-900 tracking-wide">
           {data.personalInfo.firstName} {data.personalInfo.lastName}
         </h1>
-        <div className="w-16 h-0.5 bg-gray-400 mx-auto my-4"></div>
+        <div className="w-16 h-0.5 mx-auto my-4" style={{ backgroundColor: primaryColor }}></div>
         <p className="text-lg text-gray-600 uppercase tracking-widest">
           {data.personalInfo.professionalTitle}
         </p>
@@ -24,20 +33,20 @@ export function GraceMinimalPreview({ data }: { data: CVData }) {
 
       {data.summary && (
         <div className="mb-8">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">
+          <h2 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: primaryColor }}>
             Profile
           </h2>
-          <div className="w-full h-px bg-gray-200 mb-4"></div>
-          <p className="text-gray-700 leading-relaxed">{data.summary}</p>
+          <div className="w-full h-px mb-4" style={{ backgroundColor: `${primaryColor}40` }}></div>
+          <p className="text-gray-700 leading-relaxed text-sm">{data.summary}</p>
         </div>
       )}
 
       {data.workExperiences.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">
+          <h2 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: primaryColor }}>
             Experience
           </h2>
-          <div className="w-full h-px bg-gray-200 mb-4"></div>
+          <div className="w-full h-px mb-4" style={{ backgroundColor: `${primaryColor}40` }}></div>
           <div className="space-y-6">
             {data.workExperiences.map((exp) => (
               <div key={exp.id}>
@@ -52,9 +61,9 @@ export function GraceMinimalPreview({ data }: { data: CVData }) {
                 </p>
                 {exp.achievements.length > 0 && (
                   <ul className="space-y-1">
-                    {exp.achievements.map((achievement, idx) => (
+                    {exp.achievements.slice(0, 3).map((achievement, idx) => (
                       <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
-                        <span className="text-gray-400">—</span>
+                        <span style={{ color: primaryColor }}>—</span>
                         <span>{achievement}</span>
                       </li>
                     ))}
@@ -68,16 +77,16 @@ export function GraceMinimalPreview({ data }: { data: CVData }) {
 
       {data.education.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">
+          <h2 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: primaryColor }}>
             Education
           </h2>
-          <div className="w-full h-px bg-gray-200 mb-4"></div>
+          <div className="w-full h-px mb-4" style={{ backgroundColor: `${primaryColor}40` }}></div>
           <div className="space-y-4">
             {data.education.map((edu) => (
               <div key={edu.id} className="flex justify-between items-baseline">
                 <div>
                   <h3 className="font-medium text-gray-900">
-                    {edu.degree} in {edu.fieldOfStudy}
+                    {edu.degree} {edu.fieldOfStudy && `in ${edu.fieldOfStudy}`}
                   </h3>
                   <p className="text-sm text-gray-600">{edu.institution}</p>
                 </div>
@@ -90,10 +99,10 @@ export function GraceMinimalPreview({ data }: { data: CVData }) {
 
       {data.skills.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">
+          <h2 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: primaryColor }}>
             Skills
           </h2>
-          <div className="w-full h-px bg-gray-200 mb-4"></div>
+          <div className="w-full h-px mb-4" style={{ backgroundColor: `${primaryColor}40` }}></div>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
             {data.skills.map((skill) => (
               <span key={skill.id} className="text-sm text-gray-700">
