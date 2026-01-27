@@ -2,11 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useCVStore } from "@/stores/cv-store";
-import { ArrowLeft, ArrowRight, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, Loader2, Lightbulb, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function SummaryPage() {
   const router = useRouter();
@@ -49,94 +50,126 @@ export default function SummaryPage() {
     }
   };
 
+  const summaryLength = cvData.summary?.length || 0;
+  const isOptimalLength = summaryLength >= 100 && summaryLength <= 400;
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
+      <header className="bg-white border-b sticky top-0 z-40 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <button onClick={handleBack} className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
+          <button onClick={handleBack} className="flex items-center gap-2 text-gray-600 hover:text-cv-blue-600">
             <ArrowLeft className="h-5 w-5" />
-            <span>Back</span>
           </button>
           <div className="text-center">
-            <h1 className="text-xl font-bold">Professional Summary</h1>
-            <p className="text-sm text-gray-500">Step 6 of 8</p>
+            <p className="text-xs text-gray-500">Step 5 of 6</p>
+            <h1 className="text-lg font-heading font-bold text-gray-900">Summary</h1>
           </div>
-          <div className="w-16"></div>
+          <div className="w-8"></div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Write Your Professional Summary
+      <main className="container mx-auto px-4 py-6 pb-32">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-6">
+            <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
+              Professional Summary
             </h2>
             <p className="text-gray-600">
               A compelling summary helps you stand out to employers
             </p>
           </div>
 
-          <Card className="mb-6">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg">Your Summary</CardTitle>
-                  <CardDescription>
-                    2-4 sentences highlighting your experience and goals
-                  </CardDescription>
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleGenerateSummary}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Sparkles className="h-4 w-4 mr-2" />
-                  )}
-                  AI Generate
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                value={cvData.summary}
-                onChange={(e) => setSummary(e.target.value)}
-                placeholder="Results-driven professional with X years of experience in... Known for..."
-                className="min-h-[150px]"
-              />
-              <p className="text-sm text-gray-500 mt-2">
-                {cvData.summary.length}/500 characters
+          <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <label className="text-sm font-medium text-gray-700">Your Summary</label>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleGenerateSummary}
+                disabled={isLoading}
+                className="text-cv-blue-600 border-cv-blue-200 hover:bg-cv-blue-50"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : cvData.summary ? (
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                {cvData.summary ? 'Regenerate' : 'AI Generate'}
+              </Button>
+            </div>
+            
+            <Textarea
+              value={cvData.summary}
+              onChange={(e) => setSummary(e.target.value)}
+              placeholder="Results-driven professional with X years of experience in... Known for..."
+              className="min-h-[150px] text-base"
+            />
+            
+            <div className="flex justify-between items-center mt-2">
+              <p className={`text-sm ${isOptimalLength ? 'text-green-600' : 'text-gray-500'}`}>
+                {summaryLength}/400 characters
+                {isOptimalLength && ' ✓ Great length!'}
               </p>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-6 bg-blue-50 border-blue-200">
-            <CardContent className="pt-6">
-              <h3 className="font-medium text-blue-900 mb-2">Tips for a Great Summary:</h3>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Start with your professional title and years of experience</li>
-                <li>• Mention 2-3 key skills or achievements</li>
-                <li>• Include what you're looking for in your next role</li>
-                <li>• Keep it concise - hiring managers scan quickly</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <div className="flex justify-between pt-4">
-            <Button variant="outline" onClick={handleBack}>
-              <ArrowLeft className="mr-2 h-5 w-5" />
-              Back
-            </Button>
-            <Button onClick={handleContinue}>
-              Preview Your CV
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            </div>
           </div>
+
+          {/* Tips Section */}
+          <Card className="bg-amber-50 border-amber-200">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                  <Lightbulb className="h-5 w-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-amber-900 mb-2">Tips for a Great Summary</h3>
+                  <ul className="text-sm text-amber-800 space-y-1">
+                    <li>• Start with your professional title and years of experience</li>
+                    <li>• Mention 2-3 key skills or achievements</li>
+                    <li>• Include what you're looking for in your next role</li>
+                    <li>• Keep it concise - hiring managers scan quickly</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Example summaries */}
+          {!cvData.summary && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mt-6"
+            >
+              <p className="text-sm text-gray-500 mb-3">Need inspiration? Click the AI Generate button above, or try one of these formats:</p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => setSummary(`Dedicated ${cvData.personalInfo.professionalTitle || 'professional'} with proven experience in delivering results. Known for strong problem-solving abilities and commitment to excellence.`)}
+                  className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 text-sm text-gray-600 transition-colors"
+                >
+                  <span className="text-gray-400 text-xs block mb-1">Classic format:</span>
+                  &ldquo;Dedicated [title] with proven experience in delivering results...&rdquo;
+                </button>
+              </div>
+            </motion.div>
+          )}
         </div>
       </main>
+
+      {/* Fixed bottom button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
+        <div className="container mx-auto max-w-2xl">
+          <Button 
+            onClick={handleContinue}
+            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl"
+          >
+            Preview Your CV
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
