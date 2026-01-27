@@ -223,7 +223,7 @@ export default function TemplatePage() {
           Showing {filteredTemplates.length} of {TEMPLATES.length} templates
         </p>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           {filteredTemplates.map((template) => (
             <LiveTemplateCard
               key={template.id}
