@@ -276,7 +276,7 @@ export default function HomePage() {
 
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <Link 
-                  href="/template"
+                  href="/create"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-cv-blue-600 to-cv-blue-500 text-white font-semibold rounded-full shadow-lg shadow-cv-blue-500/40 hover:shadow-cv-blue-500/50 hover:-translate-y-0.5 transition-all text-lg"
                 >
                   Create Your CV Free

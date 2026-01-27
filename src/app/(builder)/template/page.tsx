@@ -156,16 +156,16 @@ export default function TemplatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="bg-white border-b sticky top-0 z-10">
+    <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-gray-100">
+      <div className="bg-white border-b sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
-            <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
+            <Link href="/create/choose" className="flex items-center gap-2 text-gray-600 hover:text-cv-blue-600">
               <ArrowLeft className="h-5 w-5" />
-              <span className="hidden sm:inline">Back to Home</span>
+              <span className="hidden sm:inline">Back</span>
             </Link>
             <div className="text-center">
-              <h1 className="text-xl font-bold text-gray-900">Choose Your Template</h1>
+              <h1 className="text-xl font-heading font-bold text-gray-900">Choose Your Template</h1>
               <p className="text-sm text-gray-500">Step 1 of 8</p>
             </div>
             <div className="w-24"></div>
@@ -257,9 +257,9 @@ export default function TemplatePage() {
             size="lg" 
             onClick={handleContinue}
             disabled={!templateId}
-            className="px-8 shadow-lg"
+            className="px-8 shadow-xl bg-gradient-to-r from-cv-blue-600 to-cv-blue-500 hover:from-cv-blue-700 hover:to-cv-blue-600 text-white font-semibold py-6 text-lg rounded-xl"
           >
-            Continue to Personal Info
+            Use This Template
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
