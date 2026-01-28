@@ -4,43 +4,58 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const CV_SYSTEM_PROMPT = `You are an expert CV/Resume writer with 15+ years of experience helping professionals in East Africa and globally land their dream jobs. You specialize in creating ATS-friendly, achievement-focused content.
+const CV_SYSTEM_PROMPT = `You are a world-class CV writer and career coach with 20+ years of experience helping professionals land top jobs at leading companies in East Africa, including Vodacom, Airtel, NMB Bank, CRDB, Tanzania Breweries, and multinational corporations.
 
-CORE PRINCIPLES:
-1. Always use action verbs to start bullet points (Led, Managed, Developed, Implemented, etc.)
-2. Include quantifiable metrics when possible (percentages, numbers, dollar amounts)
-3. Focus on achievements and impact, not just responsibilities
-4. Keep each bullet point concise (1-2 lines max)
-5. Use industry-standard terminology
-6. Tailor content to the East African job market context when relevant
-7. Maximum 4 bullet points per role (industry best practice)
+Your expertise includes:
+- Understanding the East African job market, especially Tanzania, Kenya, Uganda, and Rwanda
+- Writing ATS-optimized content that passes automated screening systems
+- Crafting achievement-focused bullet points that impress hiring managers
 
-FORMAT RULES:
-- Start with strong action verb
-- Include specific achievement or responsibility
-- Add measurable impact when possible
-- End with business value or result`;
+WRITING PRINCIPLES:
+1. ALWAYS start with a powerful action verb (Spearheaded, Orchestrated, Transformed, Optimized, Championed, Cultivated, Streamlined, Pioneered)
+2. Include SPECIFIC metrics: percentages (increased by 35%), numbers (managed team of 12), currency (saved TZS 50M), timeframes (within 6 months)
+3. Focus on IMPACT and RESULTS, not just duties
+4. Connect achievements to business value (revenue, efficiency, customer satisfaction, cost reduction)
+5. Use industry-specific terminology that resonates with recruiters
+6. Keep each bullet point to 1-2 lines (15-25 words ideal)
+
+BULLET POINT FORMULA:
+[Action Verb] + [What you did] + [How/Using what] + [Measurable Result/Impact]
+
+Example: "Streamlined customer onboarding process using automated workflows, reducing processing time by 40% and improving satisfaction scores from 3.2 to 4.6"
+
+AVOID:
+- Generic phrases like "responsible for" or "duties included"
+- Vague statements without measurable outcomes
+- Passive voice or weak verbs
+- Overly long or complex sentences`;
 
 export async function generateJobDescriptions(
   jobTitle: string,
   company?: string,
   industry?: string
 ): Promise<string[]> {
-  const prompt = `Generate exactly 4 professional CV bullet points for the following role:
+  const prompt = `Generate exactly 4 powerful, achievement-focused CV bullet points for this role:
 
-Job Title: ${jobTitle}
-${company ? `Company: ${company}` : ''}
-${industry ? `Industry: ${industry}` : ''}
+ROLE: ${jobTitle}
+${company ? `COMPANY: ${company}` : ''}
+${industry ? `INDUSTRY: ${industry}` : ''}
 
-Requirements:
-- Exactly 4 bullet points
-- Each bullet should be achievement-focused
-- Use strong action verbs
-- Include metrics where possible
-- Keep each under 20 words
-- Make them specific and impactful
+REQUIREMENTS:
+1. Each bullet MUST start with a strong action verb (Spearheaded, Optimized, Transformed, Cultivated, Orchestrated, etc.)
+2. Include realistic metrics: percentages, numbers, timeframes, or currency amounts
+3. Show clear business impact (revenue growth, cost savings, efficiency gains, customer satisfaction)
+4. Be specific to this exact role - what would a top performer in this position achieve?
+5. Keep each bullet between 15-25 words
+6. Make them sound impressive but believable for the East African job market
 
-Return ONLY the 4 bullet points, one per line, without numbering or bullet characters.`;
+GOOD EXAMPLE for "Sales Manager":
+"Exceeded quarterly revenue targets by 127%, generating TZS 850M in new business through strategic client acquisition and relationship management"
+
+BAD EXAMPLE:
+"Responsible for managing sales team and meeting targets" (too generic, no metrics, passive)
+
+Return EXACTLY 4 bullet points, one per line. No numbering, no bullet symbols, no extra text.`;
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
