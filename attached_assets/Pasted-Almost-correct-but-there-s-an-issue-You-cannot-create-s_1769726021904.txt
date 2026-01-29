@@ -1,0 +1,689 @@
+Almost correct, but there's an issue. You **cannot create storage buckets via SQL INSERT** - Supabase Storage buckets must be created through the Dashboard or API. Let me give you the correct approach:
+
+---
+
+## ✅ Correct Setup for Supabase Storage
+
+### Step 1: Create Bucket via Dashboard (Manual)
+
+1. Go to **Supabase Dashboard** → **Storage**
+2. Click **"New Bucket"**
+3. Configure:
+   - **Name:** `cv-photos`
+   - **Public bucket:** ✅ Yes (toggle ON)
+   - **File size limit:** `2MB` (or leave default)
+   - **Allowed MIME types:** `image/jpeg, image/png, image/webp`
+4. Click **"Create bucket"**
+
+---
+
+### Step 2: Run This SQL for Policies Only
+
+```sql
+-- ============================================
+-- CV PHOTOS STORAGE POLICIES
+-- Run this AFTER creating the bucket via Dashboard
+-- ============================================
+
+-- Allow anyone to read photos (public bucket)
+CREATE POLICY "Public read access for cv photos"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'cv-photos');
+
+-- Allow authenticated users to upload photos
+CREATE POLICY "Authenticated users can upload photos"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (bucket_id = 'cv-photos');
+
+-- Allow authenticated users to update their photos
+CREATE POLICY "Authenticated users can update photos"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (bucket_id = 'cv-photos');
+
+-- Allow authenticated users to delete their photos
+CREATE POLICY "Authenticated users can delete photos"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (bucket_id = 'cv-photos');
+
+-- Allow anonymous users to upload photos (for users who haven't signed up)
+CREATE POLICY "Anonymous users can upload photos"
+ON storage.objects FOR INSERT
+TO anon
+WITH CHECK (bucket_id = 'cv-photos');
+
+-- Allow anonymous users to update their photos
+CREATE POLICY "Anonymous users can update photos"
+ON storage.objects FOR UPDATE
+TO anon
+USING (bucket_id = 'cv-photos');
+
+-- Allow anonymous users to delete their photos  
+CREATE POLICY "Anonymous users can delete photos"
+ON storage.objects FOR DELETE
+TO anon
+USING (bucket_id = 'cv-photos');
+```
+
+---
+
+### Step 3: Verify Setup
+
+After running the policies, verify in Dashboard:
+1. Go to **Storage** → **cv-photos** → **Policies**
+2. You should see all the policies listed
+
+---
+
+## Now Let Me Provide the Complete Photo Upload Implementation
+
+### Task 1: Photo Upload Component
+
+Create **`src/components/builder/photo-upload.tsx`**:
+
+```tsx
+'use client';
+
+import { useState, useRef, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+
+interface PhotoUploadProps {
+  currentPhotoUrl?: string;
+  onPhotoUploaded: (url: string) => void;
+  onPhotoRemoved: () => void;
+}
+
+export function PhotoUpload({ currentPhotoUrl, onPhotoUploaded, onPhotoRemoved }: PhotoUploadProps) {
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl || null);
+  const [isDragging, setIsDragging] = useState(false);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const supabase = createClient();
+
+  // Generate unique filename
+  const generateFileName = (file: File): string => {
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 8);
+    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    return `photo_${timestamp}_${randomString}.${extension}`;
+  };
+
+  // Compress and resize image
+  const processImage = (file: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+
+      img.onload = () => {
+        // Target size: 400x400 (square crop from center)
+        const size = 400;
+        canvas.width = size;
+        canvas.height = size;
+
+        // Calculate crop dimensions (center crop to square)
+        const minDim = Math.min(img.width, img.height);
+        const sx = (img.width - minDim) / 2;
+        const sy = (img.height - minDim) / 2;
+
+        // Draw cropped and resized image
+        ctx?.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+
+        // Convert to blob with compression
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Failed to process image'));
+            }
+          },
+          'image/jpeg',
+          0.85 // 85% quality
+        );
+      };
+
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // Handle file selection
+  const handleFileSelect = async (file: File) => {
+    setError(null);
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setError('Please upload a JPG, PNG, or WebP image');
+      return;
+    }
+
+    // Validate file size (max 5MB before compression)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image must be less than 5MB');
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      setUploadProgress(10);
+
+      // Process image (resize & compress)
+      const processedBlob = await processImage(file);
+      setUploadProgress(40);
+
+      // Create preview
+      const preview = URL.createObjectURL(processedBlob);
+      setPreviewUrl(preview);
+      setUploadProgress(50);
+
+      // Generate unique filename
+      const fileName = generateFileName(file);
+      const filePath = `uploads/${fileName}`;
+
+      // Upload to Supabase Storage
+      const { data, error: uploadError } = await supabase.storage
+        .from('cv-photos')
+        .upload(filePath, processedBlob, {
+          contentType: 'image/jpeg',
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      setUploadProgress(90);
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('cv-photos')
+        .getPublicUrl(filePath);
+
+      setUploadProgress(100);
+
+      // Notify parent component
+      onPhotoUploaded(publicUrl);
+
+      // Clean up preview URL
+      URL.revokeObjectURL(preview);
+      setPreviewUrl(publicUrl);
+
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
+      setPreviewUrl(currentPhotoUrl || null);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  // Handle file input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  // Handle drag and drop
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  }, []);
+
+  // Handle remove photo
+  const handleRemove = async () => {
+    setPreviewUrl(null);
+    onPhotoRemoved();
+    
+    // Optionally delete from storage (if you want to clean up)
+    // This requires storing the file path somewhere
+  };
+
+  return (
+    <div className="space-y-3">
+      <label className="block text-sm font-medium text-gray-700">
+        Profile Photo
+      </label>
+
+      {/* Upload Area */}
+      <div
+        className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
+          isDragging
+            ? 'border-blue-500 bg-blue-50'
+            : previewUrl
+            ? 'border-gray-200 bg-gray-50'
+            : 'border-gray-300 hover:border-gray-400 bg-white'
+        }`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        {previewUrl ? (
+          /* Photo Preview */
+          <div className="flex flex-col items-center">
+            <div className="relative w-32 h-32 mb-4">
+              <img
+                src={previewUrl}
+                alt="Profile preview"
+                className="w-full h-full object-cover rounded-xl shadow-md"
+              />
+              {isUploading && (
+                <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
+                  <div className="text-white text-sm font-medium">
+                    {uploadProgress}%
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+              >
+                Change Photo
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleRemove}
+                disabled={isUploading}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                Remove
+              </Button>
+            </div>
+          </div>
+        ) : (
+          /* Upload Prompt */
+          <div className="flex flex-col items-center">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <svg
+                className="w-10 h-10 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </div>
+            
+            {isUploading ? (
+              <div className="space-y-2">
+                <div className="w-48 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-600 transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+                <p className="text-sm text-gray-500">Uploading... {uploadProgress}%</p>
+              </div>
+            ) : (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mb-2"
+                >
+                  📷 Upload Photo
+                </Button>
+                <p className="text-sm text-gray-500">
+                  or drag and drop
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  JPG, PNG or WebP • Max 2MB
+                </p>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Hidden File Input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handleInputChange}
+          className="hidden"
+        />
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <p className="text-sm text-red-600 flex items-center gap-1">
+          <span>⚠️</span> {error}
+        </p>
+      )}
+
+      {/* Helper Text */}
+      <p className="text-xs text-gray-500">
+        Your photo will be cropped to a square. Use a professional headshot for best results.
+      </p>
+    </div>
+  );
+}
+```
+
+---
+
+### Task 2: Update Personal Info Form
+
+Update **`src/app/(builder)/personal/page.tsx`**:
+
+```tsx
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useCVStore } from '@/stores/cv-store';
+import { BuilderLayout } from '@/components/builder/builder-layout';
+import { PhotoUpload } from '@/components/builder/photo-upload';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { TEMPLATES } from '@/types/templates';
+
+export default function PersonalInfoPage() {
+  const router = useRouter();
+  const { cvData, templateId, updatePersonalInfo } = useCVStore();
+  const { personalInfo } = cvData;
+
+  // Check if selected template has photo
+  const selectedTemplate = TEMPLATES.find(t => t.id === templateId);
+  const showPhotoUpload = selectedTemplate?.hasPhoto ?? false;
+
+  const handlePhotoUploaded = (url: string) => {
+    updatePersonalInfo({ photoUrl: url });
+  };
+
+  const handlePhotoRemoved = () => {
+    updatePersonalInfo({ photoUrl: '' });
+  };
+
+  return (
+    <BuilderLayout
+      currentStep={1}
+      totalSteps={7}
+      stepTitle="Personal Information"
+      onBack={() => router.push('/template')}
+      onNext={() => router.push('/experience')}
+      nextLabel="Continue to Experience"
+    >
+      {/* Photo Upload - Only for templates with photo */}
+      {showPhotoUpload && (
+        <div className="mb-6 pb-6 border-b">
+          <PhotoUpload
+            currentPhotoUrl={personalInfo.photoUrl}
+            onPhotoUploaded={handlePhotoUploaded}
+            onPhotoRemoved={handlePhotoRemoved}
+          />
+        </div>
+      )}
+
+      {/* Name Fields - Side by Side */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="firstName">First Name *</Label>
+          <Input
+            id="firstName"
+            value={personalInfo.firstName}
+            onChange={(e) => updatePersonalInfo({ firstName: e.target.value })}
+            placeholder="Noela"
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="lastName">Last Name *</Label>
+          <Input
+            id="lastName"
+            value={personalInfo.lastName}
+            onChange={(e) => updatePersonalInfo({ lastName: e.target.value })}
+            placeholder="Bwemero"
+            className="mt-1"
+          />
+        </div>
+      </div>
+
+      {/* Professional Title */}
+      <div>
+        <Label htmlFor="title">Professional Title *</Label>
+        <Input
+          id="title"
+          value={personalInfo.professionalTitle}
+          onChange={(e) => updatePersonalInfo({ professionalTitle: e.target.value })}
+          placeholder="Senior Corporate Lawyer"
+          className="mt-1"
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          e.g., Marketing Manager, Software Engineer, Accountant
+        </p>
+      </div>
+
+      {/* Email */}
+      <div>
+        <Label htmlFor="email">Email Address *</Label>
+        <Input
+          id="email"
+          type="email"
+          value={personalInfo.email}
+          onChange={(e) => updatePersonalInfo({ email: e.target.value })}
+          placeholder="noela.bwemero@example.com"
+          className="mt-1"
+        />
+      </div>
+
+      {/* Phone */}
+      <div>
+        <Label htmlFor="phone">Phone Number *</Label>
+        <Input
+          id="phone"
+          type="tel"
+          value={personalInfo.phone}
+          onChange={(e) => updatePersonalInfo({ phone: e.target.value })}
+          placeholder="+255 754 892 341"
+          className="mt-1"
+        />
+      </div>
+
+      {/* Location */}
+      <div>
+        <Label htmlFor="location">Location *</Label>
+        <Input
+          id="location"
+          value={personalInfo.location}
+          onChange={(e) => updatePersonalInfo({ location: e.target.value })}
+          placeholder="Dar es Salaam, Tanzania"
+          className="mt-1"
+        />
+      </div>
+
+      {/* LinkedIn - Optional */}
+      <div>
+        <Label htmlFor="linkedin">
+          LinkedIn Profile <span className="text-gray-400 font-normal">(optional)</span>
+        </Label>
+        <Input
+          id="linkedin"
+          value={personalInfo.linkedin}
+          onChange={(e) => updatePersonalInfo({ linkedin: e.target.value })}
+          placeholder="linkedin.com/in/noelabwemero"
+          className="mt-1"
+        />
+      </div>
+
+      {/* Website - Optional */}
+      <div>
+        <Label htmlFor="website">
+          Website <span className="text-gray-400 font-normal">(optional)</span>
+        </Label>
+        <Input
+          id="website"
+          value={personalInfo.website}
+          onChange={(e) => updatePersonalInfo({ website: e.target.value })}
+          placeholder="www.noelabwemero.com"
+          className="mt-1"
+        />
+      </div>
+    </BuilderLayout>
+  );
+}
+```
+
+---
+
+### Task 3: Update CV Store Type
+
+Make sure your **`src/types/cv.ts`** includes `photoUrl`:
+
+```typescript
+export interface PersonalInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  location: string;
+  professionalTitle: string;
+  linkedin: string;
+  website: string;
+  photoUrl: string;  // <-- Make sure this exists
+}
+```
+
+And in **`src/stores/cv-store.ts`**, ensure the initial state has `photoUrl`:
+
+```typescript
+personalInfo: {
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  location: '',
+  professionalTitle: '',
+  linkedin: '',
+  website: '',
+  photoUrl: '',  // <-- Initialize as empty string
+},
+```
+
+---
+
+### Task 4: Update Photo Templates to Display the Image
+
+Here's the pattern for ALL photo templates. Update the photo section in each:
+
+**Example for `charles.tsx`:**
+
+```tsx
+{/* Photo Section */}
+<div className="w-28 h-28 bg-white/20 rounded-lg mx-auto mb-4 flex items-center justify-center overflow-hidden">
+  {personalInfo.photoUrl ? (
+    <img 
+      src={personalInfo.photoUrl} 
+      alt={`${personalInfo.firstName} ${personalInfo.lastName}`}
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <div className="text-center">
+      <span className="text-4xl">📷</span>
+      <p className="text-xs mt-1 opacity-70">Photo</p>
+    </div>
+  )}
+</div>
+```
+
+**Apply same pattern to these 7 templates:**
+1. `charles.tsx` - rounded-lg photo
+2. `oliver.tsx` - rounded-full photo (circular)
+3. `thomas.tsx` - rounded-lg photo
+4. `denice.tsx` - rounded-full photo (circular)
+5. `nelly-purple.tsx` - rounded-lg photo
+6. `aparna-dark.tsx` - rectangular photo
+7. `aparna-gold.tsx` - rectangular photo
+
+---
+
+### Task 5: Update Sample Data for Previews
+
+In **`src/lib/sample-data.ts`**, add a sample photo URL:
+
+```typescript
+personalInfo: {
+  firstName: 'Noela',
+  lastName: 'Bwemero',
+  // ... other fields
+  photoUrl: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=400&fit=crop&crop=face',
+  // This is a professional headshot from Unsplash for demo purposes
+},
+```
+
+---
+
+## Summary: Files to Create/Update
+
+| Action | File | Purpose |
+|--------|------|---------|
+| **Create** | `src/components/builder/photo-upload.tsx` | Photo upload component |
+| **Update** | `src/app/(builder)/personal/page.tsx` | Add photo upload to form |
+| **Update** | `src/types/cv.ts` | Ensure `photoUrl` field exists |
+| **Update** | `src/stores/cv-store.ts` | Initialize `photoUrl` |
+| **Update** | 7 photo templates | Display uploaded photo |
+| **Update** | `src/lib/sample-data.ts` | Add sample photo URL |
+
+---
+
+## Testing Checklist
+
+- [ ] Create bucket `cv-photos` in Supabase Dashboard
+- [ ] Run the SQL policies
+- [ ] Select a "with photo" template (e.g., Charles)
+- [ ] Go to Personal Info step
+- [ ] Photo upload field appears
+- [ ] Can upload JPG/PNG/WebP
+- [ ] Image is cropped to square
+- [ ] Preview updates immediately
+- [ ] Photo shows in live CV preview
+- [ ] Can change/remove photo
+- [ ] Photo persists when navigating between steps
+
+---
+
+**Engineer: Please confirm once you've:**
+1. Created the `cv-photos` bucket in Dashboard
+2. Run the SQL policies
+3. Created the photo upload component
+
+Then let me know if you encounter any issues!

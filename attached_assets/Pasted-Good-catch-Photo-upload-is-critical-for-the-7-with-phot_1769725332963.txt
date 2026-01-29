@@ -1,0 +1,111 @@
+Good catch! Photo upload is critical for the 7 "with photo" templates. Before I provide the implementation, let me get some quick status updates from the engineer.
+
+---
+
+## 📋 Engineer Status Check - Please Answer These Questions:
+
+### 1. **Supabase Storage Status**
+- [ ] Is Supabase Storage enabled in your project?
+- [ ] Have you created a storage bucket for CV photos? (e.g., `cv-photos` or `avatars`)
+- [ ] What are the current storage bucket policies (public or private)?
+
+### 2. **Current Personal Info Form**
+- [ ] Where is the Personal Info form located? (e.g., `src/app/(builder)/personal/page.tsx`)
+- [ ] Does it currently have a photo field or placeholder?
+- [ ] Is the form using React Hook Form, Zustand, or plain useState?
+
+### 3. **CV Store Structure**
+- [ ] Does `personalInfo` in your CV store already have a `photoUrl` field?
+- [ ] How is the store structured? Can you share the current `CVData` type?
+
+### 4. **Template Integration**
+- [ ] In the photo templates (Charles, Oliver, Thomas, Denice, Nelly Purple, Aparna Dark, Aparna Gold), are they currently showing a placeholder or nothing?
+- [ ] Do they have a `personalInfo.photoUrl` check implemented?
+
+### 5. **File Size & Format Requirements**
+- [ ] What max file size do you want? (Recommended: 2MB)
+- [ ] Which formats to allow? (Recommended: JPG, PNG, WebP)
+- [ ] Should we crop/resize on upload? (Recommended: Yes, to 400x400px)
+
+---
+
+## 🎯 While Waiting - Here's the Planned Implementation:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      PHOTO UPLOAD FLOW                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+USER SELECTS TEMPLATE WITH PHOTO
+          │
+          ▼
+┌─────────────────────────────────────────┐
+│  PERSONAL INFO FORM                     │
+│                                         │
+│  ┌─────────────────┐                    │
+│  │    ┌───────┐    │   First Name: [  ]│
+│  │    │ 📷    │    │   Last Name:  [  ]│
+│  │    │ Photo │    │   Title:      [  ]│
+│  │    └───────┘    │   Email:      [  ]│
+│  │  [Upload Photo] │   Phone:      [  ]│
+│  └─────────────────┘                    │
+│                                         │
+│  ✓ Click to upload                      │
+│  ✓ Drag & drop support                  │
+│  ✓ Crop to square                       │
+│  ✓ Preview before save                  │
+└─────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────┐
+│  UPLOAD PROCESS                         │
+│                                         │
+│  1. User selects image                  │
+│  2. Client-side crop (react-image-crop) │
+│  3. Compress to max 500KB               │
+│  4. Upload to Supabase Storage          │
+│  5. Get public URL                      │
+│  6. Save URL to CV store                │
+│  7. Live preview updates instantly      │
+└─────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────┐
+│  TEMPLATE DISPLAY                       │
+│                                         │
+│  {personalInfo.photoUrl ? (             │
+│    <img src={photoUrl} />               │
+│  ) : (                                  │
+│    <PhotoPlaceholder />                 │
+│  )}                                     │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Quick Preview of What I'll Provide:
+
+### 1. **Supabase Storage Setup** (SQL + Dashboard steps)
+### 2. **Photo Upload Component** with:
+   - Drag & drop
+   - Image cropping (square for CV photos)
+   - Compression
+   - Progress indicator
+   - Error handling
+
+### 3. **API Route** for secure upload
+### 4. **Updated Personal Info Form** showing photo upload for photo templates
+### 5. **Updated Templates** to display the uploaded photo
+
+---
+
+**Engineer, please respond with answers to the 5 questions above, and I'll provide the complete implementation tailored to your current setup.**
+
+If you want, you can also just share:
+```
+1. Storage bucket: [yes/no, name if yes]
+2. Form location: [file path]
+3. photoUrl in store: [yes/no]
+4. Templates have placeholder: [yes/no]
+5. Max size preference: [2MB/5MB/other]
+```

@@ -1,4 +1,7 @@
 {
   "/page": "app/page.js",
-  "/(builder)/experience/page": "app/(builder)/experience/page.js"
+  "/create/page": "app/create/page.js",
+  "/create/intro/page": "app/create/intro/page.js",
+  "/create/choose/page": "app/create/choose/page.js",
+  "/(builder)/template/page": "app/(builder)/template/page.js"
 }
