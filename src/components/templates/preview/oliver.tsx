@@ -16,14 +16,27 @@ export function OliverPreview({ data, colorOverride }: Props) {
   return (
     <div className="w-full min-h-full bg-white font-sans p-10">
       <div className="mb-8 pb-4 border-b-4" style={{ borderColor: color }}>
-        <h1 className="text-4xl font-bold text-gray-900">
-          {personalInfo.firstName} {personalInfo.lastName}
-        </h1>
-        <p className="text-lg mt-1" style={{ color }}>{personalInfo.professionalTitle}</p>
-        <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600">
-          {personalInfo.email && <span>{personalInfo.email}</span>}
-          {personalInfo.phone && <span>• {personalInfo.phone}</span>}
-          {personalInfo.location && <span>• {personalInfo.location}</span>}
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900">
+              {personalInfo.firstName} {personalInfo.lastName}
+            </h1>
+            <p className="text-lg mt-1" style={{ color }}>{personalInfo.professionalTitle}</p>
+            <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600">
+              {personalInfo.email && <span>{personalInfo.email}</span>}
+              {personalInfo.phone && <span>• {personalInfo.phone}</span>}
+              {personalInfo.location && <span>• {personalInfo.location}</span>}
+            </div>
+          </div>
+          {personalInfo.photoUrl && (
+            <div 
+              className="w-24 h-24 rounded-full bg-cover bg-center border-4 flex-shrink-0"
+              style={{ 
+                backgroundImage: `url(${personalInfo.photoUrl})`,
+                borderColor: color
+              }}
+            />
+          )}
         </div>
       </div>
 

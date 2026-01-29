@@ -19,11 +19,18 @@ export function CharlesPreview({ data, colorOverride }: Props) {
         style={{ backgroundColor: primaryColor }}
       >
         <div className="mb-8">
-          <div className="w-24 h-24 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center">
-            <span className="text-3xl font-bold">
-              {data.personalInfo.firstName?.[0]}{data.personalInfo.lastName?.[0]}
-            </span>
-          </div>
+          {data.personalInfo.photoUrl ? (
+            <div 
+              className="w-24 h-24 rounded-full mx-auto mb-4 bg-cover bg-center border-2 border-white/30"
+              style={{ backgroundImage: `url(${data.personalInfo.photoUrl})` }}
+            />
+          ) : (
+            <div className="w-24 h-24 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center">
+              <span className="text-3xl font-bold">
+                {data.personalInfo.firstName?.[0]}{data.personalInfo.lastName?.[0]}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="mb-6">

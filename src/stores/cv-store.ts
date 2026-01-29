@@ -13,6 +13,7 @@ const defaultCVData: CVData = {
     location: '',
     linkedin: '',
     website: '',
+    photoUrl: '',
   },
   summary: '',
   workExperiences: [],
