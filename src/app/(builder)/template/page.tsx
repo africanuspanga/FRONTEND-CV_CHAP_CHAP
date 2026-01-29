@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { TEMPLATES, type TemplateConfig } from "@/types/templates";
 import { useCVStore } from "@/stores/cv-store";
-import { CheckCircle, ArrowLeft, ArrowRight, Camera } from "lucide-react";
+import { CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useMemo, useEffect, useRef } from "react";
@@ -98,12 +98,6 @@ function LiveTemplateCard({
           </span>
         </div>
 
-        {template.hasPhoto && (
-          <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded flex items-center gap-1 z-10">
-            <Camera className="h-3 w-3" />
-            Photo
-          </div>
-        )}
       </div>
 
       <div className="p-3">

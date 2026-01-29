@@ -21,6 +21,11 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(builder)/template/page.js"
     ],
+    "/(builder)/template/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(builder)/template/loading.js"
+    ],
     "/(builder)/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
