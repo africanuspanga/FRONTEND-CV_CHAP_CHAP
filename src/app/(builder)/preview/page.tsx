@@ -32,8 +32,8 @@ export default function PreviewPage() {
   }, []);
 
   const handleBack = () => {
-    setCurrentStep('summary');
-    router.push('/summary');
+    setCurrentStep('additional');
+    router.push('/additional');
   };
 
   const handleDownload = () => {
@@ -47,6 +47,7 @@ export default function PreviewPage() {
     { label: 'Education', done: cvData.education.length > 0 },
     { label: 'Skills', done: cvData.skills.length > 0 },
     { label: 'Summary', done: !!cvData.summary },
+    { label: 'References', done: cvData.references.length > 0 },
   ];
 
   const completionPercentage = Math.round(
@@ -61,7 +62,7 @@ export default function PreviewPage() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="text-center">
-            <p className="text-xs text-gray-500">Step 6 of 6</p>
+            <p className="text-xs text-gray-500">Step 8 of 8</p>
             <h1 className="text-lg font-heading font-bold text-gray-900">Preview</h1>
           </div>
           <div className="w-8"></div>

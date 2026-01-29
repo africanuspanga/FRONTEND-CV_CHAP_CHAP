@@ -59,6 +59,17 @@ export interface Certification {
   date: string;
 }
 
+export interface SocialLink {
+  id: string;
+  url: string;
+  showInHeader: boolean;
+}
+
+export interface Accomplishment {
+  id: string;
+  description: string;
+}
+
 export interface CVData {
   personalInfo: PersonalInfo;
   summary: string;
@@ -67,7 +78,9 @@ export interface CVData {
   skills: Skill[];
   languages: Language[];
   references: Reference[];
-  certifications?: Certification[];
+  certifications: Certification[];
+  socialLinks: SocialLink[];
+  accomplishments: Accomplishment[];
 }
 
 export interface CVDocument {
@@ -166,6 +179,8 @@ export const CV_FORM_STEPS = [
   { id: 'education', title: 'Education', path: '/education' },
   { id: 'skills', title: 'Skills', path: '/skills' },
   { id: 'summary', title: 'Summary', path: '/summary' },
+  { id: 'references', title: 'References', path: '/references' },
+  { id: 'additional', title: 'Additional Sections', path: '/additional' },
   { id: 'preview', title: 'Preview', path: '/preview' },
   { id: 'payment', title: 'Download', path: '/payment' },
 ] as const;

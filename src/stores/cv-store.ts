@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
-import type { CVData, WorkExperience, Education, Skill, Language, Reference, CVFormStep } from '@/types/cv';
+import type { CVData, WorkExperience, Education, Skill, Language, Reference, Certification, SocialLink, Accomplishment, CVFormStep } from '@/types/cv';
 
 const defaultCVData: CVData = {
   personalInfo: {
@@ -21,6 +21,9 @@ const defaultCVData: CVData = {
   skills: [],
   languages: [],
   references: [],
+  certifications: [],
+  socialLinks: [],
+  accomplishments: [],
 };
 
 interface CVStore {
@@ -57,6 +60,18 @@ interface CVStore {
   addReference: (ref?: Partial<Reference>) => void;
   updateReference: (id: string, data: Partial<Reference>) => void;
   removeReference: (id: string) => void;
+  
+  addCertification: (cert?: Partial<Certification>) => void;
+  updateCertification: (id: string, data: Partial<Certification>) => void;
+  removeCertification: (id: string) => void;
+  
+  addSocialLink: (link?: Partial<SocialLink>) => void;
+  updateSocialLink: (id: string, data: Partial<SocialLink>) => void;
+  removeSocialLink: (id: string) => void;
+  
+  addAccomplishment: (acc?: Partial<Accomplishment>) => void;
+  updateAccomplishment: (id: string, data: Partial<Accomplishment>) => void;
+  removeAccomplishment: (id: string) => void;
   
   resetCV: () => void;
   loadCV: (data: Partial<CVData>, templateId?: string) => void;
@@ -286,12 +301,114 @@ export const useCVStore = create<CVStore>()(
           },
         })),
 
+      addCertification: (cert) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            certifications: [
+              ...state.cvData.certifications,
+              {
+                id: nanoid(),
+                name: '',
+                issuer: '',
+                date: '',
+                ...cert,
+              },
+            ],
+          },
+        })),
+
+      updateCertification: (id, data) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            certifications: state.cvData.certifications.map((cert) =>
+              cert.id === id ? { ...cert, ...data } : cert
+            ),
+          },
+        })),
+
+      removeCertification: (id) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            certifications: state.cvData.certifications.filter((cert) => cert.id !== id),
+          },
+        })),
+
+      addSocialLink: (link) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            socialLinks: [
+              ...state.cvData.socialLinks,
+              {
+                id: nanoid(),
+                url: '',
+                showInHeader: false,
+                ...link,
+              },
+            ],
+          },
+        })),
+
+      updateSocialLink: (id, data) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            socialLinks: state.cvData.socialLinks.map((link) =>
+              link.id === id ? { ...link, ...data } : link
+            ),
+          },
+        })),
+
+      removeSocialLink: (id) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            socialLinks: state.cvData.socialLinks.filter((link) => link.id !== id),
+          },
+        })),
+
+      addAccomplishment: (acc) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            accomplishments: [
+              ...state.cvData.accomplishments,
+              {
+                id: nanoid(),
+                description: '',
+                ...acc,
+              },
+            ],
+          },
+        })),
+
+      updateAccomplishment: (id, data) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            accomplishments: state.cvData.accomplishments.map((acc) =>
+              acc.id === id ? { ...acc, ...data } : acc
+            ),
+          },
+        })),
+
+      removeAccomplishment: (id) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            accomplishments: state.cvData.accomplishments.filter((acc) => acc.id !== id),
+          },
+        })),
+
       resetCV: () =>
         set({
           cvId: null,
           templateId: 'charles',
           selectedColor: null,
-          cvData: defaultCVData,
+          cvData: { ...defaultCVData },
           currentStep: 'template',
         }),
 

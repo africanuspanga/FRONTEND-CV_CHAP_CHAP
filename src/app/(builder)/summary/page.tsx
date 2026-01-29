@@ -2,29 +2,37 @@
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
 import { useCVStore } from "@/stores/cv-store";
-import { ArrowLeft, ArrowRight, Sparkles, Loader2, Lightbulb, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, X, Sparkles, Loader2, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import TemplatePreview from "@/components/builder/template-preview";
+
+type Step = 'preview' | 'edit';
 
 export default function SummaryPage() {
   const router = useRouter();
-  const { cvData, setSummary, setCurrentStep } = useCVStore();
+  const { cvData, setSummary, setCurrentStep, templateId, selectedColor } = useCVStore();
+  const [step, setStep] = useState<Step>('preview');
   const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [suggestedSummary, setSuggestedSummary] = useState('');
+  const [hasShownModal, setHasShownModal] = useState(false);
+  const [localSummary, setLocalSummary] = useState(cvData.summary || '');
 
-  const handleBack = () => {
-    setCurrentStep('skills');
-    router.push('/skills');
-  };
+  useEffect(() => {
+    if (step === 'preview' && !hasShownModal && !cvData.summary) {
+      fetchSummaryRecommendation();
+      setHasShownModal(true);
+    }
+  }, [step, hasShownModal, cvData.summary]);
 
-  const handleContinue = () => {
-    setCurrentStep('preview');
-    router.push('/preview');
-  };
-
-  const handleGenerateSummary = async () => {
+  const fetchSummaryRecommendation = async () => {
+    if (cvData.workExperiences.length === 0 && cvData.education.length === 0) {
+      return;
+    }
+    
     setIsLoading(true);
     try {
       const response = await fetch('/api/ai/summary', {
@@ -33,6 +41,7 @@ export default function SummaryPage() {
         body: JSON.stringify({
           personalInfo: cvData.personalInfo,
           workExperiences: cvData.workExperiences,
+          education: cvData.education,
           skills: cvData.skills,
         }),
       });
@@ -40,18 +49,50 @@ export default function SummaryPage() {
       if (response.ok) {
         const data = await response.json();
         if (data.summary) {
-          setSummary(data.summary);
+          setSuggestedSummary(data.summary);
+          setShowModal(true);
         }
       }
     } catch (error) {
-      console.error('Failed to generate summary:', error);
+      console.error('Failed to fetch summary:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const summaryLength = cvData.summary?.length || 0;
-  const isOptimalLength = summaryLength >= 100 && summaryLength <= 400;
+  const handleBack = () => {
+    if (step === 'edit') {
+      setStep('preview');
+    } else {
+      setCurrentStep('skills');
+      router.push('/skills');
+    }
+  };
+
+  const handleContinue = () => {
+    if (step === 'preview') {
+      setStep('edit');
+    } else {
+      setSummary(localSummary);
+      setCurrentStep('references');
+      router.push('/references');
+    }
+  };
+
+  const handleAcceptSuggestion = () => {
+    setLocalSummary(suggestedSummary);
+    setSummary(suggestedSummary);
+    setShowModal(false);
+    setStep('edit');
+  };
+
+  const handleDeclineSuggestion = () => {
+    setShowModal(false);
+    setStep('edit');
+  };
+
+  const summaryLength = localSummary?.length || 0;
+  const isOptimalLength = summaryLength >= 150 && summaryLength <= 350;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
@@ -61,7 +102,7 @@ export default function SummaryPage() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="text-center">
-            <p className="text-xs text-gray-500">Step 5 of 6</p>
+            <p className="text-xs text-gray-500">Step 5 of 8</p>
             <h1 className="text-lg font-heading font-bold text-gray-900">Summary</h1>
           </div>
           <div className="w-8"></div>
@@ -69,107 +110,157 @@ export default function SummaryPage() {
       </header>
 
       <main className="container mx-auto px-4 py-6 pb-32">
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-6">
-            <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
-              Professional Summary
-            </h2>
-            <p className="text-gray-600">
-              A compelling summary helps you stand out to employers
-            </p>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <label className="text-sm font-medium text-gray-700">Your Summary</label>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleGenerateSummary}
-                disabled={isLoading}
-                className="text-cv-blue-600 border-cv-blue-200 hover:bg-cv-blue-50"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : cvData.summary ? (
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                ) : (
-                  <Sparkles className="h-4 w-4 mr-2" />
-                )}
-                {cvData.summary ? 'Regenerate' : 'AI Generate'}
-              </Button>
-            </div>
-            
-            <Textarea
-              value={cvData.summary}
-              onChange={(e) => setSummary(e.target.value)}
-              placeholder="Results-driven professional with X years of experience in... Known for..."
-              className="min-h-[150px] text-base"
-            />
-            
-            <div className="flex justify-between items-center mt-2">
-              <p className={`text-sm ${isOptimalLength ? 'text-green-600' : 'text-gray-500'}`}>
-                {summaryLength}/400 characters
-                {isOptimalLength && ' ✓ Great length!'}
-              </p>
-            </div>
-          </div>
-
-          {/* Tips Section */}
-          <Card className="bg-amber-50 border-amber-200">
-            <CardContent className="p-5">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                  <Lightbulb className="h-5 w-5 text-amber-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-amber-900 mb-2">Tips for a Great Summary</h3>
-                  <ul className="text-sm text-amber-800 space-y-1">
-                    <li>• Start with your professional title and years of experience</li>
-                    <li>• Mention 2-3 key skills or achievements</li>
-                    <li>• Include what you're looking for in your next role</li>
-                    <li>• Keep it concise - hiring managers scan quickly</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Example summaries */}
-          {!cvData.summary && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="mt-6"
-            >
-              <p className="text-sm text-gray-500 mb-3">Need inspiration? Click the AI Generate button above, or try one of these formats:</p>
-              <div className="space-y-3">
-                <button
-                  onClick={() => setSummary(`Dedicated ${cvData.personalInfo.professionalTitle || 'professional'} with proven experience in delivering results. Known for strong problem-solving abilities and commitment to excellence.`)}
-                  className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 text-sm text-gray-600 transition-colors"
-                >
-                  <span className="text-gray-400 text-xs block mb-1">Classic format:</span>
-                  &ldquo;Dedicated [title] with proven experience in delivering results...&rdquo;
+        <div className="max-w-lg mx-auto">
+          {step === 'preview' && (
+            <>
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-heading font-bold text-gray-900">
+                  Up Next: <span className="text-cv-green-600 underline decoration-cv-green-400 decoration-4">Summary</span>
+                </h2>
+                <button className="text-cv-green-600 font-semibold mt-2 hover:underline">
+                  Change template
                 </button>
               </div>
-            </motion.div>
+
+              {isLoading && (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-cv-blue-600 mb-4" />
+                  <p className="text-gray-600">Generating your personalized summary...</p>
+                </div>
+              )}
+
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+                <div className="h-[500px] overflow-hidden">
+                  <TemplatePreview
+                    templateId={templateId}
+                    cvData={cvData}
+                    selectedColor={selectedColor}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {step === 'edit' && (
+            <>
+              <div className="mb-6">
+                <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
+                  Summary
+                </h2>
+                <p className="text-gray-600">
+                  Write about who you are, what you do, and your unique skills. Not sure where to start? Use our AI suggestion below.
+                </p>
+              </div>
+
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">
+                <Textarea
+                  value={localSummary}
+                  onChange={(e) => setLocalSummary(e.target.value)}
+                  placeholder="Write a compelling summary about yourself..."
+                  className="min-h-[200px] text-base border-0 focus:ring-0 resize-none"
+                />
+                <div className="border-t pt-3 flex items-center gap-4 text-gray-400">
+                  <button className="font-bold hover:text-gray-600">B</button>
+                  <button className="italic hover:text-gray-600">I</button>
+                  <button className="underline hover:text-gray-600">U</button>
+                  <button className="hover:text-gray-600">≡</button>
+                  <button className="hover:text-gray-600">↺</button>
+                  <button className="hover:text-gray-600">↻</button>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center mb-4">
+                <p className={`text-sm ${isOptimalLength ? 'text-green-600' : 'text-gray-500'}`}>
+                  {summaryLength}/350 characters
+                  {isOptimalLength && ' ✓ Great length!'}
+                </p>
+                
+                <button
+                  onClick={fetchSummaryRecommendation}
+                  disabled={isLoading}
+                  className="flex items-center gap-2 text-cv-blue-600 font-medium hover:underline"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  {isLoading ? 'Generating...' : 'Get AI Suggestion'}
+                </button>
+              </div>
+            </>
           )}
         </div>
       </main>
 
-      {/* Fixed bottom button */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
-        <div className="container mx-auto max-w-2xl">
+        <div className="container mx-auto max-w-lg">
           <Button 
             onClick={handleContinue}
             className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl"
           >
-            Preview Your CV
+            {step === 'preview' ? 'Continue' : 'Next: References'}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center"
+            onClick={handleDeclineSuggestion}
+          >
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-t-3xl w-full max-w-lg p-6 pb-8"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <h3 className="text-xl font-heading font-bold text-gray-900">
+                  Recommended Summary
+                </h3>
+                <button
+                  onClick={handleDeclineSuggestion}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              
+              <p className="text-gray-600 mb-4">
+                You can add and customize it in the next step.
+              </p>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+                <div className="flex items-center gap-2 text-amber-700 text-sm font-medium mb-3">
+                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  Suggested by CV experts
+                </div>
+                <p className="text-gray-800 leading-relaxed">
+                  {suggestedSummary}
+                </p>
+              </div>
+
+              <Button
+                onClick={handleAcceptSuggestion}
+                className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl mb-3"
+              >
+                Use this
+              </Button>
+
+              <button
+                onClick={handleDeclineSuggestion}
+                className="w-full py-3 text-cv-blue-600 font-medium hover:underline"
+              >
+                No, thanks
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

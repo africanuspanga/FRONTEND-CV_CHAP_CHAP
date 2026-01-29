@@ -16,25 +16,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/(builder)/template/page": [
+    "/(builder)/education/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(builder)/template/page.js"
-    ],
-    "/(builder)/template/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(builder)/template/loading.js"
+      "static/chunks/app/(builder)/education/page.js"
     ],
     "/(builder)/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(builder)/layout.js"
-    ],
-    "/(builder)/education/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(builder)/education/page.js"
     ]
   }
 }
