@@ -115,29 +115,84 @@ Return ONLY the summary paragraph, no quotes or labels.`;
   return response.choices[0]?.message?.content?.trim() || '';
 }
 
+interface WorkExperience {
+  jobTitle: string;
+  company: string;
+  achievements: string[];
+}
+
+interface Education {
+  degree: string;
+  fieldOfStudy?: string;
+  institution: string;
+}
+
+const SKILLS_SYSTEM_PROMPT = `You are an elite career strategist and hiring expert with 25+ years recruiting for top companies across East Africa, including Vodacom, Safaricom, Equity Bank, KCB, Airtel, and multinational corporations.
+
+Your ONLY job is to analyze a candidate's work experience and education, then identify the EXACT skills that:
+1. They clearly possess based on their achievements
+2. Recruiters in their industry actively search for
+3. Will make their CV pass ATS screening systems
+4. Distinguish them from other candidates
+
+You think like a hiring manager scanning CVs. You know which skills get candidates interviews.
+
+CRITICAL RULES:
+- Extract skills DIRECTLY from achievements (e.g., "managed team of 12" = Team Leadership, Staff Management)
+- Include industry-specific technical skills mentioned or implied
+- Add complementary skills that top performers in this role typically have
+- Balance hard skills (tools, technologies, certifications) with soft skills (leadership, communication)
+- Consider East African job market demands and trending skills
+- Each skill should be 1-3 words maximum (e.g., "Data Analysis" not "Advanced Data Analysis and Reporting")`;
+
 export async function generateSkillSuggestions(
-  jobTitle: string,
+  jobTitle?: string,
+  workExperiences?: WorkExperience[],
+  education?: Education[],
   existingSkills?: string[]
 ): Promise<string[]> {
-  const prompt = `Suggest 8 relevant professional skills for someone with the job title: ${jobTitle}
+  const experienceContext = workExperiences?.length 
+    ? workExperiences.map(exp => 
+        `${exp.jobTitle} at ${exp.company}:\n${exp.achievements?.slice(0, 3).map(a => `- ${a}`).join('\n') || 'No achievements listed'}`
+      ).join('\n\n')
+    : 'No work experience provided';
 
-${existingSkills?.length ? `They already have: ${existingSkills.join(', ')}` : ''}
+  const educationContext = education?.length
+    ? education.map(edu => 
+        `${edu.degree}${edu.fieldOfStudy ? ` in ${edu.fieldOfStudy}` : ''} from ${edu.institution}`
+      ).join('\n')
+    : 'No education provided';
 
-Requirements:
-- Mix of hard skills and soft skills
-- Relevant to the role and industry
-- In demand in East African job market
-- Don't repeat any existing skills
+  const prompt = `ANALYZE THIS CANDIDATE AND IDENTIFY THEIR TOP SKILLS:
 
-Return ONLY the skill names, one per line, without numbering.`;
+CURRENT/TARGET ROLE: ${jobTitle || 'Not specified'}
+
+WORK EXPERIENCE:
+${experienceContext}
+
+EDUCATION:
+${educationContext}
+
+${existingSkills?.length ? `SKILLS ALREADY ON THEIR CV (DO NOT REPEAT): ${existingSkills.join(', ')}` : ''}
+
+YOUR TASK:
+Based on their experience and education, identify exactly 8 skills that will:
+1. Match what recruiters search for in ATS systems
+2. Be 100% believable based on their background
+3. Make hiring managers want to interview them
+4. Cover both technical competencies and professional capabilities
+
+Return ONLY 8 skill names, one per line. No numbering, no explanations.
+Skills should be concise (1-3 words each).
+Start with the most impressive/marketable skills first.`;
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
-      { role: 'system', content: CV_SYSTEM_PROMPT },
+      { role: 'system', content: SKILLS_SYSTEM_PROMPT },
       { role: 'user', content: prompt },
     ],
-    temperature: 0.7,
+    temperature: 0.6,
     max_tokens: 200,
   });
 

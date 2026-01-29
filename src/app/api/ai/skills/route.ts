@@ -1,18 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateSkillSuggestions } from '@/lib/ai/cv-assistant';
 
+interface WorkExperience {
+  jobTitle: string;
+  company: string;
+  achievements: string[];
+}
+
+interface Education {
+  degree: string;
+  fieldOfStudy?: string;
+  institution: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { jobTitle, existingSkills } = await request.json();
+    const { 
+      jobTitle, 
+      workExperiences, 
+      education, 
+      existingSkills 
+    } = await request.json();
 
-    if (!jobTitle) {
-      return NextResponse.json(
-        { error: 'Job title is required' },
-        { status: 400 }
-      );
-    }
-
-    const skills = await generateSkillSuggestions(jobTitle, existingSkills);
+    const skills = await generateSkillSuggestions(
+      jobTitle,
+      workExperiences as WorkExperience[],
+      education as Education[],
+      existingSkills
+    );
 
     return NextResponse.json({ skills });
   } catch (error) {
