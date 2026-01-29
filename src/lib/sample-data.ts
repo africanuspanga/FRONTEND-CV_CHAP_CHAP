@@ -10,6 +10,7 @@ export const sampleCVData: CVData = {
     professionalTitle: 'Senior Corporate Lawyer',
     linkedin: 'linkedin.com/in/noelabwemero',
     website: 'www.noelabwemero.com',
+    photoUrl: 'https://drive.google.com/uc?export=view&id=1W8Q9AQUlxD7caDS0dQQR-4HaCjjCpjso',
   },
   summary: 'Accomplished Senior Corporate Lawyer with 8+ years of experience specializing in commercial law, mergers & acquisitions, and corporate governance across East Africa. Successfully closed over TZS 50 billion in M&A transactions and advised Fortune 500 companies on market entry strategies. Known for meticulous contract drafting, strategic negotiation skills, and deep understanding of Tanzanian regulatory frameworks. Admitted to the Tanganyika Law Society and certified mediator.',
   workExperiences: [
