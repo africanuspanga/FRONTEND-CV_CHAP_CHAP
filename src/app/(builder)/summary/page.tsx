@@ -92,7 +92,9 @@ export default function SummaryPage() {
   };
 
   const summaryLength = localSummary?.length || 0;
-  const isOptimalLength = summaryLength >= 150 && summaryLength <= 350;
+  const isOptimalLength = summaryLength >= 250 && summaryLength <= 350;
+  const isTooShort = summaryLength > 0 && summaryLength < 250;
+  const isTooLong = summaryLength > 350;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
@@ -170,9 +172,15 @@ export default function SummaryPage() {
               </div>
 
               <div className="flex justify-between items-center mb-4">
-                <p className={`text-sm ${isOptimalLength ? 'text-green-600' : 'text-gray-500'}`}>
+                <p className={`text-sm ${
+                  isOptimalLength ? 'text-green-600' : 
+                  isTooShort ? 'text-amber-600' : 
+                  isTooLong ? 'text-red-600' : 'text-gray-500'
+                }`}>
                   {summaryLength}/350 characters
-                  {isOptimalLength && ' ✓ Great length!'}
+                  {isOptimalLength && ' ✓ Perfect length!'}
+                  {isTooShort && ` (${250 - summaryLength} more needed)`}
+                  {isTooLong && ` (${summaryLength - 350} over limit)`}
                 </p>
                 
                 <button
