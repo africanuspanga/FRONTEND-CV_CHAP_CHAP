@@ -30,6 +30,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(builder)/layout.js"
+    ],
+    "/(builder)/education/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(builder)/education/page.js"
     ]
   }
 }
