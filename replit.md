@@ -40,5 +40,12 @@ The application emphasizes **frontend-independent CV creation** for optimal perf
 
 ## Recent Changes
 
+*   **January 29, 2026**: Implemented complete Summary → References → Additional Sections flow:
+    - Summary page with 2-step flow: live preview then edit mode with AI-powered recommendation modal
+    - AI summary generation with personalized prompt analyzing work experience, education, and skills (250-350 char target)
+    - References page allowing up to 2 professional references
+    - Additional Sections grid: Languages (15 language options with proficiency levels), Certifications, Social Links (with show in header option), Accomplishments
+    - Updated navigation: Template → Personal → Experience → Education → Skills → Summary → References → Additional → Preview → Payment
+    - Added new types: SocialLink, Accomplishment; updated CVData with certifications, socialLinks, accomplishments arrays
 *   **August 5, 2025**: Restored USSD payment flow - removed download-review testing page and returned to payment-required model where users must pay via SMS before downloading CVs.
 *   **August 5, 2025**: Created comprehensive CV Template Developer Guide with complete data structure documentation and live data injection specifications for future template development.
