@@ -19,6 +19,10 @@ export default function SkillsPage() {
   const [skillsText, setSkillsText] = useState(cvData.skills.map(s => s.name).join('\n'));
 
   useEffect(() => {
+    setSkillsText(cvData.skills.map(s => s.name).join('\n'));
+  }, [cvData.skills]);
+
+  useEffect(() => {
     if (!hasShownModal && cvData.skills.length === 0 && (cvData.workExperiences.length > 0 || cvData.education.length > 0)) {
       fetchSkillRecommendations();
       setHasShownModal(true);

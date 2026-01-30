@@ -95,13 +95,22 @@ Write a powerful, personalized 250-350 character professional summary that will 
       model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: 'Generate a compelling professional summary. Return ONLY the summary text, nothing else. Ensure it is between 250-350 characters.' },
+        { role: 'user', content: 'Generate a compelling professional summary. Return ONLY the summary text, nothing else. MUST be between 250-350 characters - this is a HARD LIMIT. Count your characters before responding.' },
       ],
-      max_tokens: 200,
-      temperature: 0.7,
+      max_tokens: 150,
+      temperature: 0.6,
     });
 
-    const summary = response.choices[0]?.message?.content?.trim() || '';
+    let summary = response.choices[0]?.message?.content?.trim() || '';
+    
+    if (summary.length > 350) {
+      const lastSentenceEnd = summary.lastIndexOf('.', 345);
+      if (lastSentenceEnd > 200) {
+        summary = summary.substring(0, lastSentenceEnd + 1);
+      } else {
+        summary = summary.substring(0, 347) + '...';
+      }
+    }
 
     return NextResponse.json({ summary });
   } catch (error: any) {
