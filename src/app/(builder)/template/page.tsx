@@ -3,10 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { TEMPLATES, type TemplateConfig } from "@/types/templates";
 import { useCVStore } from "@/stores/cv-store";
-import { CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
+import { CheckCircle, ArrowLeft, ArrowRight, Upload } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { TemplatePreview } from "@/components/templates/preview";
 import { sampleCVData } from "@/lib/sample-data";
 
@@ -117,8 +117,11 @@ function LiveTemplateCard({
   );
 }
 
-export default function TemplatePage() {
+function TemplatePageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isUploadMode = searchParams.get('upload') === 'true';
+  
   const { templateId, setTemplateId, setSelectedColor, setCurrentStep } = useCVStore();
   const [photoFilter, setPhotoFilter] = useState<FilterType>('all');
   const [categoryFilter, setCategoryFilter] = useState<CategoryType>('all');
@@ -145,8 +148,12 @@ export default function TemplatePage() {
   };
 
   const handleContinue = () => {
-    setCurrentStep('personal');
-    router.push('/personal');
+    if (isUploadMode) {
+      router.push('/upload');
+    } else {
+      setCurrentStep('personal');
+      router.push('/personal');
+    }
   };
 
   return (
@@ -246,34 +253,53 @@ export default function TemplatePage() {
           ))}
         </div>
 
-        {/* Upload Option Banner */}
-        <div className="mb-8 bg-gradient-to-r from-cv-blue-600 to-cv-blue-700 rounded-2xl p-6 md:p-8 text-white">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Upload Mode Indicator */}
+        {isUploadMode && (
+          <div className="mb-6 bg-gradient-to-r from-cv-blue-600 to-cv-blue-700 rounded-2xl p-4 md:p-6 text-white">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                <span className="text-3xl">📤</span>
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Upload className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-1">Have an existing CV?</h3>
-                <p className="text-blue-100">
-                  Upload it and we'll extract all your information automatically
+                <h3 className="text-lg font-bold">Upload Mode</h3>
+                <p className="text-blue-100 text-sm">
+                  Select a template, then upload your existing CV to extract data
                 </p>
               </div>
             </div>
-            <Button
-              onClick={() => {
-                if (templateId) {
-                  router.push('/upload');
-                } else {
-                  alert('Please select a template first');
-                }
-              }}
-              className="bg-white text-cv-blue-600 hover:bg-blue-50 px-6 font-semibold"
-            >
-              Upload CV →
-            </Button>
           </div>
-        </div>
+        )}
+
+        {/* Upload Option Banner - only show when NOT in upload mode */}
+        {!isUploadMode && (
+          <div className="mb-8 bg-gradient-to-r from-cv-blue-600 to-cv-blue-700 rounded-2xl p-6 md:p-8 text-white">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Upload className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-1">Have an existing CV?</h3>
+                  <p className="text-blue-100">
+                    Upload it and we'll extract all your information automatically
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() => {
+                  if (templateId) {
+                    router.push('/upload');
+                  } else {
+                    alert('Please select a template first');
+                  }
+                }}
+                className="bg-white text-cv-blue-600 hover:bg-blue-50 px-6 font-semibold"
+              >
+                Upload CV →
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-center sticky bottom-4">
           <Button 
@@ -282,11 +308,19 @@ export default function TemplatePage() {
             disabled={!templateId}
             className="px-8 shadow-xl bg-gradient-to-r from-cv-blue-600 to-cv-blue-500 hover:from-cv-blue-700 hover:to-cv-blue-600 text-white font-semibold py-6 text-lg rounded-xl"
           >
-            Use This Template
+            {isUploadMode ? 'Continue to Upload' : 'Use This Template'}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TemplatePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-gray-100 flex items-center justify-center">Loading...</div>}>
+      <TemplatePageContent />
+    </Suspense>
   );
 }

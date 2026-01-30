@@ -1,8 +1,3 @@
 {
-  "/page": "app/page.js",
-  "/create/page": "app/create/page.js",
-  "/create/intro/page": "app/create/intro/page.js",
-  "/create/choose/page": "app/create/choose/page.js",
-  "/(builder)/additional/certifications/page": "app/(builder)/additional/certifications/page.js",
-  "/(builder)/additional/page": "app/(builder)/additional/page.js"
+  "/(builder)/additional/certifications/page": "app/(builder)/additional/certifications/page.js"
 }
