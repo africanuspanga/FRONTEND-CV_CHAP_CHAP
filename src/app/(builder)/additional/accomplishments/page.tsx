@@ -13,6 +13,8 @@ export default function AccomplishmentsPage() {
   const { cvData, addAccomplishment, removeAccomplishment } = useCVStore();
   const [description, setDescription] = useState('');
 
+  const accomplishments = cvData.accomplishments || [];
+
   const handleBack = () => {
     router.push('/additional');
   };
@@ -50,7 +52,7 @@ export default function AccomplishmentsPage() {
           </p>
 
           <AnimatePresence>
-            {cvData.accomplishments.map((acc) => (
+            {accomplishments.map((acc) => (
               <motion.div
                 key={acc.id}
                 initial={{ opacity: 0, y: -10 }}
@@ -88,7 +90,7 @@ export default function AccomplishmentsPage() {
             </div>
           </div>
 
-          {cvData.accomplishments.length > 0 && (
+          {accomplishments.length > 0 && (
             <button
               onClick={handleAdd}
               disabled={!description.trim()}
@@ -105,7 +107,7 @@ export default function AccomplishmentsPage() {
         <div className="container mx-auto max-w-lg">
           <Button 
             onClick={handleSave}
-            disabled={cvData.accomplishments.length === 0 && !description.trim()}
+            disabled={accomplishments.length === 0 && !description.trim()}
             className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl disabled:opacity-50"
           >
             Add to CV

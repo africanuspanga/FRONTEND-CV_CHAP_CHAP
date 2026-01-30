@@ -39,13 +39,15 @@ export default function LanguagesPage() {
   const { cvData, addLanguage, updateLanguage, removeLanguage } = useCVStore();
   const [newLanguage, setNewLanguage] = useState({ name: '', proficiency: 'basic' as const });
 
+  const languages = cvData.languages || [];
+
   const handleBack = () => {
     router.push('/additional');
   };
 
   const handleAddLanguage = () => {
     if (newLanguage.name) {
-      const exists = cvData.languages.some(
+      const exists = languages.some(
         l => l.name.toLowerCase() === newLanguage.name.toLowerCase()
       );
       if (!exists) {
@@ -78,7 +80,7 @@ export default function LanguagesPage() {
           </p>
 
           <AnimatePresence>
-            {cvData.languages.map((lang) => (
+            {languages.map((lang) => (
               <motion.div
                 key={lang.id}
                 initial={{ opacity: 0, y: -10 }}
@@ -193,7 +195,7 @@ export default function LanguagesPage() {
         <div className="container mx-auto max-w-lg">
           <Button 
             onClick={handleSave}
-            disabled={cvData.languages.length === 0 && !newLanguage.name}
+            disabled={languages.length === 0 && !newLanguage.name}
             className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl disabled:opacity-50"
           >
             Add to CV

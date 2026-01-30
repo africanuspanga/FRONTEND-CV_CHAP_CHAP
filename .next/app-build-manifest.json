@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/(builder)/skills/page": [
+    "/(builder)/preview/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(builder)/skills/page.js"
+      "static/chunks/app/(builder)/preview/page.js"
     ],
     "/(builder)/layout": [
       "static/chunks/webpack.js",
@@ -21,10 +21,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/(builder)/preview/page": [
+    "/(builder)/additional/certifications/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(builder)/preview/page.js"
+      "static/chunks/app/(builder)/additional/certifications/page.js"
     ]
   }
 }

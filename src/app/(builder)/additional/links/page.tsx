@@ -18,6 +18,8 @@ export default function LinksPage() {
     showInHeader: false,
   });
 
+  const socialLinks = cvData.socialLinks || [];
+
   const handleBack = () => {
     router.push('/additional');
   };
@@ -55,7 +57,7 @@ export default function LinksPage() {
           </p>
 
           <AnimatePresence>
-            {cvData.socialLinks.map((link) => (
+            {socialLinks.map((link) => (
               <motion.div
                 key={link.id}
                 initial={{ opacity: 0, y: -10 }}
@@ -105,7 +107,7 @@ export default function LinksPage() {
             </div>
           </div>
 
-          {cvData.socialLinks.length > 0 && (
+          {socialLinks.length > 0 && (
             <button
               onClick={handleAdd}
               disabled={!formData.url}
@@ -122,7 +124,7 @@ export default function LinksPage() {
         <div className="container mx-auto max-w-lg">
           <Button 
             onClick={handleSave}
-            disabled={cvData.socialLinks.length === 0 && !formData.url}
+            disabled={socialLinks.length === 0 && !formData.url}
             className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl disabled:opacity-50"
           >
             Add to CV

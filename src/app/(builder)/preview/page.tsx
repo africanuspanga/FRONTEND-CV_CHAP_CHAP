@@ -5,7 +5,7 @@ import { useCVStore } from "@/stores/cv-store";
 import { TEMPLATES } from "@/types/templates";
 import { ArrowLeft, Edit2, X, Check, Pencil, GripVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { TemplatePreview } from "@/components/templates/preview";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -25,24 +25,24 @@ export default function PreviewPage() {
   const router = useRouter();
   const { cvData, templateId, selectedColor, setTemplateId, setSelectedColor, setCurrentStep } = useCVStore();
   const template = TEMPLATES.find(t => t.id === templateId) || TEMPLATES[0];
-  const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
   const [showChangeTemplate, setShowChangeTemplate] = useState(false);
   const [showEditResume, setShowEditResume] = useState(false);
 
   useEffect(() => {
-    const updateScale = () => {
-      if (containerRef.current) {
-        const containerWidth = containerRef.current.offsetWidth;
-        const templateWidth = 794;
-        const newScale = Math.min(containerWidth / templateWidth, 0.6);
-        setScale(newScale);
-      }
+    const calculateScale = () => {
+      const screenWidth = window.innerWidth;
+      const cvWidth = 794;
+      const padding = 32;
+      const availableWidth = screenWidth - padding;
+      let newScale = availableWidth / cvWidth;
+      newScale = Math.max(0.35, Math.min(0.65, newScale));
+      setScale(newScale);
     };
     
-    updateScale();
-    window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
+    calculateScale();
+    window.addEventListener('resize', calculateScale);
+    return () => window.removeEventListener('resize', calculateScale);
   }, []);
 
   const handleBack = () => {
@@ -60,79 +60,73 @@ export default function PreviewPage() {
       label: 'Resume Heading', 
       path: '/personal', 
       done: !!(cvData.personalInfo.firstName && cvData.personalInfo.email),
-      preview: `${cvData.personalInfo.fullName || 'Your Name'}\n${cvData.personalInfo.location || ''}\n${cvData.personalInfo.phone || ''}\n${cvData.personalInfo.email || ''}`
+      preview: `${cvData.personalInfo.fullName || cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName || 'Your Name'}\n${cvData.personalInfo.location || ''}\n${cvData.personalInfo.phone || ''}\n${cvData.personalInfo.email || ''}`
     },
     { label: 'Summary', path: '/summary', done: !!cvData.summary },
-    { label: 'Skills', path: '/skills', done: cvData.skills.length > 0 },
-    { label: 'Experience', path: '/experience', done: cvData.workExperiences.length > 0 },
-    { label: 'Education And Training', path: '/education', done: cvData.education.length > 0 },
-    { label: 'References', path: '/references', done: cvData.references.length > 0 },
+    { label: 'Skills', path: '/skills', done: cvData.skills?.length > 0 },
+    { label: 'Experience', path: '/experience', done: cvData.workExperiences?.length > 0 },
+    { label: 'Education And Training', path: '/education', done: cvData.education?.length > 0 },
+    { label: 'References', path: '/references', done: cvData.references?.length > 0 },
   ];
 
   return (
-    <div className="min-h-screen bg-cv-blue-900">
+    <div className="min-h-screen bg-cv-blue-900 flex flex-col">
       {/* Header */}
-      <header className="bg-cv-blue-900 py-6">
-        <div className="container mx-auto px-4">
-          <button onClick={handleBack} className="text-white mb-4">
-            <ArrowLeft className="h-6 w-6" />
+      <header className="bg-cv-blue-900 py-6 px-4">
+        <button onClick={handleBack} className="text-white mb-4 absolute left-4 top-6">
+          <ArrowLeft className="h-6 w-6" />
+        </button>
+        <h1 className="text-3xl font-heading font-bold text-white text-center mb-6">
+          Finalize Resume
+        </h1>
+        
+        {/* Action Buttons */}
+        <div className="flex gap-3 max-w-md mx-auto">
+          <button
+            onClick={() => setShowChangeTemplate(true)}
+            className="flex-1 flex items-center justify-center gap-2 bg-cv-blue-700 hover:bg-cv-blue-600 text-white py-3.5 px-4 rounded-full font-medium transition-colors border border-cv-blue-500"
+          >
+            <Pencil className="h-4 w-4" />
+            Change Template
           </button>
-          <h1 className="text-3xl font-heading font-bold text-white text-center mb-6">
-            Finalize Resume
-          </h1>
-          
-          {/* Action Buttons */}
-          <div className="flex gap-3 max-w-md mx-auto">
-            <button
-              onClick={() => setShowChangeTemplate(true)}
-              className="flex-1 flex items-center justify-center gap-2 bg-cv-blue-800 hover:bg-cv-blue-700 text-white py-3 px-4 rounded-full font-medium transition-colors"
-            >
-              <Pencil className="h-4 w-4" />
-              Change Template
-            </button>
-            <button
-              onClick={() => setShowEditResume(true)}
-              className="flex-1 flex items-center justify-center gap-2 bg-cv-blue-800 hover:bg-cv-blue-700 text-white py-3 px-4 rounded-full font-medium transition-colors"
-            >
-              <Edit2 className="h-4 w-4" />
-              Edit Resume
-            </button>
-          </div>
+          <button
+            onClick={() => setShowEditResume(true)}
+            className="flex-1 flex items-center justify-center gap-2 bg-cv-blue-700 hover:bg-cv-blue-600 text-white py-3.5 px-4 rounded-full font-medium transition-colors border border-cv-blue-500"
+          >
+            <Edit2 className="h-4 w-4" />
+            Edit Resume
+          </button>
         </div>
       </header>
 
-      {/* CV Preview */}
-      <main className="container mx-auto px-4 py-6 pb-32">
-        <div 
-          ref={containerRef}
-          className="bg-white rounded-xl shadow-2xl overflow-hidden mx-auto max-w-lg"
-        >
-          <div 
-            className="origin-top"
-            style={{ 
+      {/* CV Preview - CENTERED */}
+      <main className="flex-1 overflow-auto py-6 px-4">
+        <div className="flex justify-center">
+          <div
+            className="bg-white shadow-2xl rounded-lg overflow-hidden"
+            style={{
               transform: `scale(${scale})`,
-              width: '794px',
-              height: `${1123 * scale}px`,
               transformOrigin: 'top center',
-              marginLeft: `calc((100% - 794px * ${scale}) / 2)`,
+              width: '794px',
+              minHeight: '1123px',
             }}
           >
             <TemplatePreview
               templateId={templateId}
               data={cvData}
-              scale={1}
               colorOverride={selectedColor}
+              scale={1}
             />
           </div>
         </div>
       </main>
 
       {/* Fixed bottom button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-cv-blue-600 p-4">
+      <div className="sticky bottom-0 bg-cv-blue-600 p-4">
         <div className="container mx-auto max-w-lg">
           <Button 
             onClick={handleSaveAndNext}
-            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl text-white"
+            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl text-white border-0"
           >
             Save & Next
           </Button>
@@ -160,25 +154,33 @@ export default function PreviewPage() {
                   </button>
                 </div>
                 
-                <div className="p-4 max-h-[60vh] overflow-y-auto">
-                  <div className="space-y-4">
+                <div className="p-4 max-h-[50vh] overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-3">
                     {TEMPLATES.slice(0, 6).map((t) => (
                       <button
                         key={t.id}
-                        onClick={() => {
-                          setTemplateId(t.id);
-                        }}
-                        className={`w-full rounded-xl overflow-hidden border-4 transition-all ${
-                          templateId === t.id ? 'border-cv-blue-500' : 'border-gray-200'
+                        onClick={() => setTemplateId(t.id)}
+                        className={`rounded-xl overflow-hidden border-3 transition-all ${
+                          templateId === t.id ? 'border-cv-blue-500 ring-2 ring-cv-blue-500' : 'border-gray-200'
                         }`}
                       >
-                        <div className="h-64 bg-gray-100 overflow-hidden">
-                          <TemplatePreview
-                            templateId={t.id}
-                            data={cvData}
-                            scale={0.3}
-                            colorOverride={selectedColor}
-                          />
+                        <div className="aspect-[3/4] bg-gray-50 overflow-hidden relative">
+                          <div 
+                            className="absolute inset-0"
+                            style={{
+                              transform: 'scale(0.22)',
+                              transformOrigin: 'top left',
+                              width: '794px',
+                              height: '1123px',
+                            }}
+                          >
+                            <TemplatePreview
+                              templateId={t.id}
+                              data={cvData}
+                              scale={1}
+                              colorOverride={selectedColor}
+                            />
+                          </div>
                         </div>
                       </button>
                     ))}
@@ -187,26 +189,26 @@ export default function PreviewPage() {
 
                 {/* Color Picker */}
                 <div className="p-4 border-t">
-                  <p className="text-center text-gray-600 mb-3">
-                    Pick a Color<span className="text-gray-400">(Default Selected)</span>
+                  <p className="text-center text-gray-600 mb-3 text-sm">
+                    Pick a Color <span className="text-gray-400">(Default Selected)</span>
                   </p>
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     {TEMPLATE_COLORS.map((c) => (
                       <button
                         key={c.id}
                         onClick={() => setSelectedColor(c.color)}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform hover:scale-110 ${
+                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-110 ${
                           c.border ? 'border-2 border-gray-300' : ''
                         }`}
                         style={{ backgroundColor: c.color }}
                       >
                         {selectedColor === c.color && (
-                          <Check className={`h-5 w-5 ${c.id === 'dark' ? 'text-white' : 'text-gray-800'}`} />
+                          <Check className={`h-4 w-4 ${c.id === 'dark' ? 'text-white' : 'text-gray-800'}`} />
                         )}
                       </button>
                     ))}
-                    <button className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 via-yellow-500 to-blue-500 flex items-center justify-center">
-                      <span className="text-white text-lg">+</span>
+                    <button className="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 via-yellow-500 to-blue-500 flex items-center justify-center">
+                      <span className="text-white text-sm">+</span>
                     </button>
                   </div>
                 </div>

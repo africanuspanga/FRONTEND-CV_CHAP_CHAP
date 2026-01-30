@@ -1,8 +1,8 @@
-// File: /home/runner/workspace/src/app/(builder)/skills/page.tsx
-import * as entry from '../../../../../src/app/(builder)/skills/page.js'
+// File: /home/runner/workspace/src/app/(builder)/additional/certifications/page.tsx
+import * as entry from '../../../../../../src/app/(builder)/additional/certifications/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../../src/app/(builder)/skills/page.js')
+type TEntry = typeof import('../../../../../../src/app/(builder)/additional/certifications/page.js')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{

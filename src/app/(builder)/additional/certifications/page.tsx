@@ -18,6 +18,8 @@ export default function CertificationsPage() {
     date: '',
   });
 
+  const certifications = cvData.certifications || [];
+
   const handleBack = () => {
     router.push('/additional');
   };
@@ -55,7 +57,7 @@ export default function CertificationsPage() {
           </p>
 
           <AnimatePresence>
-            {cvData.certifications.map((cert) => (
+            {certifications.map((cert) => (
               <motion.div
                 key={cert.id}
                 initial={{ opacity: 0, y: -10 }}
@@ -116,7 +118,7 @@ export default function CertificationsPage() {
             </div>
           </div>
 
-          {cvData.certifications.length > 0 && (
+          {certifications.length > 0 && (
             <button
               onClick={handleAdd}
               disabled={!formData.name}
@@ -133,7 +135,7 @@ export default function CertificationsPage() {
         <div className="container mx-auto max-w-lg">
           <Button 
             onClick={handleSave}
-            disabled={cvData.certifications.length === 0 && !formData.name}
+            disabled={certifications.length === 0 && !formData.name}
             className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl disabled:opacity-50"
           >
             Add to CV
