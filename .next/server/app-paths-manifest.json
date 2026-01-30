@@ -1,3 +1,4 @@
 {
-  "/(builder)/skills/page": "app/(builder)/skills/page.js"
+  "/(builder)/skills/page": "app/(builder)/skills/page.js",
+  "/(builder)/preview/page": "app/(builder)/preview/page.js"
 }
