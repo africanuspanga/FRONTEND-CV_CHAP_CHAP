@@ -246,6 +246,35 @@ export default function TemplatePage() {
           ))}
         </div>
 
+        {/* Upload Option Banner */}
+        <div className="mb-8 bg-gradient-to-r from-cv-blue-600 to-cv-blue-700 rounded-2xl p-6 md:p-8 text-white">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-3xl">📤</span>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-1">Have an existing CV?</h3>
+                <p className="text-blue-100">
+                  Upload it and we'll extract all your information automatically
+                </p>
+              </div>
+            </div>
+            <Button
+              onClick={() => {
+                if (templateId) {
+                  router.push('/upload');
+                } else {
+                  alert('Please select a template first');
+                }
+              }}
+              className="bg-white text-cv-blue-600 hover:bg-blue-50 px-6 font-semibold"
+            >
+              Upload CV →
+            </Button>
+          </div>
+        </div>
+
         <div className="flex justify-center sticky bottom-4">
           <Button 
             size="lg" 

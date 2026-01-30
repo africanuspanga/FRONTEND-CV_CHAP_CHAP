@@ -76,6 +76,7 @@ interface CVStore {
   resetCV: () => void;
   loadCV: (data: Partial<CVData>, templateId?: string) => void;
   setCVId: (id: string) => void;
+  setCVData: (data: Partial<CVData>) => void;
 }
 
 export const useCVStore = create<CVStore>()(
@@ -419,6 +420,18 @@ export const useCVStore = create<CVStore>()(
         })),
 
       setCVId: (id) => set({ cvId: id }),
+
+      setCVData: (data) =>
+        set((state) => ({
+          cvData: {
+            ...state.cvData,
+            ...data,
+            personalInfo: {
+              ...state.cvData.personalInfo,
+              ...data.personalInfo,
+            },
+          },
+        })),
     }),
     {
       name: 'cv-chap-chap-storage',
