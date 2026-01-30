@@ -10,12 +10,13 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function SkillsPage() {
   const router = useRouter();
-  const { cvData, addSkill, removeSkill, setCurrentStep } = useCVStore();
+  const { cvData, addSkill, removeSkill, setCurrentStep, setSkills } = useCVStore();
   const [isLoading, setIsLoading] = useState(false);
   const [newSkillName, setNewSkillName] = useState('');
   const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [hasShownModal, setHasShownModal] = useState(false);
+  const [skillsText, setSkillsText] = useState(cvData.skills.map(s => s.name).join('\n'));
 
   useEffect(() => {
     if (!hasShownModal && cvData.skills.length === 0 && (cvData.workExperiences.length > 0 || cvData.education.length > 0)) {
@@ -141,11 +142,23 @@ export default function SkillsPage() {
 
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">
                 <textarea
-                  value={cvData.skills.map(s => s.name).join('\n')}
-                  readOnly
-                  placeholder="Add your skills here."
-                  className="w-full h-48 resize-none border-0 focus:ring-0 text-gray-700 placeholder:text-gray-400"
+                  value={skillsText}
+                  onChange={(e) => {
+                    setSkillsText(e.target.value);
+                  }}
+                  onBlur={() => {
+                    const lines = skillsText.split('\n').map(l => l.trim()).filter(l => l);
+                    const newSkills = lines.map((name, index) => ({
+                      id: `skill-${index}-${Date.now()}`,
+                      name,
+                      level: 'intermediate' as const,
+                    }));
+                    setSkills(newSkills);
+                  }}
+                  placeholder="Add your skills here (one per line)."
+                  className="w-full h-48 resize-none border-0 focus:ring-0 focus:outline-none text-gray-700 placeholder:text-gray-400"
                 />
+                <p className="text-xs text-gray-400 mb-2">Enter one skill per line</p>
                 <div className="border-t pt-3 flex items-center gap-4 text-gray-400">
                   <button className="font-bold hover:text-gray-600">B</button>
                   <button className="italic hover:text-gray-600">I</button>

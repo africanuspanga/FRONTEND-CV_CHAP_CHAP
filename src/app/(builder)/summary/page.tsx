@@ -3,11 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useCVStore } from "@/stores/cv-store";
-import { ArrowLeft, ArrowRight, X, Sparkles, Loader2, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, X, Sparkles, Loader2, Star, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import TemplatePreview from "@/components/builder/template-preview";
 
 type Step = 'preview' | 'edit';
 
@@ -132,12 +131,38 @@ export default function SummaryPage() {
               )}
 
               <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-                <div className="h-[500px] overflow-hidden">
-                  <TemplatePreview
-                    templateId={templateId}
-                    cvData={cvData}
-                    selectedColor={selectedColor}
-                  />
+                <div className="p-6 space-y-4">
+                  <div className="flex items-center gap-3 text-cv-blue-600 mb-4">
+                    <FileText className="h-8 w-8" />
+                    <span className="text-lg font-semibold">Your CV Preview</span>
+                  </div>
+                  
+                  <div className="space-y-3 text-sm">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <p className="font-medium text-gray-700">Name</p>
+                      <p className="text-gray-900">{cvData.personalInfo.fullName || 'Not set'}</p>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <p className="font-medium text-gray-700">Title</p>
+                      <p className="text-gray-900">{cvData.personalInfo.professionalTitle || 'Not set'}</p>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <p className="font-medium text-gray-700">Experience</p>
+                      <p className="text-gray-900">{cvData.workExperiences.length} job(s) added</p>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <p className="font-medium text-gray-700">Education</p>
+                      <p className="text-gray-900">{cvData.education.length} entry(s) added</p>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <p className="font-medium text-gray-700">Skills</p>
+                      <p className="text-gray-900">{cvData.skills.length} skill(s) added</p>
+                    </div>
+                    <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                      <p className="font-medium text-amber-700">Summary</p>
+                      <p className="text-amber-600 italic">{cvData.summary || 'Add your summary next →'}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </>
