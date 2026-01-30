@@ -14,7 +14,7 @@ export default function UploadPage() {
 
   useEffect(() => {
     if (!templateId) {
-      router.push('/template?next=upload');
+      router.push('/template?upload=true');
     }
   }, [templateId, router]);
 
@@ -22,7 +22,7 @@ export default function UploadPage() {
     <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/template" className="flex items-center gap-2 text-gray-600 hover:text-cv-blue-600">
+          <Link href="/template?upload=true" className="flex items-center gap-2 text-gray-600 hover:text-cv-blue-600">
             <ArrowLeft className="h-5 w-5" />
             <span>Back to Templates</span>
           </Link>
