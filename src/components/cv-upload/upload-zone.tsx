@@ -122,7 +122,9 @@ export function CVUploadZone() {
         accomplishments: [],
       });
 
-      router.push('/personal');
+      // Go directly to preview so user can see their complete CV
+      // From preview they can edit any section or change template
+      router.push('/preview');
     }
   };
 
