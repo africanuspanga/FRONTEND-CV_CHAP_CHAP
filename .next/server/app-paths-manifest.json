@@ -1,4 +1,9 @@
 {
-  "/page": "app/page.js",
+  "/create/choose/page": "app/create/choose/page.js",
+  "/api/ai/skills/route": "app/api/ai/skills/route.js",
+  "/(builder)/template/page": "app/(builder)/template/page.js",
+  "/(builder)/personal/page": "app/(builder)/personal/page.js",
+  "/(builder)/experience/page": "app/(builder)/experience/page.js",
+  "/(builder)/education/page": "app/(builder)/education/page.js",
   "/(builder)/skills/page": "app/(builder)/skills/page.js"
 }
