@@ -179,21 +179,23 @@ export default function PreviewPage() {
                   </button>
                 </div>
                 
-                <div className="p-4 max-h-[50vh] overflow-y-auto">
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="p-4 max-h-[60vh] overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-4">
                     {TEMPLATES.slice(0, 6).map((t) => (
                       <button
                         key={t.id}
                         onClick={() => setTemplateId(t.id)}
-                        className={`rounded-xl overflow-hidden border-3 transition-all ${
-                          templateId === t.id ? 'border-cv-blue-500 ring-2 ring-cv-blue-500' : 'border-gray-200'
+                        className={`rounded-xl overflow-hidden transition-all ${
+                          templateId === t.id 
+                            ? 'ring-3 ring-cv-blue-500 shadow-lg' 
+                            : 'ring-1 ring-gray-200 hover:ring-cv-blue-300'
                         }`}
                       >
-                        <div className="aspect-[3/4] bg-gray-50 overflow-hidden relative">
+                        <div className="aspect-[3/4] bg-white overflow-hidden relative">
                           <div 
                             className="absolute inset-0"
                             style={{
-                              transform: 'scale(0.22)',
+                              transform: 'scale(0.19)',
                               transformOrigin: 'top left',
                               width: '794px',
                               height: '1123px',
@@ -206,6 +208,11 @@ export default function PreviewPage() {
                               colorOverride={selectedColor}
                             />
                           </div>
+                          {templateId === t.id && (
+                            <div className="absolute top-2 right-2 w-6 h-6 bg-cv-blue-500 rounded-full flex items-center justify-center">
+                              <Check className="h-4 w-4 text-white" />
+                            </div>
+                          )}
                         </div>
                       </button>
                     ))}

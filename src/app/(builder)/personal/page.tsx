@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCVStore } from "@/stores/cv-store";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, User, Mail, Phone, MapPin, Briefcase, Globe, Linkedin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,35 +66,69 @@ export default function PersonalInfoPage() {
     updatePersonalInfo({ photoUrl: '' });
   };
 
+  const steps = [
+    { num: 1, label: 'Personal', active: true },
+    { num: 2, label: 'Experience', active: false },
+    { num: 3, label: 'Education', active: false },
+    { num: 4, label: 'Skills', active: false },
+    { num: 5, label: 'Summary', active: false },
+    { num: 6, label: 'Preview', active: false },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
-      <header className="bg-white border-b sticky top-0 z-40 shadow-sm">
-        <div className="px-4 py-4 flex items-center justify-between">
-          <button onClick={handleBack} className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 active:bg-gray-100 rounded-lg">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="text-center">
-            <p className="text-xs text-gray-500">Step 1 of 6</p>
-            <h1 className="text-lg font-heading font-bold text-gray-900">Personal Info</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Modern Header */}
+      <header className="bg-white border-b sticky top-0 z-40">
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between mb-3">
+            <button 
+              onClick={handleBack} 
+              className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <h1 className="text-lg font-bold text-gray-900">Personal Info</h1>
+            <div className="w-10"></div>
           </div>
-          <div className="w-10"></div>
+          
+          {/* Progress Steps */}
+          <div className="flex items-center justify-between">
+            {steps.map((step, idx) => (
+              <div key={step.num} className="flex items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
+                  step.active 
+                    ? 'bg-cv-blue-600 text-white' 
+                    : 'bg-gray-200 text-gray-500'
+                }`}>
+                  {step.num}
+                </div>
+                {idx < steps.length - 1 && (
+                  <div className={`w-4 sm:w-8 h-0.5 mx-1 ${
+                    step.active ? 'bg-cv-blue-600' : 'bg-gray-200'
+                  }`} />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </header>
 
-      <main className="px-4 py-6 pb-32">
+      <main className="px-4 py-6 pb-28">
         <div className="max-w-lg mx-auto">
+          {/* Section Title */}
           <div className="mb-6">
-            <h2 className="text-xl font-heading font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">
               Tell us about yourself
             </h2>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-500 text-sm">
               This information will appear at the top of your CV
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Photo Upload */}
             {hasPhoto && (
-              <div className="bg-white rounded-xl p-5 shadow-sm">
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                 <PhotoUpload
                   currentPhotoUrl={cvData.personalInfo.photoUrl}
                   onPhotoUploaded={handlePhotoUploaded}
@@ -103,104 +137,156 @@ export default function PersonalInfoPage() {
               </div>
             )}
 
-            <div className="bg-white rounded-xl p-5 shadow-sm space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName" className="text-sm font-medium">First Name *</Label>
+            {/* Name Fields */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
+              <div className="flex items-center gap-2 text-cv-blue-600 mb-2">
+                <User className="h-5 w-5" />
+                <span className="font-semibold text-sm">Basic Information</span>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">First Name</Label>
                   <Input
                     id="firstName"
                     {...register("firstName")}
                     placeholder="John"
-                    className="h-12 text-base"
+                    className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                   />
                   {errors.firstName && (
-                    <p className="text-sm text-red-500">{errors.firstName.message}</p>
+                    <p className="text-xs text-red-500">{errors.firstName.message}</p>
                   )}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName" className="text-sm font-medium">Last Name *</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">Last Name</Label>
                   <Input
                     id="lastName"
                     {...register("lastName")}
                     placeholder="Mwangi"
-                    className="h-12 text-base"
+                    className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                   />
                   {errors.lastName && (
-                    <p className="text-sm text-red-500">{errors.lastName.message}</p>
+                    <p className="text-xs text-red-500">{errors.lastName.message}</p>
                   )}
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="professionalTitle" className="text-sm font-medium">Professional Title *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="professionalTitle" className="text-sm font-medium text-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-gray-400" />
+                    Professional Title
+                  </div>
+                </Label>
                 <Input
                   id="professionalTitle"
                   {...register("professionalTitle")}
                   placeholder="e.g., Customer Service Manager"
-                  className="h-12 text-base"
+                  className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                 />
                 {errors.professionalTitle && (
-                  <p className="text-sm text-red-500">{errors.professionalTitle.message}</p>
+                  <p className="text-xs text-red-500">{errors.professionalTitle.message}</p>
                 )}
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">Email Address *</Label>
+            {/* Contact Fields */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
+              <div className="flex items-center gap-2 text-cv-blue-600 mb-2">
+                <Mail className="h-5 w-5" />
+                <span className="font-semibold text-sm">Contact Details</span>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-gray-400" />
+                    Email Address
+                  </div>
+                </Label>
                 <Input
                   id="email"
                   type="email"
                   {...register("email")}
                   placeholder="john@example.com"
-                  className="h-12 text-base"
+                  className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                 />
                 {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                  <p className="text-xs text-red-500">{errors.email.message}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-sm font-medium">Phone Number *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-gray-400" />
+                    Phone Number
+                  </div>
+                </Label>
                 <Input
                   id="phone"
                   {...register("phone")}
                   placeholder="+255 xxx xxx xxx"
-                  className="h-12 text-base"
+                  className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                 />
                 {errors.phone && (
-                  <p className="text-sm text-red-500">{errors.phone.message}</p>
+                  <p className="text-xs text-red-500">{errors.phone.message}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="location" className="text-sm font-medium">Location *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="location" className="text-sm font-medium text-gray-700">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-gray-400" />
+                    Location
+                  </div>
+                </Label>
                 <Input
                   id="location"
                   {...register("location")}
                   placeholder="e.g., Dar es Salaam, Tanzania"
-                  className="h-12 text-base"
+                  className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                 />
                 {errors.location && (
-                  <p className="text-sm text-red-500">{errors.location.message}</p>
+                  <p className="text-xs text-red-500">{errors.location.message}</p>
                 )}
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="linkedin" className="text-sm font-medium">LinkedIn (optional)</Label>
+            {/* Social Links (Optional) */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
+              <div className="flex items-center gap-2 text-gray-400 mb-2">
+                <Globe className="h-5 w-5" />
+                <span className="font-semibold text-sm">Online Presence (Optional)</span>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="linkedin" className="text-sm font-medium text-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Linkedin className="h-4 w-4 text-gray-400" />
+                    LinkedIn
+                  </div>
+                </Label>
                 <Input
                   id="linkedin"
                   {...register("linkedin")}
                   placeholder="linkedin.com/in/yourprofile"
-                  className="h-12 text-base"
+                  className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="website" className="text-sm font-medium">Website (optional)</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="website" className="text-sm font-medium text-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-gray-400" />
+                    Website
+                  </div>
+                </Label>
                 <Input
                   id="website"
                   {...register("website")}
                   placeholder="yourwebsite.com"
-                  className="h-12 text-base"
+                  className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                 />
               </div>
             </div>
@@ -208,13 +294,14 @@ export default function PersonalInfoPage() {
         </div>
       </main>
 
+      {/* Fixed Bottom Button */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
         <div className="max-w-lg mx-auto">
           <Button 
             onClick={handleSubmit(onSubmit)}
-            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 active:bg-cv-blue-800 py-6 text-lg rounded-xl"
+            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 active:bg-cv-blue-800 py-6 text-lg rounded-2xl font-semibold"
           >
-            Next: Experience
+            Continue to Experience
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>

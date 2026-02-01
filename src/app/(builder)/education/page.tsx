@@ -138,27 +138,52 @@ export default function EducationPage() {
     return month ? `${months[parseInt(month) - 1]} ${year}` : year;
   };
 
+  const steps = [
+    { num: 1, label: 'Personal', completed: true },
+    { num: 2, label: 'Experience', completed: true },
+    { num: 3, label: 'Education', active: true },
+    { num: 4, label: 'Skills', active: false },
+    { num: 5, label: 'Summary', active: false },
+    { num: 6, label: 'Preview', active: false },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
-      <header className="bg-white border-b sticky top-0 z-40 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <button onClick={handleBack} className="flex items-center gap-2 text-gray-600 hover:text-cv-blue-600">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="text-center">
-            <p className="text-xs text-gray-500">Step 3 of 6</p>
-            <div className="flex items-center gap-1 justify-center">
-              <h1 className="text-lg font-heading font-bold text-gray-900">Education</h1>
-              <ChevronDown className="h-4 w-4 text-gray-400" />
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b sticky top-0 z-40">
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={handleBack} className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors">
+              <ArrowLeft className="h-6 w-6" />
+            </button>
+            <h1 className="text-lg font-bold text-gray-900">Education</h1>
+            <div className="w-10"></div>
           </div>
-          <button className="text-gray-600 hover:text-cv-blue-600">
-            <Search className="h-5 w-5" />
-          </button>
+          
+          {/* Progress Steps */}
+          <div className="flex items-center justify-between">
+            {steps.map((step, idx) => (
+              <div key={step.num} className="flex items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
+                  step.active 
+                    ? 'bg-cv-blue-600 text-white' 
+                    : step.completed 
+                      ? 'bg-cv-blue-100 text-cv-blue-600'
+                      : 'bg-gray-200 text-gray-500'
+                }`}>
+                  {step.num}
+                </div>
+                {idx < steps.length - 1 && (
+                  <div className={`w-4 sm:w-8 h-0.5 mx-1 ${
+                    step.active || step.completed ? 'bg-cv-blue-600' : 'bg-gray-200'
+                  }`} />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 pb-32">
+      <main className="px-4 py-6 pb-28">
         <div className="max-w-lg mx-auto">
           <AnimatePresence mode="wait">
             {step === 'form' && (
@@ -169,50 +194,50 @@ export default function EducationPage() {
                 exit={{ opacity: 0, x: -20 }}
               >
                 <div className="mb-6">
-                  <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1">
                     Enter your education
                   </h2>
-                  <p className="text-gray-600">
-                    Add GPA or other info by tapping on the blue "+ Add more details" below.
+                  <p className="text-gray-500 text-sm">
+                    Add your educational background
                   </p>
                 </div>
 
-                <div className="space-y-5">
-                  <div>
-                    <Label className="text-gray-700 font-medium">School Name</Label>
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-gray-700">School / Institution Name</Label>
                     <Input
                       value={formData.institution}
                       onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
-                      placeholder="Central Valley College"
-                      className="h-12 mt-1.5 bg-gray-50 border-gray-200"
+                      placeholder="University of Dar es Salaam"
+                      className="h-12 rounded-xl border-gray-200"
                     />
                   </div>
 
-                  <div>
-                    <Label className="text-gray-700 font-medium">Location</Label>
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-gray-700">Location</Label>
                     <Input
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                       placeholder="Dar es Salaam, Tanzania"
-                      className="h-12 mt-1.5 bg-gray-50 border-gray-200"
+                      className="h-12 rounded-xl border-gray-200"
                     />
                   </div>
 
-                  <div className="relative">
-                    <Label className="text-gray-700 font-medium">Degree</Label>
+                  <div className="relative space-y-1.5">
+                    <Label className="text-sm font-medium text-gray-700">Degree</Label>
                     <button
                       type="button"
                       onClick={() => setShowDegreeDropdown(!showDegreeDropdown)}
-                      className="w-full h-12 mt-1.5 bg-gray-50 border border-gray-200 rounded-md px-3 text-left flex items-center justify-between hover:border-gray-300"
+                      className="w-full h-12 bg-white border border-gray-200 rounded-xl px-3 text-left flex items-center justify-between hover:border-cv-blue-300 transition-colors"
                     >
                       <span className={formData.degree ? 'text-gray-900' : 'text-gray-400'}>
-                        {formData.degree || 'Select'}
+                        {formData.degree || 'Select degree type'}
                       </span>
                       <ChevronDown className="h-4 w-4 text-gray-400" />
                     </button>
                     
                     {showDegreeDropdown && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto">
                         {degreeOptions.map((degree) => (
                           <button
                             key={degree}
@@ -221,7 +246,7 @@ export default function EducationPage() {
                               setFormData({ ...formData, degree });
                               setShowDegreeDropdown(false);
                             }}
-                            className="w-full px-4 py-3 text-left hover:bg-gray-50 text-gray-700"
+                            className="w-full px-4 py-3 text-left hover:bg-cv-blue-50 text-gray-700 first:rounded-t-xl last:rounded-b-xl"
                           >
                             {degree}
                           </button>
@@ -230,28 +255,28 @@ export default function EducationPage() {
                     )}
                   </div>
 
-                  <div>
-                    <Label className="text-gray-700 font-medium">Field of Study</Label>
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-gray-700">Field of Study</Label>
                     <Input
                       value={formData.fieldOfStudy}
                       onChange={(e) => setFormData({ ...formData, fieldOfStudy: e.target.value })}
-                      placeholder="English Literature"
-                      className="h-12 mt-1.5 bg-gray-50 border-gray-200"
+                      placeholder="Computer Science"
+                      className="h-12 rounded-xl border-gray-200"
                     />
                   </div>
 
-                  <div>
-                    <Label className="text-gray-700 font-medium">Graduation Date</Label>
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-gray-700">Graduation Date</Label>
                     <Input
                       type="month"
                       value={formData.graduationDate}
                       onChange={(e) => setFormData({ ...formData, graduationDate: e.target.value })}
                       disabled={formData.isStillEnrolled}
-                      className="h-12 mt-1.5 bg-gray-50 border-gray-200 disabled:opacity-50"
+                      className="h-12 rounded-xl border-gray-200 disabled:opacity-50"
                     />
                   </div>
 
-                  <label className="flex items-center gap-3 cursor-pointer">
+                  <label className="flex items-center gap-3 cursor-pointer py-2">
                     <input
                       type="checkbox"
                       checked={formData.isStillEnrolled}
@@ -272,37 +297,37 @@ export default function EducationPage() {
                 exit={{ opacity: 0, x: -20 }}
               >
                 <div className="mb-6">
-                  <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
-                    Add more education
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                    Your Education
                   </h2>
-                  <p className="text-gray-600">
-                    This includes ongoing or past studies.
-                  </p>
-                  <p className="text-gray-500 text-sm mt-1">
-                    Drag to order, tap to edit.
+                  <p className="text-gray-500 text-sm">
+                    Tap to edit your entries
                   </p>
                 </div>
 
-                <div className="space-y-4 mb-6">
+                <div className="space-y-3 mb-4">
                   {cvData.education.map((edu) => (
                     <div 
                       key={edu.id}
-                      className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
+                      className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
                     >
                       <div className="p-4">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900">
-                              {edu.degree}{edu.fieldOfStudy ? `, ${edu.fieldOfStudy}` : ''}
+                            <h3 className="font-bold text-gray-900">
+                              {edu.degree}
                             </h3>
-                            <p className="text-gray-600 mt-0.5">{edu.institution}</p>
-                            <p className="text-gray-400 text-sm mt-0.5">
+                            {edu.fieldOfStudy && (
+                              <p className="text-gray-600 text-sm">{edu.fieldOfStudy}</p>
+                            )}
+                            <p className="text-gray-500 text-sm mt-1">{edu.institution}</p>
+                            <p className="text-gray-400 text-sm mt-1">
                               {formatDate(edu.graduationDate)}
                             </p>
                           </div>
                           <button
                             onClick={() => removeEducation(edu.id)}
-                            className="text-blue-500 hover:text-blue-700 p-1"
+                            className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           >
                             <Trash2 className="h-5 w-5" />
                           </button>
@@ -310,9 +335,9 @@ export default function EducationPage() {
                         
                         <button
                           onClick={() => handleEditEducation(edu)}
-                          className="text-cv-blue-600 text-sm flex items-center gap-1 mt-3 hover:underline"
+                          className="w-full mt-4 pt-3 border-t flex items-center justify-center gap-2 text-cv-blue-600 font-medium hover:bg-cv-blue-50 rounded-lg py-2 transition-colors"
                         >
-                          <Edit2 className="w-3 h-3" />
+                          <Edit2 className="w-4 h-4" />
                           Edit
                         </button>
                       </div>
@@ -322,7 +347,7 @@ export default function EducationPage() {
 
                 <button
                   onClick={() => { resetForm(); setStep('form'); }}
-                  className="w-full py-4 border-2 border-dashed border-amber-300 bg-amber-50 rounded-xl text-gray-700 font-medium flex items-center justify-center gap-2 hover:bg-amber-100 transition-colors"
+                  className="w-full py-4 border-2 border-dashed border-cv-blue-300 bg-cv-blue-50 rounded-2xl text-cv-blue-600 font-medium flex items-center justify-center gap-2 hover:bg-cv-blue-100 transition-colors"
                 >
                   <Plus className="h-5 w-5" />
                   Add more education
@@ -378,14 +403,14 @@ export default function EducationPage() {
       </main>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
-        <div className="container mx-auto max-w-lg">
+        <div className="max-w-lg mx-auto">
           {step === 'form' && (
             <Button 
               onClick={handleSaveEducation}
               disabled={!formData.institution || !formData.degree}
-              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl disabled:opacity-50"
+              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold disabled:opacity-50"
             >
-              {editingId ? 'Save Changes' : 'Next: Education Summary'}
+              {editingId ? 'Save Changes' : 'Save Education'}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           )}
@@ -393,9 +418,9 @@ export default function EducationPage() {
           {step === 'list' && (
             <Button 
               onClick={handleContinueToPreview}
-              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl"
+              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold"
             >
-              Next: Skills
+              Continue to Skills
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           )}
@@ -403,7 +428,7 @@ export default function EducationPage() {
           {step === 'preview' && (
             <Button 
               onClick={handleContinueToSkills}
-              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl"
+              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold"
             >
               Continue
               <ArrowRight className="ml-2 h-5 w-5" />

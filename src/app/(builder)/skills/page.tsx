@@ -112,22 +112,52 @@ export default function SkillsPage() {
     await fetchSkillRecommendations();
   };
 
+  const steps = [
+    { num: 1, completed: true },
+    { num: 2, completed: true },
+    { num: 3, completed: true },
+    { num: 4, active: true },
+    { num: 5, active: false },
+    { num: 6, active: false },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
-      <header className="bg-white border-b sticky top-0 z-40 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <button onClick={handleBack} className="flex items-center gap-2 text-gray-600 hover:text-cv-blue-600">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="text-center">
-            <p className="text-xs text-gray-500">Step 4 of 6</p>
-            <h1 className="text-lg font-heading font-bold text-gray-900">Skills</h1>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b sticky top-0 z-40">
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={handleBack} className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors">
+              <ArrowLeft className="h-6 w-6" />
+            </button>
+            <h1 className="text-lg font-bold text-gray-900">Skills</h1>
+            <div className="w-10"></div>
           </div>
-          <div className="w-8"></div>
+          
+          {/* Progress Steps */}
+          <div className="flex items-center justify-between">
+            {steps.map((step, idx) => (
+              <div key={step.num} className="flex items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
+                  step.active 
+                    ? 'bg-cv-blue-600 text-white' 
+                    : step.completed 
+                      ? 'bg-cv-blue-100 text-cv-blue-600'
+                      : 'bg-gray-200 text-gray-500'
+                }`}>
+                  {step.num}
+                </div>
+                {idx < steps.length - 1 && (
+                  <div className={`w-4 sm:w-8 h-0.5 mx-1 ${
+                    step.active || step.completed ? 'bg-cv-blue-600' : 'bg-gray-200'
+                  }`} />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 pb-32">
+      <main className="px-4 py-6 pb-28">
         <div className="max-w-lg mx-auto">
           {isLoading && !showModal && (
             <div className="flex flex-col items-center justify-center py-12">
@@ -139,17 +169,68 @@ export default function SkillsPage() {
           {!isLoading && (
             <>
               <div className="mb-6">
-                <p className="text-gray-600">
-                  Focus on skills that match your desired job.
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">Your Skills</h2>
+                <p className="text-gray-500 text-sm">
+                  Add skills that match your desired job
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">
+              {/* Quick Add */}
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-4">
+                <div className="flex gap-2">
+                  <Input
+                    value={newSkillName}
+                    onChange={(e) => setNewSkillName(e.target.value)}
+                    placeholder="Type a skill (e.g., Python, Leadership)"
+                    className="h-12 rounded-xl border-gray-200"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddSkill();
+                      }
+                    }}
+                  />
+                  <Button 
+                    onClick={handleAddSkill}
+                    disabled={!newSkillName.trim()}
+                    className="bg-cv-blue-600 hover:bg-cv-blue-700 h-12 px-6 rounded-xl"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Skills List */}
+              {cvData.skills.length > 0 && (
+                <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-4">
+                  <p className="text-sm font-medium text-gray-600 mb-3">Added Skills ({cvData.skills.length})</p>
+                  <div className="flex flex-wrap gap-2">
+                    {cvData.skills.map((skill) => (
+                      <motion.div
+                        key={skill.id}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="flex items-center gap-1.5 bg-cv-blue-50 text-cv-blue-700 px-3 py-2 rounded-xl text-sm font-medium border border-cv-blue-100"
+                      >
+                        {skill.name}
+                        <button
+                          onClick={() => removeSkill(skill.id)}
+                          className="ml-1 hover:bg-cv-blue-200 rounded-full p-0.5 transition-colors"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Text Area for Bulk Edit */}
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-4">
+                <p className="text-sm font-medium text-gray-600 mb-2">Or add multiple skills</p>
                 <textarea
                   value={skillsText}
-                  onChange={(e) => {
-                    setSkillsText(e.target.value);
-                  }}
+                  onChange={(e) => setSkillsText(e.target.value)}
                   onBlur={() => {
                     const lines = skillsText.split('\n').map(l => l.trim()).filter(l => l);
                     const newSkills = lines.map((name, index) => ({
@@ -159,70 +240,19 @@ export default function SkillsPage() {
                     }));
                     setSkills(newSkills);
                   }}
-                  placeholder="Add your skills here (one per line)."
-                  className="w-full h-48 resize-none border-0 focus:ring-0 focus:outline-none text-gray-700 placeholder:text-gray-400"
+                  placeholder="Add your skills here (one per line)"
+                  className="w-full h-32 resize-none border rounded-xl p-3 text-gray-700 placeholder:text-gray-400 focus:border-cv-blue-500 focus:ring-1 focus:ring-cv-blue-500"
                 />
-                <p className="text-xs text-gray-400 mb-2">Enter one skill per line</p>
-                <div className="border-t pt-3 flex items-center gap-4 text-gray-400">
-                  <button className="font-bold hover:text-gray-600">B</button>
-                  <button className="italic hover:text-gray-600">I</button>
-                  <button className="underline hover:text-gray-600">U</button>
-                  <button className="hover:text-gray-600">≡</button>
-                  <button className="hover:text-gray-600">↺</button>
-                  <button className="hover:text-gray-600">↻</button>
-                </div>
               </div>
 
-              <div className="flex gap-2 mb-6">
-                <Input
-                  value={newSkillName}
-                  onChange={(e) => setNewSkillName(e.target.value)}
-                  placeholder="Type a skill (e.g., Python, Leadership)"
-                  className="h-12 bg-white"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddSkill();
-                    }
-                  }}
-                />
-                <Button 
-                  onClick={handleAddSkill}
-                  disabled={!newSkillName.trim()}
-                  className="bg-cv-blue-600 hover:bg-cv-blue-700 h-12 px-6"
-                >
-                  <Plus className="h-5 w-5" />
-                </Button>
-              </div>
-
-              {cvData.skills.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {cvData.skills.map((skill) => (
-                    <motion.div
-                      key={skill.id}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="flex items-center gap-1 bg-cv-blue-100 text-cv-blue-700 px-3 py-2 rounded-full text-sm font-medium"
-                    >
-                      {skill.name}
-                      <button
-                        onClick={() => removeSkill(skill.id)}
-                        className="ml-1 hover:bg-cv-blue-200 rounded-full p-0.5"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-
+              {/* AI Suggestions */}
               {(cvData.workExperiences.length > 0 || cvData.education.length > 0) && (
                 <button
                   onClick={handleRefreshSuggestions}
                   disabled={isLoading}
-                  className="w-full py-3 border-2 border-dashed border-amber-300 bg-amber-50 rounded-xl text-gray-700 font-medium flex items-center justify-center gap-2 hover:bg-amber-100 transition-colors"
+                  className="w-full py-4 border-2 border-dashed border-cv-blue-300 bg-cv-blue-50 rounded-2xl text-cv-blue-600 font-medium flex items-center justify-center gap-2 hover:bg-cv-blue-100 transition-colors"
                 >
-                  <Sparkles className="h-5 w-5 text-amber-500" />
+                  <Sparkles className="h-5 w-5" />
                   Get AI Skill Suggestions
                 </button>
               )}
@@ -232,12 +262,12 @@ export default function SkillsPage() {
       </main>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
-        <div className="container mx-auto max-w-lg">
+        <div className="max-w-lg mx-auto">
           <Button 
             onClick={handleContinue}
-            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl"
+            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold"
           >
-            Next: Summary
+            Continue to Summary
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>

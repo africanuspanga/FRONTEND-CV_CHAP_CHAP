@@ -331,64 +331,92 @@ export default function ExperiencePage() {
     return `${monthName} ${year}`;
   };
 
+  const steps = [
+    { num: 1, label: 'Personal', active: false, completed: true },
+    { num: 2, label: 'Experience', active: true },
+    { num: 3, label: 'Education', active: false },
+    { num: 4, label: 'Skills', active: false },
+    { num: 5, label: 'Summary', active: false },
+    { num: 6, label: 'Preview', active: false },
+  ];
+
   // RENDER: Review Step (list of experiences)
   if (flowStep === 'review') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
-        <header className="bg-white border-b sticky top-0 z-40 shadow-sm">
-          <div className="px-4 py-4 flex items-center justify-between">
-            <button onClick={handleBack} className="p-2 -ml-2 text-gray-600 active:bg-gray-100 rounded-lg">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <div className="text-center">
-              <p className="text-xs text-gray-500">Step 2 of 6</p>
-              <h1 className="text-lg font-heading font-bold text-gray-900">Experience</h1>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b sticky top-0 z-40">
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between mb-3">
+              <button onClick={handleBack} className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors">
+                <ArrowLeft className="h-6 w-6" />
+              </button>
+              <h1 className="text-lg font-bold text-gray-900">Experience</h1>
+              <div className="w-10"></div>
             </div>
-            <div className="w-10"></div>
+            
+            {/* Progress Steps */}
+            <div className="flex items-center justify-between">
+              {steps.map((step, idx) => (
+                <div key={step.num} className="flex items-center">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
+                    step.active 
+                      ? 'bg-cv-blue-600 text-white' 
+                      : step.completed 
+                        ? 'bg-cv-blue-100 text-cv-blue-600'
+                        : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    {step.completed && !step.active ? <Check className="h-4 w-4" /> : step.num}
+                  </div>
+                  {idx < steps.length - 1 && (
+                    <div className={`w-4 sm:w-8 h-0.5 mx-1 ${
+                      step.active || step.completed ? 'bg-cv-blue-600' : 'bg-gray-200'
+                    }`} />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </header>
 
-        <main className="px-4 py-6 pb-32">
+        <main className="px-4 py-6 pb-28">
           <div className="max-w-lg mx-auto">
             {!hasExperiences ? (
               <>
                 <div className="mb-6">
-                  <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">Experience</h2>
-                  <p className="text-gray-600">
-                    Start with your most recent job first. You can add volunteer work, internships, or extracurricular activities too.
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1">Work Experience</h2>
+                  <p className="text-gray-500 text-sm">
+                    Start with your most recent job. Include internships or volunteer work too.
                   </p>
                 </div>
-                <Card>
-                  <CardContent className="py-12 text-center">
-                    <div className="w-16 h-16 bg-cv-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Briefcase className="h-8 w-8 text-cv-blue-600" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Add your work experience
-                    </h3>
-                    <p className="text-gray-500 mb-6">
-                      Include your achievements and responsibilities
-                    </p>
-                    <Button 
-                      onClick={startNewExperience}
-                      className="bg-cv-blue-600 hover:bg-cv-blue-700 py-6 px-8"
-                    >
-                      <Plus className="h-5 w-5 mr-2" />
-                      Add Experience
-                    </Button>
-                  </CardContent>
-                </Card>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+                  <div className="w-16 h-16 bg-cv-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Briefcase className="h-8 w-8 text-cv-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Add your work experience
+                  </h3>
+                  <p className="text-gray-500 mb-6 text-sm">
+                    Include your achievements and responsibilities
+                  </p>
+                  <Button 
+                    onClick={startNewExperience}
+                    className="bg-cv-blue-600 hover:bg-cv-blue-700 py-6 px-8 rounded-xl"
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    Add Experience
+                  </Button>
+                </div>
               </>
             ) : (
               <>
                 <div className="mb-6">
-                  <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">Review your experience</h2>
-                  <p className="text-gray-600">Drag to order, tap to edit.</p>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1">Review your experience</h2>
+                  <p className="text-gray-500 text-sm">Tap to edit your entries</p>
                 </div>
 
-                <div className="space-y-4 mb-6">
+                <div className="space-y-3 mb-4">
                   {cvData.workExperiences.map((exp) => (
-                    <Card key={exp.id} className="overflow-hidden">
+                    <div key={exp.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                       <div className="p-4">
                         <div className="flex items-start gap-3">
                           <div className="pt-1 text-gray-300">
@@ -398,43 +426,44 @@ export default function ExperiencePage() {
                             <div className="flex items-start justify-between">
                               <div>
                                 <h3 className="font-bold text-gray-900">
-                                  {exp.jobTitle}, {exp.company}
+                                  {exp.jobTitle}
                                 </h3>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-gray-600 text-sm">{exp.company}</p>
+                                <p className="text-sm text-gray-400 mt-1">
                                   {exp.startDate ? formatDate(exp.startDate) : 'Start'} - {exp.isCurrent ? 'Present' : (exp.endDate ? formatDate(exp.endDate) : 'End')}
                                 </p>
                               </div>
                               <button
                                 onClick={() => removeWorkExperience(exp.id)}
-                                className="p-2 text-cv-blue-600 hover:bg-cv-blue-50 rounded-lg"
+                                className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                               >
                                 <Trash2 className="h-5 w-5" />
                               </button>
                             </div>
 
                             {exp.achievements.length > 0 && (
-                              <div className="mt-3">
-                                <div className="text-sm text-gray-700">
-                                  <span className="mr-2">•</span>
-                                  {exp.achievements[0]}
+                              <div className="mt-3 space-y-1">
+                                <div className="text-sm text-gray-600 flex">
+                                  <span className="mr-2 text-cv-blue-600">•</span>
+                                  <span>{exp.achievements[0]}</span>
                                 </div>
                                 {exp.achievements.length > 1 && (
                                   <AnimatePresence>
-                                    {expandedCards.has(exp.id) ? (
+                                    {expandedCards.has(exp.id) && (
                                       <motion.div
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: 'auto', opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
-                                        className="overflow-hidden"
+                                        className="overflow-hidden space-y-1"
                                       >
                                         {exp.achievements.slice(1).map((achievement, idx) => (
-                                          <div key={idx} className="text-sm text-gray-700 mt-1">
-                                            <span className="mr-2">•</span>
-                                            {achievement}
+                                          <div key={idx} className="text-sm text-gray-600 flex">
+                                            <span className="mr-2 text-cv-blue-600">•</span>
+                                            <span>{achievement}</span>
                                           </div>
                                         ))}
                                       </motion.div>
-                                    ) : null}
+                                    )}
                                   </AnimatePresence>
                                 )}
                                 {exp.achievements.length > 1 && (
@@ -442,7 +471,7 @@ export default function ExperiencePage() {
                                     onClick={() => toggleCardExpand(exp.id)}
                                     className="text-cv-blue-600 text-sm font-medium mt-2 flex items-center gap-1"
                                   >
-                                    {expandedCards.has(exp.id) ? 'See less' : 'See more'}
+                                    {expandedCards.has(exp.id) ? 'See less' : `+${exp.achievements.length - 1} more`}
                                     {expandedCards.has(exp.id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                                   </button>
                                 )}
@@ -451,28 +480,25 @@ export default function ExperiencePage() {
                           </div>
                         </div>
 
-                        <div className="mt-4 pt-3 border-t flex justify-center">
-                          <button
-                            onClick={() => editExperience(exp)}
-                            className="flex items-center gap-2 text-cv-blue-600 font-medium"
-                          >
-                            <Pencil className="h-4 w-4" />
-                            Edit
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => editExperience(exp)}
+                          className="w-full mt-4 pt-3 border-t flex items-center justify-center gap-2 text-cv-blue-600 font-medium hover:bg-cv-blue-50 rounded-lg py-2 transition-colors"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Edit
+                        </button>
                       </div>
-                    </Card>
+                    </div>
                   ))}
-
-                  <Button 
-                    onClick={startNewExperience}
-                    variant="outline"
-                    className="w-full py-5 border-2 border-dashed border-cv-gold-400 bg-cv-gold-50 text-gray-900 hover:bg-cv-gold-100"
-                  >
-                    <Plus className="h-5 w-5 mr-2" />
-                    Add more experience
-                  </Button>
                 </div>
+
+                <button
+                  onClick={startNewExperience}
+                  className="w-full py-4 border-2 border-dashed border-cv-blue-300 bg-cv-blue-50 rounded-2xl text-cv-blue-600 font-medium flex items-center justify-center gap-2 hover:bg-cv-blue-100 transition-colors"
+                >
+                  <Plus className="h-5 w-5" />
+                  Add more experience
+                </button>
               </>
             )}
           </div>
@@ -483,9 +509,9 @@ export default function ExperiencePage() {
             <Button 
               onClick={handleContinue}
               disabled={!hasExperiences}
-              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl disabled:opacity-50"
+              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold disabled:opacity-50"
             >
-              Next: Education
+              Continue to Education
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -499,67 +525,66 @@ export default function ExperiencePage() {
     const isFormValid = formData.jobTitle && formData.company;
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
-        <header className="bg-white border-b sticky top-0 z-40 shadow-sm">
-          <div className="px-4 py-4 flex items-center justify-between">
-            <button onClick={() => setFlowStep('review')} className="p-2 -ml-2 text-gray-600 active:bg-gray-100 rounded-lg">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <div className="text-center">
-              <p className="text-xs text-gray-500">Step 2 of 6</p>
-              <h1 className="text-lg font-heading font-bold text-gray-900">Experience</h1>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b sticky top-0 z-40">
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between mb-3">
+              <button onClick={() => setFlowStep('review')} className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors">
+                <ArrowLeft className="h-6 w-6" />
+              </button>
+              <h1 className="text-lg font-bold text-gray-900">Add Experience</h1>
+              <div className="w-10"></div>
             </div>
-            <div className="w-10"></div>
           </div>
         </header>
 
-        <main className="px-4 py-6 pb-32">
+        <main className="px-4 py-6 pb-28">
           <div className="max-w-lg mx-auto">
             <div className="mb-6">
-              <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">Experience</h2>
-              <p className="text-gray-600">
-                Start with your most recent job first. You can add volunteer work, internships, or extracurricular activities too.
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">Job Details</h2>
+              <p className="text-gray-500 text-sm">
+                Tell us about this position
               </p>
             </div>
 
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Job Title</Label>
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium text-gray-700">Job Title</Label>
                 <Input
                   value={formData.jobTitle}
                   onChange={(e) => setFormData(prev => ({ ...prev, jobTitle: e.target.value }))}
                   placeholder="Customer Service Manager"
-                  className="h-12 text-base"
+                  className="h-12 text-base rounded-xl border-gray-200"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Employer</Label>
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium text-gray-700">Employer / Company</Label>
                 <Input
                   value={formData.company}
                   onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
-                  placeholder="Vandelay Industries"
-                  className="h-12 text-base"
+                  placeholder="Vodacom Tanzania"
+                  className="h-12 text-base rounded-xl border-gray-200"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">City</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-medium text-gray-700">City</Label>
                   <Input
                     value={formData.city}
                     onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                    placeholder="San Francisco"
-                    className="h-12 text-base"
+                    placeholder="Dar es Salaam"
+                    className="h-12 text-base rounded-xl border-gray-200"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">State</Label>
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-medium text-gray-700">Country</Label>
                   <Input
                     value={formData.state}
                     onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
-                    placeholder="CA"
-                    className="h-12 text-base"
+                    placeholder="Tanzania"
+                    className="h-12 text-base rounded-xl border-gray-200"
                   />
                 </div>
               </div>
