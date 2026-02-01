@@ -29,13 +29,13 @@ import tanzaniaGovtLogo from "@/assets/logos/tanzania-govt.png";
 import metlLogo from "@/assets/logos/metl.png";
 import heroCvImage from "@/assets/hero-cv.png";
 
-const templates = [
-  { name: 'Professional', color: 'from-blue-500 to-cyan-400', category: 'Corporate' },
-  { name: 'Modern', color: 'from-indigo-500 to-blue-400', category: 'Tech' },
-  { name: 'Creative', color: 'from-cyan-400 to-teal-400', category: 'Design' },
-  { name: 'Executive', color: 'from-slate-600 to-slate-400', category: 'Leadership' },
-  { name: 'Minimalist', color: 'from-gray-400 to-gray-300', category: 'Clean' },
-  { name: 'Bold', color: 'from-blue-600 to-indigo-500', category: 'Standout' },
+const homeTemplates = [
+  { id: 'kazi-fasta', name: 'Kazi Fasta', category: 'Professional', hasImage: true, previewImage: '/templates/previews/kazi-fasta-preview.png' },
+  { id: 'moonlight-sonata', name: 'Moonlight Sonata', category: 'Modern', hasImage: true, previewImage: '/templates/previews/moonlight-sonata-preview.png' },
+  { id: 'executive-classic', name: 'Executive Classic', category: 'Professional', hasImage: false, color: 'from-slate-600 to-slate-400' },
+  { id: 'tech-modern', name: 'Tech Modern', category: 'Modern', hasImage: false, color: 'from-blue-500 to-cyan-400' },
+  { id: 'minimal-clean', name: 'Minimal Clean', category: 'Minimal', hasImage: false, color: 'from-gray-400 to-gray-300' },
+  { id: 'creative-pro', name: 'Creative Pro', category: 'Creative', hasImage: false, color: 'from-indigo-500 to-purple-400' },
 ];
 
 const features = [
@@ -85,25 +85,46 @@ const steps = [
 
 const testimonials = [
   {
-    name: 'Amina Hassan',
-    role: 'Marketing Manager',
+    name: 'Madeline Sirikwa',
+    role: 'Project Coordinator',
     location: 'Dar es Salaam',
-    text: 'CV Chap Chap helped me land my dream job! The templates are modern and the process was so simple.',
-    avatar: 'AH',
+    text: 'Got a call for an interview and they needed my CV urgently. Made one in under 3 minutes and sent it right away. Got the job!',
+    avatar: 'MS',
   },
   {
-    name: 'Joseph Kimaro',
-    role: 'Software Developer',
-    location: 'Arusha',
-    text: 'Finally, a CV builder that understands the Tanzanian market. M-Pesa payment made it so convenient!',
-    avatar: 'JK',
-  },
-  {
-    name: 'Grace Mwangi',
-    role: 'Finance Analyst',
+    name: 'Lucy Mdema',
+    role: 'Sales Executive',
     location: 'Mwanza',
-    text: 'I created my CV in just 10 minutes. The AI suggestions were incredibly helpful for my experience section.',
-    avatar: 'GM',
+    text: 'I was applying for a gig that needed verification with a proper CV. CV Chap Chap saved me - created a professional CV so fast!',
+    avatar: 'LM',
+  },
+  {
+    name: 'Jackson Lazaro',
+    role: 'IT Support Technician',
+    location: 'Arusha',
+    text: 'Needed to update my CV quickly for a new opportunity. The AI suggestions made it look so professional in just 3 minutes!',
+    avatar: 'JL',
+  },
+  {
+    name: 'Mohammed Salim',
+    role: 'Accountant',
+    location: 'Dodoma',
+    text: 'A recruiter asked for my CV on the spot. Used CV Chap Chap on my phone and had a beautiful CV ready before the call ended!',
+    avatar: 'MS',
+  },
+  {
+    name: 'Nassor Chongo',
+    role: 'Operations Manager',
+    location: 'Tanga',
+    text: 'The speed is unbelievable! I was skeptical about 3 minutes but it actually works. Professional CV, ready to send instantly.',
+    avatar: 'NC',
+  },
+  {
+    name: 'Julius Msuya',
+    role: 'Civil Engineer',
+    location: 'Morogoro',
+    text: 'Last minute job application and needed a better CV. CV Chap Chap delivered in under 3 minutes. Now I recommend it to everyone!',
+    avatar: 'JM',
   },
 ];
 
@@ -347,28 +368,9 @@ export default function HomePage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="relative py-12 bg-gradient-to-r from-cv-blue-600 to-cv-blue-500 overflow-hidden">
+      <section className="relative py-12 bg-gradient-to-r from-cv-blue-600 to-cv-blue-500">
         <div className="max-w-7xl mx-auto px-6">
-          {/* Mobile: Horizontal scrolling */}
-          <div className="md:hidden overflow-x-auto scrollbar-hide -mx-6 px-6">
-            <motion.div 
-              className="flex gap-8 min-w-max"
-              animate={{ x: [0, -200, 0] }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            >
-              {[...stats, ...stats].map((stat, index) => (
-                <div key={`${stat.label}-${index}`} className="text-center flex-shrink-0 px-4">
-                  <stat.icon className="w-7 h-7 text-white/80 mx-auto mb-2" />
-                  <div className="font-display text-2xl font-bold text-white mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-cv-blue-100 text-xs whitespace-nowrap">{stat.label}</div>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-          {/* Desktop: Grid */}
-          <div className="hidden md:grid md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -378,24 +380,25 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 className="text-center"
               >
-                <stat.icon className="w-8 h-8 text-white/80 mx-auto mb-2" />
-                <div className="font-display text-3xl md:text-4xl font-bold text-white mb-1">
+                <stat.icon className="w-7 h-7 md:w-8 md:h-8 text-white/80 mx-auto mb-2" />
+                <div className="font-display text-2xl md:text-4xl font-bold text-white mb-1">
                   {stat.value}
                 </div>
-                <div className="text-cv-blue-100 text-sm">{stat.label}</div>
+                <div className="text-cv-blue-100 text-xs md:text-sm">{stat.label}</div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Trusted By Section */}
-      <section className="py-12 bg-gray-50">
+      {/* Trusted By Section - with scrolling logos */}
+      <section className="py-12 bg-gray-50 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
           <p className="text-center text-gray-500 text-sm mb-8">
             Professionals from these companies have created CVs with us
           </p>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
+          {/* Desktop: Static */}
+          <div className="hidden md:flex flex-wrap justify-center items-center gap-8 md:gap-16">
             {trustedCompanies.map((company) => (
               <div key={company.name} className="hover:scale-110 transition-all">
                 <Image
@@ -407,6 +410,26 @@ export default function HomePage() {
                 />
               </div>
             ))}
+          </div>
+          {/* Mobile: Scrolling */}
+          <div className="md:hidden -mx-6">
+            <motion.div 
+              className="flex gap-12 items-center"
+              animate={{ x: [0, -600] }}
+              transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            >
+              {[...trustedCompanies, ...trustedCompanies].map((company, index) => (
+                <div key={`${company.name}-${index}`} className="flex-shrink-0">
+                  <Image
+                    src={company.logo}
+                    alt={company.name}
+                    width={80}
+                    height={32}
+                    className="h-8 w-auto object-contain"
+                  />
+                </div>
+              ))}
+            </motion.div>
           </div>
         </div>
       </section>
@@ -540,33 +563,104 @@ export default function HomePage() {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {templates.map((template, index) => (
+          {/* Desktop: Grid of 6 */}
+          <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {homeTemplates.map((template, index) => (
               <motion.div
-                key={template.name}
+                key={template.id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="group cursor-pointer"
               >
-                <div className={`aspect-[3/4] bg-gradient-to-br ${template.color} rounded-xl shadow-lg group-hover:shadow-xl group-hover:-translate-y-2 transition-all relative overflow-hidden`}>
-                  <div className="absolute inset-2 bg-white rounded-lg p-3">
-                    <div className="w-8 h-8 bg-gray-200 rounded-full mb-2" />
-                    <div className="space-y-1">
-                      <div className="h-2 bg-gray-300 rounded w-3/4" />
-                      <div className="h-2 bg-gray-200 rounded w-1/2" />
-                    </div>
-                    <div className="mt-3 space-y-1">
-                      <div className="h-1.5 bg-gray-100 rounded" />
-                      <div className="h-1.5 bg-gray-100 rounded w-5/6" />
+                <Link href="/template" className="group block cursor-pointer">
+                  <div className="aspect-[3/4] rounded-xl shadow-lg group-hover:shadow-2xl group-hover:-translate-y-2 transition-all relative overflow-hidden bg-white border border-gray-100">
+                    {template.hasImage ? (
+                      <Image
+                        src={template.previewImage!}
+                        alt={template.name}
+                        fill
+                        className="object-cover object-top"
+                      />
+                    ) : (
+                      <div className={`absolute inset-0 bg-gradient-to-br ${template.color}`}>
+                        <div className="absolute inset-2 bg-white rounded-lg p-3">
+                          <div className="w-8 h-8 bg-gray-200 rounded-full mb-2" />
+                          <div className="space-y-1">
+                            <div className="h-2 bg-gray-300 rounded w-3/4" />
+                            <div className="h-2 bg-gray-200 rounded w-1/2" />
+                          </div>
+                          <div className="mt-3 space-y-1">
+                            <div className="h-1.5 bg-gray-100 rounded" />
+                            <div className="h-1.5 bg-gray-100 rounded w-5/6" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="px-4 py-2 bg-white text-gray-900 rounded-lg font-semibold text-sm shadow-lg">
+                        Use This Template
+                      </span>
                     </div>
                   </div>
-                </div>
-                <p className="mt-2 text-sm font-medium text-gray-900 text-center">{template.name}</p>
-                <p className="text-xs text-gray-500 text-center">{template.category}</p>
+                  <p className="mt-3 text-sm font-semibold text-gray-900 text-center">{template.name}</p>
+                  <p className="text-xs text-gray-500 text-center">{template.category}</p>
+                </Link>
               </motion.div>
             ))}
+          </div>
+
+          {/* Mobile: Horizontal scroll - one at a time */}
+          <div className="md:hidden -mx-6 px-6">
+            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4">
+              {homeTemplates.map((template, index) => (
+                <motion.div
+                  key={template.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="flex-shrink-0 w-[70vw] snap-center"
+                >
+                  <Link href="/template" className="group block">
+                    <div className="aspect-[3/4] rounded-xl shadow-lg relative overflow-hidden bg-white border border-gray-100">
+                      {template.hasImage ? (
+                        <Image
+                          src={template.previewImage!}
+                          alt={template.name}
+                          fill
+                          className="object-cover object-top"
+                        />
+                      ) : (
+                        <div className={`absolute inset-0 bg-gradient-to-br ${template.color}`}>
+                          <div className="absolute inset-2 bg-white rounded-lg p-3">
+                            <div className="w-8 h-8 bg-gray-200 rounded-full mb-2" />
+                            <div className="space-y-1">
+                              <div className="h-2 bg-gray-300 rounded w-3/4" />
+                              <div className="h-2 bg-gray-200 rounded w-1/2" />
+                            </div>
+                            <div className="mt-3 space-y-1">
+                              <div className="h-1.5 bg-gray-100 rounded" />
+                              <div className="h-1.5 bg-gray-100 rounded w-5/6" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {/* Always visible on mobile */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-8">
+                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-900 rounded-lg font-semibold text-sm w-full justify-center">
+                          Use This Template
+                          <ArrowRight className="w-4 h-4" />
+                        </span>
+                      </div>
+                    </div>
+                    <p className="mt-3 text-base font-semibold text-gray-900 text-center">{template.name}</p>
+                    <p className="text-sm text-gray-500 text-center">{template.category}</p>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
           </div>
 
           <div className="text-center mt-12">
@@ -574,7 +668,7 @@ export default function HomePage() {
               href="/template"
               className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cv-blue-600 to-cv-blue-500 text-white font-semibold rounded-full shadow-lg shadow-cv-blue-500/40 hover:shadow-cv-blue-500/50 hover:-translate-y-0.5 transition-all"
             >
-              Browse All Templates
+              Browse All 35+ Templates
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -827,7 +921,7 @@ export default function HomePage() {
               <h4 className="font-display font-semibold mb-4">Contact</h4>
               <ul className="space-y-3 text-gray-400">
                 <li>Dar es Salaam, Tanzania</li>
-                <li>info@cvchapchap.co.tz</li>
+                <li>info@cvchapchap.com</li>
                 <li>+255 xxx xxx xxx</li>
               </ul>
             </div>

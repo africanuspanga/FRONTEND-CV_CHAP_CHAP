@@ -26,12 +26,10 @@ const colorOptions = [
 
 function LiveTemplateCard({ 
   template, 
-  isSelected, 
   onSelect,
   previewColor,
 }: { 
   template: TemplateConfig; 
-  isSelected: boolean;
   onSelect: () => void;
   previewColor: string | null;
 }) {
@@ -56,9 +54,7 @@ function LiveTemplateCard({
 
   return (
     <div
-      className={`group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer ${
-        isSelected ? 'ring-2 ring-blue-500' : ''
-      }`}
+      className="group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer hover:-translate-y-1"
       onClick={onSelect}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -83,18 +79,14 @@ function LiveTemplateCard({
             colorOverride={previewColor}
           />
         </div>
-        
-        {isSelected && (
-          <div className="absolute top-2 left-2 bg-blue-500 rounded-full p-1 z-10">
-            <CheckCircle className="h-5 w-5 text-white" />
-          </div>
-        )}
 
-        <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity z-10 ${
+        {/* Hover overlay with button */}
+        <div className={`absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex flex-col items-center justify-end pb-6 transition-opacity z-10 ${
           isHovered ? 'opacity-100' : 'opacity-0'
         }`}>
-          <span className="px-4 py-2 bg-white text-gray-900 rounded-lg font-medium text-sm">
+          <span className="px-6 py-3 bg-white text-gray-900 rounded-xl font-semibold text-sm shadow-lg flex items-center gap-2">
             Use This Template
+            <ArrowRight className="w-4 h-4" />
           </span>
         </div>
 
@@ -145,9 +137,6 @@ function TemplatePageContent() {
   const handleSelectTemplate = (id: string) => {
     setTemplateId(id);
     setSelectedColor(previewColor);
-  };
-
-  const handleContinue = () => {
     if (isUploadMode) {
       router.push('/upload');
     } else {
@@ -246,7 +235,6 @@ function TemplatePageContent() {
             <LiveTemplateCard
               key={template.id}
               template={template}
-              isSelected={templateId === template.id}
               onSelect={() => handleSelectTemplate(template.id)}
               previewColor={previewColor}
             />
@@ -301,17 +289,6 @@ function TemplatePageContent() {
           </div>
         )}
 
-        <div className="flex justify-center sticky bottom-4">
-          <Button 
-            size="lg" 
-            onClick={handleContinue}
-            disabled={!templateId}
-            className="px-8 shadow-xl bg-gradient-to-r from-cv-blue-600 to-cv-blue-500 hover:from-cv-blue-700 hover:to-cv-blue-600 text-white font-semibold py-6 text-lg rounded-xl"
-          >
-            {isUploadMode ? 'Continue to Upload' : 'Use This Template'}
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </div>
       </div>
     </div>
   );
