@@ -15,10 +15,8 @@ import {
   Menu,
   X,
   Star,
-  Users,
   Clock,
   Award,
-  CreditCard,
   Download
 } from "lucide-react";
 
@@ -49,7 +47,7 @@ const features = [
   },
   {
     icon: FileText,
-    title: '21+ Templates',
+    title: '35+ Templates',
     subtitle: 'Professional Designs',
     description: 'Recruiter-approved templates designed for the East African job market.',
   },
@@ -58,12 +56,6 @@ const features = [
     title: 'AI-Powered',
     subtitle: 'Smart Suggestions',
     description: 'Get intelligent content suggestions tailored to your industry and role.',
-  },
-  {
-    icon: CreditCard,
-    title: 'M-Pesa Ready',
-    subtitle: 'Easy Payment',
-    description: 'Pay conveniently with M-Pesa. Download your CV instantly after payment.',
   },
   {
     icon: CheckCircle,
@@ -77,13 +69,18 @@ const features = [
     subtitle: 'Professional Format',
     description: 'Download high-quality PDFs ready to send to any employer.',
   },
+  {
+    icon: Smartphone,
+    title: 'Mobile First',
+    subtitle: 'Create Anywhere',
+    description: 'Build your CV from your phone, tablet, or computer - anytime, anywhere.',
+  },
 ];
 
 const steps = [
-  { number: '01', title: 'Choose Template', description: 'Pick from 21+ professional designs' },
-  { number: '02', title: 'Fill Your Details', description: 'AI helps you write compelling content' },
-  { number: '03', title: 'Pay via M-Pesa', description: 'Quick, secure mobile payment' },
-  { number: '04', title: 'Download PDF', description: 'Get your CV instantly' },
+  { number: '01', title: 'Choose Template', description: 'Pick from 35+ professional designs', icon: FileText },
+  { number: '02', title: 'Fill Your Details', description: 'AI helps you write compelling content', icon: Bot },
+  { number: '03', title: 'Download & Apply', description: 'Get your professional CV instantly', icon: Download },
 ];
 
 const testimonials = [
@@ -112,8 +109,8 @@ const testimonials = [
 
 const stats = [
   { value: '50,000+', label: 'CVs Created', icon: FileText },
-  { value: '21', label: 'Templates', icon: Star },
-  { value: '5 min', label: 'Average Time', icon: Clock },
+  { value: '35', label: 'Templates', icon: Star },
+  { value: '3 min', label: 'Average Time', icon: Clock },
   { value: '4.9/5', label: 'User Rating', icon: Award },
 ];
 
@@ -257,21 +254,20 @@ export default function HomePage() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-cv-blue-200 mb-6">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-sm font-medium text-gray-700">Made for Tanzania</span>
+                <span className="text-sm font-medium text-gray-700">Made In Tanzania</span>
                 <span className="text-xs">🇹🇿</span>
               </div>
 
               <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Create Your 
+                Create Your CV
                 <span className="block bg-gradient-to-r from-cv-blue-700 via-cv-blue-500 to-cv-blue-400 bg-clip-text text-transparent">
-                  Professional CV
+                  in 3 Minutes
                 </span>
-                in Minutes
               </h1>
 
               <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-xl">
                 Build a stunning CV that gets you noticed. AI-powered content suggestions, 
-                professional templates, and instant PDF download. Pay with M-Pesa.
+                35+ professional templates, and instant PDF download.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -290,15 +286,19 @@ export default function HomePage() {
                 </a>
               </div>
 
-              {/* Trust badges */}
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <div className="flex items-center gap-1">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span>No signup required</span>
+              {/* Success stats */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div className="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full border border-green-200">
+                  <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  <span className="text-sm font-semibold text-green-700">30% higher chance of getting a job*</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span>Free to create</span>
+                <div className="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full border border-green-200">
+                  <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  <span className="text-sm font-semibold text-green-700">42% higher response rate from recruiters*</span>
                 </div>
               </div>
             </motion.div>
@@ -347,9 +347,28 @@ export default function HomePage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="relative py-12 bg-gradient-to-r from-cv-blue-600 to-cv-blue-500">
+      <section className="relative py-12 bg-gradient-to-r from-cv-blue-600 to-cv-blue-500 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {/* Mobile: Horizontal scrolling */}
+          <div className="md:hidden overflow-x-auto scrollbar-hide -mx-6 px-6">
+            <motion.div 
+              className="flex gap-8 min-w-max"
+              animate={{ x: [0, -200, 0] }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            >
+              {[...stats, ...stats].map((stat, index) => (
+                <div key={`${stat.label}-${index}`} className="text-center flex-shrink-0 px-4">
+                  <stat.icon className="w-7 h-7 text-white/80 mx-auto mb-2" />
+                  <div className="font-display text-2xl font-bold text-white mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-cv-blue-100 text-xs whitespace-nowrap">{stat.label}</div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+          {/* Desktop: Grid */}
+          <div className="hidden md:grid md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -393,7 +412,7 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-20 bg-white">
+      <section id="how-it-works" className="py-20 bg-gradient-to-b from-white to-cv-blue-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <motion.div
@@ -403,39 +422,54 @@ export default function HomePage() {
               viewport={{ once: true }}
             >
               <span className="inline-block px-4 py-2 bg-cv-blue-100 text-cv-blue-700 text-sm font-medium rounded-full mb-4">
-                Simple Process
+                Simple & Fast
               </span>
               <h2 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Create Your CV in 4 Easy Steps
+                Create Your CV in 3 Easy Steps
               </h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Our streamlined process makes it quick and easy to create a professional CV
+                Our AI-powered platform makes it quick and effortless to create a professional CV
               </p>
             </motion.div>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {steps.map((step, index) => (
               <motion.div
                 key={step.number}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.5, delay: index * 0.15 }}
                 viewport={{ once: true }}
-                className="relative text-center"
+                className="relative"
               >
                 {/* Connector line */}
                 {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gradient-to-r from-cv-blue-400 to-cv-blue-200" />
+                  <div className="hidden md:block absolute top-12 left-1/2 w-full h-1 bg-gradient-to-r from-cv-blue-400 via-cyan-400 to-cv-blue-200 rounded-full" />
                 )}
                 
-                <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-cv-blue-500 to-cyan-400 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cv-blue-500/30">
-                  <span className="font-display font-bold text-xl">{step.number}</span>
+                <div className="relative bg-white rounded-2xl p-6 shadow-xl shadow-cv-blue-100/50 border border-cv-blue-100 text-center hover:shadow-2xl hover:-translate-y-1 transition-all">
+                  <div className="relative z-10 w-20 h-20 bg-gradient-to-br from-cv-blue-500 to-cyan-400 text-white rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-cv-blue-500/30">
+                    <step.icon className="w-10 h-10" />
+                  </div>
+                  <div className="absolute top-4 right-4 w-8 h-8 bg-cv-blue-100 text-cv-blue-600 rounded-full flex items-center justify-center font-bold text-sm">
+                    {step.number}
+                  </div>
+                  <h3 className="font-display font-bold text-xl text-gray-900 mb-2">{step.title}</h3>
+                  <p className="text-gray-600">{step.description}</p>
                 </div>
-                <h3 className="font-display font-semibold text-lg text-gray-900 mb-2">{step.title}</h3>
-                <p className="text-gray-600 text-sm">{step.description}</p>
               </motion.div>
             ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <Link 
+              href="/create"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cv-blue-600 to-cv-blue-500 text-white font-semibold rounded-full shadow-lg shadow-cv-blue-500/40 hover:shadow-cv-blue-500/50 hover:-translate-y-0.5 transition-all text-lg"
+            >
+              Start Creating Now
+              <ArrowRight className="w-5 h-5" />
+            </Link>
           </div>
         </div>
       </section>
@@ -498,7 +532,7 @@ export default function HomePage() {
                 Templates
               </span>
               <h2 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                21+ Professional Templates
+                35+ Professional Templates
               </h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
                 Choose from our collection of recruiter-approved designs
