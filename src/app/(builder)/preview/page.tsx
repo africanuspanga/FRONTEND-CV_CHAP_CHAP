@@ -5,9 +5,8 @@ import { useCVStore } from '@/stores/cv-store';
 import { TemplatePreview } from '@/components/templates/preview';
 import { useAuth } from '@/lib/auth/context';
 import { TEMPLATES } from '@/types/templates';
-import { useState, useEffect } from 'react';
-// TEMPLATES used in Change Template modal
-import { ArrowLeft, Edit2, X, Check, Pencil, GripVertical } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { ArrowLeft, Edit2, X, Check, Pencil, GripVertical, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -27,25 +26,25 @@ export default function PreviewPage() {
   const router = useRouter();
   const { cvData, templateId, selectedColor, setTemplateId, setSelectedColor, setCurrentStep } = useCVStore();
   const { user } = useAuth();
+  const containerRef = useRef<HTMLDivElement>(null);
   
   const [showChangeTemplate, setShowChangeTemplate] = useState(false);
   const [showEditResume, setShowEditResume] = useState(false);
-  const [scale, setScale] = useState(0.45);
+  const [scale, setScale] = useState(0.5);
 
   useEffect(() => {
-    const calculateScale = () => {
-      const screenWidth = window.innerWidth;
-      const cvWidth = 794;
-      const padding = 32;
-      const availableWidth = screenWidth - padding;
-      let newScale = availableWidth / cvWidth;
-      newScale = Math.max(0.35, Math.min(0.65, newScale));
-      setScale(newScale);
+    const updateScale = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const cvWidth = 794;
+        const newScale = containerWidth / cvWidth;
+        setScale(Math.min(newScale, 0.6));
+      }
     };
     
-    calculateScale();
-    window.addEventListener('resize', calculateScale);
-    return () => window.removeEventListener('resize', calculateScale);
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
   }, []);
 
   const handleSaveAndNext = () => {
@@ -72,17 +71,19 @@ export default function PreviewPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#1e3a5f] flex flex-col">
+    <div className="min-h-screen bg-[#e8edf2] flex flex-col">
       {/* Header */}
-      <div className="px-4 pt-4 pb-2">
-        <button 
-          onClick={() => router.back()}
-          className="text-white text-2xl mb-2"
-        >
-          <ArrowLeft className="h-6 w-6" />
-        </button>
+      <div className="bg-[#e8edf2] px-4 pt-4 pb-3 flex-shrink-0">
+        <div className="flex items-center mb-4">
+          <button 
+            onClick={() => router.back()}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            <ChevronLeft className="h-7 w-7" />
+          </button>
+        </div>
         
-        <h1 className="text-white text-2xl font-bold text-center italic mb-4">
+        <h1 className="text-gray-900 text-2xl font-bold text-center italic font-serif mb-5">
           Finalize Resume
         </h1>
 
@@ -90,50 +91,68 @@ export default function PreviewPage() {
         <div className="flex justify-center gap-3 mb-4">
           <button
             onClick={() => setShowChangeTemplate(true)}
-            className="flex items-center gap-2 bg-[#2d4a6f] text-white px-4 py-2 rounded-full text-sm"
+            className="flex items-center gap-2 bg-[#0d9488] text-white px-5 py-2.5 rounded-full text-sm font-medium shadow-md hover:bg-[#0f766e] transition-colors"
           >
             <Pencil className="h-4 w-4" /> Change Template
           </button>
           <button
             onClick={() => setShowEditResume(true)}
-            className="flex items-center gap-2 bg-white text-gray-800 px-4 py-2 rounded-full text-sm"
+            className="flex items-center gap-2 bg-white text-gray-700 px-5 py-2.5 rounded-full text-sm font-medium shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
           >
             <Edit2 className="h-4 w-4" /> Edit Resume
           </button>
         </div>
       </div>
 
-      {/* CV Preview - Responsive */}
-      <div className="flex-1 bg-gray-100 rounded-t-3xl overflow-hidden">
-        <div className="h-full overflow-auto p-4 flex justify-center">
+      {/* CV Preview Container - Scrollable */}
+      <div className="flex-1 flex justify-center px-4 overflow-hidden min-h-0">
+        <div 
+          ref={containerRef}
+          className="relative w-full max-w-[400px] h-full"
+        >
+          {/* Phone-like card container */}
           <div 
-            className="bg-white shadow-2xl rounded-lg overflow-hidden"
+            className="bg-white rounded-2xl shadow-2xl overflow-hidden h-full"
             style={{
-              transform: `scale(${scale})`,
-              transformOrigin: 'top center',
-              width: '794px',
-              minHeight: '1123px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
             }}
           >
-            <TemplatePreview
-              templateId={templateId}
-              data={cvData}
-              colorOverride={selectedColor}
-              scale={1}
-            />
+            {/* Scrollable CV content */}
+            <div className="h-full overflow-y-auto overflow-x-hidden">
+              <div 
+                className="origin-top-left"
+                style={{
+                  width: '794px',
+                  transform: `scale(${scale})`,
+                  transformOrigin: 'top left',
+                }}
+              >
+                <TemplatePreview
+                  templateId={templateId}
+                  data={cvData}
+                  colorOverride={selectedColor}
+                  scale={1}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Button */}
-      <div className="bg-gray-100 p-4">
-        <button
-          onClick={handleSaveAndNext}
-          className="w-full bg-blue-500 text-white text-lg font-semibold py-4 rounded-xl"
-        >
-          Save & Next
-        </button>
+      {/* Bottom Button - Fixed */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#e8edf2] via-[#e8edf2] to-transparent z-10">
+        <div className="max-w-[400px] mx-auto">
+          <button
+            onClick={handleSaveAndNext}
+            className="w-full bg-[#3b5bdb] hover:bg-[#364fc7] text-white text-lg font-semibold py-4 rounded-2xl shadow-lg transition-colors"
+          >
+            Save & Next
+          </button>
+        </div>
       </div>
+      
+      {/* Spacer for fixed button */}
+      <div className="h-20 flex-shrink-0" />
 
       {/* Change Template Modal */}
       <AnimatePresence>
