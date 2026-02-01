@@ -1,0 +1,1041 @@
+I understand the frustration. Let me provide a complete, foolproof solution for all three critical items. I'll make it as simple as possible for your developer.
+
+---
+
+# CRITICAL FIX #1: Preview Page (The One That Keeps Failing)
+
+The issue is the CV is not scaling/centering properly. Here's a **bulletproof** solution:
+
+## **`src/app/(builder)/preview/page.tsx`** - COMPLETE REPLACEMENT
+
+```tsx
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useCVStore } from '@/stores/cv-store';
+import { TemplatePreview } from '@/components/templates/preview';
+import { useAuth } from '@/lib/auth/context';
+
+export default function PreviewPage() {
+  const router = useRouter();
+  const { cvData, templateId, selectedColor } = useCVStore();
+  const { user } = useAuth();
+
+  const handleSaveAndNext = () => {
+    if (user) {
+      // User is logged in, go to payment
+      router.push('/payment');
+    } else {
+      // User not logged in, go to auth first
+      router.push('/auth/register?redirect=/payment');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#1e3a5f] flex flex-col">
+      {/* Header */}
+      <div className="px-4 pt-4 pb-2">
+        <button 
+          onClick={() => router.back()}
+          className="text-white text-2xl mb-2"
+        >
+          ←
+        </button>
+        
+        <h1 className="text-white text-2xl font-bold text-center italic mb-4">
+          Finalize Resume
+        </h1>
+
+        {/* Action Buttons */}
+        <div className="flex justify-center gap-3 mb-4">
+          <button
+            onClick={() => router.push('/template?edit=true')}
+            className="flex items-center gap-2 bg-[#2d4a6f] text-white px-4 py-2 rounded-full text-sm"
+          >
+            <span>✏️</span> Change Template
+          </button>
+          <button
+            onClick={() => router.push('/personal')}
+            className="flex items-center gap-2 bg-white text-gray-800 px-4 py-2 rounded-full text-sm"
+          >
+            <span>✏️</span> Edit Resume
+          </button>
+        </div>
+      </div>
+
+      {/* CV Preview Container - THIS IS THE FIX */}
+      <div className="flex-1 bg-gray-200 rounded-t-3xl overflow-hidden flex flex-col">
+        {/* Scrollable CV Area */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4">
+          {/* Centering Wrapper */}
+          <div className="flex justify-center">
+            {/* 
+              IMPORTANT: This container has a fixed width that matches 
+              the scaled CV width. This prevents overflow issues.
+            */}
+            <div 
+              style={{
+                width: '100%',
+                maxWidth: '400px', // Scaled width on mobile
+              }}
+            >
+              {/* 
+                CV Scaling Container
+                - transform-origin MUST be 'top center' for centering
+                - Scale is calculated: 400px / 794px ≈ 0.5
+              */}
+              <div
+                style={{
+                  transform: 'scale(0.5)',
+                  transformOrigin: 'top center',
+                  width: '210mm', // A4 width
+                  marginLeft: 'calc((100% - 210mm) / 2)', // Center the unscaled element
+                }}
+              >
+                <div className="bg-white shadow-xl">
+                  <TemplatePreview
+                    templateId={templateId}
+                    data={cvData}
+                    colorOverride={selectedColor}
+                    scale={1}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Button - Fixed */}
+        <div className="p-4 bg-gray-200">
+          <button
+            onClick={handleSaveAndNext}
+            className="w-full bg-[#3b9df8] text-white text-lg font-semibold py-4 rounded-xl"
+          >
+            Save & Next
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## EVEN SIMPLER VERSION (If above still fails)
+
+If the developer is still having issues, use this **ultra-simple** approach with an iframe-like container:
+
+```tsx
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useCVStore } from '@/stores/cv-store';
+import { TemplatePreview } from '@/components/templates/preview';
+import { useAuth } from '@/lib/auth/context';
+
+export default function PreviewPage() {
+  const router = useRouter();
+  const { cvData, templateId, selectedColor } = useCVStore();
+  const { user } = useAuth();
+
+  const handleSaveAndNext = () => {
+    router.push(user ? '/payment' : '/auth/register?redirect=/payment');
+  };
+
+  return (
+    <div className="min-h-screen bg-[#1e3a5f] flex flex-col">
+      {/* Header */}
+      <div className="p-4">
+        <button onClick={() => router.back()} className="text-white text-2xl">←</button>
+        <h1 className="text-white text-2xl font-bold text-center italic my-3">
+          Finalize Resume
+        </h1>
+        <div className="flex justify-center gap-3">
+          <button
+            onClick={() => router.push('/template?edit=true')}
+            className="bg-[#2d4a6f] text-white px-4 py-2 rounded-full text-sm"
+          >
+            ✏️ Change Template
+          </button>
+          <button
+            onClick={() => router.push('/personal')}
+            className="bg-white text-gray-800 px-4 py-2 rounded-full text-sm"
+          >
+            ✏️ Edit Resume
+          </button>
+        </div>
+      </div>
+
+      {/* CV Preview - SIMPLE APPROACH */}
+      <div className="flex-1 bg-gray-100 rounded-t-3xl overflow-hidden">
+        <div className="h-full overflow-auto p-4 flex justify-center">
+          {/* Fixed-size preview box */}
+          <div 
+            className="bg-white shadow-2xl rounded-lg overflow-hidden"
+            style={{ 
+              width: '340px',  // Fixed mobile width
+              height: '480px', // Fixed mobile height (A4 ratio)
+            }}
+          >
+            {/* Scale CV to fit the box */}
+            <div 
+              style={{
+                transform: 'scale(0.428)', // 340px / 794px
+                transformOrigin: 'top left',
+                width: '794px',  // A4 width in px
+                height: '1123px', // A4 height in px
+              }}
+            >
+              <TemplatePreview
+                templateId={templateId}
+                data={cvData}
+                colorOverride={selectedColor}
+                scale={1}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Button */}
+      <div className="bg-gray-100 p-4">
+        <button
+          onClick={handleSaveAndNext}
+          className="w-full bg-blue-500 text-white text-lg font-semibold py-4 rounded-xl"
+        >
+          Save & Next
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+# CRITICAL FIX #2: Complete Auth Flow
+
+## File Structure to Create:
+
+```
+src/
+├── lib/
+│   └── auth/
+│       └── context.tsx       ← Auth provider
+├── app/
+│   ├── auth/
+│   │   ├── login/
+│   │   │   └── page.tsx      ← Login page
+│   │   ├── register/
+│   │   │   └── page.tsx      ← Register page
+│   │   └── callback/
+│   │       └── route.ts      ← Email confirmation
+│   └── layout.tsx            ← Wrap with AuthProvider
+```
+
+## **`src/lib/auth/context.tsx`**
+
+```tsx
+'use client';
+
+import { createContext, useContext, useEffect, useState } from 'react';
+import { User } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
+
+interface AuthContextType {
+  user: User | null;
+  isLoading: boolean;
+  signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    // Listen for changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signUp = async (email: string, password: string, name: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: name } },
+    });
+    return { error: error as Error | null };
+  };
+
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error as Error | null };
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, isLoading, signUp, signIn, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  return context;
+}
+```
+
+## **`src/app/auth/register/page.tsx`**
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { useAuth } from '@/lib/auth/context';
+
+export default function RegisterPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect') || '/payment';
+  const { signUp } = useAuth();
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const { error } = await signUp(email, password, name);
+    
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    } else {
+      router.push(redirect);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-600 to-blue-800 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-xl">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Create Account</h1>
+          <p className="text-gray-600 mt-1">Save your CV and download anytime</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="John Doe"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Min 6 characters"
+              minLength={6}
+              required
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading ? 'Creating Account...' : 'Create Account'}
+          </button>
+        </form>
+
+        <p className="text-center text-gray-600 mt-6">
+          Already have an account?{' '}
+          <Link href={`/auth/login?redirect=${redirect}`} className="text-blue-600 font-medium">
+            Sign In
+          </Link>
+        </p>
+
+        <div className="mt-6 pt-6 border-t text-center">
+          <button
+            onClick={() => router.push(redirect)}
+            className="text-gray-500 text-sm hover:text-gray-700"
+          >
+            Skip for now →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+## **`src/app/auth/login/page.tsx`**
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { useAuth } from '@/lib/auth/context';
+
+export default function LoginPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect') || '/dashboard';
+  const { signIn } = useAuth();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const { error } = await signIn(email, password);
+    
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    } else {
+      router.push(redirect);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-600 to-blue-800 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-xl">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
+          <p className="text-gray-600 mt-1">Sign in to access your CVs</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Your password"
+              required
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading ? 'Signing In...' : 'Sign In'}
+          </button>
+        </form>
+
+        <p className="text-center text-gray-600 mt-6">
+          Don't have an account?{' '}
+          <Link href={`/auth/register?redirect=${redirect}`} className="text-blue-600 font-medium">
+            Sign Up
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
+```
+
+## **Update `src/app/layout.tsx`**
+
+```tsx
+import { AuthProvider } from '@/lib/auth/context';
+import './globals.css';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+---
+
+# CRITICAL FIX #3: Payment Page
+
+## **`src/app/payment/page.tsx`**
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCVStore } from '@/stores/cv-store';
+import { useAuth } from '@/lib/auth/context';
+
+export default function PaymentPage() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const { cvData, templateId } = useCVStore();
+  
+  const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'processing' | 'waiting' | 'success' | 'error'>('idle');
+  const [error, setError] = useState('');
+
+  const handlePayment = async () => {
+    if (!phone || phone.length < 10) {
+      setError('Please enter a valid phone number');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setStatus('processing');
+
+    try {
+      // 1. Create payment order
+      const initRes = await fetch('/api/payment/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cvData,
+          templateId,
+          phone: phone.startsWith('0') ? `255${phone.slice(1)}` : phone,
+          email: user?.email || '',
+          name: `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`,
+        }),
+      });
+
+      const initData = await initRes.json();
+      if (!initRes.ok) throw new Error(initData.error);
+
+      // 2. Trigger USSD push
+      setStatus('waiting');
+      
+      const pushRes = await fetch('/api/payment/push-ussd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: initData.orderId,
+          msisdn: initData.msisdn,
+        }),
+      });
+
+      const pushData = await pushRes.json();
+      if (!pushData.success) throw new Error(pushData.message);
+
+      // 3. Poll for payment status
+      const pollPayment = async (attempts = 0): Promise<boolean> => {
+        if (attempts > 60) return false; // 3 minutes timeout
+
+        const statusRes = await fetch(`/api/payment/status?orderId=${initData.orderId}`);
+        const statusData = await statusRes.json();
+
+        if (statusData.status === 'completed') {
+          return true;
+        } else if (statusData.status === 'failed' || statusData.status === 'cancelled') {
+          return false;
+        }
+
+        // Wait 3 seconds and try again
+        await new Promise(r => setTimeout(r, 3000));
+        return pollPayment(attempts + 1);
+      };
+
+      const success = await pollPayment();
+
+      if (success) {
+        setStatus('success');
+        // Download PDF
+        setTimeout(() => {
+          window.location.href = `/api/pdf/generate?cvId=${initData.cvId}`;
+        }, 1500);
+      } else {
+        throw new Error('Payment was not completed');
+      }
+
+    } catch (err) {
+      setStatus('error');
+      setError(err instanceof Error ? err.message : 'Payment failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+        <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">
+          Download Your CV
+        </h1>
+        <p className="text-center text-gray-600 mb-6">
+          Complete payment to get your professional CV
+        </p>
+
+        {/* Price */}
+        <div className="bg-green-50 rounded-xl p-4 text-center mb-6">
+          <p className="text-sm text-green-700">Total Amount</p>
+          <p className="text-3xl font-bold text-green-600">TZS 5,000</p>
+        </div>
+
+        {status === 'idle' && (
+          <>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                M-Pesa / Airtel Money Number
+              </label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="0712 345 678"
+                className="w-full px-4 py-3 border rounded-lg text-lg focus:ring-2 focus:ring-green-500 outline-none"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                You'll receive a USSD prompt to confirm payment
+              </p>
+            </div>
+
+            {error && (
+              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">
+                {error}
+              </div>
+            )}
+
+            <button
+              onClick={handlePayment}
+              disabled={loading}
+              className="w-full bg-green-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-green-700 disabled:opacity-50"
+            >
+              Pay with Mobile Money
+            </button>
+          </>
+        )}
+
+        {status === 'processing' && (
+          <div className="text-center py-8">
+            <div className="animate-spin w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full mx-auto mb-4" />
+            <p className="text-lg font-medium">Creating payment...</p>
+          </div>
+        )}
+
+        {status === 'waiting' && (
+          <div className="text-center py-8">
+            <div className="animate-pulse text-6xl mb-4">📱</div>
+            <p className="text-lg font-bold text-gray-900 mb-2">Check your phone!</p>
+            <p className="text-gray-600">Enter your M-Pesa PIN to complete payment</p>
+            <div className="mt-4">
+              <div className="animate-spin w-6 h-6 border-2 border-green-600 border-t-transparent rounded-full mx-auto" />
+            </div>
+          </div>
+        )}
+
+        {status === 'success' && (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">✓</span>
+            </div>
+            <p className="text-lg font-bold text-green-600 mb-2">Payment Successful!</p>
+            <p className="text-gray-600">Your CV is downloading...</p>
+          </div>
+        )}
+
+        {status === 'error' && (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">✗</span>
+            </div>
+            <p className="text-lg font-bold text-red-600 mb-2">Payment Failed</p>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button
+              onClick={() => { setStatus('idle'); setError(''); }}
+              className="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        <p className="text-xs text-center text-gray-500 mt-6">
+          Secure payment powered by Selcom
+        </p>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+# CRITICAL FIX #4: PDF Generation
+
+## Install Dependencies
+
+```bash
+npm install @react-pdf/renderer
+```
+
+## **`src/app/api/pdf/generate/route.ts`**
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import ReactPDF from '@react-pdf/renderer';
+import { createClient } from '@/lib/supabase/server';
+import { KathleenPDF } from '@/components/templates/pdf/kathleen';
+import { CharlesPDF } from '@/components/templates/pdf/charles';
+// Import other PDF templates...
+
+const pdfTemplates: Record<string, any> = {
+  'kathleen': KathleenPDF,
+  'charles': CharlesPDF,
+  // Add all 21 templates...
+};
+
+export async function GET(request: NextRequest) {
+  const cvId = request.nextUrl.searchParams.get('cvId');
+  
+  if (!cvId) {
+    return NextResponse.json({ error: 'cvId required' }, { status: 400 });
+  }
+
+  try {
+    const supabase = await createClient();
+    
+    // Get CV data
+    const { data: cv, error } = await supabase
+      .from('cvs')
+      .select('*, payments(*)')
+      .eq('id', cvId)
+      .single();
+
+    if (error || !cv) {
+      return NextResponse.json({ error: 'CV not found' }, { status: 404 });
+    }
+
+    // Check payment status
+    const isPaid = cv.payments?.some((p: any) => p.status === 'completed');
+    if (!isPaid) {
+      return NextResponse.json({ error: 'Payment required' }, { status: 402 });
+    }
+
+    // Get template component
+    const Template = pdfTemplates[cv.template_id] || pdfTemplates['kathleen'];
+
+    // Generate PDF
+    const pdfStream = await ReactPDF.renderToStream(
+      <Template data={cv.data} />
+    );
+
+    // Convert stream to buffer
+    const chunks: Buffer[] = [];
+    for await (const chunk of pdfStream) {
+      chunks.push(Buffer.from(chunk));
+    }
+    const pdfBuffer = Buffer.concat(chunks);
+
+    // Update download count
+    await supabase
+      .from('cvs')
+      .update({ 
+        download_count: (cv.download_count || 0) + 1,
+        last_downloaded_at: new Date().toISOString(),
+      })
+      .eq('id', cvId);
+
+    // Return PDF
+    const fileName = `${cv.data.personalInfo.firstName}_${cv.data.personalInfo.lastName}_CV.pdf`;
+    
+    return new NextResponse(pdfBuffer, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+      },
+    });
+
+  } catch (err) {
+    console.error('PDF generation error:', err);
+    return NextResponse.json({ error: 'PDF generation failed' }, { status: 500 });
+  }
+}
+```
+
+## **`src/components/templates/pdf/kathleen.tsx`** (Example PDF Template)
+
+```tsx
+import React from 'react';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: 'row',
+    backgroundColor: '#f5f7fa',
+    fontFamily: 'Helvetica',
+  },
+  leftColumn: {
+    width: '35%',
+    padding: 30,
+    backgroundColor: '#f5f7fa',
+  },
+  rightColumn: {
+    width: '65%',
+    padding: 30,
+    backgroundColor: '#ffffff',
+  },
+  name: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1f2937',
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 11,
+    color: '#6b7280',
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#e5b94e',
+    marginBottom: 8,
+    paddingBottom: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5b94e',
+  },
+  text: {
+    fontSize: 9,
+    color: '#374151',
+    lineHeight: 1.5,
+  },
+  contactItem: {
+    fontSize: 9,
+    color: '#e5b94e',
+    marginBottom: 4,
+  },
+  jobTitle: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#1f2937',
+  },
+  company: {
+    fontSize: 9,
+    color: '#6b7280',
+    marginBottom: 4,
+  },
+  bullet: {
+    fontSize: 9,
+    color: '#374151',
+    marginBottom: 2,
+    paddingLeft: 10,
+  },
+  skillItem: {
+    fontSize: 9,
+    color: '#374151',
+    marginBottom: 2,
+  },
+});
+
+export function KathleenPDF({ data }: { data: any }) {
+  const { personalInfo, summary, workExperiences, education, skills } = data;
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Left Column */}
+        <View style={styles.leftColumn}>
+          <Text style={styles.name}>{personalInfo.firstName}</Text>
+          <Text style={styles.name}>{personalInfo.lastName}</Text>
+          <Text style={styles.title}>{personalInfo.professionalTitle}</Text>
+
+          {/* Contact */}
+          <View style={{ marginTop: 20 }}>
+            <Text style={{ ...styles.sectionTitle, color: '#374151', borderBottomColor: '#d1d5db' }}>
+              CONTACT
+            </Text>
+            <Text style={styles.contactItem}>{personalInfo.email}</Text>
+            <Text style={styles.contactItem}>{personalInfo.phone}</Text>
+            <Text style={styles.contactItem}>{personalInfo.location}</Text>
+          </View>
+
+          {/* Education */}
+          {education?.length > 0 && (
+            <View style={{ marginTop: 20 }}>
+              <Text style={{ ...styles.sectionTitle, color: '#374151', borderBottomColor: '#d1d5db' }}>
+                EDUCATION
+              </Text>
+              {education.map((edu: any, i: number) => (
+                <View key={i} style={{ marginBottom: 8 }}>
+                  <Text style={{ fontSize: 10, fontWeight: 'bold' }}>{edu.degree}</Text>
+                  <Text style={{ fontSize: 9, color: '#6b7280' }}>{edu.institution}</Text>
+                  <Text style={{ fontSize: 8, color: '#9ca3af' }}>{edu.graduationDate}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Skills */}
+          {skills?.length > 0 && (
+            <View style={{ marginTop: 20 }}>
+              <Text style={{ ...styles.sectionTitle, color: '#374151', borderBottomColor: '#d1d5db' }}>
+                SKILLS
+              </Text>
+              {skills.map((skill: any, i: number) => (
+                <Text key={i} style={styles.skillItem}>• {skill.name}</Text>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Right Column */}
+        <View style={styles.rightColumn}>
+          {/* Summary */}
+          {summary && (
+            <View style={{ marginBottom: 20 }}>
+              <Text style={styles.sectionTitle}>PROFESSIONAL SUMMARY</Text>
+              <Text style={styles.text}>{summary}</Text>
+            </View>
+          )}
+
+          {/* Experience */}
+          {workExperiences?.length > 0 && (
+            <View>
+              <Text style={styles.sectionTitle}>WORK EXPERIENCE</Text>
+              {workExperiences.map((exp: any, i: number) => (
+                <View key={i} style={{ marginBottom: 12 }}>
+                  <Text style={styles.jobTitle}>{exp.jobTitle}</Text>
+                  <Text style={styles.company}>
+                    {exp.company} | {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
+                  </Text>
+                  {exp.achievements?.map((achievement: string, j: number) => (
+                    <Text key={j} style={styles.bullet}>• {achievement}</Text>
+                  ))}
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+      </Page>
+    </Document>
+  );
+}
+```
+
+---
+
+# Summary: Developer Checklist
+
+## Files to Create/Update:
+
+| # | File | Action |
+|---|------|--------|
+| 1 | `src/app/(builder)/preview/page.tsx` | **REPLACE** with code above |
+| 2 | `src/lib/auth/context.tsx` | **CREATE** |
+| 3 | `src/app/auth/register/page.tsx` | **CREATE** |
+| 4 | `src/app/auth/login/page.tsx` | **CREATE** |
+| 5 | `src/app/layout.tsx` | **UPDATE** - wrap with AuthProvider |
+| 6 | `src/app/payment/page.tsx` | **CREATE** |
+| 7 | `src/app/api/pdf/generate/route.ts` | **CREATE** |
+| 8 | `src/components/templates/pdf/kathleen.tsx` | **CREATE** |
+
+## Install:
+
+```bash
+npm install @react-pdf/renderer
+```
+
+## Flow After Implementation:
+
+```
+Preview Page → Save & Next
+      ↓
+(Not logged in?) → Register/Login Page
+      ↓
+Payment Page → Enter Phone → Confirm on Phone
+      ↓
+PDF Downloads Automatically
+```
+
+---
+
+**Tell your developer to start with the Preview Page fix first, then move to Auth, then Payment. I've made the code as simple as possible.**

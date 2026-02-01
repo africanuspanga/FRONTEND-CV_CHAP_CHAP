@@ -180,6 +180,15 @@ export default function RegisterPage() {
               Sign in
             </Link>
           </div>
+
+          <div className="mt-4 pt-4 border-t text-center">
+            <button
+              onClick={() => router.push(redirectTo)}
+              className="text-gray-500 text-sm hover:text-gray-700"
+            >
+              Skip for now →
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>

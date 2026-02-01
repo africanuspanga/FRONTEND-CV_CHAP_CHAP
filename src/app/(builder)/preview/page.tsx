@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { useCVStore } from "@/stores/cv-store";
-import { TEMPLATES } from "@/types/templates";
-import { ArrowLeft, Edit2, X, Check, Pencil, GripVertical } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { TemplatePreview } from "@/components/templates/preview";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from 'next/navigation';
+import { useCVStore } from '@/stores/cv-store';
+import { TemplatePreview } from '@/components/templates/preview';
+import { useAuth } from '@/lib/auth/context';
+import { TEMPLATES } from '@/types/templates';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Edit2, X, Check, Pencil, GripVertical } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const TEMPLATE_COLORS = [
   { id: 'default', color: '#ffffff', border: true },
@@ -24,10 +25,11 @@ const TEMPLATE_COLORS = [
 export default function PreviewPage() {
   const router = useRouter();
   const { cvData, templateId, selectedColor, setTemplateId, setSelectedColor, setCurrentStep } = useCVStore();
-  const template = TEMPLATES.find(t => t.id === templateId) || TEMPLATES[0];
-  const [scale, setScale] = useState(0.5);
+  const { user } = useAuth();
+  
   const [showChangeTemplate, setShowChangeTemplate] = useState(false);
   const [showEditResume, setShowEditResume] = useState(false);
+  const [scale, setScale] = useState(0.45);
 
   useEffect(() => {
     const calculateScale = () => {
@@ -45,14 +47,13 @@ export default function PreviewPage() {
     return () => window.removeEventListener('resize', calculateScale);
   }, []);
 
-  const handleBack = () => {
-    setCurrentStep('additional');
-    router.push('/additional');
-  };
-
   const handleSaveAndNext = () => {
-    setCurrentStep('payment');
-    router.push('/payment');
+    if (user) {
+      setCurrentStep('payment');
+      router.push('/payment');
+    } else {
+      router.push('/auth/register?redirect=/payment');
+    }
   };
 
   const editSections = [
@@ -70,39 +71,41 @@ export default function PreviewPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-cv-blue-900 flex flex-col">
+    <div className="min-h-screen bg-[#1e3a5f] flex flex-col">
       {/* Header */}
-      <header className="bg-cv-blue-900 py-6 px-4">
-        <button onClick={handleBack} className="text-white mb-4 absolute left-4 top-6">
+      <div className="px-4 pt-4 pb-2">
+        <button 
+          onClick={() => router.back()}
+          className="text-white text-2xl mb-2"
+        >
           <ArrowLeft className="h-6 w-6" />
         </button>
-        <h1 className="text-3xl font-heading font-bold text-white text-center mb-6">
+        
+        <h1 className="text-white text-2xl font-bold text-center italic mb-4">
           Finalize Resume
         </h1>
-        
+
         {/* Action Buttons */}
-        <div className="flex gap-3 max-w-md mx-auto">
+        <div className="flex justify-center gap-3 mb-4">
           <button
             onClick={() => setShowChangeTemplate(true)}
-            className="flex-1 flex items-center justify-center gap-2 bg-cv-blue-700 hover:bg-cv-blue-600 text-white py-3.5 px-4 rounded-full font-medium transition-colors border border-cv-blue-500"
+            className="flex items-center gap-2 bg-[#2d4a6f] text-white px-4 py-2 rounded-full text-sm"
           >
-            <Pencil className="h-4 w-4" />
-            Change Template
+            <Pencil className="h-4 w-4" /> Change Template
           </button>
           <button
             onClick={() => setShowEditResume(true)}
-            className="flex-1 flex items-center justify-center gap-2 bg-cv-blue-700 hover:bg-cv-blue-600 text-white py-3.5 px-4 rounded-full font-medium transition-colors border border-cv-blue-500"
+            className="flex items-center gap-2 bg-white text-gray-800 px-4 py-2 rounded-full text-sm"
           >
-            <Edit2 className="h-4 w-4" />
-            Edit Resume
+            <Edit2 className="h-4 w-4" /> Edit Resume
           </button>
         </div>
-      </header>
+      </div>
 
-      {/* CV Preview - CENTERED */}
-      <main className="flex-1 overflow-auto py-6 px-4">
-        <div className="flex justify-center">
-          <div
+      {/* CV Preview - Responsive */}
+      <div className="flex-1 bg-gray-100 rounded-t-3xl overflow-hidden">
+        <div className="h-full overflow-auto p-4 flex justify-center">
+          <div 
             className="bg-white shadow-2xl rounded-lg overflow-hidden"
             style={{
               transform: `scale(${scale})`,
@@ -119,18 +122,16 @@ export default function PreviewPage() {
             />
           </div>
         </div>
-      </main>
+      </div>
 
-      {/* Fixed bottom button */}
-      <div className="sticky bottom-0 bg-cv-blue-600 p-4">
-        <div className="container mx-auto max-w-lg">
-          <Button 
-            onClick={handleSaveAndNext}
-            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl text-white border-0"
-          >
-            Save & Next
-          </Button>
-        </div>
+      {/* Bottom Button */}
+      <div className="bg-gray-100 p-4">
+        <button
+          onClick={handleSaveAndNext}
+          className="w-full bg-blue-500 text-white text-lg font-semibold py-4 rounded-xl"
+        >
+          Save & Next
+        </button>
       </div>
 
       {/* Change Template Modal */}
@@ -207,9 +208,6 @@ export default function PreviewPage() {
                         )}
                       </button>
                     ))}
-                    <button className="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 via-yellow-500 to-blue-500 flex items-center justify-center">
-                      <span className="text-white text-sm">+</span>
-                    </button>
                   </div>
                 </div>
 

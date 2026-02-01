@@ -1,14 +1,9 @@
 {
   "pages": {
-    "/(builder)/additional/certifications/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(builder)/additional/certifications/page.js"
-    ],
-    "/(builder)/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(builder)/layout.js"
+      "static/chunks/app/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
