@@ -670,7 +670,7 @@ export default function ExperiencePage() {
             <Button 
               onClick={handleNextToJobDescription}
               disabled={!isFormValid}
-              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl disabled:opacity-50"
+              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold disabled:opacity-50"
             >
               Next: Job Description
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -684,13 +684,13 @@ export default function ExperiencePage() {
   // RENDER: Loading Step
   if (flowStep === 'loading') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white flex items-center justify-center">
-        <div className="text-center p-8">
-          <Loader2 className="w-16 h-16 text-cv-blue-500 animate-spin mx-auto mb-6" />
-          <h2 className="text-xl font-heading font-bold text-gray-900 mb-2">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 text-center p-8 mx-4">
+          <Loader2 className="w-16 h-16 text-cv-blue-600 animate-spin mx-auto mb-6" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
             Finding the best recommendations
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-500">
             Analyzing {formData.jobTitle} role...
           </p>
         </div>
@@ -752,7 +752,7 @@ export default function ExperiencePage() {
                 <div className="space-y-3">
                   <Button
                     onClick={handleAcceptRecommendations}
-                    className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-full"
+                    className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold"
                   >
                     Add Recommendations
                   </Button>
@@ -774,31 +774,30 @@ export default function ExperiencePage() {
   // RENDER: Edit Achievements Step
   if (flowStep === 'edit-achievements') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
-        <header className="bg-white border-b sticky top-0 z-40 shadow-sm">
-          <div className="px-4 py-4 flex items-center justify-between">
-            <button onClick={() => setFlowStep('form')} className="p-2 -ml-2 text-gray-600 active:bg-gray-100 rounded-lg">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <div className="text-center">
-              <p className="text-xs text-gray-500">Step 2 of 6</p>
-              <h1 className="text-lg font-heading font-bold text-gray-900">Job Description</h1>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b sticky top-0 z-40">
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between">
+              <button onClick={() => setFlowStep('form')} className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors">
+                <ArrowLeft className="h-6 w-6" />
+              </button>
+              <h1 className="text-lg font-bold text-gray-900">Job Description</h1>
+              <div className="w-10"></div>
             </div>
-            <div className="w-10"></div>
           </div>
         </header>
 
-        <main className="px-4 py-6 pb-32">
+        <main className="px-4 py-6 pb-28">
           <div className="max-w-lg mx-auto">
             <div className="mb-6">
-              <h2 className="text-xl font-heading font-bold text-gray-900 mb-1">
+              <h2 className="text-xl font-bold text-gray-900 mb-1">
                 {formData.jobTitle}
               </h2>
-              <p className="text-gray-600">{formData.company}</p>
+              <p className="text-gray-500 text-sm">{formData.company}</p>
             </div>
 
-            <div className="bg-gray-100 rounded-xl p-4 mb-6">
-              <p className="text-gray-600 text-sm">
+            <div className="bg-cv-blue-50 rounded-2xl p-4 mb-6 border border-cv-blue-100">
+              <p className="text-cv-blue-700 text-sm">
                 List your responsibilities and achievements, or use the pre-written phrases below.
               </p>
             </div>
@@ -812,7 +811,7 @@ export default function ExperiencePage() {
               {editingAchievements.length > 0 && (
                 <div className="space-y-2">
                   {editingAchievements.map((achievement, index) => (
-                    <div key={index} className="bg-white border rounded-lg overflow-hidden">
+                    <div key={index} className="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm">
                       {editingIndex === index ? (
                         <div className="p-3 space-y-3">
                           <Textarea
@@ -889,7 +888,7 @@ export default function ExperiencePage() {
           <div className="max-w-lg mx-auto">
             <Button 
               onClick={handleSaveExperience}
-              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl"
+              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold"
             >
               Save Experience
               <Check className="ml-2 h-5 w-5" />
