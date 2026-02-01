@@ -1,4 +1,5 @@
 {
+  "/api/pdf/generate/route": "app/api/pdf/generate/route.js",
   "/(builder)/preview/page": "app/(builder)/preview/page.js",
   "/(builder)/personal/page": "app/(builder)/personal/page.js"
 }

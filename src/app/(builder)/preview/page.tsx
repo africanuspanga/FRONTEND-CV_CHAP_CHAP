@@ -6,7 +6,7 @@ import { TemplatePreview } from '@/components/templates/preview';
 import { useAuth } from '@/lib/auth/context';
 import { TEMPLATES } from '@/types/templates';
 import { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Edit2, X, Check, Pencil, GripVertical, ChevronLeft } from 'lucide-react';
+import { ArrowLeft, Edit2, X, Check, Pencil, GripVertical, ChevronLeft, Download, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -31,6 +31,7 @@ export default function PreviewPage() {
   const [showChangeTemplate, setShowChangeTemplate] = useState(false);
   const [showEditResume, setShowEditResume] = useState(false);
   const [scale, setScale] = useState(0.5);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const updateScale = () => {
@@ -53,12 +54,34 @@ export default function PreviewPage() {
     return () => window.removeEventListener('resize', updateScale);
   }, []);
 
-  const handleSaveAndNext = () => {
-    if (user) {
-      setCurrentStep('payment');
-      router.push('/payment');
-    } else {
-      router.push('/auth/register?redirect=/payment');
+  const handleDownloadCV = async () => {
+    setIsDownloading(true);
+    try {
+      const response = await fetch('/api/pdf/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cvData, templateId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate CV');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const fileName = `${cvData.personalInfo.firstName || 'My'}_${cvData.personalInfo.lastName || 'CV'}_CV.html`;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download CV. Please try again.');
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -150,10 +173,21 @@ export default function PreviewPage() {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#e8edf2] via-[#e8edf2] to-transparent z-10">
         <div className="max-w-[400px] mx-auto">
           <button
-            onClick={handleSaveAndNext}
-            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 text-white text-lg font-semibold py-4 rounded-2xl shadow-lg transition-colors"
+            onClick={handleDownloadCV}
+            disabled={isDownloading}
+            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 disabled:bg-cv-blue-400 text-white text-lg font-semibold py-4 rounded-2xl shadow-lg transition-colors flex items-center justify-center gap-2"
           >
-            Save & Next
+            {isDownloading ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Download className="h-5 w-5" />
+                Download CV
+              </>
+            )}
           </button>
         </div>
       </div>
