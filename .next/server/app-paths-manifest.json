@@ -1,3 +1,4 @@
 {
-  "/(builder)/preview/page": "app/(builder)/preview/page.js"
+  "/(builder)/preview/page": "app/(builder)/preview/page.js",
+  "/(builder)/personal/page": "app/(builder)/personal/page.js"
 }
