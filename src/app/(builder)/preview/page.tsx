@@ -36,9 +36,15 @@ export default function PreviewPage() {
     const updateScale = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
+        const containerHeight = containerRef.current.offsetHeight;
         const cvWidth = 794;
-        const newScale = containerWidth / cvWidth;
-        setScale(Math.min(newScale, 0.6));
+        const cvHeight = 1123;
+        
+        // Calculate scale to fit both width and height (no scrolling)
+        const scaleByWidth = containerWidth / cvWidth;
+        const scaleByHeight = containerHeight / cvHeight;
+        const newScale = Math.min(scaleByWidth, scaleByHeight, 0.55);
+        setScale(newScale);
       }
     };
     
@@ -73,8 +79,8 @@ export default function PreviewPage() {
   return (
     <div className="min-h-screen bg-[#e8edf2] flex flex-col">
       {/* Header */}
-      <div className="bg-[#e8edf2] px-4 pt-4 pb-3 flex-shrink-0">
-        <div className="flex items-center mb-4">
+      <div className="bg-[#e8edf2] px-4 pt-3 pb-2 flex-shrink-0">
+        <div className="flex items-center mb-2">
           <button 
             onClick={() => router.back()}
             className="text-gray-600 hover:text-gray-800"
@@ -83,57 +89,58 @@ export default function PreviewPage() {
           </button>
         </div>
         
-        <h1 className="text-gray-900 text-2xl font-bold text-center italic font-serif mb-5">
+        <h1 className="text-gray-900 text-2xl font-bold text-center italic font-serif mb-3">
           Finalize Resume
         </h1>
 
-        {/* Action Buttons */}
-        <div className="flex justify-center gap-3 mb-4">
+        {/* Action Buttons - Blue Brand Color */}
+        <div className="flex justify-center gap-3 mb-3">
           <button
             onClick={() => setShowChangeTemplate(true)}
-            className="flex items-center gap-2 bg-[#0d9488] text-white px-5 py-2.5 rounded-full text-sm font-medium shadow-md hover:bg-[#0f766e] transition-colors"
+            className="flex items-center gap-2 bg-cv-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-medium shadow-lg hover:bg-cv-blue-700 transition-colors"
           >
             <Pencil className="h-4 w-4" /> Change Template
           </button>
           <button
             onClick={() => setShowEditResume(true)}
-            className="flex items-center gap-2 bg-white text-gray-700 px-5 py-2.5 rounded-full text-sm font-medium shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 bg-white text-cv-blue-600 px-5 py-2.5 rounded-full text-sm font-medium shadow-lg border-2 border-cv-blue-600 hover:bg-cv-blue-50 transition-colors"
           >
             <Edit2 className="h-4 w-4" /> Edit Resume
           </button>
         </div>
       </div>
 
-      {/* CV Preview Container - Scrollable */}
-      <div className="flex-1 flex justify-center px-4 overflow-hidden min-h-0">
+      {/* CV Preview Container - Fit to Screen (No Scrolling) */}
+      <div className="flex-1 flex justify-center items-center px-4 overflow-hidden min-h-0 pb-20">
         <div 
           ref={containerRef}
-          className="relative w-full max-w-[400px] h-full"
+          className="relative w-full max-w-[400px] h-full flex items-center justify-center"
         >
           {/* Phone-like card container */}
           <div 
-            className="bg-white rounded-2xl shadow-2xl overflow-hidden h-full"
+            className="bg-white rounded-2xl shadow-2xl overflow-hidden"
             style={{
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+              width: `${794 * scale}px`,
+              height: `${1123 * scale}px`,
             }}
           >
-            {/* Scrollable CV content */}
-            <div className="h-full overflow-y-auto overflow-x-hidden">
-              <div 
-                className="origin-top-left"
-                style={{
-                  width: '794px',
-                  transform: `scale(${scale})`,
-                  transformOrigin: 'top left',
-                }}
-              >
-                <TemplatePreview
-                  templateId={templateId}
-                  data={cvData}
-                  colorOverride={selectedColor}
-                  scale={1}
-                />
-              </div>
+            {/* CV content - scaled to fit */}
+            <div 
+              className="origin-top-left"
+              style={{
+                width: '794px',
+                height: '1123px',
+                transform: `scale(${scale})`,
+                transformOrigin: 'top left',
+              }}
+            >
+              <TemplatePreview
+                templateId={templateId}
+                data={cvData}
+                colorOverride={selectedColor}
+                scale={1}
+              />
             </div>
           </div>
         </div>
@@ -144,15 +151,12 @@ export default function PreviewPage() {
         <div className="max-w-[400px] mx-auto">
           <button
             onClick={handleSaveAndNext}
-            className="w-full bg-[#3b5bdb] hover:bg-[#364fc7] text-white text-lg font-semibold py-4 rounded-2xl shadow-lg transition-colors"
+            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 text-white text-lg font-semibold py-4 rounded-2xl shadow-lg transition-colors"
           >
             Save & Next
           </button>
         </div>
       </div>
-      
-      {/* Spacer for fixed button */}
-      <div className="h-20 flex-shrink-0" />
 
       {/* Change Template Modal */}
       <AnimatePresence>
