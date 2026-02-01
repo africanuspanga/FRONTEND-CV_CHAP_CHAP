@@ -6,6 +6,7 @@ import { TemplatePreview } from '@/components/templates/preview';
 import { useAuth } from '@/lib/auth/context';
 import { TEMPLATES } from '@/types/templates';
 import { useState, useEffect } from 'react';
+// TEMPLATES used in Change Template modal
 import { ArrowLeft, Edit2, X, Check, Pencil, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
