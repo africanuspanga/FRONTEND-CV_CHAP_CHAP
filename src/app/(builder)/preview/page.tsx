@@ -60,7 +60,7 @@ export default function PreviewPage() {
       const response = await fetch('/api/pdf/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cvData, templateId }),
+        body: JSON.stringify({ cvData, templateId, colorOverride: selectedColor }),
       });
 
       if (!response.ok) {
@@ -71,7 +71,7 @@ export default function PreviewPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const fileName = `${cvData.personalInfo.firstName || 'My'}_${cvData.personalInfo.lastName || 'CV'}_CV.html`;
+      const fileName = `${cvData.personalInfo.firstName || 'My'}_${cvData.personalInfo.lastName || 'CV'}_CV.pdf`;
       a.download = fileName;
       document.body.appendChild(a);
       a.click();

@@ -1,65 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCVById, markCVDownloaded } from '@/lib/supabase/database';
 import { generatePDF } from '@/lib/pdf/generator';
-
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const cvId = searchParams.get('cvId');
-
-    if (!cvId) {
-      return NextResponse.json(
-        { error: 'cvId is required' },
-        { status: 400 }
-      );
-    }
-
-    const cv = await getCVById(cvId);
-
-    if (!cv) {
-      return NextResponse.json(
-        { error: 'CV not found' },
-        { status: 404 }
-      );
-    }
-
-    if (cv.status !== 'paid' && cv.status !== 'downloaded') {
-      return NextResponse.json(
-        { error: 'Payment required to download CV' },
-        { status: 402 }
-      );
-    }
-
-    const pdfBuffer = await generatePDF({
-      templateId: cv.template_id,
-      data: cv.data,
-    });
-
-    await markCVDownloaded(cvId);
-
-    const fileName = `${cv.data.personalInfo.firstName}_${cv.data.personalInfo.lastName}_CV.pdf`;
-
-    return new NextResponse(new Uint8Array(pdfBuffer), {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/html',
-        'Content-Disposition': `attachment; filename="${fileName.replace('.pdf', '.html')}"`,
-        'Content-Length': pdfBuffer.length.toString(),
-      },
-    });
-
-  } catch (error) {
-    console.error('PDF generation error:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate PDF' },
-      { status: 500 }
-    );
-  }
-}
 
 export async function POST(request: NextRequest) {
   try {
-    const { cvData, templateId } = await request.json();
+    const { cvData, templateId, colorOverride } = await request.json();
 
     if (!cvData || !templateId) {
       return NextResponse.json(
@@ -71,23 +15,26 @@ export async function POST(request: NextRequest) {
     const pdfBuffer = await generatePDF({
       templateId,
       data: cvData,
+      colorOverride,
     });
 
-    const fileName = `${cvData.personalInfo.firstName}_${cvData.personalInfo.lastName}_CV_Preview.html`;
+    const firstName = cvData?.personalInfo?.firstName || 'CV';
+    const lastName = cvData?.personalInfo?.lastName || '';
+    const fileName = `${firstName}_${lastName}_CV.pdf`.replace(/\s+/g, '_');
 
     return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
-        'Content-Type': 'text/html',
+        'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${fileName}"`,
         'Content-Length': pdfBuffer.length.toString(),
       },
     });
 
   } catch (error) {
-    console.error('PDF preview generation error:', error);
+    console.error('PDF generation error:', error);
     return NextResponse.json(
-      { error: 'Failed to generate PDF preview' },
+      { error: 'Failed to generate PDF' },
       { status: 500 }
     );
   }
