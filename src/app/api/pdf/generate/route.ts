@@ -5,6 +5,8 @@ export async function POST(request: NextRequest) {
   try {
     const { cvData, templateId, colorOverride } = await request.json();
 
+    console.log('PDF Generate Request - templateId:', templateId, 'colorOverride:', colorOverride);
+
     if (!cvData || !templateId) {
       return NextResponse.json(
         { error: 'cvData and templateId are required' },
