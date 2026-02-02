@@ -293,78 +293,99 @@ export default function PreviewPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-white z-50 overflow-y-auto"
+            className="fixed inset-0 bg-gradient-to-b from-cv-blue-50 to-white z-50 overflow-y-auto"
           >
             <div className="min-h-screen">
-              <header className="bg-white border-b sticky top-0 z-10">
+              <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-10">
                 <div className="container mx-auto px-4 py-4 flex items-center justify-center relative">
                   <button
                     onClick={() => setShowEditResume(false)}
-                    className="absolute left-4 text-gray-400 hover:text-gray-600"
+                    className="absolute left-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
                   >
-                    <X className="h-6 w-6" />
+                    <X className="h-5 w-5" />
                   </button>
-                  <h2 className="text-xl font-heading font-bold">Edit Resume</h2>
+                  <h2 className="text-xl font-heading font-bold text-gray-900">Edit CV</h2>
                 </div>
               </header>
 
               <main className="container mx-auto px-4 py-6 pb-32">
-                <div className="max-w-lg mx-auto space-y-4">
-                  {editSections.map((section, index) => (
-                    <motion.div
-                      key={section.path}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="bg-white rounded-xl border border-gray-200 overflow-hidden"
-                    >
-                      {section.path === '/personal' ? (
-                        <div className="p-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            <h3 className="font-semibold text-gray-900">{section.label}</h3>
-                            {section.done && <Check className="h-4 w-4 text-green-500" />}
+                <div className="max-w-lg mx-auto">
+                  <p className="text-center text-gray-600 mb-6">
+                    Tap any section to update your information
+                  </p>
+                  
+                  <div className="space-y-3">
+                    {editSections.map((section, index) => (
+                      <motion.div
+                        key={section.path}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        {section.path === '/personal' ? (
+                          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div className="p-5">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-full bg-cv-blue-100 flex items-center justify-center">
+                                    <Pencil className="h-4 w-4 text-cv-blue-600" />
+                                  </div>
+                                  <h3 className="font-semibold text-gray-900">{section.label}</h3>
+                                </div>
+                                {section.done && (
+                                  <span className="flex items-center gap-1 text-green-600 text-sm font-medium bg-green-50 px-2 py-1 rounded-full">
+                                    <Check className="h-3 w-3" /> Complete
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-sm text-gray-600 whitespace-pre-line mb-4 pl-10">
+                                {section.preview}
+                              </div>
+                              <button
+                                onClick={() => {
+                                  setShowEditResume(false);
+                                  router.push(section.path);
+                                }}
+                                className="w-full py-3 bg-gradient-to-r from-cv-blue-500 to-cv-blue-600 hover:from-cv-blue-600 hover:to-cv-blue-700 rounded-xl text-white font-medium flex items-center justify-center gap-2 transition-all shadow-sm"
+                              >
+                                <Pencil className="h-4 w-4" />
+                                Edit Details
+                              </button>
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-600 whitespace-pre-line mb-3">
-                            {section.preview}
-                          </div>
+                        ) : (
                           <button
                             onClick={() => {
                               setShowEditResume(false);
                               router.push(section.path);
                             }}
-                            className="w-full py-3 bg-amber-100 hover:bg-amber-200 rounded-lg text-gray-800 font-medium flex items-center justify-center gap-2 transition-colors"
+                            className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center justify-between hover:border-cv-blue-200 hover:shadow-md transition-all group"
                           >
-                            <Pencil className="h-4 w-4" />
-                            Edit
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-cv-blue-100 flex items-center justify-center transition-colors">
+                                <Pencil className="h-4 w-4 text-gray-400 group-hover:text-cv-blue-600 transition-colors" />
+                              </div>
+                              <h3 className="font-semibold text-gray-900">{section.label}</h3>
+                              {section.done && (
+                                <Check className="h-4 w-4 text-green-500" />
+                              )}
+                            </div>
+                            <ArrowLeft className="h-5 w-5 text-gray-300 group-hover:text-cv-blue-500 rotate-180 transition-colors" />
                           </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => {
-                            setShowEditResume(false);
-                            router.push(section.path);
-                          }}
-                          className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-gray-900">{section.label}</h3>
-                            {section.done && <Check className="h-4 w-4 text-green-500" />}
-                          </div>
-                          <GripVertical className="h-5 w-5 text-cv-blue-400" />
-                        </button>
-                      )}
-                    </motion.div>
-                  ))}
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
               </main>
 
-              <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">
+              <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t p-4">
                 <div className="container mx-auto max-w-lg">
                   <Button
                     onClick={() => setShowEditResume(false)}
-                    className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl"
+                    className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl shadow-lg"
                   >
-                    Finish Editing
+                    Done Editing
                   </Button>
                 </div>
               </div>

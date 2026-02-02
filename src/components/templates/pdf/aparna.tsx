@@ -118,7 +118,8 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     fontSize: 9,
     color: '#DBEAFE',
     backgroundColor: 'rgba(59, 130, 246, 0.3)',
-    padding: '4 8',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: 'rgba(147, 197, 253, 0.5)',
@@ -175,9 +176,9 @@ export function AparnaPDF({ data, colorOverride }: Props) {
         </View>
 
         <View style={styles.contactRow}>
-          {personalInfo?.email && <Text style={styles.contactText}>✉ {personalInfo.email}</Text>}
-          {personalInfo?.phone && <Text style={styles.contactText}>☎ {personalInfo.phone}</Text>}
-          {personalInfo?.location && <Text style={styles.contactText}>📍 {personalInfo.location}</Text>}
+          {personalInfo?.email && <Text style={styles.contactText}>{personalInfo.email}</Text>}
+          {personalInfo?.phone && <Text style={styles.contactText}>{personalInfo.phone}</Text>}
+          {personalInfo?.location && <Text style={styles.contactText}>{personalInfo.location}</Text>}
         </View>
 
         {summary && (
