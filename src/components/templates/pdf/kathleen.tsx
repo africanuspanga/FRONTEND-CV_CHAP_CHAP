@@ -137,6 +137,18 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     color: '#4B5563',
     marginBottom: 2,
   },
+  refItem: {
+    marginBottom: 10,
+  },
+  refName: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  refDetails: {
+    fontSize: 8,
+    color: '#6B7280',
+  },
 });
 
 interface Props {
@@ -148,25 +160,27 @@ export function KathleenPDF({ data, colorOverride }: Props) {
   const primaryColor = colorOverride || '#E5B94E';
   const styles = createStyles(primaryColor);
   
-  const { personalInfo, summary, workExperiences, education, skills, languages, certifications } = data || {};
+  const { personalInfo, summary, workExperiences, education, skills, languages, certifications, references } = data || {};
+
+  const hasMinimalContent = 
+    (!workExperiences || workExperiences.length <= 1) &&
+    (!education || education.length <= 1);
+
+  const maxBullets = hasMinimalContent ? 6 : 4;
+  const maxSkills = hasMinimalContent ? 12 : 8;
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Top color bar */}
         <View style={styles.topBar} />
         
-        {/* LEFT SIDEBAR */}
         <View style={styles.sidebar}>
-          {/* Name */}
           <Text style={styles.name}>{personalInfo?.firstName}</Text>
           <Text style={styles.name}>{personalInfo?.lastName}</Text>
           <Text style={styles.title}>{personalInfo?.professionalTitle}</Text>
           
-          {/* Quote mark decoration */}
           <Text style={styles.quoteMark}>"</Text>
 
-          {/* Contact */}
           <View style={styles.sidebarSection}>
             <Text style={styles.sidebarTitle}>CONTACT</Text>
             {personalInfo?.email && (
@@ -180,7 +194,6 @@ export function KathleenPDF({ data, colorOverride }: Props) {
             )}
           </View>
 
-          {/* Education */}
           {education?.length > 0 && (
             <View style={styles.sidebarSection}>
               <Text style={styles.sidebarTitle}>EDUCATION</Text>
@@ -189,23 +202,21 @@ export function KathleenPDF({ data, colorOverride }: Props) {
                   <Text style={styles.eduDate}>{edu.graduationDate}</Text>
                   <Text style={styles.eduDegree}>{edu.degree}</Text>
                   <Text style={styles.eduSchool}>{edu.institution}</Text>
-                  <Text style={styles.eduField}>{edu.fieldOfStudy}</Text>
+                  {edu.fieldOfStudy && <Text style={styles.eduField}>{edu.fieldOfStudy}</Text>}
                 </View>
               ))}
             </View>
           )}
 
-          {/* Skills */}
           {skills?.length > 0 && (
             <View style={styles.sidebarSection}>
               <Text style={styles.sidebarTitle}>SKILLS</Text>
-              {skills.slice(0, 10).map((skill: any, i: number) => (
+              {skills.slice(0, maxSkills).map((skill: any, i: number) => (
                 <Text key={i} style={styles.skillItem}>• {skill.name}</Text>
               ))}
             </View>
           )}
 
-          {/* Languages */}
           {languages?.length > 0 && (
             <View style={styles.sidebarSection}>
               <Text style={styles.sidebarTitle}>LANGUAGES</Text>
@@ -214,11 +225,18 @@ export function KathleenPDF({ data, colorOverride }: Props) {
               ))}
             </View>
           )}
+
+          {certifications?.length > 0 && (
+            <View style={styles.sidebarSection}>
+              <Text style={styles.sidebarTitle}>CERTIFICATIONS</Text>
+              {certifications.slice(0, 4).map((cert: any, i: number) => (
+                <Text key={i} style={styles.skillItem}>• {cert.name}</Text>
+              ))}
+            </View>
+          )}
         </View>
 
-        {/* RIGHT MAIN CONTENT */}
         <View style={styles.main}>
-          {/* Summary */}
           {summary && (
             <View style={styles.mainSection}>
               <Text style={styles.mainSectionTitle}>PROFESSIONAL SUMMARY</Text>
@@ -226,7 +244,6 @@ export function KathleenPDF({ data, colorOverride }: Props) {
             </View>
           )}
 
-          {/* Experience */}
           {workExperiences?.length > 0 && (
             <View style={styles.mainSection}>
               <Text style={styles.mainSectionTitle}>WORK EXPERIENCE</Text>
@@ -239,7 +256,7 @@ export function KathleenPDF({ data, colorOverride }: Props) {
                     </Text>
                   </View>
                   <Text style={styles.expCompany}>{exp.company} | {exp.location}</Text>
-                  {exp.achievements?.slice(0, 4).map((a: string, j: number) => (
+                  {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
                     <Text key={j} style={styles.bullet}>• {a}</Text>
                   ))}
                 </View>
@@ -247,12 +264,16 @@ export function KathleenPDF({ data, colorOverride }: Props) {
             </View>
           )}
 
-          {/* Certifications */}
-          {certifications?.length > 0 && (
+          {references?.length > 0 && hasMinimalContent && (
             <View style={styles.mainSection}>
-              <Text style={styles.mainSectionTitle}>CERTIFICATIONS</Text>
-              {certifications.map((cert: any, i: number) => (
-                <Text key={i} style={styles.skillItem}>• {cert.name} ({cert.date})</Text>
+              <Text style={styles.mainSectionTitle}>REFERENCES</Text>
+              {references.slice(0, 2).map((ref: any, i: number) => (
+                <View key={i} style={styles.refItem}>
+                  <Text style={styles.refName}>{ref.name}</Text>
+                  <Text style={styles.refDetails}>{ref.position || ref.title} at {ref.company}</Text>
+                  {ref.email && <Text style={styles.refDetails}>{ref.email}</Text>}
+                  {ref.phone && <Text style={styles.refDetails}>{ref.phone}</Text>}
+                </View>
               ))}
             </View>
           )}
