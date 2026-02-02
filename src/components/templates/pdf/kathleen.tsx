@@ -162,12 +162,17 @@ export function KathleenPDF({ data, colorOverride }: Props) {
   
   const { personalInfo, summary, workExperiences, education, skills, languages, certifications, references } = data || {};
 
-  const hasMinimalContent = 
-    (!workExperiences || workExperiences.length <= 1) &&
-    (!education || education.length <= 1);
+  // Calculate total content to determine if we need to fill space
+  const totalExperiences = workExperiences?.length || 0;
+  const totalEducation = education?.length || 0;
+  const totalAchievements = workExperiences?.reduce((acc: number, exp: any) => acc + (exp.achievements?.length || 0), 0) || 0;
+  
+  // More flexible check - if total content items are low, show more
+  const hasMinimalContent = (totalExperiences + totalEducation) <= 3 || totalAchievements < 8;
 
-  const maxBullets = hasMinimalContent ? 6 : 4;
-  const maxSkills = hasMinimalContent ? 12 : 8;
+  // Always show good amount of content
+  const maxBullets = hasMinimalContent ? 5 : 4;
+  const maxSkills = 10; // Always show up to 10 skills to fill sidebar
 
   return (
     <Document>
@@ -264,7 +269,7 @@ export function KathleenPDF({ data, colorOverride }: Props) {
             </View>
           )}
 
-          {references?.length > 0 && hasMinimalContent && (
+          {references?.length > 0 && (
             <View style={styles.mainSection}>
               <Text style={styles.mainSectionTitle}>REFERENCES</Text>
               {references.slice(0, 2).map((ref: any, i: number) => (
