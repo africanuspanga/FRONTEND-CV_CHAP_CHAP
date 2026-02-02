@@ -218,21 +218,29 @@ export default function PreviewPage() {
                     {TEMPLATES.map((t) => (
                       <button
                         key={t.id}
-                        onClick={() => setTemplateId(t.id)}
+                        onClick={() => {
+                          setTemplateId(t.id);
+                          setShowChangeTemplate(false);
+                        }}
                         className={`w-full rounded-xl overflow-hidden transition-all ${
                           templateId === t.id 
                             ? 'ring-3 ring-cv-blue-500 shadow-lg' 
                             : 'ring-1 ring-gray-200 hover:ring-cv-blue-300'
                         }`}
                       >
-                        <div className="aspect-[3/4] bg-white overflow-hidden relative">
+                        <div 
+                          className="w-full bg-white overflow-hidden relative"
+                          style={{ 
+                            height: 'calc((100vw - 80px) * 1123 / 794)',
+                            maxHeight: '500px',
+                          }}
+                        >
                           <div 
-                            className="absolute inset-0"
+                            className="absolute top-0 left-1/2 origin-top"
                             style={{
-                              transform: 'scale(0.52)',
-                              transformOrigin: 'top left',
                               width: '794px',
                               height: '1123px',
+                              transform: 'translateX(-50%) scale(calc((min(100vw - 80px, 440px)) / 794))',
                             }}
                           >
                             <TemplatePreview
@@ -243,7 +251,7 @@ export default function PreviewPage() {
                             />
                           </div>
                           {templateId === t.id && (
-                            <div className="absolute top-3 right-3 w-8 h-8 bg-cv-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                            <div className="absolute top-3 right-3 w-8 h-8 bg-cv-blue-500 rounded-full flex items-center justify-center shadow-lg z-10">
                               <Check className="h-5 w-5 text-white" />
                             </div>
                           )}
@@ -262,7 +270,10 @@ export default function PreviewPage() {
                     {TEMPLATE_COLORS.map((c) => (
                       <button
                         key={c.id}
-                        onClick={() => setSelectedColor(c.color)}
+                        onClick={() => {
+                          setSelectedColor(c.color);
+                          setShowChangeTemplate(false);
+                        }}
                         className={`w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-110 ${
                           c.border ? 'border-2 border-gray-300' : ''
                         }`}
@@ -274,15 +285,6 @@ export default function PreviewPage() {
                       </button>
                     ))}
                   </div>
-                </div>
-
-                <div className="p-4">
-                  <Button
-                    onClick={() => setShowChangeTemplate(false)}
-                    className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-4 rounded-xl"
-                  >
-                    Apply Template
-                  </Button>
                 </div>
               </div>
             </div>
