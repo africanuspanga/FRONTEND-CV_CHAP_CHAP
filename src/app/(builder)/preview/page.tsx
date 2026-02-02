@@ -214,46 +214,37 @@ export default function PreviewPage() {
                 </div>
                 
                 <div className="p-4 max-h-[70vh] overflow-y-auto">
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-4">
                     {TEMPLATES.map((t) => (
                       <button
                         key={t.id}
                         onClick={() => setTemplateId(t.id)}
-                        className={`rounded-xl overflow-hidden transition-all ${
+                        className={`w-full rounded-xl overflow-hidden transition-all ${
                           templateId === t.id 
                             ? 'ring-3 ring-cv-blue-500 shadow-lg' 
                             : 'ring-1 ring-gray-200 hover:ring-cv-blue-300'
                         }`}
                       >
-                        <div className="flex items-center gap-4 p-3 bg-white">
-                          <div className="w-24 h-32 bg-gray-50 rounded-lg overflow-hidden relative flex-shrink-0">
-                            <div 
-                              className="absolute inset-0"
-                              style={{
-                                transform: 'scale(0.12)',
-                                transformOrigin: 'top left',
-                                width: '794px',
-                                height: '1123px',
-                              }}
-                            >
-                              <TemplatePreview
-                                templateId={t.id}
-                                data={cvData}
-                                scale={1}
-                                colorOverride={selectedColor}
-                              />
-                            </div>
-                          </div>
-                          <div className="flex-1 text-left">
-                            <h3 className="font-semibold text-gray-900">{t.name}</h3>
-                            <p className="text-sm text-gray-500 mt-1">{t.description}</p>
-                            <span className="inline-block mt-2 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 capitalize">
-                              {t.category} {t.hasPhoto ? '• Photo' : ''}
-                            </span>
+                        <div className="aspect-[3/4] bg-white overflow-hidden relative">
+                          <div 
+                            className="absolute inset-0"
+                            style={{
+                              transform: 'scale(0.52)',
+                              transformOrigin: 'top left',
+                              width: '794px',
+                              height: '1123px',
+                            }}
+                          >
+                            <TemplatePreview
+                              templateId={t.id}
+                              data={cvData}
+                              scale={1}
+                              colorOverride={selectedColor}
+                            />
                           </div>
                           {templateId === t.id && (
-                            <div className="w-6 h-6 bg-cv-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                              <Check className="h-4 w-4 text-white" />
+                            <div className="absolute top-3 right-3 w-8 h-8 bg-cv-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                              <Check className="h-5 w-5 text-white" />
                             </div>
                           )}
                         </div>
