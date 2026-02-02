@@ -228,19 +228,13 @@ export default function PreviewPage() {
                             : 'ring-1 ring-gray-200 hover:ring-cv-blue-300'
                         }`}
                       >
-                        <div 
-                          className="w-full bg-white overflow-hidden relative"
-                          style={{ 
-                            height: 'calc((100vw - 80px) * 1123 / 794)',
-                            maxHeight: '500px',
-                          }}
-                        >
+                        <div className="aspect-[794/1123] bg-white overflow-hidden relative">
                           <div 
-                            className="absolute top-0 left-1/2 origin-top"
+                            className="absolute top-0 left-0 origin-top-left"
                             style={{
                               width: '794px',
                               height: '1123px',
-                              transform: 'translateX(-50%) scale(calc((min(100vw - 80px, 440px)) / 794))',
+                              transform: 'scale(0.45)',
                             }}
                           >
                             <TemplatePreview
