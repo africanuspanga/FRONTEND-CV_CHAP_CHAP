@@ -90,7 +90,7 @@ export default function PreviewPage() {
       label: 'Resume Heading', 
       path: '/personal', 
       done: !!(cvData.personalInfo.firstName && cvData.personalInfo.email),
-      preview: `${cvData.personalInfo.fullName || cvData.personalInfo.firstName + ' ' + cvData.personalInfo.lastName || 'Your Name'}\n${cvData.personalInfo.location || ''}\n${cvData.personalInfo.phone || ''}\n${cvData.personalInfo.email || ''}`
+      preview: `${cvData.personalInfo.firstName ? `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`.trim() : 'Your Name'}\n${cvData.personalInfo.location || ''}\n${cvData.personalInfo.phone || ''}\n${cvData.personalInfo.email || ''}`
     },
     { label: 'Summary', path: '/summary', done: !!cvData.summary },
     { label: 'Skills', path: '/skills', done: cvData.skills?.length > 0 },

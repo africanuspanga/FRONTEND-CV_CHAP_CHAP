@@ -140,7 +140,7 @@ export default function SummaryPage() {
                   <div className="space-y-3 text-sm">
                     <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="font-medium text-gray-700">Name</p>
-                      <p className="text-gray-900">{cvData.personalInfo.fullName || 'Not set'}</p>
+                      <p className="text-gray-900">{cvData.personalInfo.firstName ? `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`.trim() : 'Not set'}</p>
                     </div>
                     <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="font-medium text-gray-700">Title</p>

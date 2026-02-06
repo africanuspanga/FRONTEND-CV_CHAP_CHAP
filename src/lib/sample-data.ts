@@ -113,4 +113,7 @@ export const sampleCVData: CVData = {
       phone: '+255 222 117 442',
     },
   ],
+  certifications: [],
+  socialLinks: [],
+  accomplishments: [],
 };

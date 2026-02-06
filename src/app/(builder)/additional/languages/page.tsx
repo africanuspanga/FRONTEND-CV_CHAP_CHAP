@@ -34,10 +34,12 @@ const PROFICIENCY_LEVELS = [
   { value: 'native', label: 'Native / Bilingual' },
 ] as const;
 
+type ProficiencyLevel = typeof PROFICIENCY_LEVELS[number]['value'];
+
 export default function LanguagesPage() {
   const router = useRouter();
   const { cvData, addLanguage, updateLanguage, removeLanguage } = useCVStore();
-  const [newLanguage, setNewLanguage] = useState({ name: '', proficiency: 'basic' as const });
+  const [newLanguage, setNewLanguage] = useState<{ name: string; proficiency: ProficiencyLevel }>({ name: '', proficiency: 'basic' });
 
   const languages = cvData.languages || [];
 

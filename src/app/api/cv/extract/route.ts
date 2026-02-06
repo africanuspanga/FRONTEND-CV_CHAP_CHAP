@@ -8,7 +8,9 @@ let pdfParse: any = null;
 
 async function getPdfParser() {
   if (!pdfParse) {
-    pdfParse = (await import('pdf-parse')).default;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const module = await import('pdf-parse') as any;
+    pdfParse = module.default || module;
   }
   return pdfParse;
 }
