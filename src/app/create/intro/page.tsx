@@ -3,27 +3,30 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FileText, Sparkles, Palette, ArrowLeft } from 'lucide-react';
+import { FileText, Sparkles, Download, ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const steps = [
   {
     number: 1,
-    title: 'Pick a template to match your style',
-    description: 'Whatever your job title or industry, choose from 21+ professional designs.',
+    title: 'Choose your template',
+    description: 'Pick from 6 professionally designed templates crafted for the East African job market.',
     icon: FileText,
+    color: 'bg-cv-blue-500',
   },
   {
     number: 2,
-    title: 'Add your details with AI help',
-    description: 'Generate and add expertly written descriptions tailored to your background.',
+    title: 'Add your details',
+    description: 'Fill in your information with AI-powered suggestions to make your CV stand out.',
     icon: Sparkles,
+    color: 'bg-cv-blue-600',
   },
   {
     number: 3,
-    title: 'Customize and download',
-    description: 'Adjust colors and details, then download your polished CV instantly.',
-    icon: Palette,
+    title: 'Download & apply',
+    description: 'Get your polished CV instantly and start applying for your dream job.',
+    icon: Download,
+    color: 'bg-cv-blue-700',
   },
 ];
 
@@ -31,105 +34,133 @@ export default function IntroPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="p-4 flex items-center">
-        <Link href="/" className="text-gray-500 hover:text-gray-700 flex items-center gap-2">
-          <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm">Back</span>
-        </Link>
+      <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+        <div className="px-4 py-3 flex items-center justify-between max-w-lg mx-auto">
+          <Link
+            href="/"
+            className="p-2 -ml-2 text-gray-500 hover:text-cv-blue-600 hover:bg-gray-50 rounded-full transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <span className="text-lg font-bold text-cv-blue-600">CV Chap Chap</span>
+          <div className="w-9" />
+        </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-6 py-8 flex flex-col min-h-[calc(100vh-80px)]">
-        {/* CV Preview Illustration */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative mx-auto mb-8"
-        >
-          <div className="relative">
-            {/* Main CV preview */}
-            <div className="w-32 h-44 bg-white rounded-lg shadow-xl border border-gray-100 mx-auto overflow-hidden">
-              <div className="h-8 bg-gradient-to-r from-cv-blue-500 to-cyan-400" />
-              <div className="p-3 space-y-2">
-                <div className="h-2 w-16 bg-gray-300 rounded" />
-                <div className="h-1.5 w-full bg-gray-200 rounded" />
-                <div className="h-1.5 w-5/6 bg-gray-200 rounded" />
-                <div className="h-1.5 w-4/6 bg-gray-200 rounded" />
-                <div className="mt-2 h-2 w-12 bg-cv-blue-300 rounded" />
-                <div className="h-1.5 w-full bg-gray-100 rounded" />
-              </div>
-            </div>
-            
-            {/* Floating toolbar */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
-              className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white rounded-full shadow-lg px-3 py-1.5 flex items-center gap-2"
-            >
-              <div className="w-6 h-6 rounded-full bg-cv-blue-500 flex items-center justify-center">
-                <Sparkles className="w-3 h-3 text-white" />
-              </div>
-              <div className="w-5 h-5 rounded bg-gray-200" />
-              <div className="w-5 h-5 rounded bg-gray-200" />
-              <div className="w-5 h-5 rounded bg-gray-200" />
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Title */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-3xl md:text-4xl font-heading font-bold text-gray-900">
-            Just three<br />simple steps
-          </h1>
-        </motion.div>
-
-        {/* Steps */}
-        <div className="space-y-6 flex-1">
-          {steps.map((step, index) => (
-            <motion.div
-              key={step.number}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 + index * 0.15 }}
-              className="flex gap-4"
-            >
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                {step.number}
-              </div>
-              <div>
-                <p className="text-gray-900 font-medium leading-relaxed">
-                  <span className="font-semibold">{step.title.split(',')[0]}</span>
-                  {step.title.includes(',') ? ',' + step.title.split(',').slice(1).join(',') : ''}
-                </p>
-                <p className="text-gray-500 text-sm mt-1">{step.description}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* CTA Button */}
+      <main className="px-5 py-6 max-w-lg mx-auto">
+        {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="mt-8 pb-6"
+          className="text-center mb-8"
         >
+          {/* CV Preview Card */}
+          <div className="relative inline-block mb-6">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="w-28 h-36 bg-white rounded-xl shadow-xl border border-gray-100 mx-auto overflow-hidden"
+            >
+              <div className="h-7 bg-gradient-to-r from-cv-blue-600 to-cv-blue-500" />
+              <div className="p-2.5 space-y-1.5">
+                <div className="h-2 w-14 bg-gray-800 rounded" />
+                <div className="h-1 w-full bg-gray-200 rounded" />
+                <div className="h-1 w-4/5 bg-gray-200 rounded" />
+                <div className="h-1 w-3/5 bg-gray-200 rounded" />
+                <div className="mt-2 h-1.5 w-10 bg-cv-blue-200 rounded" />
+                <div className="h-1 w-full bg-gray-100 rounded" />
+                <div className="h-1 w-5/6 bg-gray-100 rounded" />
+              </div>
+            </motion.div>
+
+            {/* Success badge */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4, type: "spring" }}
+              className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg"
+            >
+              <CheckCircle2 className="w-5 h-5 text-white" />
+            </motion.div>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+            Create your CV in minutes
+          </h1>
+          <p className="text-gray-500 text-sm sm:text-base">
+            Three simple steps to your professional CV
+          </p>
+        </motion.div>
+
+        {/* Steps */}
+        <div className="space-y-4 mb-8">
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+            return (
+              <motion.div
+                key={step.number}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 + index * 0.1 }}
+                className="bg-gray-50 rounded-2xl p-4 flex gap-4 items-start"
+              >
+                <div className={`flex-shrink-0 w-12 h-12 rounded-xl ${step.color} flex items-center justify-center shadow-sm`}>
+                  <Icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-semibold text-cv-blue-600 bg-cv-blue-100 px-2 py-0.5 rounded-full">
+                      Step {step.number}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-gray-900 text-base mb-0.5">
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    {step.description}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Features */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="bg-cv-blue-50 rounded-2xl p-4 mb-8 border border-cv-blue-100"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-4 h-4 text-cv-blue-600" />
+            <span className="text-sm font-semibold text-cv-blue-700">AI-Powered</span>
+          </div>
+          <p className="text-cv-blue-600 text-sm">
+            Our AI helps you write professional job descriptions and summaries that impress employers.
+          </p>
+        </motion.div>
+      </main>
+
+      {/* Fixed Bottom CTA */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 shadow-lg">
+        <div className="max-w-lg mx-auto">
           <Button
             onClick={() => router.push('/create/choose')}
             size="lg"
-            className="w-full bg-gradient-to-r from-cv-blue-500 to-cyan-500 hover:from-cv-blue-600 hover:to-cyan-600 text-white font-semibold py-6 text-lg rounded-xl shadow-lg"
+            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 active:bg-cv-blue-800 text-white font-semibold py-6 text-lg rounded-2xl shadow-sm transition-colors"
           >
-            Next
+            Get Started
+            <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-        </motion.div>
+        </div>
       </div>
+
+      {/* Bottom padding for fixed button */}
+      <div className="h-24" />
     </div>
   );
 }

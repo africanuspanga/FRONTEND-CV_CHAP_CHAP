@@ -16,9 +16,10 @@ import {
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TemplatePreview } from "@/components/templates/preview";
+import { AutocompleteInput } from "@/components/ui/autocomplete-input";
+import { UNIVERSITIES, CITIES, FIELDS_OF_STUDY } from "@/data/autocomplete";
 
-type Step = 'form' | 'list' | 'preview';
+type Step = 'form' | 'list';
 
 const degreeOptions = [
   'High School Diploma',
@@ -34,14 +35,12 @@ const degreeOptions = [
 
 export default function EducationPage() {
   const router = useRouter();
-  const { 
-    cvData, 
-    templateId,
-    selectedColor,
-    addEducation, 
-    updateEducation, 
-    removeEducation, 
-    setCurrentStep 
+  const {
+    cvData,
+    addEducation,
+    updateEducation,
+    removeEducation,
+    setCurrentStep
   } = useCVStore();
   
   const [step, setStep] = useState<Step>('form');
@@ -68,8 +67,6 @@ export default function EducationPage() {
   const handleBack = () => {
     if (step === 'list') {
       setStep('form');
-    } else if (step === 'preview') {
-      setStep('list');
     } else {
       setCurrentStep('experience');
       router.push('/experience');
@@ -120,10 +117,6 @@ export default function EducationPage() {
     });
     setEditingId(edu.id);
     setStep('form');
-  };
-
-  const handleContinueToPreview = () => {
-    setStep('preview');
   };
 
   const handleContinueToSkills = () => {
@@ -205,21 +198,23 @@ export default function EducationPage() {
                 <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
                   <div className="space-y-1.5">
                     <Label className="text-sm font-medium text-gray-700">School / Institution Name</Label>
-                    <Input
+                    <AutocompleteInput
+                      id="institution"
                       value={formData.institution}
-                      onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
+                      onChange={(value) => setFormData({ ...formData, institution: value })}
+                      suggestions={UNIVERSITIES}
                       placeholder="University of Dar es Salaam"
-                      className="h-12 rounded-xl border-gray-200"
                     />
                   </div>
 
                   <div className="space-y-1.5">
                     <Label className="text-sm font-medium text-gray-700">Location</Label>
-                    <Input
+                    <AutocompleteInput
+                      id="edu-location"
                       value={formData.location}
-                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      onChange={(value) => setFormData({ ...formData, location: value })}
+                      suggestions={CITIES}
                       placeholder="Dar es Salaam, Tanzania"
-                      className="h-12 rounded-xl border-gray-200"
                     />
                   </div>
 
@@ -257,11 +252,12 @@ export default function EducationPage() {
 
                   <div className="space-y-1.5">
                     <Label className="text-sm font-medium text-gray-700">Field of Study</Label>
-                    <Input
+                    <AutocompleteInput
+                      id="fieldOfStudy"
                       value={formData.fieldOfStudy}
-                      onChange={(e) => setFormData({ ...formData, fieldOfStudy: e.target.value })}
+                      onChange={(value) => setFormData({ ...formData, fieldOfStudy: value })}
+                      suggestions={FIELDS_OF_STUDY}
                       placeholder="Computer Science"
-                      className="h-12 rounded-xl border-gray-200"
                     />
                   </div>
 
@@ -355,50 +351,7 @@ export default function EducationPage() {
               </motion.div>
             )}
 
-            {step === 'preview' && (
-              <motion.div
-                key="preview"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="text-center"
-              >
-                <div className="mb-4">
-                  <p className="text-gray-500 text-sm">Up Next:</p>
-                  <h2 className="text-2xl font-heading font-bold text-cv-blue-600">
-                    Skills
-                  </h2>
-                </div>
-
-                <button 
-                  onClick={() => setStep('list')}
-                  className="text-cv-blue-600 font-medium mb-6 hover:underline"
-                >
-                  Change template
-                </button>
-
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-auto max-w-sm">
-                  <div className="relative" style={{ height: '500px' }}>
-                    <div 
-                      className="absolute top-0 left-0 origin-top-left"
-                      style={{ 
-                        transform: 'scale(0.4)',
-                        width: '794px',
-                        height: '1123px',
-                      }}
-                    >
-                      <TemplatePreview
-                        templateId={templateId}
-                        data={cvData}
-                        scale={1}
-                        colorOverride={selectedColor}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                      </AnimatePresence>
         </div>
       </main>
 
@@ -416,21 +369,11 @@ export default function EducationPage() {
           )}
           
           {step === 'list' && (
-            <Button 
-              onClick={handleContinueToPreview}
-              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold"
-            >
-              Continue to Skills
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          )}
-          
-          {step === 'preview' && (
-            <Button 
+            <Button
               onClick={handleContinueToSkills}
               className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold"
             >
-              Continue
+              Continue to Skills
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           )}

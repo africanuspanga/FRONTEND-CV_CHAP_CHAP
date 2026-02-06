@@ -8,6 +8,8 @@ import { ArrowLeft, ArrowRight, Plus, Trash2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AutocompleteInput } from "@/components/ui/autocomplete-input";
+import { COMPANIES, JOB_TITLES } from "@/data/autocomplete";
 
 const MAX_REFERENCES = 2;
 
@@ -163,22 +165,28 @@ export default function ReferencesPage() {
 
                 <div>
                   <Label className="text-gray-700">Job Title *</Label>
-                  <Input
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Manager"
-                    className="h-12 mt-1.5"
-                  />
+                  <div className="mt-1.5">
+                    <AutocompleteInput
+                      id="ref-title"
+                      value={formData.title}
+                      onChange={(value) => setFormData({ ...formData, title: value })}
+                      suggestions={JOB_TITLES}
+                      placeholder="Manager"
+                    />
+                  </div>
                 </div>
 
                 <div>
                   <Label className="text-gray-700">Company *</Label>
-                  <Input
-                    value={formData.company}
-                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                    placeholder="ABC Company Ltd"
-                    className="h-12 mt-1.5"
-                  />
+                  <div className="mt-1.5">
+                    <AutocompleteInput
+                      id="ref-company"
+                      value={formData.company}
+                      onChange={(value) => setFormData({ ...formData, company: value })}
+                      suggestions={COMPANIES}
+                      placeholder="ABC Company Ltd"
+                    />
+                  </div>
                 </div>
 
                 <div>

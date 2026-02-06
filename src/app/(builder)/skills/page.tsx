@@ -1,12 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useCVStore } from "@/stores/cv-store";
 import { ArrowLeft, ArrowRight, Plus, X, Sparkles, Loader2, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AutocompleteInput } from "@/components/ui/autocomplete-input";
+import { ALL_SKILLS_AND_CERTS } from "@/data/autocomplete";
 
 export default function SkillsPage() {
   const router = useRouter();
@@ -178,19 +179,22 @@ export default function SkillsPage() {
               {/* Quick Add */}
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-4">
                 <div className="flex gap-2">
-                  <Input
-                    value={newSkillName}
-                    onChange={(e) => setNewSkillName(e.target.value)}
-                    placeholder="Type a skill (e.g., Python, Leadership)"
-                    className="h-12 rounded-xl border-gray-200"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddSkill();
-                      }
-                    }}
-                  />
-                  <Button 
+                  <div className="flex-1">
+                    <AutocompleteInput
+                      id="skill-name"
+                      value={newSkillName}
+                      onChange={setNewSkillName}
+                      suggestions={ALL_SKILLS_AND_CERTS}
+                      placeholder="Type a skill (e.g., Python, Leadership)"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddSkill();
+                        }
+                      }}
+                    />
+                  </div>
+                  <Button
                     onClick={handleAddSkill}
                     disabled={!newSkillName.trim()}
                     className="bg-cv-blue-600 hover:bg-cv-blue-700 h-12 px-6 rounded-xl"

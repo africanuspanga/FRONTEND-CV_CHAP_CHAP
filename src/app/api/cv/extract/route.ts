@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import mammoth from 'mammoth';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 
-const pdfParse = require('pdf-parse');
+// Dynamic import for pdf-parse to avoid bundling issues
+let pdfParse: any = null;
+
+async function getPdfParser() {
+  if (!pdfParse) {
+    pdfParse = (await import('pdf-parse')).default;
+  }
+  return pdfParse;
+}
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -75,11 +83,12 @@ interface ExtractedCV {
 
 async function extractFromPDF(buffer: Buffer): Promise<string> {
   try {
-    const data = await pdfParse(buffer);
+    const parser = await getPdfParser();
+    const data = await parser(buffer);
     return data.text;
   } catch (error) {
     console.error('PDF parsing error:', error);
-    throw new Error('Failed to parse PDF file');
+    throw new Error('Failed to parse PDF file. Please ensure the PDF contains readable text (not just images).');
   }
 }
 
@@ -227,30 +236,30 @@ function processExtractedData(data: ExtractedCV): ExtractedCV {
     },
     workExperiences: (data.workExperiences || []).map((exp) => ({
       ...exp,
-      id: uuidv4(),
+      id: nanoid(),
       achievements: exp.achievements?.filter((a) => a && a.trim()) || [],
     })),
     education: (data.education || []).map((edu) => ({
       ...edu,
-      id: uuidv4(),
+      id: nanoid(),
     })),
     skills: (data.skills || []).map((skill) => ({
       ...skill,
-      id: uuidv4(),
+      id: nanoid(),
       level: skill.level || 'intermediate',
     })),
     languages: (data.languages || []).map((lang) => ({
       ...lang,
-      id: uuidv4(),
+      id: nanoid(),
       proficiency: lang.proficiency || 'conversational',
     })),
     certifications: (data.certifications || []).map((cert) => ({
       ...cert,
-      id: uuidv4(),
+      id: nanoid(),
     })),
     references: (data.references || []).slice(0, 2).map((ref) => ({
       ...ref,
-      id: uuidv4(),
+      id: nanoid(),
     })),
   };
 }

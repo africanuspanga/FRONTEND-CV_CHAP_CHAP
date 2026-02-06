@@ -23,6 +23,11 @@ import {
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AutocompleteInput } from "@/components/ui/autocomplete-input";
+import { COMPANIES, CITIES, JOB_TITLES } from "@/data/autocomplete";
+
+// Extract city names only (without country) for the city field
+const CITY_NAMES = CITIES.map(city => city.split(',')[0].trim());
 
 const MONTHS = [
   { value: '01', label: 'January' },
@@ -550,32 +555,35 @@ export default function ExperiencePage() {
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium text-gray-700">Job Title</Label>
-                <Input
+                <AutocompleteInput
+                  id="jobTitle"
                   value={formData.jobTitle}
-                  onChange={(e) => setFormData(prev => ({ ...prev, jobTitle: e.target.value }))}
+                  onChange={(value) => setFormData(prev => ({ ...prev, jobTitle: value }))}
+                  suggestions={JOB_TITLES}
                   placeholder="Customer Service Manager"
-                  className="h-12 text-base rounded-xl border-gray-200"
                 />
               </div>
 
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium text-gray-700">Employer / Company</Label>
-                <Input
+                <AutocompleteInput
+                  id="company"
                   value={formData.company}
-                  onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
+                  onChange={(value) => setFormData(prev => ({ ...prev, company: value }))}
+                  suggestions={COMPANIES}
                   placeholder="Vodacom Tanzania"
-                  className="h-12 text-base rounded-xl border-gray-200"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="text-sm font-medium text-gray-700">City</Label>
-                  <Input
+                  <AutocompleteInput
+                    id="city"
                     value={formData.city}
-                    onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                    onChange={(value) => setFormData(prev => ({ ...prev, city: value }))}
+                    suggestions={CITY_NAMES}
                     placeholder="Dar es Salaam"
-                    className="h-12 text-base rounded-xl border-gray-200"
                   />
                 </div>
                 <div className="space-y-1.5">

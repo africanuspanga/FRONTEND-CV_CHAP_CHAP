@@ -1,8 +1,12 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAIClient() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY is not configured');
+  }
+  return new OpenAI({ apiKey });
+}
 
 const CV_SYSTEM_PROMPT = `You are a world-class CV writer and career coach with 20+ years of experience helping professionals land top jobs at leading companies in East Africa, including Vodacom, Airtel, NMB Bank, CRDB, Tanzania Breweries, and multinational corporations.
 
@@ -57,6 +61,8 @@ BAD EXAMPLE:
 
 Return EXACTLY 4 bullet points, one per line. No numbering, no bullet symbols, no extra text.`;
 
+  const openai = getOpenAIClient();
+
   const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
@@ -101,6 +107,8 @@ Requirements:
 - Make it compelling for East African employers
 
 Return ONLY the summary paragraph, no quotes or labels.`;
+
+  const openai = getOpenAIClient();
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
@@ -186,6 +194,8 @@ Return ONLY 8 skill names, one per line. No numbering, no explanations.
 Skills should be concise (1-3 words each).
 Start with the most impressive/marketable skills first.`;
 
+  const openai = getOpenAIClient();
+
   const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
@@ -220,6 +230,8 @@ Requirements:
 - Make it achievement-focused
 
 Return ONLY the improved bullet point, no quotes.`;
+
+  const openai = getOpenAIClient();
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',

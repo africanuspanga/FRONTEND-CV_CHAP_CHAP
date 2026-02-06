@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCVStore } from "@/stores/cv-store";
-import { ArrowRight, ChevronLeft, User, Mail, Phone, MapPin, Briefcase, Globe, Linkedin } from "lucide-react";
+import { ArrowRight, ChevronLeft, User, Mail, Phone, MapPin, Briefcase } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +12,8 @@ import { z } from "zod";
 import { useEffect } from "react";
 import { PhotoUpload } from "@/components/builder/photo-upload";
 import { TEMPLATES } from "@/types/templates";
+import { AutocompleteInput } from "@/components/ui/autocomplete-input";
+import { CITIES, JOB_TITLES } from "@/data/autocomplete";
 
 const personalInfoSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -38,10 +40,15 @@ export default function PersonalInfoPage() {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    setValue,
   } = useForm<PersonalInfoForm>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: cvData.personalInfo,
   });
+
+  const locationValue = watch("location");
+  const professionalTitleValue = watch("professionalTitle");
 
   useEffect(() => {
     reset(cvData.personalInfo);
@@ -150,7 +157,7 @@ export default function PersonalInfoPage() {
                   <Input
                     id="firstName"
                     {...register("firstName")}
-                    placeholder="John"
+                    placeholder="Noela"
                     className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                   />
                   {errors.firstName && (
@@ -162,7 +169,7 @@ export default function PersonalInfoPage() {
                   <Input
                     id="lastName"
                     {...register("lastName")}
-                    placeholder="Mwangi"
+                    placeholder="Bwemero"
                     className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                   />
                   {errors.lastName && (
@@ -178,11 +185,12 @@ export default function PersonalInfoPage() {
                     Professional Title
                   </div>
                 </Label>
-                <Input
+                <AutocompleteInput
                   id="professionalTitle"
-                  {...register("professionalTitle")}
-                  placeholder="e.g., Customer Service Manager"
-                  className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
+                  value={professionalTitleValue || ""}
+                  onChange={(value) => setValue("professionalTitle", value, { shouldValidate: true })}
+                  suggestions={JOB_TITLES}
+                  placeholder="e.g., Corporate Lawyer"
                 />
                 {errors.professionalTitle && (
                   <p className="text-xs text-red-500">{errors.professionalTitle.message}</p>
@@ -208,7 +216,7 @@ export default function PersonalInfoPage() {
                   id="email"
                   type="email"
                   {...register("email")}
-                  placeholder="john@example.com"
+                  placeholder="noela@example.com"
                   className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                 />
                 {errors.email && (
@@ -241,11 +249,12 @@ export default function PersonalInfoPage() {
                     Location
                   </div>
                 </Label>
-                <Input
+                <AutocompleteInput
                   id="location"
-                  {...register("location")}
+                  value={locationValue || ""}
+                  onChange={(value) => setValue("location", value, { shouldValidate: true })}
+                  suggestions={CITIES}
                   placeholder="e.g., Dar es Salaam, Tanzania"
-                  className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
                 />
                 {errors.location && (
                   <p className="text-xs text-red-500">{errors.location.message}</p>
@@ -253,43 +262,6 @@ export default function PersonalInfoPage() {
               </div>
             </div>
 
-            {/* Social Links (Optional) */}
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
-              <div className="flex items-center gap-2 text-gray-400 mb-2">
-                <Globe className="h-5 w-5" />
-                <span className="font-semibold text-sm">Online Presence (Optional)</span>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="linkedin" className="text-sm font-medium text-gray-700">
-                  <div className="flex items-center gap-2">
-                    <Linkedin className="h-4 w-4 text-gray-400" />
-                    LinkedIn
-                  </div>
-                </Label>
-                <Input
-                  id="linkedin"
-                  {...register("linkedin")}
-                  placeholder="linkedin.com/in/yourprofile"
-                  className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="website" className="text-sm font-medium text-gray-700">
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-gray-400" />
-                    Website
-                  </div>
-                </Label>
-                <Input
-                  id="website"
-                  {...register("website")}
-                  placeholder="yourwebsite.com"
-                  className="h-12 text-base rounded-xl border-gray-200 focus:border-cv-blue-500 focus:ring-cv-blue-500"
-                />
-              </div>
-            </div>
           </form>
         </div>
       </main>
