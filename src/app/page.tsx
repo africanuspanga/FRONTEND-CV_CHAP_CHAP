@@ -215,7 +215,7 @@ export default function HomePage() {
 
             {/* CTA Buttons */}
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/auth" className="px-4 py-2 text-gray-700 font-medium hover:text-cv-blue-600 transition-colors">
+              <Link href="/auth/login" className="px-4 py-2 text-gray-700 font-medium hover:text-cv-blue-600 transition-colors">
                 Login
               </Link>
               <Link 

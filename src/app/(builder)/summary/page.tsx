@@ -3,10 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useCVStore } from "@/stores/cv-store";
-import { ArrowLeft, ArrowRight, X, Sparkles, Loader2, Star, FileText } from "lucide-react";
+import { ArrowRight, X, Sparkles, Loader2, Star, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { StepHeader } from "@/components/builder/step-header";
 
 type Step = 'preview' | 'edit';
 
@@ -96,19 +97,13 @@ export default function SummaryPage() {
   const isTooLong = summaryLength > 350;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
-      <header className="bg-white border-b sticky top-0 z-40 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <button onClick={handleBack} className="flex items-center gap-2 text-gray-600 hover:text-cv-blue-600">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="text-center">
-            <p className="text-xs text-gray-500">Step 5 of 8</p>
-            <h1 className="text-lg font-heading font-bold text-gray-900">Summary</h1>
-          </div>
-          <div className="w-8"></div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50">
+      <StepHeader
+        currentStep={5}
+        totalSteps={8}
+        title="Summary"
+        onBack={handleBack}
+      />
 
       <main className="container mx-auto px-4 py-6 pb-32">
         <div className="max-w-lg mx-auto">

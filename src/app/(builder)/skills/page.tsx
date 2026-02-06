@@ -2,12 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { useCVStore } from "@/stores/cv-store";
-import { ArrowLeft, ArrowRight, Plus, X, Sparkles, Loader2, Check } from "lucide-react";
+import { ArrowRight, Plus, X, Sparkles, Loader2, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import { ALL_SKILLS_AND_CERTS } from "@/data/autocomplete";
+import { StepHeader } from "@/components/builder/step-header";
 
 export default function SkillsPage() {
   const router = useRouter();
@@ -113,50 +114,14 @@ export default function SkillsPage() {
     await fetchSkillRecommendations();
   };
 
-  const steps = [
-    { num: 1, completed: true },
-    { num: 2, completed: true },
-    { num: 3, completed: true },
-    { num: 4, active: true },
-    { num: 5, active: false },
-    { num: 6, active: false },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b sticky top-0 z-40">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between mb-3">
-            <button onClick={handleBack} className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors">
-              <ArrowLeft className="h-6 w-6" />
-            </button>
-            <h1 className="text-lg font-bold text-gray-900">Skills</h1>
-            <div className="w-10"></div>
-          </div>
-          
-          {/* Progress Steps */}
-          <div className="flex items-center justify-between">
-            {steps.map((step, idx) => (
-              <div key={step.num} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                  step.active 
-                    ? 'bg-cv-blue-600 text-white' 
-                    : step.completed 
-                      ? 'bg-cv-blue-100 text-cv-blue-600'
-                      : 'bg-gray-200 text-gray-500'
-                }`}>
-                  {step.num}
-                </div>
-                {idx < steps.length - 1 && (
-                  <div className={`w-4 sm:w-8 h-0.5 mx-1 ${
-                    step.active || step.completed ? 'bg-cv-blue-600' : 'bg-gray-200'
-                  }`} />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </header>
+      <StepHeader
+        currentStep={4}
+        totalSteps={8}
+        title="Skills"
+        onBack={handleBack}
+      />
 
       <main className="px-4 py-6 pb-28">
         <div className="max-w-lg mx-auto">

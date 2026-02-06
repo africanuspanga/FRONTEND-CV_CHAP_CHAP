@@ -1,3 +1,4 @@
+import React from 'react';
 import ReactPDF from '@react-pdf/renderer';
 import { CharlesPDF } from '@/components/templates/pdf/charles';
 import { KathleenPDF } from '@/components/templates/pdf/kathleen';
@@ -29,30 +30,6 @@ const templateColors: Record<string, string> = {
   'nelly-gray': '#4B5563',
 };
 
-const pdfTemplates: Record<string, React.FC<{ data: any; colorOverride?: string | null }>> = {
-  'charles': CharlesPDF,
-  'kathleen': KathleenPDF,
-  'oliver': OliverPDF,
-  'thomas': CharlesPDF,
-  'denice': CharlesPDF,
-  'nelly-purple': CharlesPDF,
-  'nelly-sidebar': CharlesPDF,
-  'aparna-dark': AparnaPDF,
-  'aparna-gold': AparnaPDF,
-  'grace-minimal': GracePDF,
-  'lauren-orange': OliverPDF,
-  'lauren-icons': OliverPDF,
-  'grace-navy': GracePDF,
-  'grace-teal': GracePDF,
-  'lesley': KathleenPDF,
-  'kelly': KathleenPDF,
-  'richard': KathleenPDF,
-  'grace-mint': GracePDF,
-  'grace-coral': GracePDF,
-  'nelly-mint': KathleenPDF,
-  'nelly-gray': KathleenPDF,
-};
-
 export interface PDFGeneratorOptions {
   templateId: string;
   data: any;
@@ -61,26 +38,84 @@ export interface PDFGeneratorOptions {
 
 export async function generatePDF(options: PDFGeneratorOptions): Promise<Buffer> {
   const { templateId, data, colorOverride } = options;
-  
+
   const defaultColor = templateColors[templateId] || '#0891B2';
   const finalColor = colorOverride || defaultColor;
-  
+
   console.log('PDF Generator - templateId:', templateId, '| color:', finalColor);
-  
-  const PDFTemplate = pdfTemplates[templateId] || pdfTemplates['charles'];
-  
-  const element = PDFTemplate({ data, colorOverride: finalColor });
-  
+
+  // Create the appropriate PDF element based on template
+  let element: React.ReactElement;
+
+  switch (templateId) {
+    case 'kathleen':
+    case 'lesley':
+    case 'kelly':
+    case 'richard':
+    case 'nelly-mint':
+    case 'nelly-gray':
+      element = <KathleenPDF data={data} colorOverride={finalColor} />;
+      break;
+    case 'oliver':
+    case 'lauren-orange':
+    case 'lauren-icons':
+      element = <OliverPDF data={data} colorOverride={finalColor} />;
+      break;
+    case 'aparna-dark':
+    case 'aparna-gold':
+      element = <AparnaPDF data={data} colorOverride={finalColor} />;
+      break;
+    case 'grace-minimal':
+    case 'grace-navy':
+    case 'grace-teal':
+    case 'grace-mint':
+    case 'grace-coral':
+      element = <GracePDF data={data} colorOverride={finalColor} />;
+      break;
+    case 'charles':
+    case 'thomas':
+    case 'denice':
+    case 'nelly-purple':
+    case 'nelly-sidebar':
+    default:
+      element = <CharlesPDF data={data} colorOverride={finalColor} />;
+      break;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pdfStream = await ReactPDF.renderToStream(element as any);
 
   const chunks: Uint8Array[] = [];
   for await (const chunk of pdfStream) {
     chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
   }
-  
+
   return Buffer.concat(chunks);
 }
 
 export function getTemplate(templateId: string) {
-  return pdfTemplates[templateId] || pdfTemplates['charles'];
+  switch (templateId) {
+    case 'kathleen':
+    case 'lesley':
+    case 'kelly':
+    case 'richard':
+    case 'nelly-mint':
+    case 'nelly-gray':
+      return KathleenPDF;
+    case 'oliver':
+    case 'lauren-orange':
+    case 'lauren-icons':
+      return OliverPDF;
+    case 'aparna-dark':
+    case 'aparna-gold':
+      return AparnaPDF;
+    case 'grace-minimal':
+    case 'grace-navy':
+    case 'grace-teal':
+    case 'grace-mint':
+    case 'grace-coral':
+      return GracePDF;
+    default:
+      return CharlesPDF;
+  }
 }

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCVStore } from "@/stores/cv-store";
-import { ArrowRight, ChevronLeft, User, Mail, Phone, MapPin, Briefcase } from "lucide-react";
+import { ArrowRight, User, Mail, Phone, MapPin, Briefcase } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +14,7 @@ import { PhotoUpload } from "@/components/builder/photo-upload";
 import { TEMPLATES } from "@/types/templates";
 import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import { CITIES, JOB_TITLES } from "@/data/autocomplete";
+import { StepHeader } from "@/components/builder/step-header";
 
 const personalInfoSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -73,52 +74,14 @@ export default function PersonalInfoPage() {
     updatePersonalInfo({ photoUrl: '' });
   };
 
-  const steps = [
-    { num: 1, label: 'Personal', active: true },
-    { num: 2, label: 'Experience', active: false },
-    { num: 3, label: 'Education', active: false },
-    { num: 4, label: 'Skills', active: false },
-    { num: 5, label: 'Summary', active: false },
-    { num: 6, label: 'Preview', active: false },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Modern Header */}
-      <header className="bg-white border-b sticky top-0 z-40">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between mb-3">
-            <button 
-              onClick={handleBack} 
-              className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-            <h1 className="text-lg font-bold text-gray-900">Personal Info</h1>
-            <div className="w-10"></div>
-          </div>
-          
-          {/* Progress Steps */}
-          <div className="flex items-center justify-between">
-            {steps.map((step, idx) => (
-              <div key={step.num} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                  step.active 
-                    ? 'bg-cv-blue-600 text-white' 
-                    : 'bg-gray-200 text-gray-500'
-                }`}>
-                  {step.num}
-                </div>
-                {idx < steps.length - 1 && (
-                  <div className={`w-4 sm:w-8 h-0.5 mx-1 ${
-                    step.active ? 'bg-cv-blue-600' : 'bg-gray-200'
-                  }`} />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </header>
+      <StepHeader
+        currentStep={1}
+        totalSteps={8}
+        title="Personal Info"
+        onBack={handleBack}
+      />
 
       <main className="px-4 py-6 pb-28">
         <div className="max-w-lg mx-auto">
@@ -150,7 +113,7 @@ export default function PersonalInfoPage() {
                 <User className="h-5 w-5" />
                 <span className="font-semibold text-sm">Basic Information</span>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">First Name</Label>
@@ -269,7 +232,7 @@ export default function PersonalInfoPage() {
       {/* Fixed Bottom Button */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
         <div className="max-w-lg mx-auto">
-          <Button 
+          <Button
             onClick={handleSubmit(onSubmit)}
             className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 active:bg-cv-blue-800 py-6 text-lg rounded-2xl font-semibold"
           >

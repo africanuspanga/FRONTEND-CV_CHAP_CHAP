@@ -6,9 +6,10 @@ import { TemplatePreview } from '@/components/templates/preview';
 import { useAuth } from '@/lib/auth/context';
 import { TEMPLATES } from '@/types/templates';
 import { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Edit2, X, Check, Pencil, GripVertical, ChevronLeft, Download, Loader2 } from 'lucide-react';
+import { Edit2, X, Check, Pencil, GripVertical, Download, Loader2, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { StepHeader } from '@/components/builder/step-header';
 
 const TEMPLATE_COLORS = [
   { id: 'default', color: '#ffffff', border: true },
@@ -101,36 +102,27 @@ export default function PreviewPage() {
 
   return (
     <div className="min-h-screen bg-[#e8edf2] flex flex-col">
-      {/* Header */}
-      <div className="bg-[#e8edf2] px-4 pt-3 pb-2 flex-shrink-0">
-        <div className="flex items-center mb-2">
-          <button 
-            onClick={() => router.back()}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            <ChevronLeft className="h-7 w-7" />
-          </button>
-        </div>
-        
-        <h1 className="text-gray-900 text-2xl font-bold text-center italic font-serif mb-3">
-          Finalize Resume
-        </h1>
+      <StepHeader
+        currentStep={8}
+        totalSteps={8}
+        title="Preview & Download"
+        backPath="/additional"
+      />
 
-        {/* Action Buttons - Blue Brand Color */}
-        <div className="flex justify-center gap-3 mb-3">
-          <button
-            onClick={() => setShowChangeTemplate(true)}
-            className="flex items-center gap-2 bg-cv-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-medium shadow-lg hover:bg-cv-blue-700 transition-colors"
-          >
-            <Pencil className="h-4 w-4" /> Change Template
-          </button>
-          <button
-            onClick={() => setShowEditResume(true)}
-            className="flex items-center gap-2 bg-white text-cv-blue-600 px-5 py-2.5 rounded-full text-sm font-medium shadow-lg border-2 border-cv-blue-600 hover:bg-cv-blue-50 transition-colors"
-          >
-            <Edit2 className="h-4 w-4" /> Edit Resume
-          </button>
-        </div>
+      {/* Action Buttons - Blue Brand Color */}
+      <div className="flex justify-center gap-3 px-4 pb-3 bg-white">
+        <button
+          onClick={() => setShowChangeTemplate(true)}
+          className="flex items-center gap-2 bg-cv-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-medium shadow-lg hover:bg-cv-blue-700 transition-colors"
+        >
+          <Pencil className="h-4 w-4" /> Change Template
+        </button>
+        <button
+          onClick={() => setShowEditResume(true)}
+          className="flex items-center gap-2 bg-white text-cv-blue-600 px-5 py-2.5 rounded-full text-sm font-medium shadow-lg border-2 border-cv-blue-600 hover:bg-cv-blue-50 transition-colors"
+        >
+          <Edit2 className="h-4 w-4" /> Edit Resume
+        </button>
       </div>
 
       {/* CV Preview Container - Fit to Screen (No Scrolling) */}
@@ -370,7 +362,7 @@ export default function PreviewPage() {
                                 <Check className="h-4 w-4 text-green-500" />
                               )}
                             </div>
-                            <ArrowLeft className="h-5 w-5 text-gray-300 group-hover:text-cv-blue-500 rotate-180 transition-colors" />
+                            <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-cv-blue-500 transition-colors" />
                           </button>
                         )}
                       </motion.div>

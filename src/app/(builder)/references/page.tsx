@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCVStore } from "@/stores/cv-store";
-import { ArrowLeft, ArrowRight, Plus, Trash2, User } from "lucide-react";
+import { ArrowRight, Plus, Trash2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import { COMPANIES, JOB_TITLES } from "@/data/autocomplete";
+import { StepHeader } from "@/components/builder/step-header";
 
 const MAX_REFERENCES = 2;
 
@@ -78,19 +79,13 @@ export default function ReferencesPage() {
   const canAddMore = cvData.references.length < MAX_REFERENCES;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cv-blue-50 to-white">
-      <header className="bg-white border-b sticky top-0 z-40 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <button onClick={handleBack} className="flex items-center gap-2 text-gray-600 hover:text-cv-blue-600">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="text-center">
-            <p className="text-xs text-gray-500">Step 6 of 8</p>
-            <h1 className="text-lg font-heading font-bold text-gray-900">References</h1>
-          </div>
-          <div className="w-8"></div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50">
+      <StepHeader
+        currentStep={6}
+        totalSteps={8}
+        title="References"
+        onBack={handleBack}
+      />
 
       <main className="container mx-auto px-4 py-6 pb-32">
         <div className="max-w-lg mx-auto">

@@ -25,6 +25,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import { COMPANIES, CITIES, JOB_TITLES } from "@/data/autocomplete";
+import { StepHeader } from "@/components/builder/step-header";
 
 // Extract city names only (without country) for the city field
 const CITY_NAMES = CITIES.map(city => city.split(',')[0].trim());
@@ -336,52 +337,16 @@ export default function ExperiencePage() {
     return `${monthName} ${year}`;
   };
 
-  const steps = [
-    { num: 1, label: 'Personal', active: false, completed: true },
-    { num: 2, label: 'Experience', active: true },
-    { num: 3, label: 'Education', active: false },
-    { num: 4, label: 'Skills', active: false },
-    { num: 5, label: 'Summary', active: false },
-    { num: 6, label: 'Preview', active: false },
-  ];
-
   // RENDER: Review Step (list of experiences)
   if (flowStep === 'review') {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b sticky top-0 z-40">
-          <div className="px-4 py-3">
-            <div className="flex items-center justify-between mb-3">
-              <button onClick={handleBack} className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors">
-                <ArrowLeft className="h-6 w-6" />
-              </button>
-              <h1 className="text-lg font-bold text-gray-900">Experience</h1>
-              <div className="w-10"></div>
-            </div>
-            
-            {/* Progress Steps */}
-            <div className="flex items-center justify-between">
-              {steps.map((step, idx) => (
-                <div key={step.num} className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                    step.active 
-                      ? 'bg-cv-blue-600 text-white' 
-                      : step.completed 
-                        ? 'bg-cv-blue-100 text-cv-blue-600'
-                        : 'bg-gray-200 text-gray-500'
-                  }`}>
-                    {step.completed && !step.active ? <Check className="h-4 w-4" /> : step.num}
-                  </div>
-                  {idx < steps.length - 1 && (
-                    <div className={`w-4 sm:w-8 h-0.5 mx-1 ${
-                      step.active || step.completed ? 'bg-cv-blue-600' : 'bg-gray-200'
-                    }`} />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </header>
+        <StepHeader
+          currentStep={2}
+          totalSteps={8}
+          title="Experience"
+          onBack={handleBack}
+        />
 
         <main className="px-4 py-6 pb-28">
           <div className="max-w-lg mx-auto">
@@ -531,17 +496,12 @@ export default function ExperiencePage() {
 
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b sticky top-0 z-40">
-          <div className="px-4 py-3">
-            <div className="flex items-center justify-between mb-3">
-              <button onClick={() => setFlowStep('review')} className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors">
-                <ArrowLeft className="h-6 w-6" />
-              </button>
-              <h1 className="text-lg font-bold text-gray-900">Add Experience</h1>
-              <div className="w-10"></div>
-            </div>
-          </div>
-        </header>
+        <StepHeader
+          currentStep={2}
+          totalSteps={8}
+          title="Add Experience"
+          onBack={() => setFlowStep('review')}
+        />
 
         <main className="px-4 py-6 pb-28">
           <div className="max-w-lg mx-auto">
@@ -783,17 +743,12 @@ export default function ExperiencePage() {
   if (flowStep === 'edit-achievements') {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b sticky top-0 z-40">
-          <div className="px-4 py-3">
-            <div className="flex items-center justify-between">
-              <button onClick={() => setFlowStep('form')} className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors">
-                <ArrowLeft className="h-6 w-6" />
-              </button>
-              <h1 className="text-lg font-bold text-gray-900">Job Description</h1>
-              <div className="w-10"></div>
-            </div>
-          </div>
-        </header>
+        <StepHeader
+          currentStep={2}
+          totalSteps={8}
+          title="Job Description"
+          onBack={() => setFlowStep('form')}
+        />
 
         <main className="px-4 py-6 pb-28">
           <div className="max-w-lg mx-auto">

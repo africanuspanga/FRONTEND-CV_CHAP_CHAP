@@ -18,8 +18,27 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import { UNIVERSITIES, CITIES, FIELDS_OF_STUDY } from "@/data/autocomplete";
+import { StepHeader } from "@/components/builder/step-header";
 
 type Step = 'form' | 'list';
+
+const MONTHS = [
+  { value: '01', label: 'January' },
+  { value: '02', label: 'February' },
+  { value: '03', label: 'March' },
+  { value: '04', label: 'April' },
+  { value: '05', label: 'May' },
+  { value: '06', label: 'June' },
+  { value: '07', label: 'July' },
+  { value: '08', label: 'August' },
+  { value: '09', label: 'September' },
+  { value: '10', label: 'October' },
+  { value: '11', label: 'November' },
+  { value: '12', label: 'December' },
+];
+
+const currentYear = new Date().getFullYear();
+const YEARS = Array.from({ length: 50 }, (_, i) => (currentYear + 5 - i).toString());
 
 const degreeOptions = [
   'High School Diploma',
@@ -131,50 +150,14 @@ export default function EducationPage() {
     return month ? `${months[parseInt(month) - 1]} ${year}` : year;
   };
 
-  const steps = [
-    { num: 1, label: 'Personal', completed: true },
-    { num: 2, label: 'Experience', completed: true },
-    { num: 3, label: 'Education', active: true },
-    { num: 4, label: 'Skills', active: false },
-    { num: 5, label: 'Summary', active: false },
-    { num: 6, label: 'Preview', active: false },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b sticky top-0 z-40">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between mb-3">
-            <button onClick={handleBack} className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors">
-              <ArrowLeft className="h-6 w-6" />
-            </button>
-            <h1 className="text-lg font-bold text-gray-900">Education</h1>
-            <div className="w-10"></div>
-          </div>
-          
-          {/* Progress Steps */}
-          <div className="flex items-center justify-between">
-            {steps.map((step, idx) => (
-              <div key={step.num} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                  step.active 
-                    ? 'bg-cv-blue-600 text-white' 
-                    : step.completed 
-                      ? 'bg-cv-blue-100 text-cv-blue-600'
-                      : 'bg-gray-200 text-gray-500'
-                }`}>
-                  {step.num}
-                </div>
-                {idx < steps.length - 1 && (
-                  <div className={`w-4 sm:w-8 h-0.5 mx-1 ${
-                    step.active || step.completed ? 'bg-cv-blue-600' : 'bg-gray-200'
-                  }`} />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </header>
+      <StepHeader
+        currentStep={3}
+        totalSteps={8}
+        title="Education"
+        onBack={handleBack}
+      />
 
       <main className="px-4 py-6 pb-28">
         <div className="max-w-lg mx-auto">
@@ -263,13 +246,42 @@ export default function EducationPage() {
 
                   <div className="space-y-1.5">
                     <Label className="text-sm font-medium text-gray-700">Graduation Date</Label>
-                    <Input
-                      type="month"
-                      value={formData.graduationDate}
-                      onChange={(e) => setFormData({ ...formData, graduationDate: e.target.value })}
-                      disabled={formData.isStillEnrolled}
-                      className="h-12 rounded-xl border-gray-200 disabled:opacity-50"
-                    />
+                    <div className="flex gap-3">
+                      <div className="flex-1 relative">
+                        <select
+                          value={formData.graduationDate.split('-')[1] || ''}
+                          onChange={(e) => {
+                            const year = formData.graduationDate.split('-')[0] || '';
+                            setFormData({ ...formData, graduationDate: year ? `${year}-${e.target.value}` : '' });
+                          }}
+                          disabled={formData.isStillEnrolled}
+                          className="w-full h-12 bg-white border border-gray-200 rounded-xl px-3 text-gray-900 appearance-none cursor-pointer hover:border-cv-blue-300 focus:border-cv-blue-500 focus:ring-2 focus:ring-cv-blue-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <option value="">Month</option>
+                          {MONTHS.map((month) => (
+                            <option key={month.value} value={month.value}>{month.label}</option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                      </div>
+                      <div className="flex-1 relative">
+                        <select
+                          value={formData.graduationDate.split('-')[0] || ''}
+                          onChange={(e) => {
+                            const month = formData.graduationDate.split('-')[1] || '01';
+                            setFormData({ ...formData, graduationDate: e.target.value ? `${e.target.value}-${month}` : '' });
+                          }}
+                          disabled={formData.isStillEnrolled}
+                          className="w-full h-12 bg-white border border-gray-200 rounded-xl px-3 text-gray-900 appearance-none cursor-pointer hover:border-cv-blue-300 focus:border-cv-blue-500 focus:ring-2 focus:ring-cv-blue-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <option value="">Year</option>
+                          {YEARS.map((year) => (
+                            <option key={year} value={year}>{year}</option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                      </div>
+                    </div>
                   </div>
 
                   <label className="flex items-center gap-3 cursor-pointer py-2">
