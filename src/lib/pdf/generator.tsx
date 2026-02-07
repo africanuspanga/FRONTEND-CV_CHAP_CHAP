@@ -5,6 +5,8 @@ import { KathleenPDF } from '@/components/templates/pdf/kathleen';
 import { OliverPDF } from '@/components/templates/pdf/oliver';
 import { AparnaPDF } from '@/components/templates/pdf/aparna';
 import { GracePDF } from '@/components/templates/pdf/grace';
+import { ClassicElegantPDF } from '@/components/templates/pdf/classic-elegant';
+import { HexagonBluePDF } from '@/components/templates/pdf/hexagon-blue';
 
 const templateColors: Record<string, string> = {
   'charles': '#0891B2',
@@ -28,6 +30,16 @@ const templateColors: Record<string, string> = {
   'grace-coral': '#E85A5A',
   'nelly-mint': '#3EB489',
   'nelly-gray': '#4B5563',
+  // New templates
+  'classic-elegant': '#1F2937',
+  'teal-accent': '#3B9B9B',
+  'professional-sidebar': '#6B7B8C',
+  'centered-traditional': '#1F2937',
+  'modern-header': '#4B5563',
+  'creative-yellow': '#F5C542',
+  'diamond-monogram': '#4B5563',
+  'timeline-gray': '#6B7280',
+  'hexagon-blue': '#2563EB',
 };
 
 export interface PDFGeneratorOptions {
@@ -54,6 +66,11 @@ export async function generatePDF(options: PDFGeneratorOptions): Promise<Buffer>
     case 'richard':
     case 'nelly-mint':
     case 'nelly-gray':
+    case 'teal-accent':
+    case 'professional-sidebar':
+    case 'creative-yellow':
+    case 'diamond-monogram':
+    case 'timeline-gray':
       element = <KathleenPDF data={data} colorOverride={finalColor} />;
       break;
     case 'oliver':
@@ -72,11 +89,19 @@ export async function generatePDF(options: PDFGeneratorOptions): Promise<Buffer>
     case 'grace-coral':
       element = <GracePDF data={data} colorOverride={finalColor} />;
       break;
+    case 'classic-elegant':
+    case 'centered-traditional':
+      element = <ClassicElegantPDF data={data} colorOverride={finalColor} />;
+      break;
+    case 'hexagon-blue':
+      element = <HexagonBluePDF data={data} colorOverride={finalColor} />;
+      break;
     case 'charles':
     case 'thomas':
     case 'denice':
     case 'nelly-purple':
     case 'nelly-sidebar':
+    case 'modern-header':
     default:
       element = <CharlesPDF data={data} colorOverride={finalColor} />;
       break;
@@ -101,6 +126,11 @@ export function getTemplate(templateId: string) {
     case 'richard':
     case 'nelly-mint':
     case 'nelly-gray':
+    case 'teal-accent':
+    case 'professional-sidebar':
+    case 'creative-yellow':
+    case 'diamond-monogram':
+    case 'timeline-gray':
       return KathleenPDF;
     case 'oliver':
     case 'lauren-orange':
@@ -115,6 +145,11 @@ export function getTemplate(templateId: string) {
     case 'grace-mint':
     case 'grace-coral':
       return GracePDF;
+    case 'classic-elegant':
+    case 'centered-traditional':
+      return ClassicElegantPDF;
+    case 'hexagon-blue':
+      return HexagonBluePDF;
     default:
       return CharlesPDF;
   }

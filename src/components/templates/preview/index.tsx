@@ -22,6 +22,15 @@ import { DenicePreview } from './denice';
 import { NellyPurplePreview } from './nelly-purple';
 import { AparnaDarkPreview } from './aparna-dark';
 import { AparnaGoldPreview } from './aparna-gold';
+import { ClassicElegantPreview } from './classic-elegant';
+import { TealAccentPreview } from './teal-accent';
+import { ProfessionalSidebarPreview } from './professional-sidebar';
+import { CenteredTraditionalPreview } from './centered-traditional';
+import { ModernHeaderPreview } from './modern-header';
+import { CreativeYellowPreview } from './creative-yellow';
+import { DiamondMonogramPreview } from './diamond-monogram';
+import { TimelineGrayPreview } from './timeline-gray';
+import { HexagonBluePreview } from './hexagon-blue';
 
 export interface TemplatePreviewProps {
   templateId: string;
@@ -54,6 +63,15 @@ const templateComponents: Record<string, TemplateComponent> = {
   'nelly-purple': NellyPurplePreview,
   'aparna-dark': AparnaDarkPreview,
   'aparna-gold': AparnaGoldPreview,
+  'classic-elegant': ClassicElegantPreview,
+  'teal-accent': TealAccentPreview,
+  'professional-sidebar': ProfessionalSidebarPreview,
+  'centered-traditional': CenteredTraditionalPreview,
+  'modern-header': ModernHeaderPreview,
+  'creative-yellow': CreativeYellowPreview,
+  'diamond-monogram': DiamondMonogramPreview,
+  'timeline-gray': TimelineGrayPreview,
+  'hexagon-blue': HexagonBluePreview,
 };
 
 export function TemplatePreview({ templateId, data, scale = 1, colorOverride }: TemplatePreviewProps) {
@@ -192,6 +210,15 @@ export {
   NellyPurplePreview,
   AparnaDarkPreview,
   AparnaGoldPreview,
+  ClassicElegantPreview,
+  TealAccentPreview,
+  ProfessionalSidebarPreview,
+  CenteredTraditionalPreview,
+  ModernHeaderPreview,
+  CreativeYellowPreview,
+  DiamondMonogramPreview,
+  TimelineGrayPreview,
+  HexagonBluePreview,
 };
 
 export default TemplatePreview;

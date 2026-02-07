@@ -1,7 +1,0 @@
-{
-  "/(builder)/preview/page": "app/(builder)/preview/page.js",
-  "/(builder)/summary/page": "app/(builder)/summary/page.js",
-  "/(builder)/additional/page": "app/(builder)/additional/page.js",
-  "/(builder)/references/page": "app/(builder)/references/page.js",
-  "/(builder)/experience/page": "app/(builder)/experience/page.js"
-}
