@@ -28,7 +28,7 @@ import sportpesaLogo from "@/assets/logos/sportpesa.webp";
 import amsonsLogo from "@/assets/logos/amsons.png";
 import tanzaniaGovtLogo from "@/assets/logos/tanzania-govt.png";
 import metlLogo from "@/assets/logos/metl.png";
-import heroCvImage from "../../public/images/cv-hero-image.png";
+
 
 // Select 6 templates to showcase on homepage (mix of styles)
 const homeTemplateIds = ['charles', 'kathleen', 'grace-mint', 'classic-elegant', 'hexagon-blue', 'creative-yellow'];
@@ -409,7 +409,7 @@ export default function HomePage() {
               <div className="relative">
                 {/* Hero Image */}
                 <Image
-                  src={heroCvImage}
+                  src="/images/cv-hero-image.png"
                   alt="Professional CV Example - Create your own CV"
                   width={550}
                   height={550}
