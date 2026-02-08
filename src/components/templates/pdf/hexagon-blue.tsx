@@ -159,6 +159,14 @@ export function HexagonBluePDF({ data, colorOverride }: Props) {
 
   const { personalInfo, summary, workExperiences, education, skills, languages, references } = data || {};
 
+  // Dynamic content balancing - match behavior of original templates
+  const totalExperiences = workExperiences?.length || 0;
+  const totalEducation = education?.length || 0;
+  const totalAchievements = workExperiences?.reduce((acc: number, exp: any) => acc + (exp.achievements?.length || 0), 0) || 0;
+  const hasMinimalContent = (totalExperiences + totalEducation) <= 3 || totalAchievements < 8;
+  const maxBullets = hasMinimalContent ? 5 : 4;
+  const maxSkills = 10;
+
   const initials = `${personalInfo?.firstName?.[0] || ''}${personalInfo?.lastName?.[0] || ''}`.toUpperCase();
 
   const getProficiencyWidth = (proficiency: string) => {
@@ -221,7 +229,7 @@ export function HexagonBluePDF({ data, colorOverride }: Props) {
             {skills?.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Skills</Text>
-                {skills.slice(0, 10).map((skill: any, i: number) => (
+                {skills.slice(0, maxSkills).map((skill: any, i: number) => (
                   <Text key={i} style={styles.skillItem}>• {skill.name}</Text>
                 ))}
               </View>
@@ -274,7 +282,7 @@ export function HexagonBluePDF({ data, colorOverride }: Props) {
                     <Text style={styles.expMeta}>
                       {exp.jobTitle} | {exp.location} | {exp.startDate} to {exp.isCurrent ? 'Current' : exp.endDate}
                     </Text>
-                    {exp.achievements?.slice(0, 4).map((a: string, j: number) => (
+                    {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
                       <Text key={j} style={styles.bullet}>• {a}</Text>
                     ))}
                   </View>

@@ -168,33 +168,26 @@ export default function ExperiencePage() {
       : '';
     const location = [formData.city, formData.state].filter(Boolean).join(', ');
 
+    const expData = {
+      jobTitle: formData.jobTitle,
+      company: formData.company,
+      location,
+      startDate,
+      endDate,
+      isCurrent: formData.isCurrent,
+    };
+
     if (currentExpId) {
       // Update existing
-      updateWorkExperience(currentExpId, {
-        jobTitle: formData.jobTitle,
-        company: formData.company,
-        location,
-        startDate,
-        endDate,
-        isCurrent: formData.isCurrent,
-      });
+      updateWorkExperience(currentExpId, expData);
     } else {
-      // Create new
-      addWorkExperience();
-      const newExp = cvData.workExperiences[cvData.workExperiences.length - 1];
+      // Create new with all data at once to avoid stale state issues
+      addWorkExperience(expData);
+      // Get the newly added experience ID from the updated store
+      const updatedExperiences = useCVStore.getState().cvData.workExperiences;
+      const newExp = updatedExperiences[updatedExperiences.length - 1];
       if (newExp) {
         setCurrentExpId(newExp.id);
-        // Use setTimeout to ensure state is updated
-        setTimeout(() => {
-          updateWorkExperience(newExp.id, {
-            jobTitle: formData.jobTitle,
-            company: formData.company,
-            location,
-            startDate,
-            endDate,
-            isCurrent: formData.isCurrent,
-          });
-        }, 0);
       }
     }
 

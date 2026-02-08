@@ -111,11 +111,9 @@ export default function SummaryPage() {
             <>
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-heading font-bold text-gray-900">
-                  Up Next: <span className="text-cv-green-600 underline decoration-cv-green-400 decoration-4">Summary</span>
+                  Your CV So Far
                 </h2>
-                <button className="text-cv-green-600 font-semibold mt-2 hover:underline">
-                  Change template
-                </button>
+                <p className="text-gray-500 text-sm mt-1">Review your details before adding a summary</p>
               </div>
 
               {isLoading && (

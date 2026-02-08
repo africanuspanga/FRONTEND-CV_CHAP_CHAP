@@ -135,6 +135,14 @@ export function ClassicElegantPDF({ data, colorOverride }: Props) {
 
   const { personalInfo, summary, workExperiences, education, skills, languages, references } = data || {};
 
+  // Dynamic content balancing - match behavior of original templates
+  const totalExperiences = workExperiences?.length || 0;
+  const totalEducation = education?.length || 0;
+  const totalAchievements = workExperiences?.reduce((acc: number, exp: any) => acc + (exp.achievements?.length || 0), 0) || 0;
+  const hasMinimalContent = (totalExperiences + totalEducation) <= 3 || totalAchievements < 8;
+  const maxBullets = hasMinimalContent ? 5 : 4;
+  const maxSkills = 10;
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -164,7 +172,7 @@ export function ClassicElegantPDF({ data, colorOverride }: Props) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Skills</Text>
             <View style={styles.skillsGrid}>
-              {skills.slice(0, 10).map((skill: any, i: number) => (
+              {skills.slice(0, maxSkills).map((skill: any, i: number) => (
                 <Text key={i} style={styles.skillItem}>• {skill.name}</Text>
               ))}
             </View>
@@ -183,7 +191,7 @@ export function ClassicElegantPDF({ data, colorOverride }: Props) {
                 <Text style={styles.expCompany}>
                   {exp.company} | {exp.location} | {exp.startDate} - {exp.isCurrent ? 'Current' : exp.endDate}
                 </Text>
-                {exp.achievements?.slice(0, 4).map((a: string, j: number) => (
+                {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
                   <Text key={j} style={styles.bullet}>• {a}</Text>
                 ))}
               </View>

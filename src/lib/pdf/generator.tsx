@@ -1,5 +1,4 @@
-import React from 'react';
-import ReactPDF from '@react-pdf/renderer';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CharlesPDF } from '@/components/templates/pdf/charles';
 import { KathleenPDF } from '@/components/templates/pdf/kathleen';
 import { OliverPDF } from '@/components/templates/pdf/oliver';
@@ -30,7 +29,6 @@ const templateColors: Record<string, string> = {
   'grace-coral': '#E85A5A',
   'nelly-mint': '#3EB489',
   'nelly-gray': '#4B5563',
-  // New templates
   'classic-elegant': '#1F2937',
   'teal-accent': '#3B9B9B',
   'professional-sidebar': '#6B7B8C',
@@ -42,80 +40,8 @@ const templateColors: Record<string, string> = {
   'hexagon-blue': '#2563EB',
 };
 
-export interface PDFGeneratorOptions {
-  templateId: string;
-  data: any;
-  colorOverride?: string | null;
-}
-
-export async function generatePDF(options: PDFGeneratorOptions): Promise<Buffer> {
-  const { templateId, data, colorOverride } = options;
-
-  const defaultColor = templateColors[templateId] || '#0891B2';
-  const finalColor = colorOverride || defaultColor;
-
-  console.log('PDF Generator - templateId:', templateId, '| color:', finalColor);
-
-  // Create the appropriate PDF element based on template
-  let element: React.ReactElement;
-
-  switch (templateId) {
-    case 'kathleen':
-    case 'lesley':
-    case 'kelly':
-    case 'richard':
-    case 'nelly-mint':
-    case 'nelly-gray':
-    case 'teal-accent':
-    case 'professional-sidebar':
-    case 'creative-yellow':
-    case 'diamond-monogram':
-    case 'timeline-gray':
-      element = <KathleenPDF data={data} colorOverride={finalColor} />;
-      break;
-    case 'oliver':
-    case 'lauren-orange':
-    case 'lauren-icons':
-      element = <OliverPDF data={data} colorOverride={finalColor} />;
-      break;
-    case 'aparna-dark':
-    case 'aparna-gold':
-      element = <AparnaPDF data={data} colorOverride={finalColor} />;
-      break;
-    case 'grace-minimal':
-    case 'grace-navy':
-    case 'grace-teal':
-    case 'grace-mint':
-    case 'grace-coral':
-      element = <GracePDF data={data} colorOverride={finalColor} />;
-      break;
-    case 'classic-elegant':
-    case 'centered-traditional':
-      element = <ClassicElegantPDF data={data} colorOverride={finalColor} />;
-      break;
-    case 'hexagon-blue':
-      element = <HexagonBluePDF data={data} colorOverride={finalColor} />;
-      break;
-    case 'charles':
-    case 'thomas':
-    case 'denice':
-    case 'nelly-purple':
-    case 'nelly-sidebar':
-    case 'modern-header':
-    default:
-      element = <CharlesPDF data={data} colorOverride={finalColor} />;
-      break;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pdfStream = await ReactPDF.renderToStream(element as any);
-
-  const chunks: Uint8Array[] = [];
-  for await (const chunk of pdfStream) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-  }
-
-  return Buffer.concat(chunks);
+export function getTemplateColor(templateId: string): string {
+  return templateColors[templateId] || '#0891B2';
 }
 
 export function getTemplate(templateId: string) {

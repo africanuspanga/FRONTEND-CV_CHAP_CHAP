@@ -3,17 +3,7 @@ import OpenAI from 'openai';
 import mammoth from 'mammoth';
 import { nanoid } from 'nanoid';
 
-// Dynamic import for pdf-parse to avoid bundling issues
-let pdfParse: any = null;
-
-async function getPdfParser() {
-  if (!pdfParse) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const module = await import('pdf-parse') as any;
-    pdfParse = module.default || module;
-  }
-  return pdfParse;
-}
+import { PDFParse } from 'pdf-parse';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -85,11 +75,12 @@ interface ExtractedCV {
 
 async function extractFromPDF(buffer: Buffer): Promise<string> {
   try {
-    const parser = await getPdfParser();
-    const data = await parser(buffer);
-    return data.text;
-  } catch (error) {
-    console.error('PDF parsing error:', error);
+    const parser = new PDFParse({ data: new Uint8Array(buffer) });
+    const result = await parser.getText();
+    await parser.destroy();
+    return result.text;
+  } catch (error: any) {
+    console.error('PDF parsing error:', error?.message || error);
     throw new Error('Failed to parse PDF file. Please ensure the PDF contains readable text (not just images).');
   }
 }

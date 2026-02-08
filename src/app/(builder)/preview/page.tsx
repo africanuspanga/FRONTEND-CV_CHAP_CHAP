@@ -10,6 +10,8 @@ import { Edit2, X, Check, Pencil, GripVertical, Download, Loader2, ChevronRight 
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StepHeader } from '@/components/builder/step-header';
+import { pdf } from '@react-pdf/renderer';
+import { getTemplate, getTemplateColor } from '@/lib/pdf/generator';
 
 const TEMPLATE_COLORS = [
   { id: 'default', color: '#ffffff', border: true },
@@ -58,17 +60,13 @@ export default function PreviewPage() {
   const handleDownloadCV = async () => {
     setIsDownloading(true);
     try {
-      const response = await fetch('/api/pdf/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cvData, templateId, colorOverride: selectedColor }),
-      });
+      const TemplateComponent = getTemplate(templateId || 'charles');
+      const finalColor = selectedColor || getTemplateColor(templateId || 'charles');
 
-      if (!response.ok) {
-        throw new Error('Failed to generate CV');
-      }
+      // Generate PDF client-side to avoid Turbopack JSX runtime mismatch on server
+      const element = <TemplateComponent data={cvData} colorOverride={finalColor} />;
+      const blob = await pdf(element).toBlob();
 
-      const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

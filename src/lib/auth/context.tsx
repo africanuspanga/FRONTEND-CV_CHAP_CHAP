@@ -51,7 +51,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .single();
 
     if (error) {
-      console.error('Error fetching profile:', error);
+      // Silently handle missing profile (e.g. unauthenticated or new user)
+      if (error.code !== 'PGRST116') {
+        console.error('Error fetching profile:', error);
+      }
       return null;
     }
     return data as Profile;

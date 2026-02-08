@@ -30,31 +30,38 @@ export function StepHeader({
     }
   };
 
+  const steps = Array.from({ length: totalSteps }, (_, i) => i + 1);
+
   return (
     <header className="bg-white sticky top-0 z-40">
-      {/* Navigation Row */}
-      <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100">
+      {/* Top bar */}
+      <div className="px-4 pt-3 pb-2 flex items-center justify-between">
         <button
           onClick={handleBack}
-          className="p-2 -ml-2 text-gray-600 hover:text-cv-blue-600 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-1.5 -ml-1.5 text-gray-400 hover:text-gray-900 rounded-lg transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <div className="w-10"></div>
+        <h1 className="text-sm font-semibold text-gray-900 tracking-tight">{title}</h1>
+        <span className="text-xs text-gray-400 tabular-nums">{currentStep} of {totalSteps}</span>
       </div>
 
-      {/* Step Indicator Card */}
-      <div className="flex justify-center py-4 px-4">
-        <div className="bg-gradient-to-r from-cv-blue-500 to-cyan-500 rounded-full px-6 py-3 shadow-lg shadow-cv-blue-500/20">
-          <div className="text-center">
-            <p className="text-white/90 text-xs font-medium tracking-wide">
-              Step {currentStep} of {totalSteps}
-            </p>
-            <p className="text-white text-base font-bold mt-0.5">
-              {title}
-            </p>
+      {/* Segmented progress bar */}
+      <div className="px-4 pb-3 flex gap-1.5">
+        {steps.map((step) => (
+          <div
+            key={step}
+            className="h-[3px] flex-1 rounded-full overflow-hidden bg-gray-100"
+          >
+            <div
+              className={`h-full rounded-full transition-all duration-500 ease-out ${
+                step <= currentStep
+                  ? 'w-full bg-cv-blue-600'
+                  : 'w-0 bg-cv-blue-600'
+              }`}
+            />
           </div>
-        </div>
+        ))}
       </div>
     </header>
   );
