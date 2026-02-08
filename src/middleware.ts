@@ -44,34 +44,33 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  const adminRoutes = ['/admin'];
-  const isAdminRoute = adminRoutes.some(route => 
-    request.nextUrl.pathname.startsWith(route)
-  );
+  // Admin login page: always accessible
+  if (request.nextUrl.pathname === '/admin-login') {
+    return supabaseResponse;
+  }
 
-  if (isAdminRoute) {
-    if (!session) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
-    }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
-      .single();
-
-    if (profile?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
+  // Admin routes: only check if logged in. Role check happens client-side in layout.
+  if (request.nextUrl.pathname.startsWith('/admin') && !session) {
+    return NextResponse.redirect(new URL('/admin-login', request.url));
   }
 
   const authRoutes = ['/auth/login', '/auth/register'];
-  const isAuthRoute = authRoutes.some(route => 
+  const isAuthRoute = authRoutes.some(route =>
     request.nextUrl.pathname.startsWith(route)
   );
 
   if (isAuthRoute && session) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  // Allow password reset pages for all users (reset-password needs session from email link)
+  const publicAuthRoutes = ['/auth/forgot-password', '/auth/reset-password', '/auth/callback'];
+  const isPublicAuthRoute = publicAuthRoutes.some(route =>
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  if (isPublicAuthRoute) {
+    return supabaseResponse;
   }
 
   return supabaseResponse;

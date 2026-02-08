@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { FileText, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { GoogleButton } from '@/components/auth/google-button';
+import { AuthDivider } from '@/components/auth/auth-divider';
 
 function RegisterForm() {
   const router = useRouter();
@@ -19,6 +21,7 @@ function RegisterForm() {
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -44,7 +47,8 @@ function RegisterForm() {
     setIsLoading(true);
 
     try {
-      const { error } = await signUp(email, password, fullName);
+      const fullPhone = phone ? `+255${phone.replace(/^0/, '')}` : undefined;
+      const { error } = await signUp(email, password, fullName, fullPhone);
 
       if (error) {
         setError(error.message);
@@ -100,6 +104,10 @@ function RegisterForm() {
       </CardHeader>
 
       <CardContent>
+        <GoogleButton label="Sign up with Google" />
+
+        <AuthDivider />
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="fullName">Full Name</Label>
@@ -125,6 +133,25 @@ function RegisterForm() {
               required
               className="mt-1"
             />
+          </div>
+
+          <div>
+            <Label htmlFor="phone">Phone Number</Label>
+            <div className="flex gap-2 mt-1">
+              <div className="flex items-center px-3 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-600 shrink-0">
+                +255
+              </div>
+              <Input
+                id="phone"
+                type="tel"
+                inputMode="numeric"
+                placeholder="7XX XXX XXX"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value.replace(/[^\d]/g, ''))}
+                required
+                className="flex-1"
+              />
+            </div>
           </div>
 
           <div>

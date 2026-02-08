@@ -28,7 +28,7 @@ import sportpesaLogo from "@/assets/logos/sportpesa.webp";
 import amsonsLogo from "@/assets/logos/amsons.png";
 import tanzaniaGovtLogo from "@/assets/logos/tanzania-govt.png";
 import metlLogo from "@/assets/logos/metl.png";
-import heroCvImage from "@/assets/hero-cv.png";
+import heroCvImage from "../../public/images/CV HERO IMAGE.png";
 
 // Select 6 templates to showcase on homepage (mix of styles)
 const homeTemplateIds = ['charles', 'kathleen', 'grace-mint', 'classic-elegant', 'hexagon-blue', 'creative-yellow'];

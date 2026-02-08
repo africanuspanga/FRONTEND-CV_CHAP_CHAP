@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/context';
 import {
   LayoutDashboard,
@@ -10,9 +10,10 @@ import {
   FileText,
   CreditCard,
   BarChart3,
+  FlaskConical,
   LogOut,
   Menu,
-  X,
+  ShieldX,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -21,12 +22,50 @@ const NAV_ITEMS = [
   { href: '/admin/cvs', label: 'CVs', icon: FileText },
   { href: '/admin/payments', label: 'Payments', icon: CreditCard },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/admin/test-payment', label: 'Test Payment', icon: FlaskConical },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { profile, signOut } = useAuth();
+  const router = useRouter();
+  const { profile, isLoading, isAdmin, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  // Not admin — block access
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+        <div className="text-center">
+          <ShieldX className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
+          <p className="text-gray-400 mb-6">This account does not have admin privileges.</p>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => { signOut(); router.push('/admin-login'); }}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              Sign in as Admin
+            </button>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const isActive = (href: string) => {
     if (href === '/admin') return pathname === '/admin';
@@ -82,12 +121,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
-      {/* Desktop sidebar */}
       <aside className="hidden lg:block w-64 fixed inset-y-0 left-0 z-30">
         {sidebar}
       </aside>
 
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
@@ -97,9 +134,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       )}
 
-      {/* Main content */}
       <div className="flex-1 lg:ml-64">
-        {/* Mobile header */}
         <header className="lg:hidden bg-white border-b px-4 py-3 flex items-center justify-between sticky top-0 z-20">
           <button onClick={() => setSidebarOpen(true)} className="p-1">
             <Menu className="w-6 h-6 text-gray-700" />

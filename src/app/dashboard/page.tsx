@@ -26,7 +26,7 @@ interface CVWithPayment {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, profile, isLoading: authLoading, signOut } = useAuth();
+  const { user, profile, isLoading: authLoading, signOut, claimAnonymousCVs } = useAuth();
   const [cvs, setCVs] = useState<CVWithPayment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -35,6 +35,19 @@ export default function DashboardPage() {
       router.push('/auth/login?redirect=/dashboard');
     }
   }, [authLoading, user, router]);
+
+  // Claim anonymous CVs on mount (handles post-OAuth redirect)
+  useEffect(() => {
+    if (!user) return;
+    const anonymousId = localStorage.getItem('cv_anonymous_id');
+    if (anonymousId) {
+      claimAnonymousCVs(anonymousId).then((claimed) => {
+        if (claimed > 0) {
+          localStorage.removeItem('cv_anonymous_id');
+        }
+      });
+    }
+  }, [user, claimAnonymousCVs]);
 
   useEffect(() => {
     const fetchCVs = async () => {
