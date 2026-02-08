@@ -6,9 +6,10 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth/context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { FileText } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { FileText, Eye, EyeOff } from 'lucide-react';
+import { GoogleButton } from '@/components/auth/google-button';
+import { AuthDivider } from '@/components/auth/auth-divider';
 
 function LoginForm() {
   const router = useRouter();
@@ -17,8 +18,9 @@ function LoginForm() {
 
   const { signIn, claimAnonymousCVs } = useAuth();
 
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,8 +30,7 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
-      const { error } = await signIn(email, password);
-
+      const { error } = await signIn(identifier.trim(), password);
       if (error) {
         setError(error.message);
         return;
@@ -38,13 +39,11 @@ function LoginForm() {
       const anonymousId = localStorage.getItem('cv_anonymous_id');
       if (anonymousId) {
         const claimed = await claimAnonymousCVs(anonymousId);
-        if (claimed > 0) {
-          localStorage.removeItem('cv_anonymous_id');
-        }
+        if (claimed > 0) localStorage.removeItem('cv_anonymous_id');
       }
 
       router.push(redirectTo);
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -53,43 +52,48 @@ function LoginForm() {
 
   return (
     <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <Link href="/" className="inline-flex items-center justify-center gap-2 mb-4">
+      <CardHeader className="text-center pb-2">
+        <Link href="/" className="inline-flex items-center justify-center gap-2 mb-2 mx-auto">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cv-blue-500 to-cyan-400 flex items-center justify-center">
             <FileText className="w-6 h-6 text-white" />
           </div>
           <span className="text-xl font-bold text-cv-blue-600">CV Chap Chap</span>
         </Link>
-        <CardTitle className="text-2xl">Welcome Back</CardTitle>
-        <CardDescription>Sign in to access your CVs</CardDescription>
       </CardHeader>
 
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-1"
-            />
-          </div>
+        <GoogleButton />
+        <AuthDivider />
 
-          <div>
-            <Label htmlFor="password">Password</Label>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <Input
+            type="text"
+            placeholder="Phone number or email"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            required
+            className="h-11"
+            autoComplete="username"
+          />
+
+          <div className="relative">
             <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="mt-1"
+              className="h-11 pr-10"
+              autoComplete="current-password"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
 
           {error && (
@@ -100,29 +104,29 @@ function LoginForm() {
 
           <Button
             type="submit"
-            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700"
+            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 h-11 text-base"
             disabled={isLoading}
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? 'Please wait...' : 'Log In'}
           </Button>
         </form>
 
-        <div className="mt-6 text-center text-sm">
-          <Link href="/auth/forgot-password" className="text-cv-blue-600 hover:underline">
+        <div className="mt-4 text-center">
+          <Link href="/auth/forgot-password" className="text-xs text-cv-blue-600 hover:underline">
             Forgot password?
           </Link>
         </div>
 
-        <div className="mt-4 text-center text-sm text-gray-600">
+        <div className="mt-6 pt-6 border-t text-center text-sm text-gray-600">
           Don&apos;t have an account?{' '}
-          <Link href={`/auth/register?redirect=${redirectTo}`} className="text-cv-blue-600 hover:underline font-medium">
-            Sign up free
+          <Link href={`/auth/register?redirect=${redirectTo}`} className="text-cv-blue-600 hover:underline font-semibold">
+            Sign up
           </Link>
         </div>
 
-        <div className="mt-6 pt-6 border-t text-center">
-          <Link href="/template" className="text-sm text-gray-500 hover:text-gray-700">
-            ← Continue without account
+        <div className="mt-4 text-center">
+          <Link href="/template" className="text-xs text-gray-400 hover:text-gray-600">
+            Continue without account
           </Link>
         </div>
       </CardContent>
