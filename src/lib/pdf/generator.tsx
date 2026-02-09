@@ -50,6 +50,8 @@ export function getTemplate(templateId: string) {
     case 'lesley':
     case 'kelly':
     case 'richard':
+    case 'nelly-purple':
+    case 'nelly-sidebar':
     case 'nelly-mint':
     case 'nelly-gray':
     case 'teal-accent':
@@ -62,6 +64,11 @@ export function getTemplate(templateId: string) {
     case 'lauren-orange':
     case 'lauren-icons':
       return OliverPDF;
+    case 'charles':
+    case 'denice':
+    case 'thomas':
+    case 'modern-header':
+      return CharlesPDF;
     case 'aparna-dark':
     case 'aparna-gold':
       return AparnaPDF;

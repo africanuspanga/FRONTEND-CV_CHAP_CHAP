@@ -295,7 +295,7 @@ export default function SkillsPage() {
                 onClick={handleAcceptSuggestions}
                 className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl mb-3"
               >
-                Add skills to my resume
+                Add skills to my CV
               </Button>
 
               <button
