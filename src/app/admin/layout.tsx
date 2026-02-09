@@ -14,6 +14,7 @@ import {
   LogOut,
   Menu,
   ShieldX,
+  UserCheck,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { href: '/admin/cvs', label: 'CVs', icon: FileText },
   { href: '/admin/payments', label: 'Payments', icon: CreditCard },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/admin/affiliates', label: 'Affiliates', icon: UserCheck },
   { href: '/admin/test-payment', label: 'Test Payment', icon: FlaskConical },
 ];
 

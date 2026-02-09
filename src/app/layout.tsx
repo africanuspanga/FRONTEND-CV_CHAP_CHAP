@@ -3,6 +3,8 @@ import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/lib/auth/context";
+import { ReferralTracker } from "@/components/referral-tracker";
+import { Suspense } from "react";
 
 const plusJakarta = Plus_Jakarta_Sans({ 
   subsets: ["latin"],
@@ -27,8 +29,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+      </head>
       <body className={`${plusJakarta.variable} ${spaceGrotesk.variable} font-body`}>
         <AuthProvider>
+          <Suspense fallback={null}>
+            <ReferralTracker />
+          </Suspense>
           {children}
         </AuthProvider>
         <Toaster />

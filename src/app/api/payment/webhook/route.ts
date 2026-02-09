@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyWebhookSignature } from '@/lib/selcom/client';
-import { updatePaymentStatus, getCVById, updateCVStatus } from '@/lib/supabase/database';
+import { updatePaymentStatus, getCVById, updateCVStatus, getPaymentByOrderId } from '@/lib/supabase/database';
+import { createClient as createServiceClient } from '@supabase/supabase-js';
 
 interface SelcomWebhookPayload {
   result: string;
@@ -59,6 +60,45 @@ export async function POST(request: NextRequest) {
         if (cv) {
           await updateCVStatus(cv.id, 'paid');
         }
+      }
+
+      // Record affiliate conversion if payment has an affiliate
+      try {
+        const payment = await getPaymentByOrderId(orderId);
+        if (payment?.affiliate_id) {
+          const serviceSupabase = createServiceClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+          );
+
+          // Get affiliate commission rate
+          const { data: affiliate } = await serviceSupabase
+            .from('affiliates')
+            .select('id, commission_rate')
+            .eq('id', payment.affiliate_id)
+            .single();
+
+          if (affiliate) {
+            const amount = Number(body.amount) || 5000;
+            const commission = (amount * affiliate.commission_rate) / 100;
+
+            // Look up the CV to get the user_id
+            const paymentCV = payment.cv_id ? await getCVById(payment.cv_id) : null;
+
+            await serviceSupabase.rpc('record_affiliate_conversion', {
+              p_affiliate_id: affiliate.id,
+              p_payment_id: payment.id,
+              p_customer_user_id: paymentCV?.user_id || null,
+              p_amount: amount,
+              p_commission: commission,
+            });
+
+            console.log(`Affiliate conversion recorded: ${affiliate.id}, commission: ${commission}`);
+          }
+        }
+      } catch (affError) {
+        console.error('Affiliate conversion recording failed:', affError);
+        // Don't fail the webhook for affiliate errors
       }
 
       console.log(`Payment completed for order ${orderId}`);

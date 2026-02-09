@@ -43,18 +43,23 @@ export default function PreviewPage() {
         const containerHeight = containerRef.current.offsetHeight;
         const cvWidth = 794;
         const cvHeight = 1123;
-        
-        // Calculate scale to fit both width and height (no scrolling)
-        const scaleByWidth = containerWidth / cvWidth;
+
+        // Fit both width and height — cap at 0.55 for readability
+        const scaleByWidth = (containerWidth - 8) / cvWidth; // small side margin
         const scaleByHeight = containerHeight / cvHeight;
         const newScale = Math.min(scaleByWidth, scaleByHeight, 0.55);
-        setScale(newScale);
+        setScale(Math.max(newScale, 0.25)); // floor so it never vanishes
       }
     };
-    
+
     updateScale();
     window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
+    // Also recalculate when mobile address bar shows/hides
+    window.addEventListener('orientationchange', updateScale);
+    return () => {
+      window.removeEventListener('resize', updateScale);
+      window.removeEventListener('orientationchange', updateScale);
+    };
   }, []);
 
   const handleDownloadCV = async () => {
@@ -99,7 +104,7 @@ export default function PreviewPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#e8edf2] flex flex-col">
+    <div className="min-h-[100dvh] bg-[#e8edf2] flex flex-col">
       <StepHeader
         currentStep={8}
         totalSteps={8}
@@ -107,31 +112,31 @@ export default function PreviewPage() {
         backPath="/additional"
       />
 
-      {/* Action Buttons - Blue Brand Color */}
-      <div className="flex justify-center gap-3 px-4 pb-3 bg-white">
+      {/* Action Buttons - wraps on tiny screens */}
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-3 px-3 sm:px-4 pb-3 bg-white">
         <button
           onClick={() => setShowChangeTemplate(true)}
-          className="flex items-center gap-2 bg-cv-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-medium shadow-lg hover:bg-cv-blue-700 transition-colors"
+          className="flex items-center gap-1.5 sm:gap-2 bg-cv-blue-600 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium shadow-lg hover:bg-cv-blue-700 transition-colors"
         >
-          <Pencil className="h-4 w-4" /> Change Template
+          <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Change Template
         </button>
         <button
           onClick={() => setShowEditResume(true)}
-          className="flex items-center gap-2 bg-white text-cv-blue-600 px-5 py-2.5 rounded-full text-sm font-medium shadow-lg border-2 border-cv-blue-600 hover:bg-cv-blue-50 transition-colors"
+          className="flex items-center gap-1.5 sm:gap-2 bg-white text-cv-blue-600 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium shadow-lg border-2 border-cv-blue-600 hover:bg-cv-blue-50 transition-colors"
         >
-          <Edit2 className="h-4 w-4" /> Edit Resume
+          <Edit2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Edit Resume
         </button>
       </div>
 
-      {/* CV Preview Container - Fit to Screen (No Scrolling) */}
-      <div className="flex-1 flex justify-center items-center px-4 overflow-hidden min-h-0 pb-20">
-        <div 
+      {/* CV Preview Container - leaves room for fixed bottom button + safe area */}
+      <div className="flex-1 flex justify-center items-center px-3 sm:px-4 overflow-hidden min-h-0 pb-[100px]">
+        <div
           ref={containerRef}
           className="relative w-full max-w-[400px] h-full flex items-center justify-center"
         >
           {/* Phone-like card container */}
-          <div 
-            className="bg-white rounded-2xl shadow-2xl overflow-hidden"
+          <div
+            className="bg-white rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden"
             style={{
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
               width: `${794 * scale}px`,
@@ -139,7 +144,7 @@ export default function PreviewPage() {
             }}
           >
             {/* CV content - scaled to fit */}
-            <div 
+            <div
               className="origin-top-left"
               style={{
                 width: '794px',
@@ -159,26 +164,31 @@ export default function PreviewPage() {
         </div>
       </div>
 
-      {/* Bottom Button - Fixed */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#e8edf2] via-[#e8edf2] to-transparent z-10">
-        <div className="max-w-[400px] mx-auto">
-          <button
-            onClick={handleDownloadCV}
-            disabled={isDownloading}
-            className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 disabled:bg-cv-blue-400 text-white text-lg font-semibold py-4 rounded-2xl shadow-lg transition-colors flex items-center justify-center gap-2"
-          >
-            {isDownloading ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Download className="h-5 w-5" />
-                Download CV
-              </>
-            )}
-          </button>
+      {/* Bottom Download Button - Fixed, safe-area aware */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-10 bg-[#e8edf2]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
+        <div className="bg-gradient-to-t from-[#e8edf2] from-80% to-transparent pt-6 px-3 sm:px-4 pb-3 sm:pb-4">
+          <div className="max-w-[400px] mx-auto">
+            <button
+              onClick={handleDownloadCV}
+              disabled={isDownloading}
+              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 disabled:bg-cv-blue-400 text-white text-base sm:text-lg font-semibold py-3.5 sm:py-4 rounded-2xl shadow-lg transition-colors flex items-center justify-center gap-2"
+            >
+              {isDownloading ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Download className="h-5 w-5" />
+                  Download CV
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -191,7 +201,7 @@ export default function PreviewPage() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 z-50 overflow-y-auto"
           >
-            <div className="min-h-screen py-8 px-4">
+            <div className="min-h-[100dvh] py-4 sm:py-8 px-3 sm:px-4">
               <div className="bg-white rounded-2xl max-w-lg mx-auto">
                 <div className="flex items-center justify-between p-4 border-b">
                   <h2 className="text-xl font-heading font-bold">Change Template</h2>
@@ -369,7 +379,10 @@ export default function PreviewPage() {
                 </div>
               </main>
 
-              <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t p-4">
+              <div
+                className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t p-4"
+                style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
+              >
                 <div className="container mx-auto max-w-lg">
                   <Button
                     onClick={() => setShowEditResume(false)}

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useCVStore } from "@/stores/cv-store";
 import { ArrowLeft, Phone, CheckCircle, Loader2, Download, RefreshCw } from "lucide-react";
+import { getStoredReferralCode } from "@/components/referral-tracker";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 
@@ -99,6 +100,7 @@ export default function PaymentPage() {
           name: `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`,
           cvData,
           templateId,
+          referral_code: getStoredReferralCode(),
         }),
       });
       

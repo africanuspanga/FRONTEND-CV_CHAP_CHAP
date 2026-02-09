@@ -13,7 +13,7 @@ interface ExtractionProgress {
 
 export function CVUploadZone() {
   const router = useRouter();
-  const { setCVData, templateId } = useCVStore();
+  const { setCVData, setCurrentStep } = useCVStore();
   
   const [isDragging, setIsDragging] = useState(false);
   const [progress, setProgress] = useState<ExtractionProgress>({
@@ -122,9 +122,9 @@ export function CVUploadZone() {
         accomplishments: [],
       });
 
-      // Go directly to preview so user can see their complete CV
-      // From preview they can edit any section or change template
-      router.push('/preview');
+      // Take user through the multi-step builder to review/edit extracted data
+      setCurrentStep('personal');
+      router.push('/personal');
     }
   };
 

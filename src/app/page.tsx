@@ -942,6 +942,7 @@ export default function HomePage() {
                 <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
                 <li><a href="#templates" className="hover:text-white transition-colors">Templates</a></li>
                 <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><Link href="/affiliate" className="hover:text-white transition-colors">Become an Affiliate</Link></li>
               </ul>
             </div>
 
@@ -950,8 +951,8 @@ export default function HomePage() {
               <h4 className="font-display font-semibold mb-4">Contact</h4>
               <ul className="space-y-3 text-gray-400">
                 <li>Dar es Salaam, Tanzania</li>
-                <li>info@cvchapchap.com</li>
-                <li>+255 xxx xxx xxx</li>
+                <li><a href="mailto:info@cvchapchap.com" className="hover:text-white transition-colors">info@cvchapchap.com</a></li>
+                <li><a href="tel:+255682152148" className="hover:text-white transition-colors">+255 682 152 148</a></li>
               </ul>
             </div>
           </div>

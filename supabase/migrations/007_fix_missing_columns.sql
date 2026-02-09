@@ -1,6 +1,5 @@
 -- Fix missing columns and ensure admin profile exists
 -- Run this in Supabase SQL Editor
-
 -- Add missing columns to profiles
 ALTER TABLE public.profiles
 ADD COLUMN IF NOT EXISTS last_login TIMESTAMPTZ,

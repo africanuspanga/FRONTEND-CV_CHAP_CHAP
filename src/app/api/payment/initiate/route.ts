@@ -2,17 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createOrderMinimal } from '@/lib/selcom/client';
 import { createCV, createPayment } from '@/lib/supabase/database';
 import { CVData } from '@/types/cv';
+import { createClient as createServiceClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { 
-      cvData, 
-      templateId, 
-      phone, 
-      email, 
+      cvData,
+      templateId,
+      phone,
+      email,
       name,
-      anonymousId 
+      anonymousId,
+      referral_code,
     } = body as {
       cvData: CVData;
       templateId: string;
@@ -20,6 +22,7 @@ export async function POST(request: NextRequest) {
       email: string;
       name: string;
       anonymousId?: string;
+      referral_code?: string;
     };
 
     const cleanPhone = phone.replace(/\D/g, '');
@@ -65,7 +68,26 @@ export async function POST(request: NextRequest) {
     }
 
     const paymentToken = selcomOrder.data[0]?.payment_token;
-    await createPayment(cv.id, orderId);
+
+    // Look up affiliate from referral code
+    let affiliateId: string | null = null;
+    if (referral_code) {
+      const serviceSupabase = createServiceClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+      const { data: affiliate } = await serviceSupabase
+        .from('affiliates')
+        .select('id')
+        .eq('referral_code', referral_code)
+        .eq('status', 'approved')
+        .single();
+      if (affiliate) {
+        affiliateId = affiliate.id;
+      }
+    }
+
+    const payment = await createPayment(cv.id, orderId, msisdn, affiliateId);
 
     return NextResponse.json({
       success: true,

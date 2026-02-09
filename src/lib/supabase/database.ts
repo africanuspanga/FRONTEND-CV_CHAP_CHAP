@@ -71,19 +71,24 @@ export async function getCVByAnonymousId(anonymousId: string) {
   return cv;
 }
 
-export async function createPayment(cvId: string, requestId: string, phoneNumber?: string) {
+export async function createPayment(cvId: string, requestId: string, phoneNumber?: string, affiliateId?: string | null) {
   const supabase = await createClient();
-  
+
+  const insertData: Record<string, unknown> = {
+    cv_id: cvId,
+    request_id: requestId,
+    amount: 5000,
+    currency: 'TZS',
+    status: 'pending',
+    phone_number: phoneNumber,
+  };
+  if (affiliateId) {
+    insertData.affiliate_id = affiliateId;
+  }
+
   const { data: payment, error } = await supabase
     .from('payments')
-    .insert({
-      cv_id: cvId,
-      request_id: requestId,
-      amount: 5000,
-      currency: 'TZS',
-      status: 'pending',
-      phone_number: phoneNumber,
-    })
+    .insert(insertData)
     .select()
     .single();
 
