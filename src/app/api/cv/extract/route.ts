@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import mammoth from 'mammoth';
 import { nanoid } from 'nanoid';
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
-
-// Disable worker for serverless environments (Vercel has no Web Workers)
-GlobalWorkerOptions.workerPort = null;
+// pdfjs-dist is loaded dynamically to avoid Turbopack bundling issues with workers
+async function getPdfJs() {
+  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  pdfjsLib.GlobalWorkerOptions.workerPort = null;
+  return pdfjsLib;
+}
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -77,9 +79,9 @@ interface ExtractedCV {
 
 async function extractFromPDF(buffer: Buffer): Promise<string> {
   try {
+    const pdfjsLib = await getPdfJs();
     const data = new Uint8Array(buffer);
-    const standardFontDataUrl = new URL('pdfjs-dist/standard_fonts/', import.meta.url).href;
-    const doc = await getDocument({ data, useWorkerFetch: false, isEvalSupported: false, useSystemFonts: false, standardFontDataUrl }).promise;
+    const doc = await pdfjsLib.getDocument({ data, useWorkerFetch: false, isEvalSupported: false, useSystemFonts: false }).promise;
     const textParts: string[] = [];
 
     for (let i = 1; i <= doc.numPages; i++) {
