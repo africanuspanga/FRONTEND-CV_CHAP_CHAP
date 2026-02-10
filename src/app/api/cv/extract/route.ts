@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import mammoth from 'mammoth';
 import { nanoid } from 'nanoid';
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
+
+// Disable worker for serverless environments (Vercel has no Web Workers)
+GlobalWorkerOptions.workerSrc = '';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -75,7 +78,7 @@ interface ExtractedCV {
 async function extractFromPDF(buffer: Buffer): Promise<string> {
   try {
     const data = new Uint8Array(buffer);
-    const doc = await getDocument({ data, useSystemFonts: true }).promise;
+    const doc = await getDocument({ data, useWorkerFetch: false, isEvalSupported: false, useSystemFonts: false }).promise;
     const textParts: string[] = [];
 
     for (let i = 1; i <= doc.numPages; i++) {
