@@ -18,7 +18,8 @@ import {
   Loader2,
   Pencil,
   GripVertical,
-  Check
+  Check,
+  Sparkles
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -259,6 +260,40 @@ export default function ExperiencePage() {
       setFlowStep('recommendations');
     } catch (err) {
       setAiError('Failed to generate suggestions. Please try again.');
+      setFlowStep('recommendations');
+    } finally {
+      setIsLoadingAI(false);
+    }
+  };
+
+  // Generate AI suggestions from edit-achievements step
+  const handleGenerateAI = async () => {
+    if (!formData.jobTitle || !formData.company) return;
+
+    setIsLoadingAI(true);
+    setAiError('');
+
+    try {
+      const response = await fetch('/api/ai/job-descriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobTitle: formData.jobTitle,
+          company: formData.company
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setAiSuggestions(data.suggestions || []);
+      setFlowStep('recommendations');
+    } catch (err) {
+      setAiError('Failed to generate suggestions. Please try again.');
+      console.error(err);
       setFlowStep('recommendations');
     } finally {
       setIsLoadingAI(false);
@@ -740,7 +775,7 @@ export default function ExperiencePage() {
           currentStep={2}
           totalSteps={8}
           title="Job Description"
-          onBack={() => setFlowStep('form')}
+          onBack={() => setFlowStep(currentExpId ? 'review' : 'form')}
         />
 
         <main className="px-4 py-6 pb-28">
@@ -752,11 +787,24 @@ export default function ExperiencePage() {
               <p className="text-gray-500 text-sm">{formData.company}</p>
             </div>
 
-            <div className="bg-cv-blue-50 rounded-2xl p-4 mb-6 border border-cv-blue-100">
+            <div className="bg-cv-blue-50 rounded-2xl p-4 mb-4 border border-cv-blue-100">
               <p className="text-cv-blue-700 text-sm">
                 List your responsibilities and achievements, or use the pre-written phrases below.
               </p>
             </div>
+
+            <button
+              onClick={handleGenerateAI}
+              disabled={isLoadingAI}
+              className="w-full mb-6 flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-cv-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-cv-blue-700 hover:to-indigo-700 transition-all disabled:opacity-60"
+            >
+              {isLoadingAI ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Sparkles className="h-5 w-5" />
+              )}
+              {isLoadingAI ? 'Generating...' : 'Generate with AI'}
+            </button>
 
             <div className="space-y-3 mb-6">
               <div className="flex items-center justify-between">

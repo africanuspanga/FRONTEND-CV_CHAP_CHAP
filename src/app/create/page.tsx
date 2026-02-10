@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, CheckCircle } from 'lucide-react';
 
 const features = [
-  '21+ Professional CV Designs',
+  '35+ Professional CV Designs',
   'AI-Powered Content Suggestions',
   '1000+ Job-Specific Phrases',
   '7 Template Color Options',

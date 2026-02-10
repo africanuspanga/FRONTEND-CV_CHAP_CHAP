@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import mammoth from 'mammoth';
 import { nanoid } from 'nanoid';
-
-import { PDFParse } from 'pdf-parse';
+import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -75,10 +74,21 @@ interface ExtractedCV {
 
 async function extractFromPDF(buffer: Buffer): Promise<string> {
   try {
-    const parser = new PDFParse({ data: new Uint8Array(buffer) });
-    const result = await parser.getText();
-    await parser.destroy();
-    return result.text;
+    const data = new Uint8Array(buffer);
+    const doc = await getDocument({ data, useSystemFonts: true }).promise;
+    const textParts: string[] = [];
+
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items
+        .map((item: any) => item.str)
+        .join(' ');
+      textParts.push(pageText);
+    }
+
+    doc.destroy();
+    return textParts.join('\n');
   } catch (error: any) {
     console.error('PDF parsing error:', error?.message || error);
     throw new Error('Failed to parse PDF file. Please ensure the PDF contains readable text (not just images).');

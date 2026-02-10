@@ -9,7 +9,7 @@ const nextConfig = {
       },
     ],
   },
-  serverExternalPackages: ['@react-pdf/renderer', '@react-pdf/layout', '@react-pdf/pdfkit', 'pdf-parse'],
+  serverExternalPackages: ['@react-pdf/renderer', '@react-pdf/layout', '@react-pdf/pdfkit', 'pdfjs-dist'],
 };
 
 export default nextConfig;
