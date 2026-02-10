@@ -58,10 +58,25 @@ export function CVUploadZone() {
 
       setProgress({ stage: 'extracting', message: 'Extracting information with AI...', percent: 60 });
 
-      const result = await response.json();
-
       if (!response.ok) {
-        throw new Error(result.error || 'Extraction failed');
+        let errorMessage = 'Extraction failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // Response body was empty or not valid JSON (e.g., server timeout)
+          errorMessage = response.status === 504
+            ? 'Request timed out. Please try again with a smaller file.'
+            : `Server error (${response.status}). Please try again.`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        throw new Error('Failed to process server response. Please try again.');
       }
 
       setProgress({ stage: 'processing', message: 'Organizing your data...', percent: 90 });

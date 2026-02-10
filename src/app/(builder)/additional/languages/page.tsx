@@ -60,6 +60,15 @@ export default function LanguagesPage() {
   };
 
   const handleSave = () => {
+    // Save any unsaved language in the form before navigating
+    if (newLanguage.name) {
+      const exists = languages.some(
+        l => l.name.toLowerCase() === newLanguage.name.toLowerCase()
+      );
+      if (!exists) {
+        addLanguage({ name: newLanguage.name, proficiency: newLanguage.proficiency });
+      }
+    }
     router.push('/additional');
   };
 
@@ -188,7 +197,7 @@ export default function LanguagesPage() {
             className="flex items-center gap-2 text-cv-blue-600 font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="h-5 w-5" />
-            Add another language
+            {languages.length === 0 ? 'Add language' : 'Add another language'}
           </button>
         </div>
       </main>
