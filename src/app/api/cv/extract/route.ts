@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 // Disable worker for serverless environments (Vercel has no Web Workers)
-GlobalWorkerOptions.workerSrc = '';
+GlobalWorkerOptions.workerPort = null;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -78,7 +78,8 @@ interface ExtractedCV {
 async function extractFromPDF(buffer: Buffer): Promise<string> {
   try {
     const data = new Uint8Array(buffer);
-    const doc = await getDocument({ data, useWorkerFetch: false, isEvalSupported: false, useSystemFonts: false }).promise;
+    const standardFontDataUrl = new URL('pdfjs-dist/standard_fonts/', import.meta.url).href;
+    const doc = await getDocument({ data, useWorkerFetch: false, isEvalSupported: false, useSystemFonts: false, standardFontDataUrl }).promise;
     const textParts: string[] = [];
 
     for (let i = 1; i <= doc.numPages; i++) {
