@@ -2,12 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import mammoth from 'mammoth';
 import { nanoid } from 'nanoid';
-// pdfjs-dist is loaded dynamically to avoid Turbopack bundling issues with workers
-async function getPdfJs() {
-  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-  pdfjsLib.GlobalWorkerOptions.workerPort = null;
-  return pdfjsLib;
-}
+import pdfParse from 'pdf-parse';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -79,22 +74,8 @@ interface ExtractedCV {
 
 async function extractFromPDF(buffer: Buffer): Promise<string> {
   try {
-    const pdfjsLib = await getPdfJs();
-    const data = new Uint8Array(buffer);
-    const doc = await pdfjsLib.getDocument({ data, useWorkerFetch: false, isEvalSupported: false, useSystemFonts: false }).promise;
-    const textParts: string[] = [];
-
-    for (let i = 1; i <= doc.numPages; i++) {
-      const page = await doc.getPage(i);
-      const content = await page.getTextContent();
-      const pageText = content.items
-        .map((item: any) => item.str)
-        .join(' ');
-      textParts.push(pageText);
-    }
-
-    doc.destroy();
-    return textParts.join('\n');
+    const result = await pdfParse(buffer);
+    return result.text;
   } catch (error: any) {
     console.error('PDF parsing error:', error?.message || error);
     throw new Error('Failed to parse PDF file. Please ensure the PDF contains readable text (not just images).');
