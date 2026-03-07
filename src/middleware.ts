@@ -49,9 +49,24 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // Admin routes: only check if logged in. Role check happens client-side in layout.
-  if (request.nextUrl.pathname.startsWith('/admin') && !session) {
-    return NextResponse.redirect(new URL('/admin-login', request.url));
+  // Admin routes: require login + admin role (server-side check)
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    if (!session) {
+      return NextResponse.redirect(new URL('/admin-login', request.url));
+    }
+
+    // Server-side role check using service role to query user metadata
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', session.user.id)
+      .single();
+
+    const userRole = profile?.role || session.user.user_metadata?.role;
+
+    if (userRole !== 'admin') {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
   }
 
   const authRoutes = ['/auth/login', '/auth/register'];

@@ -10,7 +10,7 @@ interface Props {
 const DEFAULT_COLOR = '#D4A056';
 
 export function AparnaGoldPreview({ data, colorOverride }: Props) {
-  const { personalInfo, summary, workExperiences, education, skills } = data;
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
   const color = colorOverride || DEFAULT_COLOR;
 
   return (
@@ -114,6 +114,23 @@ export function AparnaGoldPreview({ data, colorOverride }: Props) {
             </div>
           )}
         </div>
+
+        {languages && languages.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-lg font-bold mb-4 pb-1 border-b" style={{ color, borderColor: color }}>
+              Languages
+            </h2>
+            <div className="space-y-2">
+              {languages.map((lang) => (
+                <div key={lang.id} className="flex items-center gap-2">
+                  <span style={{ color }}>◆</span>
+                  <span className="text-sm text-gray-700">{lang.name}</span>
+                  <span className="text-sm text-gray-500 capitalize">— {lang.proficiency}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -38,7 +38,8 @@ export function StepHeader({
       <div className="px-4 pt-3 pb-2 flex items-center justify-between">
         <button
           onClick={handleBack}
-          className="p-1.5 -ml-1.5 text-gray-400 hover:text-gray-900 rounded-lg transition-colors"
+          className="p-2.5 -ml-2.5 text-gray-400 hover:text-gray-900 rounded-xl transition-colors"
+          style={{ minWidth: 44, minHeight: 44 }}
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
@@ -51,7 +52,7 @@ export function StepHeader({
         {steps.map((step) => (
           <div
             key={step}
-            className="h-[3px] flex-1 rounded-full overflow-hidden bg-gray-100"
+            className="h-1 flex-1 rounded-full overflow-hidden bg-gray-100"
           >
             <div
               className={`h-full rounded-full transition-all duration-500 ease-out ${

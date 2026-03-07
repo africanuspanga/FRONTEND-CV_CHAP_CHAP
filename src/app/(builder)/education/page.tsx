@@ -367,7 +367,7 @@ export default function EducationPage() {
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 px-4 shadow-lg" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}>
         <div className="max-w-lg mx-auto">
           {step === 'form' && (
             <Button 

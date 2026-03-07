@@ -114,7 +114,7 @@ export default function PersonalInfoPage() {
                 <span className="font-semibold text-sm">Basic Information</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">First Name</Label>
                   <Input
@@ -230,7 +230,7 @@ export default function PersonalInfoPage() {
       </main>
 
       {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 px-4 shadow-lg" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}>
         <div className="max-w-lg mx-auto">
           <Button
             onClick={handleSubmit(onSubmit)}

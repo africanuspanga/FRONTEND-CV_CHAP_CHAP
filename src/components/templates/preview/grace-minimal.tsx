@@ -112,6 +112,22 @@ export function GraceMinimalPreview({ data, colorOverride }: Props) {
           </div>
         </div>
       )}
+
+      {data.languages && data.languages.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: primaryColor }}>
+            Languages
+          </h2>
+          <div className="w-full h-px mb-4" style={{ backgroundColor: `${primaryColor}40` }}></div>
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            {data.languages.map((lang) => (
+              <span key={lang.id} className="text-sm text-gray-700">
+                {lang.name} <span className="text-gray-500 capitalize">({lang.proficiency})</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

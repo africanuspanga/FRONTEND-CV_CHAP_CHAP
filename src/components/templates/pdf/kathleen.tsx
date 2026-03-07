@@ -34,7 +34,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 2,
   },
   title: {
-    fontSize: 10,
+    fontSize: 12,
     color: '#6B7280',
     marginBottom: 20,
   },
@@ -50,7 +50,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 18,
   },
   sidebarTitle: {
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: 'bold',
     letterSpacing: 1,
     color: '#374151',
@@ -61,7 +61,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     textTransform: 'uppercase',
   },
   contactItem: {
-    fontSize: 8,
+    fontSize: 9,
     color: primaryColor,
     marginBottom: 4,
   },
@@ -87,7 +87,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     fontStyle: 'italic',
   },
   skillItem: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#374151',
     marginBottom: 3,
   },
@@ -95,7 +95,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 15,
   },
   mainSectionTitle: {
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: 'bold',
     letterSpacing: 1,
     color: primaryColor,
@@ -106,7 +106,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     textTransform: 'uppercase',
   },
   summaryText: {
-    fontSize: 9,
+    fontSize: 10,
     lineHeight: 1.5,
     color: '#4B5563',
   },
@@ -133,7 +133,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 4,
   },
   bullet: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#4B5563',
     marginBottom: 2,
   },

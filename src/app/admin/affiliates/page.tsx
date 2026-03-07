@@ -110,31 +110,36 @@ export default function AdminAffiliatesPage() {
 
       if (error) throw error;
 
-      // If rejected, refund the held balance
-      if (status === 'rejected') {
-        const affiliate = affiliates.find((a) => a.id === affiliateId);
-        if (affiliate) {
-          await supabase
-            .from('affiliates')
-            .update({
-              available_balance: Number(affiliate.available_balance) + amount,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', affiliateId);
-        }
-      }
+      // Re-fetch current affiliate data to avoid stale balance overwrites
+      if (status === 'rejected' || status === 'completed') {
+        const { data: freshAffiliate } = await supabase
+          .from('affiliates')
+          .select('available_balance, total_withdrawn')
+          .eq('id', affiliateId)
+          .single();
 
-      // If completed, update total_withdrawn
-      if (status === 'completed') {
-        const affiliate = affiliates.find((a) => a.id === affiliateId);
-        if (affiliate) {
-          await supabase
-            .from('affiliates')
-            .update({
-              total_withdrawn: Number(affiliate.total_withdrawn) + amount,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', affiliateId);
+        if (freshAffiliate) {
+          if (status === 'rejected') {
+            // Refund the held balance
+            await supabase
+              .from('affiliates')
+              .update({
+                available_balance: Number(freshAffiliate.available_balance) + amount,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', affiliateId);
+          }
+
+          if (status === 'completed') {
+            // Record the withdrawal
+            await supabase
+              .from('affiliates')
+              .update({
+                total_withdrawn: Number(freshAffiliate.total_withdrawn) + amount,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', affiliateId);
+          }
         }
       }
 

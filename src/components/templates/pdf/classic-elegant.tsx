@@ -36,7 +36,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -47,7 +47,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     borderBottomColor: primaryColor,
   },
   summaryText: {
-    fontSize: 9,
+    fontSize: 10,
     lineHeight: 1.5,
     color: '#374151',
   },
@@ -70,7 +70,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 2,
   },
   expTitle: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: 'bold',
     color: '#1F2937',
   },
@@ -79,12 +79,12 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     color: '#6B7280',
   },
   expCompany: {
-    fontSize: 9,
+    fontSize: 10,
     color: '#4B5563',
     marginBottom: 4,
   },
   bullet: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#4B5563',
     marginBottom: 2,
     paddingLeft: 10,

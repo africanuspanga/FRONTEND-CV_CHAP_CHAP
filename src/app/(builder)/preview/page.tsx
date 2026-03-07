@@ -6,12 +6,10 @@ import { TemplatePreview } from '@/components/templates/preview';
 import { useAuth } from '@/lib/auth/context';
 import { TEMPLATES } from '@/types/templates';
 import { useState, useRef, useEffect } from 'react';
-import { Edit2, X, Check, Pencil, GripVertical, Download, Loader2, ChevronRight } from 'lucide-react';
+import { Edit2, X, Check, Pencil, GripVertical, Download, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StepHeader } from '@/components/builder/step-header';
-import { pdf } from '@react-pdf/renderer';
-import { getTemplate, getTemplateColor } from '@/lib/pdf/generator';
 
 const TEMPLATE_COLORS = [
   { id: 'default', color: '#ffffff', border: true },
@@ -34,8 +32,6 @@ export default function PreviewPage() {
   const [showChangeTemplate, setShowChangeTemplate] = useState(false);
   const [showEditResume, setShowEditResume] = useState(false);
   const [scale, setScale] = useState(0.5);
-  const [isDownloading, setIsDownloading] = useState(false);
-
   useEffect(() => {
     const updateScale = () => {
       if (containerRef.current) {
@@ -61,33 +57,6 @@ export default function PreviewPage() {
       window.removeEventListener('orientationchange', updateScale);
     };
   }, []);
-
-  const handleDownloadCV = async () => {
-    setIsDownloading(true);
-    try {
-      const TemplateComponent = getTemplate(templateId || 'charles');
-      const finalColor = selectedColor || getTemplateColor(templateId || 'charles');
-
-      // Generate PDF client-side to avoid Turbopack JSX runtime mismatch on server
-      const element = <TemplateComponent data={cvData} colorOverride={finalColor} />;
-      const blob = await pdf(element).toBlob();
-
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      const fileName = `${cvData.personalInfo.firstName || 'My'}_${cvData.personalInfo.lastName || 'CV'}_CV.pdf`;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('Download error:', error);
-      alert('Failed to download CV. Please try again.');
-    } finally {
-      setIsDownloading(false);
-    }
-  };
 
   const editSections = [
     { 
@@ -172,21 +141,11 @@ export default function PreviewPage() {
         <div className="bg-gradient-to-t from-[#e8edf2] from-80% to-transparent pt-6 px-3 sm:px-4 pb-3 sm:pb-4">
           <div className="max-w-[400px] mx-auto">
             <button
-              onClick={handleDownloadCV}
-              disabled={isDownloading}
-              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 disabled:bg-cv-blue-400 text-white text-base sm:text-lg font-semibold py-3.5 sm:py-4 rounded-2xl shadow-lg transition-colors flex items-center justify-center gap-2"
+              onClick={() => router.push('/ussd-payment')}
+              className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 active:scale-95 text-white text-base sm:text-lg font-semibold py-3.5 sm:py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2"
             >
-              {isDownloading ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Download className="h-5 w-5" />
-                  Download CV
-                </>
-              )}
+              <Download className="h-5 w-5" />
+              Download CV — TZS 5,000
             </button>
           </div>
         </div>
@@ -268,7 +227,7 @@ export default function PreviewPage() {
                           setSelectedColor(c.color);
                           setShowChangeTemplate(false);
                         }}
-                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-110 ${
+                        className={`w-11 h-11 rounded-full flex items-center justify-center transition-transform active:scale-95 hover:scale-105 ${
                           c.border ? 'border-2 border-gray-300' : ''
                         }`}
                         style={{ backgroundColor: c.color }}

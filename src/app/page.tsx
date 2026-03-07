@@ -289,10 +289,11 @@ export default function HomePage() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Features</a>
-              <a href="#templates" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Templates</a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">How It Works</a>
-              <a href="#pricing" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Pricing</a>
+              <Link href="/" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Home</Link>
+              <Link href="/template" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Templates</Link>
+              <Link href="/letter" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Cover Letters</Link>
+              <Link href="/blog" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Blog</Link>
+              <a href="#contact" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Contact</a>
             </div>
 
             {/* CTA Buttons */}
@@ -321,10 +322,11 @@ export default function HomePage() {
           {isMenuOpen && (
             <div className="md:hidden mt-4 pb-4 border-t border-gray-100">
               <div className="flex flex-col gap-4 pt-4">
-                <a href="#features" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Features</a>
-                <a href="#templates" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Templates</a>
-                <a href="#how-it-works" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">How It Works</a>
-                <a href="#pricing" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Pricing</a>
+                <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Home</Link>
+                <Link href="/template" onClick={() => setIsMenuOpen(false)} className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Templates</Link>
+                <Link href="/letter" onClick={() => setIsMenuOpen(false)} className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Cover Letters</Link>
+                <Link href="/blog" onClick={() => setIsMenuOpen(false)} className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Blog</Link>
+                <a href="#contact" onClick={() => setIsMenuOpen(false)} className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Contact</a>
                 <Link
                   href="/template"
                   className="px-6 py-2.5 bg-cv-blue-600 text-white font-semibold rounded-lg text-center mt-2"
@@ -338,8 +340,8 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="relative pt-20 md:pt-32 pb-12 md:pb-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <motion.div
@@ -354,7 +356,7 @@ export default function HomePage() {
                 <span className="text-xs">🇹🇿</span>
               </div>
 
-              <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
+              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
                 Create Your CV
                 <span className="block text-cv-blue-600">
                   in 3 Minutes
@@ -434,7 +436,7 @@ export default function HomePage() {
                 key={stat.label}
                 className="text-center"
               >
-                <div className="font-display text-2xl md:text-4xl font-bold text-white mb-1">
+                <div className="font-display text-xl sm:text-2xl md:text-4xl font-bold text-white mb-1">
                   {stat.value}
                 </div>
                 <div className="text-cv-blue-100 text-xs md:text-sm">{stat.label}</div>
@@ -751,7 +753,7 @@ export default function HomePage() {
               <div className="flex justify-between items-center mt-6">
                 <button
                   onClick={() => setActiveTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)}
-                  className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 active:bg-gray-100 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -759,21 +761,23 @@ export default function HomePage() {
                 </button>
 
                 {/* Dots */}
-                <div className="flex gap-2">
+                <div className="flex gap-1 items-center">
                   {testimonials.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setActiveTestimonial(index)}
-                      className={`h-2 rounded-full transition-all ${
+                      className="p-2 flex items-center justify-center"
+                    >
+                      <span className={`h-2 rounded-full transition-all block ${
                         index === activeTestimonial ? 'bg-cv-blue-600 w-6' : 'bg-gray-300 w-2'
-                      }`}
-                    />
+                      }`} />
+                    </button>
                   ))}
                 </div>
 
                 <button
                   onClick={() => setActiveTestimonial((prev) => (prev + 1) % testimonials.length)}
-                  className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 active:bg-gray-100 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -811,12 +815,12 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="max-w-md mx-auto"
           >
-            <div className="bg-cv-blue-600 rounded-2xl p-8 text-white">
+            <div className="bg-cv-blue-600 rounded-2xl p-6 sm:p-8 text-white">
               <div className="text-center mb-6">
                 <p className="text-cv-blue-100 text-sm mb-2">One-time payment</p>
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="text-lg">TZS</span>
-                  <span className="font-display text-6xl font-bold">5,000</span>
+                  <span className="font-display text-5xl sm:text-6xl font-bold">5,000</span>
                 </div>
                 <p className="text-cv-blue-100 text-sm mt-2">per CV download</p>
               </div>
@@ -942,12 +946,13 @@ export default function HomePage() {
                 <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
                 <li><a href="#templates" className="hover:text-white transition-colors">Templates</a></li>
                 <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
                 <li><Link href="/affiliate" className="hover:text-white transition-colors">Become an Affiliate</Link></li>
               </ul>
             </div>
 
             {/* Contact */}
-            <div>
+            <div id="contact">
               <h4 className="font-display font-semibold mb-4">Contact</h4>
               <ul className="space-y-3 text-gray-400">
                 <li>Dar es Salaam, Tanzania</li>

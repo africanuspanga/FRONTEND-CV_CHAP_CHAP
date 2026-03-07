@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+
+export const maxDuration = 30;
 
 const MIN_WITHDRAWAL = 5000; // TZS 5,000 minimum
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  const { success, resetAt } = rateLimit(`aff:withdraw:${ip}`, 5);
+  if (!success) return rateLimitResponse(resetAt);
+
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -63,7 +70,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create payout request
+    // Atomic balance deduction — only succeeds if balance is still sufficient
+    const { data: updated, error: updateError } = await supabase
+      .from('affiliates')
+      .update({
+        available_balance: affiliate.available_balance - amount,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', affiliate.id)
+      .gte('available_balance', amount)
+      .select('id')
+      .single();
+
+    if (updateError || !updated) {
+      return NextResponse.json(
+        { error: 'Balance changed during request. Please try again.' },
+        { status: 409 }
+      );
+    }
+
+    // Create payout request after balance has been held
     const { data: payout, error: payoutError } = await supabase
       .from('affiliate_payouts')
       .insert({
@@ -76,18 +102,18 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (payoutError) {
-      console.error('Payout creation error:', payoutError);
-      return NextResponse.json({ error: payoutError.message }, { status: 500 });
-    }
+      // Rollback balance deduction
+      await supabase
+        .from('affiliates')
+        .update({
+          available_balance: affiliate.available_balance,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', affiliate.id);
 
-    // Deduct from available balance (hold the funds)
-    await supabase
-      .from('affiliates')
-      .update({
-        available_balance: affiliate.available_balance - amount,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', affiliate.id);
+      console.error('Payout creation error:', payoutError);
+      return NextResponse.json({ error: 'Failed to create withdrawal request' }, { status: 500 });
+    }
 
     return NextResponse.json({ payout });
   } catch (error) {

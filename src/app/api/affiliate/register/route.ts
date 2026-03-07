@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+export const maxDuration = 30;
+
 function generateReferralCode(name: string): string {
   const clean = name.replace(/[^a-zA-Z]/g, '').toLowerCase().slice(0, 6);
   const random = Math.random().toString(36).substring(2, 6);

@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { triggerWalletPayment } from '@/lib/selcom/client';
+import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+
+export const maxDuration = 30;
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  const { success, resetAt } = rateLimit(`pay:ussd:${ip}`, 5);
+  if (!success) return rateLimitResponse(resetAt);
+
   try {
     const { orderId, msisdn } = await request.json();
 

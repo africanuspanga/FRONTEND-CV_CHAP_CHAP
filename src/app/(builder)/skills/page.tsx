@@ -184,7 +184,8 @@ export default function SkillsPage() {
                         {skill.name}
                         <button
                           onClick={() => removeSkill(skill.id)}
-                          className="ml-1 hover:bg-cv-blue-200 rounded-full p-0.5 transition-colors"
+                          className="ml-1 hover:bg-cv-blue-200 rounded-full p-1.5 transition-colors -mr-1"
+                          style={{ minWidth: 28, minHeight: 28 }}
                         >
                           <X className="h-3.5 w-3.5" />
                         </button>
@@ -230,7 +231,7 @@ export default function SkillsPage() {
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 px-4 shadow-lg" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}>
         <div className="max-w-lg mx-auto">
           <Button 
             onClick={handleContinue}

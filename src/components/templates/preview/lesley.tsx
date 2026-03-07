@@ -10,7 +10,7 @@ interface Props {
 const DEFAULT_COLOR = '#2B4764';
 
 export function LesleyPreview({ data, colorOverride }: Props) {
-  const { personalInfo, summary, workExperiences, education, skills } = data;
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
   const color = colorOverride || DEFAULT_COLOR;
 
   return (
@@ -95,8 +95,8 @@ export function LesleyPreview({ data, colorOverride }: Props) {
         )}
 
         {skills.length > 0 && (
-          <div className="flex">
-            <div 
+          <div className="flex mb-8">
+            <div
               className="w-32 flex-shrink-0 text-xs font-bold uppercase tracking-widest py-2 px-3 text-white"
               style={{ backgroundColor: color }}
             >
@@ -105,12 +105,36 @@ export function LesleyPreview({ data, colorOverride }: Props) {
             <div className="flex-1 pl-6 pt-2">
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill) => (
-                  <span 
+                  <span
                     key={skill.id}
                     className="px-3 py-1 text-sm rounded"
                     style={{ backgroundColor: color + '15', color }}
                   >
                     {skill.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {languages && languages.length > 0 && (
+          <div className="flex">
+            <div
+              className="w-32 flex-shrink-0 text-xs font-bold uppercase tracking-widest py-2 px-3 text-white"
+              style={{ backgroundColor: color }}
+            >
+              Languages
+            </div>
+            <div className="flex-1 pl-6 pt-2">
+              <div className="flex flex-wrap gap-2">
+                {languages.map((lang) => (
+                  <span
+                    key={lang.id}
+                    className="px-3 py-1 text-sm rounded"
+                    style={{ backgroundColor: color + '15', color }}
+                  >
+                    {lang.name} <span className="capitalize">({lang.proficiency})</span>
                   </span>
                 ))}
               </div>

@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateJobDescriptions } from '@/lib/ai/cv-assistant';
+import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+
+export const maxDuration = 30;
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  const { success, resetAt } = rateLimit(`ai:jobs:${ip}`, 10);
+  if (!success) return rateLimitResponse(resetAt);
+
   try {
     // Check if OpenAI API key is configured
     if (!process.env.OPENAI_API_KEY) {

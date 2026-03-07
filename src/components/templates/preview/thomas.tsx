@@ -10,7 +10,7 @@ interface Props {
 const DEFAULT_COLOR = '#8ECFC8';
 
 export function ThomasPreview({ data, colorOverride }: Props) {
-  const { personalInfo, summary, workExperiences, education, skills } = data;
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
   const color = colorOverride || DEFAULT_COLOR;
 
   return (
@@ -100,18 +100,38 @@ export function ThomasPreview({ data, colorOverride }: Props) {
             )}
 
             {skills.length > 0 && (
-              <div>
+              <div className="mb-6">
                 <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color }}>
                   Skills
                 </h2>
                 <div className="space-y-2">
                   {skills.map((skill) => (
                     <div key={skill.id} className="flex items-center gap-2">
-                      <div 
+                      <div
                         className="w-2 h-2 rounded-full"
                         style={{ backgroundColor: color }}
                       />
                       <span className="text-sm">{skill.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {languages && languages.length > 0 && (
+              <div>
+                <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color }}>
+                  Languages
+                </h2>
+                <div className="space-y-2">
+                  {languages.map((lang) => (
+                    <div key={lang.id} className="flex items-center gap-2">
+                      <div
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="text-sm">{lang.name}</span>
+                      <span className="text-xs text-gray-500 capitalize">({lang.proficiency})</span>
                     </div>
                   ))}
                 </div>

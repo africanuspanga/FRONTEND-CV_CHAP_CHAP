@@ -8,7 +8,10 @@ const SELCOM_VENDOR = process.env.SELCOM_VENDOR_ID!;
 type SelcomHeaders = Record<string, string>;
 
 function generateTimestamp(): string {
-  return new Date().toISOString().replace(/\.\d{3}Z$/, '+03:00');
+  // Selcom expects timestamp in East Africa Time (UTC+3)
+  const now = new Date();
+  const eat = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+  return eat.toISOString().replace(/\.\d{3}Z$/, '+03:00');
 }
 
 function generateDigest(timestamp: string, data: Record<string, unknown>, signedFields: string[]): string {

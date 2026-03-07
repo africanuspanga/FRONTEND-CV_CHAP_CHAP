@@ -1,3 +1,4 @@
+// Original 7 templates
 export { CharlesPDF } from './charles';
 export { KathleenPDF } from './kathleen';
 export { OliverPDF } from './oliver';
@@ -6,18 +7,32 @@ export { GracePDF } from './grace';
 export { ClassicElegantPDF } from './classic-elegant';
 export { HexagonBluePDF } from './hexagon-blue';
 
-import { CharlesPDF } from './charles';
-import { KathleenPDF } from './kathleen';
-import { OliverPDF } from './oliver';
+// New dedicated PDF templates (Group A - Charles aliases replaced)
+export { ThomasPDF } from './thomas';
+export { DenicePDF } from './denice';
+export { NellyPurplePDF } from './nelly-purple';
+export { NellySidebarPDF } from './nelly-sidebar';
+export { ModernHeaderPDF } from './modern-header';
+
+// New dedicated PDF templates (Group B - Kathleen aliases replaced)
+export { LesleyPDF } from './lesley';
+export { KellyPDF } from './kelly';
+export { RichardPDF } from './richard';
+export { NellyMintPDF } from './nelly-mint';
+export { NellyGrayPDF } from './nelly-gray';
+export { TealAccentPDF } from './teal-accent';
+export { CreativeYellowPDF } from './creative-yellow';
+export { DiamondMonogramPDF } from './diamond-monogram';
+export { TimelineGrayPDF } from './timeline-gray';
+export { ProfessionalSidebarPDF } from './professional-sidebar';
+
+// New dedicated PDF templates (Group C - Oliver aliases replaced)
+export { LaurenOrangePDF } from './lauren-orange';
+export { LaurenIconsPDF } from './lauren-icons';
+
+// Color variants that share the same layout (these are intentional aliases)
 import { AparnaPDF } from './aparna';
 import { GracePDF } from './grace';
-import { ClassicElegantPDF } from './classic-elegant';
-import { HexagonBluePDF } from './hexagon-blue';
-
-export const ThomasPDF = CharlesPDF;
-export const DenicePDF = CharlesPDF;
-export const NellyPurplePDF = CharlesPDF;
-export const NellySidebarPDF = CharlesPDF;
 
 export const AparnaDarkPDF = AparnaPDF;
 export const AparnaGoldPDF = AparnaPDF;
@@ -28,21 +43,6 @@ export const GraceTealPDF = GracePDF;
 export const GraceMintPDF = GracePDF;
 export const GraceCoralPDF = GracePDF;
 
-export const LaurenOrangePDF = OliverPDF;
-export const LaurenIconsPDF = OliverPDF;
-
-export const LesleyPDF = KathleenPDF;
-export const KellyPDF = KathleenPDF;
-export const RichardPDF = KathleenPDF;
-
-export const NellyMintPDF = KathleenPDF;
-export const NellyGrayPDF = KathleenPDF;
-
-// New templates - aliased to similar layouts
+// Classic Elegant variant
+import { ClassicElegantPDF } from './classic-elegant';
 export const CenteredTraditionalPDF = ClassicElegantPDF;
-export const TealAccentPDF = KathleenPDF;
-export const ProfessionalSidebarPDF = KathleenPDF;
-export const ModernHeaderPDF = CharlesPDF;
-export const CreativeYellowPDF = KathleenPDF;
-export const DiamondMonogramPDF = KathleenPDF;
-export const TimelineGrayPDF = KathleenPDF;

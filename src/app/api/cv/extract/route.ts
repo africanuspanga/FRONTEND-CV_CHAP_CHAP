@@ -3,6 +3,9 @@ import OpenAI from 'openai';
 import mammoth from 'mammoth';
 import { nanoid } from 'nanoid';
 import pdfParse from 'pdf-parse';
+import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+
+export const maxDuration = 30;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -255,6 +258,10 @@ function processExtractedData(data: ExtractedCV): ExtractedCV {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  const { success, resetAt } = rateLimit(`cv:extract:${ip}`, 3);
+  if (!success) return rateLimitResponse(resetAt);
+
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;

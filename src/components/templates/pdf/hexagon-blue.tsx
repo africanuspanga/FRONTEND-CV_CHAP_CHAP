@@ -19,12 +19,12 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     flex: 1,
   },
   firstName: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'light',
     color: '#374151',
   },
   lastName: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'light',
     color: '#374151',
   },
@@ -58,7 +58,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 8,
   },
   summaryText: {
-    fontSize: 9,
+    fontSize: 10,
     lineHeight: 1.5,
     color: '#4B5563',
   },
@@ -114,7 +114,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 14,
   },
   expCompany: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: 'bold',
     color: '#1F2937',
   },
@@ -125,7 +125,7 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 4,
   },
   bullet: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#4B5563',
     marginBottom: 2,
     paddingLeft: 8,

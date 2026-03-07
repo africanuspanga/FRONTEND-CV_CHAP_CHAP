@@ -16,6 +16,9 @@ const config: Config = {
       },
     },
     extend: {
+      screens: {
+        'xs': '400px',
+      },
       fontFamily: {
         'display': ['var(--font-space-grotesk)', 'sans-serif'],
         'body': ['var(--font-plus-jakarta)', 'sans-serif'],

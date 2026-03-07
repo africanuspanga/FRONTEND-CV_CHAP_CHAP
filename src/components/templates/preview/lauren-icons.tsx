@@ -10,7 +10,7 @@ interface Props {
 const DEFAULT_COLOR = '#374151';
 
 export function LaurenIconsPreview({ data, colorOverride }: Props) {
-  const { personalInfo, summary, workExperiences, education, skills } = data;
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
   const color = colorOverride || DEFAULT_COLOR;
 
   return (
@@ -100,7 +100,7 @@ export function LaurenIconsPreview({ data, colorOverride }: Props) {
       )}
 
       {skills.length > 0 && (
-        <div>
+        <div className="mb-6">
           <h2 className="text-sm font-bold mb-2 pb-1" style={{ color, borderBottom: `2px solid ${color}` }}>
             SKILLS
           </h2>
@@ -109,6 +109,22 @@ export function LaurenIconsPreview({ data, colorOverride }: Props) {
               <span key={skill.id} className="text-sm flex items-center gap-2">
                 <span style={{ color }}>•</span>
                 {skill.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {languages && languages.length > 0 && (
+        <div>
+          <h2 className="text-sm font-bold mb-2 pb-1" style={{ color, borderBottom: `2px solid ${color}` }}>
+            LANGUAGES
+          </h2>
+          <div className="flex flex-wrap gap-x-8 gap-y-1">
+            {languages.map((lang) => (
+              <span key={lang.id} className="text-sm flex items-center gap-2">
+                <span style={{ color }}>•</span>
+                {lang.name} <span className="text-gray-500 capitalize">({lang.proficiency})</span>
               </span>
             ))}
           </div>

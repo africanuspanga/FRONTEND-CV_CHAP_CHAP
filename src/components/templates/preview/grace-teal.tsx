@@ -10,7 +10,7 @@ interface Props {
 const DEFAULT_COLOR = '#2AAA9E';
 
 export function GraceTealPreview({ data, colorOverride }: Props) {
-  const { personalInfo, summary, workExperiences, education, skills } = data;
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
   const color = colorOverride || DEFAULT_COLOR;
 
   return (
@@ -101,7 +101,7 @@ export function GraceTealPreview({ data, colorOverride }: Props) {
 
         {skills.length > 0 && (
           <div className="relative pl-6 border-l-4" style={{ borderColor: color }}>
-            <div 
+            <div
               className="absolute w-3 h-3 rounded-full -left-[8px] top-0"
               style={{ backgroundColor: color }}
             />
@@ -119,6 +119,27 @@ export function GraceTealPreview({ data, colorOverride }: Props) {
           </div>
         )}
       </div>
+
+      {languages && languages.length > 0 && (
+        <div className="mt-8 relative pl-6 border-l-4" style={{ borderColor: color }}>
+          <div
+            className="absolute w-3 h-3 rounded-full -left-[8px] top-0"
+            style={{ backgroundColor: color }}
+          />
+          <h2 className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color }}>
+            Languages
+          </h2>
+          <div className="space-y-1">
+            {languages.map((lang) => (
+              <div key={lang.id} className="text-sm flex items-center gap-2">
+                <span style={{ color }}>•</span>
+                <span>{lang.name}</span>
+                <span className="text-gray-500 capitalize">— {lang.proficiency}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

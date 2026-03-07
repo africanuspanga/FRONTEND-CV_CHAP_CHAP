@@ -91,7 +91,7 @@ export default function AdditionalSectionsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-3 mb-6">
             {sections.map((section, index) => {
               const count = getSectionCount(section.id);
               return (
@@ -101,11 +101,11 @@ export default function AdditionalSectionsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   onClick={() => handleSectionClick(section.path)}
-                  className={`${section.color} rounded-2xl p-6 text-left hover:shadow-md transition-shadow relative group`}
+                  className={`${section.color} rounded-2xl p-4 sm:p-6 text-left hover:shadow-md active:scale-95 transition-all relative group`}
                 >
                   <div className="flex flex-col items-center text-center">
-                    <section.icon className="h-10 w-10 text-gray-700 mb-3" />
-                    <h3 className="font-semibold text-gray-900 text-sm leading-tight">
+                    <section.icon className="h-9 w-9 sm:h-10 sm:w-10 text-gray-700 mb-2 sm:mb-3" />
+                    <h3 className="font-semibold text-gray-900 text-xs sm:text-sm leading-tight">
                       {section.title}
                     </h3>
                     {count > 0 && (
@@ -122,7 +122,7 @@ export default function AdditionalSectionsPage() {
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 px-4 shadow-lg" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}>
         <div className="container mx-auto max-w-lg">
           <Button 
             onClick={handleContinue}

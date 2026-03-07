@@ -433,7 +433,8 @@ export default function ExperiencePage() {
                               </div>
                               <button
                                 onClick={() => removeWorkExperience(exp.id)}
-                                className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-3 text-red-400 hover:text-red-600 hover:bg-red-50 active:bg-red-100 rounded-xl transition-colors"
+                                style={{ minWidth: 44, minHeight: 44 }}
                               >
                                 <Trash2 className="h-5 w-5" />
                               </button>
@@ -502,7 +503,7 @@ export default function ExperiencePage() {
           </div>
         </main>
 
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 px-4 shadow-lg" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}>
           <div className="max-w-lg mx-auto">
             <Button 
               onClick={handleContinue}
@@ -661,7 +662,7 @@ export default function ExperiencePage() {
           </div>
         </main>
 
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 px-4 shadow-lg" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}>
           <div className="max-w-lg mx-auto">
             <Button 
               onClick={handleNextToJobDescription}
@@ -888,7 +889,7 @@ export default function ExperiencePage() {
           </div>
         </main>
 
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 px-4 shadow-lg" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}>
           <div className="max-w-lg mx-auto">
             <Button 
               onClick={handleSaveExperience}

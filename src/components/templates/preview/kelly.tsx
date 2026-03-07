@@ -10,7 +10,7 @@ interface Props {
 const DEFAULT_COLOR = '#1F2937';
 
 export function KellyPreview({ data, colorOverride }: Props) {
-  const { personalInfo, summary, workExperiences, education, skills } = data;
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
   const color = colorOverride || DEFAULT_COLOR;
 
   return (
@@ -96,7 +96,7 @@ export function KellyPreview({ data, colorOverride }: Props) {
 
         {skills.length > 0 && (
           <div>
-            <div 
+            <div
               className="inline-block px-4 py-1 text-sm font-bold uppercase tracking-wide text-white mb-4"
               style={{ backgroundColor: color }}
             >
@@ -113,6 +113,26 @@ export function KellyPreview({ data, colorOverride }: Props) {
           </div>
         )}
       </div>
+
+      {languages && languages.length > 0 && (
+        <div className="mt-8">
+          <div
+            className="inline-block px-4 py-1 text-sm font-bold uppercase tracking-wide text-white mb-4"
+            style={{ backgroundColor: color }}
+          >
+            Languages
+          </div>
+          <div className="space-y-1">
+            {languages.map((lang) => (
+              <div key={lang.id} className="text-sm flex items-center gap-2">
+                <span className="text-gray-400">▪</span>
+                <span>{lang.name}</span>
+                <span className="text-gray-500 capitalize">— {lang.proficiency}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

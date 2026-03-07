@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+
+export const maxDuration = 30;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -22,6 +25,10 @@ interface Skill {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  const { success, resetAt } = rateLimit(`ai:summary:${ip}`, 10);
+  if (!success) return rateLimitResponse(resetAt);
+
   try {
     const body = await request.json();
     const { personalInfo, workExperiences, education, skills } = body;

@@ -10,7 +10,7 @@ interface Props {
 const DEFAULT_COLOR = '#111827';
 
 export function RichardPreview({ data, colorOverride }: Props) {
-  const { personalInfo, summary, workExperiences, education, skills } = data;
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
   const color = colorOverride || DEFAULT_COLOR;
 
   return (
@@ -115,6 +115,23 @@ export function RichardPreview({ data, colorOverride }: Props) {
           </div>
         )}
       </div>
+
+      {languages && languages.length > 0 && (
+        <div className="mt-8">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1 h-px bg-gray-300" />
+            <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">
+              Languages
+            </h2>
+            <div className="flex-1 h-px bg-gray-300" />
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-700">
+              {languages.map(l => `${l.name} (${l.proficiency})`).join(' • ')}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

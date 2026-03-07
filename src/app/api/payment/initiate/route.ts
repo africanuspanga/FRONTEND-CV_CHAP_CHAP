@@ -1,13 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createOrderMinimal } from '@/lib/selcom/client';
-import { createCV, createPayment } from '@/lib/supabase/database';
 import { CVData } from '@/types/cv';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+
+export const maxDuration = 30;
+
+function getServiceSupabase() {
+  return createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  const { success, resetAt } = rateLimit(`pay:init:${ip}`, 5);
+  if (!success) return rateLimitResponse(resetAt);
+
   try {
     const body = await request.json();
-    const { 
+    const {
       cvData,
       templateId,
       phone,
@@ -37,20 +50,29 @@ export async function POST(request: NextRequest) {
       ? `255${cleanPhone.slice(1)}` 
       : cleanPhone;
 
-    const cv = await createCV({
-      templateId,
-      cvData,
-      anonymousId,
-    });
+    const serviceSupabase = getServiceSupabase();
+
+    const { data: cv, error: cvError } = await serviceSupabase
+      .from('cvs')
+      .insert({
+        template_id: templateId,
+        data: cvData,
+        anonymous_id: anonymousId || crypto.randomUUID(),
+        status: 'draft',
+      })
+      .select()
+      .single();
+
+    if (cvError) throw cvError;
 
     const orderId = `CV-${cv.id.slice(0, 8)}-${Date.now()}`;
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://cvchapchap.co.tz';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cvchapchap.com';
     const webhookUrl = `${baseUrl}/api/payment/webhook`;
 
     const selcomOrder = await createOrderMinimal({
       orderId,
-      buyerEmail: email || `${msisdn}@cvchapchap.co.tz`,
+      buyerEmail: email || `${msisdn}@cvchapchap.com`,
       buyerName: name || `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`,
       buyerPhone: msisdn,
       amount: 5000,
@@ -72,10 +94,6 @@ export async function POST(request: NextRequest) {
     // Look up affiliate from referral code
     let affiliateId: string | null = null;
     if (referral_code) {
-      const serviceSupabase = createServiceClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      );
       const { data: affiliate } = await serviceSupabase
         .from('affiliates')
         .select('id')
@@ -87,7 +105,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const payment = await createPayment(cv.id, orderId, msisdn, affiliateId);
+    const insertData: Record<string, unknown> = {
+      cv_id: cv.id,
+      request_id: orderId,
+      amount: 5000,
+      currency: 'TZS',
+      status: 'pending',
+      phone_number: msisdn,
+    };
+    if (affiliateId) insertData.affiliate_id = affiliateId;
+
+    const { data: payment, error: payError } = await serviceSupabase
+      .from('payments')
+      .insert(insertData)
+      .select()
+      .single();
+
+    if (payError) throw payError;
+
+    await serviceSupabase
+      .from('cvs')
+      .update({ status: 'pending_payment' })
+      .eq('id', cv.id);
 
     return NextResponse.json({
       success: true,

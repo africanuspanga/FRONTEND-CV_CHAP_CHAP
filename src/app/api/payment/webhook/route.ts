@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyWebhookSignature } from '@/lib/selcom/client';
+
+export const maxDuration = 30;
 import { updatePaymentStatus, getCVById, updateCVStatus, getPaymentByOrderId } from '@/lib/supabase/database';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 
@@ -30,21 +32,27 @@ export async function POST(request: NextRequest) {
       transid: body.transid,
     });
 
-    if (process.env.SELCOM_API_SECRET) {
-      const isValid = verifyWebhookSignature(
-        timestamp,
-        digest,
-        body as unknown as Record<string, unknown>,
-        signedFields
+    if (!process.env.SELCOM_API_SECRET) {
+      console.error('SELCOM_API_SECRET is not configured — rejecting webhook');
+      return NextResponse.json(
+        { error: 'Server misconfiguration' },
+        { status: 500 }
       );
+    }
 
-      if (!isValid) {
-        console.error('Invalid webhook signature');
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 401 }
-        );
-      }
+    const isValid = verifyWebhookSignature(
+      timestamp,
+      digest,
+      body as unknown as Record<string, unknown>,
+      signedFields
+    );
+
+    if (!isValid) {
+      console.error('Invalid webhook signature');
+      return NextResponse.json(
+        { error: 'Invalid signature' },
+        { status: 401 }
+      );
     }
 
     const orderId = body.order_id;

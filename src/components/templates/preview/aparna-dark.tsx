@@ -10,7 +10,7 @@ interface Props {
 const DEFAULT_COLOR = '#1E3A5F';
 
 export function AparnaDarkPreview({ data, colorOverride }: Props) {
-  const { personalInfo, summary, workExperiences, education, skills } = data;
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
   const color = colorOverride || DEFAULT_COLOR;
 
   return (
@@ -97,8 +97,8 @@ export function AparnaDarkPreview({ data, colorOverride }: Props) {
               </h2>
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill) => (
-                  <span 
-                    key={skill.id} 
+                  <span
+                    key={skill.id}
                     className="px-3 py-1 text-sm rounded-full bg-blue-500/30 text-blue-100 border border-blue-400/50"
                   >
                     {skill.name}
@@ -108,6 +108,22 @@ export function AparnaDarkPreview({ data, colorOverride }: Props) {
             </div>
           )}
         </div>
+
+        {languages && languages.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-lg font-bold text-blue-300 mb-4 uppercase tracking-wider">
+              Languages
+            </h2>
+            <div className="flex flex-wrap gap-4">
+              {languages.map((lang) => (
+                <div key={lang.id} className="text-sm text-blue-100">
+                  <span className="font-medium">{lang.name}</span>
+                  <span className="text-blue-300 capitalize"> — {lang.proficiency}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

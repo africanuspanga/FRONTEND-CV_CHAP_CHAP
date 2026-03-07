@@ -210,9 +210,9 @@ function TemplatePageContent() {
                       setPreviewColor(opt.value);
                       setSelectedColor(opt.value);
                     }}
-                    className={`w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 ${
-                      previewColor === opt.value 
-                        ? 'border-gray-900 scale-110' 
+                    className={`w-9 h-9 rounded-full border-2 transition-transform active:scale-95 hover:scale-110 ${
+                      previewColor === opt.value
+                        ? 'border-gray-900 scale-110'
                         : 'border-gray-300'
                     }`}
                     style={{ backgroundColor: opt.value || '#666' }}

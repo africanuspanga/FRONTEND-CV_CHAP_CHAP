@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOrderStatus } from '@/lib/selcom/client';
 import { getPaymentByOrderId } from '@/lib/supabase/database';
+import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+
+export const maxDuration = 30;
 
 export async function GET(request: NextRequest) {
+  const ip = getClientIp(request);
+  const { success, resetAt } = rateLimit(`pay:status:${ip}`, 30);
+  if (!success) return rateLimitResponse(resetAt);
+
   try {
     const { searchParams } = new URL(request.url);
     const orderId = searchParams.get('orderId');

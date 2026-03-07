@@ -10,7 +10,7 @@ interface Props {
 const DEFAULT_COLOR = '#4B5563';
 
 export function NellyGrayPreview({ data, colorOverride }: Props) {
-  const { personalInfo, summary, workExperiences, education, skills } = data;
+  const { personalInfo, summary, workExperiences, education, skills, languages } = data;
   const color = colorOverride || DEFAULT_COLOR;
 
   return (
@@ -94,6 +94,22 @@ export function NellyGrayPreview({ data, colorOverride }: Props) {
           </div>
         )}
       </div>
+
+      {languages && languages.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color }}>
+            Languages
+          </h2>
+          <div className="flex flex-wrap gap-4">
+            {languages.map((lang) => (
+              <div key={lang.id} className="text-sm">
+                <span className="text-gray-700">{lang.name}</span>
+                <span className="text-gray-500 capitalize"> — {lang.proficiency}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

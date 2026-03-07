@@ -17,6 +17,10 @@ import {
   RotateCw,
 } from 'lucide-react';
 
+import { redirect } from 'next/navigation';
+
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
 type Step = 'idle' | 'initiating' | 'initiated' | 'pushing' | 'pushed' | 'polling' | 'completed' | 'failed';
 
 interface LogEntry {
@@ -27,6 +31,8 @@ interface LogEntry {
 }
 
 export default function TestPaymentPage() {
+  if (IS_PRODUCTION) redirect('/');
+
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('Test User');
   const [email, setEmail] = useState('test@cvchapchap.co.tz');

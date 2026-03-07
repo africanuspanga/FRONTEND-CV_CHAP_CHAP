@@ -193,22 +193,23 @@ export default function DashboardPage() {
                       )}
                     </div>
 
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                      <Button 
-                        size="sm" 
+                    <div className="absolute inset-0 bg-black/60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 sm:gap-3">
+                      <Button
+                        size="default"
                         variant="secondary"
                         onClick={() => handleEdit(cv.id)}
+                        className="h-10 px-3 text-sm"
                       >
                         <Edit className="w-4 h-4 mr-1" />
                         Edit
                       </Button>
-                      <Button 
-                        size="sm"
+                      <Button
+                        size="default"
                         onClick={() => handleDownload(cv.id)}
-                        className={isPaid ? 'bg-green-600 hover:bg-green-700' : 'bg-cv-blue-600 hover:bg-cv-blue-700'}
+                        className={`h-10 px-3 text-sm ${isPaid ? 'bg-green-600 hover:bg-green-700' : 'bg-cv-blue-600 hover:bg-cv-blue-700'}`}
                       >
                         <Download className="w-4 h-4 mr-1" />
-                        {isPaid ? 'Download' : 'Pay & Download'}
+                        {isPaid ? 'Download' : 'Pay'}
                       </Button>
                     </div>
                   </div>
