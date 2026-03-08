@@ -61,12 +61,6 @@ function validateReceipt(parsed: ParsedReceipt): boolean {
     return false;
   }
 
-  // Date/time format must match (e.g. 03/10/2025 2:00:51 PM)
-  const datePattern = /\d{1,2}\/\d{1,2}\/\d{4}\s+\d{1,2}:\d{2}:\d{2}\s*(AM|PM)/i;
-  if (!datePattern.test(parsed.date)) {
-    return false;
-  }
-
   return true;
 }
 
@@ -166,7 +160,16 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (payError) throw payError;
+    if (payError) {
+      // Unique constraint = this receipt was already used successfully
+      if ((payError as { code?: string }).code === '23505') {
+        return NextResponse.json(
+          { error: 'This receipt has already been used.' },
+          { status: 400 }
+        );
+      }
+      throw payError;
+    }
 
     // Record affiliate conversion if applicable
     if (affiliateId && payment) {
