@@ -80,100 +80,78 @@ export async function POST(request: NextRequest) {
 
     const parsed = parseSelcomReceipt(receiptText);
 
-    const serviceSupabase = getServiceSupabase();
+    // DB save is best-effort — never block the user if it fails
+    try {
+      const serviceSupabase = getServiceSupabase();
 
-    // Save the CV
-    const { data: cv, error: cvError } = await serviceSupabase
-      .from('cvs')
-      .insert({
-        template_id: templateId,
-        data: cvData,
-        anonymous_id: anonymousId || crypto.randomUUID(),
-        status: 'paid',
-      })
-      .select()
-      .single();
-
-    if (cvError) throw cvError;
-
-    const orderId = `CV-${cv.id.slice(0, 8)}-${Date.now()}`;
-
-    // Look up affiliate from referral code
-    let affiliateId: string | null = null;
-    if (referral_code) {
-      const { data: affiliate } = await serviceSupabase
-        .from('affiliates')
-        .select('id')
-        .eq('referral_code', referral_code)
-        .eq('status', 'approved')
+      const { data: cv, error: cvError } = await serviceSupabase
+        .from('cvs')
+        .insert({
+          template_id: templateId,
+          data: cvData,
+          anonymous_id: anonymousId || crypto.randomUUID(),
+          status: 'paid',
+        })
+        .select()
         .single();
-      if (affiliate) {
-        affiliateId = affiliate.id;
-      }
-    }
 
-    // Save the payment as completed
-    const insertData: Record<string, unknown> = {
-      cv_id: cv.id,
-      request_id: orderId,
-      amount: 5000,
-      currency: 'TZS',
-      status: 'completed',
-      phone_number: parsed.from.replace(/\D/g, ''),
-      transaction_id: parsed.transId,
-      selcom_reference: parsed.ref,
-      completed_at: new Date().toISOString(),
-      raw_callback: { manual_receipt: receiptText, parsed },
-    };
-    if (affiliateId) insertData.affiliate_id = affiliateId;
+      if (!cvError && cv) {
+        const orderId = `CV-${cv.id.slice(0, 8)}-${Date.now()}`;
 
-    const { data: payment, error: payError } = await serviceSupabase
-      .from('payments')
-      .insert(insertData)
-      .select()
-      .single();
+        let affiliateId: string | null = null;
+        if (referral_code) {
+          const { data: affiliate } = await serviceSupabase
+            .from('affiliates')
+            .select('id')
+            .eq('referral_code', referral_code)
+            .eq('status', 'approved')
+            .single();
+          if (affiliate) affiliateId = affiliate.id;
+        }
 
-    if (payError) {
-      // Unique constraint = this receipt was already used successfully
-      if ((payError as { code?: string }).code === '23505') {
-        return NextResponse.json(
-          { error: 'This receipt has already been used.' },
-          { status: 400 }
-        );
-      }
-      throw payError;
-    }
+        const insertData: Record<string, unknown> = {
+          cv_id: cv.id,
+          request_id: orderId,
+          amount: 5000,
+          currency: 'TZS',
+          status: 'completed',
+          phone_number: parsed.from.replace(/\D/g, ''),
+          transaction_id: parsed.transId,
+          selcom_reference: parsed.ref,
+          completed_at: new Date().toISOString(),
+          raw_callback: { manual_receipt: receiptText, parsed },
+        };
+        if (affiliateId) insertData.affiliate_id = affiliateId;
 
-    // Record affiliate conversion if applicable
-    if (affiliateId && payment) {
-      try {
-        const { data: affiliate } = await serviceSupabase
-          .from('affiliates')
-          .select('id, commission_rate')
-          .eq('id', affiliateId)
+        const { data: payment } = await serviceSupabase
+          .from('payments')
+          .insert(insertData)
+          .select()
           .single();
 
-        if (affiliate) {
-          const commission = (5000 * affiliate.commission_rate) / 100;
-          await serviceSupabase.rpc('record_affiliate_conversion', {
-            p_affiliate_id: affiliate.id,
-            p_payment_id: payment.id,
-            p_customer_user_id: null,
-            p_amount: 5000,
-            p_commission: commission,
-          });
+        if (affiliateId && payment) {
+          const { data: affiliate } = await serviceSupabase
+            .from('affiliates')
+            .select('id, commission_rate')
+            .eq('id', affiliateId)
+            .single();
+          if (affiliate) {
+            const commission = (5000 * affiliate.commission_rate) / 100;
+            await serviceSupabase.rpc('record_affiliate_conversion', {
+              p_affiliate_id: affiliate.id,
+              p_payment_id: payment.id,
+              p_customer_user_id: null,
+              p_amount: 5000,
+              p_commission: commission,
+            });
+          }
         }
-      } catch (affError) {
-        console.error('Affiliate conversion recording failed:', affError);
       }
+    } catch (dbErr) {
+      console.error('DB save failed (non-blocking):', dbErr);
     }
 
-    return NextResponse.json({
-      success: true,
-      cvId: cv.id,
-      orderId,
-      transId: parsed.transId,
-    });
+    return NextResponse.json({ success: true });
 
   } catch (error) {
     console.error('Receipt verification error:', error);
