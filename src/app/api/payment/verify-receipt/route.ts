@@ -5,6 +5,8 @@ import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 export const maxDuration = 30;
 
+const GENERIC_ERROR = 'Please copy the exact message after payment';
+
 function getServiceSupabase() {
   return createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,14 +28,12 @@ interface ParsedReceipt {
 function parseSelcomReceipt(text: string): ParsedReceipt | null {
   const trimmed = text.trim();
 
-  // Message length must be in a realistic range for Selcom receipts
   if (trimmed.length < 120 || trimmed.length > 300) return null;
 
   const lines = trimmed.split('\n').map(l => l.trim()).filter(Boolean);
 
   if (lines.length < 7) return null;
 
-  // First line should be "Selcom Pay" (case-insensitive)
   if (!lines[0].toLowerCase().includes('selcom')) return null;
 
   const merchantName = lines[1] || '';
@@ -48,44 +48,26 @@ function parseSelcomReceipt(text: string): ParsedReceipt | null {
   return { merchantName, merchantNumber, amount, transId, ref, channel, from, date };
 }
 
-function validateReceipt(parsed: ParsedReceipt): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-
-  // 1. Validate merchant name
-  //    Selcom truncates to ~20 chars so it shows "DRIFTMARK TECHNOLOGI" (not TECHNOLOGIES).
-  //    Any receipt showing "TECHNOLOGIES" is fake.
+function validateReceipt(parsed: ParsedReceipt): boolean {
+  // Merchant must be DRIFTMARK TECHNOLOGI (Selcom truncates the name)
   const merchantUpper = parsed.merchantName.toUpperCase();
-
-  if (!merchantUpper.includes('DRIFTMARK')) {
-    errors.push('Merchant name does not match. Please ensure you paid to DRIFTMARK TECHNOLOGIES via Selcom.');
-  } else if (!merchantUpper.includes('TECHNOLOGI')) {
-    errors.push('Merchant name does not match. Please ensure you paid to DRIFTMARK TECHNOLOGIES via Selcom.');
+  if (!merchantUpper.includes('DRIFTMARK') || !merchantUpper.includes('TECHNOLOGI')) {
+    return false;
   }
 
-  // 2. Validate amount - must be exactly TZS 5,000.00
+  // Amount must be exactly 5000
   const amountClean = parsed.amount.replace(/[^0-9.]/g, '');
-  const amountNum = parseFloat(amountClean);
-  if (isNaN(amountNum) || amountNum !== 5000) {
-    errors.push('Payment amount must be exactly TZS 5,000.00');
+  if (parseFloat(amountClean) !== 5000) {
+    return false;
   }
 
-  // 3. Validate TransID exists and has reasonable length
-  if (!parsed.transId || parsed.transId.length < 5) {
-    errors.push('Invalid transaction ID.');
+  // Date/time format must match (e.g. 03/10/2025 2:00:51 PM)
+  const datePattern = /\d{1,2}\/\d{1,2}\/\d{4}\s+\d{1,2}:\d{2}:\d{2}\s*(AM|PM)/i;
+  if (!datePattern.test(parsed.date)) {
+    return false;
   }
 
-  // 4. Validate Ref exists
-  if (!parsed.ref || parsed.ref.length < 4) {
-    errors.push('Invalid reference number.');
-  }
-
-  // 5. Validate From (phone number)
-  const phoneClean = parsed.from.replace(/\D/g, '');
-  if (!phoneClean || phoneClean.length < 9) {
-    errors.push('Invalid sender phone number in receipt.');
-  }
-
-  return { valid: errors.length === 0, errors };
+  return true;
 }
 
 export async function POST(request: NextRequest) {
@@ -116,52 +98,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse the receipt
     const parsed = parseSelcomReceipt(receiptText);
     if (!parsed) {
       return NextResponse.json(
-        { error: 'Could not read the receipt. Please paste the full Selcom payment message exactly as received.' },
+        { error: GENERIC_ERROR },
         { status: 400 }
       );
     }
 
-    // Validate the receipt
-    const validation = validateReceipt(parsed);
-    if (!validation.valid) {
+    if (!validateReceipt(parsed)) {
       return NextResponse.json(
-        { error: validation.errors.join(' ') },
+        { error: GENERIC_ERROR },
         { status: 400 }
       );
     }
 
     const serviceSupabase = getServiceSupabase();
-
-    // Check if this TransID or Ref was already used (prevent reuse)
-    const { data: existingByTransId } = await serviceSupabase
-      .from('payments')
-      .select('id')
-      .eq('transaction_id', parsed.transId)
-      .maybeSingle();
-
-    if (existingByTransId) {
-      return NextResponse.json(
-        { error: 'This receipt has already been used. Each payment receipt can only be used once.' },
-        { status: 400 }
-      );
-    }
-
-    const { data: existingByRef } = await serviceSupabase
-      .from('payments')
-      .select('id')
-      .eq('selcom_reference', parsed.ref)
-      .maybeSingle();
-
-    if (existingByRef) {
-      return NextResponse.json(
-        { error: 'This payment reference has already been used. Each payment can only be used once.' },
-        { status: 400 }
-      );
-    }
 
     // Save the CV
     const { data: cv, error: cvError } = await serviceSupabase

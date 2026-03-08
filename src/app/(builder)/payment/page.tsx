@@ -192,7 +192,7 @@ export default function PaymentPage() {
                       <textarea
                         id="receipt"
                         className="w-full min-h-[200px] p-3 border rounded-lg text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                        placeholder={`Paste your receipt here, e.g:\n\nSelcom Pay\nDRIFTMARK TECHNOLOGI\nMerchant# 61115073\nTZS 5,000.00\nTransID 503-CJ33KFK42OD\nRef 0987219237\nChannel TanQR\nFrom 255XXXXXXXXX\n03/10/2025 2:00:51 PM`}
+                        placeholder={`Paste your receipt here, e.g:\n\nSelcom Pay\nDRIFTMARK TECHNOLOGIES\nMerchant# 61115073\nTZS 5,000.00\nTransID 503-CJ33KFK42OD\nRef 0987219237\nChannel TanQR\nFrom 255XXXXXXXXX\n03/10/2025 2:00:51 PM`}
                         value={receiptText}
                         onChange={(e) => {
                           setReceiptText(e.target.value);

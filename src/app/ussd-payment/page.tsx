@@ -312,7 +312,7 @@ export default function USSdPaymentPage() {
                     <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-500 font-mono leading-relaxed">
                       <p className="font-sans text-slate-400 text-xs mb-1 not-italic">Example message:</p>
                       <p>Selcom Pay</p>
-                      <p>DRIFTMARK TECHNOLOGI</p>
+                      <p>DRIFTMARK TECHNOLOGIES</p>
                       <p>Merchant# 61115073</p>
                       <p>TZS 5,000.00</p>
                       <p>TransID 503-CJ33KFK42OD</p>
