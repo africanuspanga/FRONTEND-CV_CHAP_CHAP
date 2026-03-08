@@ -132,11 +132,17 @@ function TemplateCard({
   }, []);
 
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onSelect}
-      className={`relative rounded-xl overflow-hidden border-2 transition-all ${
-        selected ? 'border-cv-blue-500 shadow-lg' : 'border-gray-200 hover:border-gray-300'
+      onKeyDown={(e) => e.key === 'Enter' && onSelect()}
+      className={`relative rounded-xl overflow-hidden border-2 transition-all cursor-pointer select-none active:scale-95 active:opacity-80 ${
+        selected
+          ? 'border-cv-blue-500 shadow-lg ring-2 ring-cv-blue-400 ring-offset-1'
+          : 'border-gray-200'
       }`}
+      style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
     >
       <div
         ref={containerRef}
@@ -157,14 +163,14 @@ function TemplateCard({
           />
         </div>
       </div>
-      {selected && (
-        <div className="absolute top-2 right-2 w-6 h-6 bg-cv-blue-500 rounded-full flex items-center justify-center shadow z-10">
-          <Check className="h-4 w-4 text-white" />
-        </div>
-      )}
-      <div className="p-2 bg-white">
+      <div className="p-2 bg-white flex items-center justify-between">
         <p className="text-xs font-medium text-gray-900">{template.name}</p>
+        {selected && (
+          <div className="w-5 h-5 bg-cv-blue-500 rounded-full flex items-center justify-center shadow flex-shrink-0">
+            <Check className="h-3 w-3 text-white" />
+          </div>
+        )}
       </div>
-    </button>
+    </div>
   );
 }
