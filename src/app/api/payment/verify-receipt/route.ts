@@ -25,43 +25,25 @@ interface ParsedReceipt {
   date: string;
 }
 
-function parseSelcomReceipt(text: string): ParsedReceipt | null {
-  const trimmed = text.trim();
-
-  if (trimmed.length < 120 || trimmed.length > 300) return null;
-
-  const lines = trimmed.split('\n').map(l => l.trim()).filter(Boolean);
-
-  if (lines.length < 7) return null;
-
-  if (!lines[0].toLowerCase().includes('selcom')) return null;
-
-  const merchantName = lines[1] || '';
-  const merchantNumber = lines[2]?.replace(/^Merchant#?\s*/i, '').trim() || '';
-  const amount = lines[3]?.trim() || '';
-  const transId = lines[4]?.replace(/^TransID\s*/i, '').trim() || '';
-  const ref = lines[5]?.replace(/^Ref\s*/i, '').trim() || '';
-  const channel = lines[6]?.replace(/^Channel\s*/i, '').trim() || '';
-  const from = lines[7]?.replace(/^From\s*/i, '').trim() || '';
-  const date = lines[8]?.trim() || '';
-
-  return { merchantName, merchantNumber, amount, transId, ref, channel, from, date };
+function validateReceiptText(text: string): boolean {
+  const upper = text.toUpperCase();
+  if (!upper.includes('DRIFTMARK') || !upper.includes('TECHNOLOGI')) return false;
+  if (!upper.includes('5,000') && !upper.includes('5000')) return false;
+  return true;
 }
 
-function validateReceipt(parsed: ParsedReceipt): boolean {
-  // Merchant must be DRIFTMARK TECHNOLOGI (Selcom truncates the name)
-  const merchantUpper = parsed.merchantName.toUpperCase();
-  if (!merchantUpper.includes('DRIFTMARK') || !merchantUpper.includes('TECHNOLOGI')) {
-    return false;
-  }
-
-  // Amount must be exactly 5000
-  const amountClean = parsed.amount.replace(/[^0-9.]/g, '');
-  if (parseFloat(amountClean) !== 5000) {
-    return false;
-  }
-
-  return true;
+function parseSelcomReceipt(text: string): ParsedReceipt {
+  const lines = text.trim().split('\n').map(l => l.trim()).filter(Boolean);
+  return {
+    merchantName: lines[1] || '',
+    merchantNumber: lines[2]?.replace(/^Merchant#?\s*/i, '').trim() || '',
+    amount: lines[3]?.trim() || '',
+    transId: lines[4]?.replace(/^TransID\s*/i, '').trim() || '',
+    ref: lines[5]?.replace(/^Ref\s*/i, '').trim() || '',
+    channel: lines[6]?.replace(/^Channel\s*/i, '').trim() || '',
+    from: lines[7]?.replace(/^From\s*/i, '').trim() || '',
+    date: lines[8]?.trim() || '',
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -92,20 +74,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const parsed = parseSelcomReceipt(receiptText);
-    if (!parsed) {
-      return NextResponse.json(
-        { error: GENERIC_ERROR },
-        { status: 400 }
-      );
+    if (!validateReceiptText(receiptText)) {
+      return NextResponse.json({ error: GENERIC_ERROR }, { status: 400 });
     }
 
-    if (!validateReceipt(parsed)) {
-      return NextResponse.json(
-        { error: GENERIC_ERROR },
-        { status: 400 }
-      );
-    }
+    const parsed = parseSelcomReceipt(receiptText);
 
     const serviceSupabase = getServiceSupabase();
 
