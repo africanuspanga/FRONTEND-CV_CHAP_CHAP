@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -73,13 +73,43 @@ type Step = 'pay' | 'verify' | 'success';
 
 export default function USSdPaymentPage() {
   const router = useRouter();
-  const { cvData, templateId, selectedColor } = useCVStore();
+  const { cvData, templateId, selectedColor, setCVData, setTemplateId, setSelectedColor } = useCVStore();
   const [step, setStep] = useState<Step>('pay');
   const [receipt, setReceipt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+
+  // Capture CV data at verification time so download always uses the correct data
+  // even if Zustand state changes or the page partially reloads after payment.
+  const [verifiedSnapshot, setVerifiedSnapshot] = useState<{
+    cvData: typeof cvData;
+    templateId: string;
+    selectedColor: string | null;
+  } | null>(null);
+
+  // On mount: if Zustand state is empty (e.g. after a page reload on mobile when the
+  // browser killed the tab during USSD dialing), manually restore from localStorage.
+  useEffect(() => {
+    if (!cvData.personalInfo.firstName) {
+      try {
+        const stored = localStorage.getItem('cv-chap-chap-storage');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const s = parsed?.state;
+          if (s?.cvData?.personalInfo?.firstName) {
+            setCVData(s.cvData);
+            if (s.templateId) setTemplateId(s.templateId);
+            if (s.selectedColor !== undefined) setSelectedColor(s.selectedColor);
+          }
+        }
+      } catch {
+        // localStorage not available or corrupt – nothing we can do
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleVerify = async () => {
     const trimmed = receipt.trim();
@@ -106,6 +136,12 @@ export default function USSdPaymentPage() {
       const data = await res.json();
 
       if (res.ok && data.success) {
+        // Snapshot the CV data right now so the download always uses these exact values.
+        setVerifiedSnapshot({
+          cvData,
+          templateId: templateId || 'charles',
+          selectedColor,
+        });
         setStep('success');
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
@@ -122,13 +158,20 @@ export default function USSdPaymentPage() {
   const handleDownload = useCallback(async () => {
     setIsDownloading(true);
     try {
-      const TemplateComponent = getTemplate(templateId || 'charles');
-      const finalColor = selectedColor || getTemplateColor(templateId || 'charles');
-      const blob = await pdf(<TemplateComponent data={cvData} colorOverride={finalColor} />).toBlob();
+      // Prefer the snapshot captured at verification time; fall back to current Zustand state.
+      const downloadCvData = verifiedSnapshot?.cvData ?? cvData;
+      const downloadTemplateId = verifiedSnapshot?.templateId ?? templateId ?? 'charles';
+      const downloadColor = verifiedSnapshot !== null
+        ? verifiedSnapshot.selectedColor
+        : selectedColor;
+
+      const TemplateComponent = getTemplate(downloadTemplateId);
+      const finalColor = downloadColor || getTemplateColor(downloadTemplateId);
+      const blob = await pdf(<TemplateComponent data={downloadCvData} colorOverride={finalColor} />).toBlob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${cvData.personalInfo.firstName || 'My'}_${cvData.personalInfo.lastName || 'CV'}_CV.pdf`;
+      a.download = `${downloadCvData.personalInfo.firstName || 'My'}_${downloadCvData.personalInfo.lastName || 'CV'}_CV.pdf`;
       document.body.appendChild(a);
       a.click();
       URL.revokeObjectURL(url);
@@ -138,7 +181,7 @@ export default function USSdPaymentPage() {
     } finally {
       setIsDownloading(false);
     }
-  }, [cvData, templateId, selectedColor]);
+  }, [verifiedSnapshot, cvData, templateId, selectedColor]);
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
