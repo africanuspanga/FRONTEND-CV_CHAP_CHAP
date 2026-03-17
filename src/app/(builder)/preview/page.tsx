@@ -303,7 +303,7 @@ export default function PreviewPage() {
                               <button
                                 onClick={() => {
                                   setShowEditResume(false);
-                                  router.push(section.path);
+                                  router.push(`${section.path}?from=preview`);
                                 }}
                                 className="w-full py-3 bg-gradient-to-r from-cv-blue-500 to-cv-blue-600 hover:from-cv-blue-600 hover:to-cv-blue-700 rounded-xl text-white font-medium flex items-center justify-center gap-2 transition-all shadow-sm"
                               >
@@ -316,7 +316,7 @@ export default function PreviewPage() {
                           <button
                             onClick={() => {
                               setShowEditResume(false);
-                              router.push(section.path);
+                              router.push(`${section.path}?from=preview`);
                             }}
                             className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center justify-between hover:border-cv-blue-200 hover:shadow-md transition-all group"
                           >

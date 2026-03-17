@@ -21,8 +21,8 @@ import {
   Check,
   Sparkles
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import { COMPANIES, CITIES, JOB_TITLES } from "@/data/autocomplete";
@@ -61,14 +61,16 @@ interface WorkExperience {
   achievements: string[];
 }
 
-export default function ExperiencePage() {
+function ExperiencePageContent() {
   const router = useRouter();
-  const { 
-    cvData, 
-    addWorkExperience, 
-    removeWorkExperience, 
+  const searchParams = useSearchParams();
+  const fromPreview = searchParams.get('from') === 'preview';
+  const {
+    cvData,
+    addWorkExperience,
+    removeWorkExperience,
     updateWorkExperience,
-    setCurrentStep 
+    setCurrentStep
   } = useCVStore();
   
   const [flowStep, setFlowStep] = useState<FlowStep>('review');
@@ -106,6 +108,8 @@ export default function ExperiencePage() {
     if (flowStep === 'form' || flowStep === 'edit-achievements') {
       setFlowStep('review');
       setCurrentExpId(null);
+    } else if (fromPreview) {
+      router.push('/preview');
     } else {
       setCurrentStep('personal');
       router.push('/personal');
@@ -113,8 +117,12 @@ export default function ExperiencePage() {
   };
 
   const handleContinue = () => {
-    setCurrentStep('education');
-    router.push('/education');
+    if (fromPreview) {
+      router.push('/preview');
+    } else {
+      setCurrentStep('education');
+      router.push('/education');
+    }
   };
 
   const startNewExperience = () => {
@@ -151,7 +159,7 @@ export default function ExperiencePage() {
     });
     setCurrentExpId(exp.id);
     setEditingAchievements([...exp.achievements]);
-    setFlowStep('edit-achievements');
+    setFlowStep('form');
   };
 
   const handleNextToJobDescription = async () => {
@@ -179,8 +187,10 @@ export default function ExperiencePage() {
     };
 
     if (currentExpId) {
-      // Update existing
+      // Update existing — skip AI, go straight to edit achievements
       updateWorkExperience(currentExpId, expData);
+      setFlowStep('edit-achievements');
+      return;
     } else {
       // Create new with all data at once to avoid stale state issues
       addWorkExperience(expData);
@@ -192,7 +202,7 @@ export default function ExperiencePage() {
       }
     }
 
-    // Start AI loading
+    // New experience — run AI loading
     setFlowStep('loading');
     setIsLoadingAI(true);
     setAiError('');
@@ -505,12 +515,12 @@ export default function ExperiencePage() {
 
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 px-4 shadow-lg" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}>
           <div className="max-w-lg mx-auto">
-            <Button 
+            <Button
               onClick={handleContinue}
               disabled={!hasExperiences}
               className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold disabled:opacity-50"
             >
-              Continue to Education
+              {fromPreview ? 'Back to Preview' : 'Continue to Education'}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -664,7 +674,7 @@ export default function ExperiencePage() {
 
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 px-4 shadow-lg" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}>
           <div className="max-w-lg mx-auto">
-            <Button 
+            <Button
               onClick={handleNextToJobDescription}
               disabled={!isFormValid}
               className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold disabled:opacity-50"
@@ -905,4 +915,12 @@ export default function ExperiencePage() {
   }
 
   return null;
+}
+
+export default function ExperiencePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <ExperiencePageContent />
+    </Suspense>
+  );
 }

@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCVStore } from "@/stores/cv-store";
 import { ArrowRight, Plus, Trash2, User } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import { COMPANIES, JOB_TITLES } from "@/data/autocomplete";
@@ -14,8 +14,10 @@ import { StepHeader } from "@/components/builder/step-header";
 
 const MAX_REFERENCES = 2;
 
-export default function ReferencesPage() {
+function ReferencesPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromPreview = searchParams.get('from') === 'preview';
   const { cvData, addReference, updateReference, removeReference, setCurrentStep } = useCVStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -27,13 +29,21 @@ export default function ReferencesPage() {
   });
 
   const handleBack = () => {
-    setCurrentStep('summary');
-    router.push('/summary');
+    if (fromPreview) {
+      router.push('/preview');
+    } else {
+      setCurrentStep('summary');
+      router.push('/summary');
+    }
   };
 
   const handleContinue = () => {
-    setCurrentStep('additional');
-    router.push('/additional');
+    if (fromPreview) {
+      router.push('/preview');
+    } else {
+      setCurrentStep('additional');
+      router.push('/additional');
+    }
   };
 
   const resetForm = () => {
@@ -241,11 +251,19 @@ export default function ReferencesPage() {
             onClick={handleContinue}
             className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-xl"
           >
-            Next: Additional Sections
+            {fromPreview ? 'Back to Preview' : 'Next: Additional Sections'}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ReferencesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <ReferencesPageContent />
+    </Suspense>
   );
 }

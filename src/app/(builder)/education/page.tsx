@@ -13,8 +13,8 @@ import {
   ChevronDown,
   Search
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import { UNIVERSITIES, CITIES, FIELDS_OF_STUDY } from "@/data/autocomplete";
@@ -52,8 +52,10 @@ const degreeOptions = [
   'Other',
 ];
 
-export default function EducationPage() {
+function EducationPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromPreview = searchParams.get('from') === 'preview';
   const {
     cvData,
     addEducation,
@@ -86,6 +88,8 @@ export default function EducationPage() {
   const handleBack = () => {
     if (step === 'list') {
       setStep('form');
+    } else if (fromPreview) {
+      router.push('/preview');
     } else {
       setCurrentStep('experience');
       router.push('/experience');
@@ -139,8 +143,12 @@ export default function EducationPage() {
   };
 
   const handleContinueToSkills = () => {
-    setCurrentStep('skills');
-    router.push('/skills');
+    if (fromPreview) {
+      router.push('/preview');
+    } else {
+      setCurrentStep('skills');
+      router.push('/skills');
+    }
   };
 
   const formatDate = (dateStr: string) => {
@@ -385,12 +393,20 @@ export default function EducationPage() {
               onClick={handleContinueToSkills}
               className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold"
             >
-              Continue to Skills
+              {fromPreview ? 'Back to Preview' : 'Continue to Skills'}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+export default function EducationPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <EducationPageContent />
+    </Suspense>
   );
 }

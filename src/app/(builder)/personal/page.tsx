@@ -10,6 +10,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { PhotoUpload } from "@/components/builder/photo-upload";
 import { TEMPLATES } from "@/types/templates";
 import { AutocompleteInput } from "@/components/ui/autocomplete-input";
@@ -29,8 +31,10 @@ const personalInfoSchema = z.object({
 
 type PersonalInfoForm = z.infer<typeof personalInfoSchema>;
 
-export default function PersonalInfoPage() {
+function PersonalInfoPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromPreview = searchParams.get('from') === 'preview';
   const { cvData, templateId, updatePersonalInfo, setCurrentStep } = useCVStore();
 
   const selectedTemplate = TEMPLATES.find(t => t.id === templateId);
@@ -57,13 +61,21 @@ export default function PersonalInfoPage() {
 
   const onSubmit = (data: PersonalInfoForm) => {
     updatePersonalInfo(data);
-    setCurrentStep('experience');
-    router.push('/experience');
+    if (fromPreview) {
+      router.push('/preview');
+    } else {
+      setCurrentStep('experience');
+      router.push('/experience');
+    }
   };
 
   const handleBack = () => {
-    setCurrentStep('template');
-    router.push('/template');
+    if (fromPreview) {
+      router.push('/preview');
+    } else {
+      setCurrentStep('template');
+      router.push('/template');
+    }
   };
 
   const handlePhotoUploaded = (url: string) => {
@@ -242,5 +254,13 @@ export default function PersonalInfoPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PersonalInfoPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <PersonalInfoPageContent />
+    </Suspense>
   );
 }

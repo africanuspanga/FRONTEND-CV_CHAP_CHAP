@@ -3,15 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { useCVStore } from "@/stores/cv-store";
 import { ArrowRight, Plus, X, Sparkles, Loader2, Check } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import { ALL_SKILLS_AND_CERTS } from "@/data/autocomplete";
 import { StepHeader } from "@/components/builder/step-header";
 
-export default function SkillsPage() {
+function SkillsPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromPreview = searchParams.get('from') === 'preview';
   const { cvData, addSkill, removeSkill, setCurrentStep, setSkills } = useCVStore();
   const [isLoading, setIsLoading] = useState(false);
   const [newSkillName, setNewSkillName] = useState('');
@@ -72,13 +74,21 @@ export default function SkillsPage() {
   };
 
   const handleBack = () => {
-    setCurrentStep('education');
-    router.push('/education');
+    if (fromPreview) {
+      router.push('/preview');
+    } else {
+      setCurrentStep('education');
+      router.push('/education');
+    }
   };
 
   const handleContinue = () => {
-    setCurrentStep('summary');
-    router.push('/summary');
+    if (fromPreview) {
+      router.push('/preview');
+    } else {
+      setCurrentStep('summary');
+      router.push('/summary');
+    }
   };
 
   const handleAddSkill = () => {
@@ -237,7 +247,7 @@ export default function SkillsPage() {
             onClick={handleContinue}
             className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 py-6 text-lg rounded-2xl font-semibold"
           >
-            Continue to Summary
+            {fromPreview ? 'Back to Preview' : 'Continue to Summary'}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
@@ -310,5 +320,13 @@ export default function SkillsPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function SkillsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <SkillsPageContent />
+    </Suspense>
   );
 }

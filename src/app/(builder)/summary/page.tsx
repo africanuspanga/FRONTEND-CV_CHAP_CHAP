@@ -4,15 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useCVStore } from "@/stores/cv-store";
 import { ArrowRight, X, Sparkles, Loader2, Star, FileText } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { StepHeader } from "@/components/builder/step-header";
 
 type Step = 'preview' | 'edit';
 
-export default function SummaryPage() {
+function SummaryPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromPreview = searchParams.get('from') === 'preview';
   const { cvData, setSummary, setCurrentStep, templateId, selectedColor } = useCVStore();
   const [step, setStep] = useState<Step>('preview');
   const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +65,8 @@ export default function SummaryPage() {
   const handleBack = () => {
     if (step === 'edit') {
       setStep('preview');
+    } else if (fromPreview) {
+      router.push('/preview');
     } else {
       setCurrentStep('skills');
       router.push('/skills');
@@ -74,8 +78,12 @@ export default function SummaryPage() {
       setStep('edit');
     } else {
       setSummary(localSummary);
-      setCurrentStep('references');
-      router.push('/references');
+      if (fromPreview) {
+        router.push('/preview');
+      } else {
+        setCurrentStep('references');
+        router.push('/references');
+      }
     }
   };
 
@@ -288,5 +296,13 @@ export default function SummaryPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function SummaryPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <SummaryPageContent />
+    </Suspense>
   );
 }
