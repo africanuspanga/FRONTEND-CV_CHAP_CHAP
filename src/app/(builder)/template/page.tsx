@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { TEMPLATES, type TemplateConfig } from "@/types/templates";
 import { useCVStore } from "@/stores/cv-store";
-import { CheckCircle, ArrowLeft, ArrowRight, Upload } from "lucide-react";
+import { CheckCircle, ArrowLeft, ArrowRight, Upload, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
@@ -114,7 +114,20 @@ function TemplatePageContent() {
   const searchParams = useSearchParams();
   const isUploadMode = searchParams.get('upload') === 'true';
   
-  const { templateId, setTemplateId, setSelectedColor, setCurrentStep } = useCVStore();
+  const { templateId, setTemplateId, setSelectedColor, setCurrentStep, resetCV, cvData } = useCVStore();
+
+  const hasData = !!(
+    cvData.personalInfo.firstName ||
+    cvData.personalInfo.lastName ||
+    cvData.workExperiences.length > 0 ||
+    cvData.education.length > 0
+  );
+
+  const handleStartFresh = () => {
+    if (confirm('Start fresh? This will clear all your saved CV data and cannot be undone.')) {
+      resetCV();
+    }
+  };
   const [photoFilter, setPhotoFilter] = useState<FilterType>('all');
   const [categoryFilter, setCategoryFilter] = useState<CategoryType>('all');
   const [previewColor, setPreviewColor] = useState<string | null>(null);
@@ -158,7 +171,18 @@ function TemplatePageContent() {
               <h1 className="text-xl font-heading font-bold text-gray-900">Choose Your Template</h1>
               <p className="text-sm text-gray-500">Step 1 of 8</p>
             </div>
-            <div className="w-24"></div>
+            <div className="w-24 flex justify-end">
+              {hasData && (
+                <button
+                  onClick={handleStartFresh}
+                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors"
+                  title="Clear all data and start fresh"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  <span className="hidden sm:inline">Start Fresh</span>
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-4 items-center justify-between">

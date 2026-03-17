@@ -71,6 +71,18 @@ export default function PaymentPage() {
   const handleDownload = async () => {
     if (!cvId) return;
 
+    // Safari iOS fix: pre-open a window synchronously before the async fetch
+    // so the blob URL navigation stays within the user-gesture chain.
+    const ua = navigator.userAgent;
+    const isSafariIOS = /iP(hone|ad|od)/.test(ua) && /WebKit/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
+    let safariWindow: Window | null = null;
+    if (isSafariIOS) {
+      safariWindow = window.open('', '_blank');
+      if (safariWindow) {
+        safariWindow.document.write('<html><body style="font-family:sans-serif;padding:24px;color:#333"><p>Preparing your CV PDF, please wait…</p></body></html>');
+      }
+    }
+
     setIsLoading(true);
     try {
       const response = await fetch(`/api/pdf/generate?cvId=${cvId}`);
@@ -78,18 +90,26 @@ export default function PaymentPage() {
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${cvData.personalInfo.firstName}_${cvData.personalInfo.lastName}_CV.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        const filename = `${cvData.personalInfo.firstName || 'My'}_${cvData.personalInfo.lastName || 'CV'}_CV.pdf`;
+
+        if (safariWindow) {
+          safariWindow.location.href = url;
+        } else {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }
       } else {
+        if (safariWindow) safariWindow.close();
         const data = await response.json();
         alert(data.error || 'Download failed');
       }
     } catch (error) {
+      if (safariWindow) safariWindow.close();
       console.error('Download failed:', error);
       alert('Download failed. Please try again.');
     } finally {

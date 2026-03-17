@@ -88,6 +88,9 @@ export default function USSdPaymentPage() {
     templateId: string;
     selectedColor: string | null;
   } | null>(null);
+  const [paidCvId, setPaidCvId] = useState<string | null>(() => {
+    try { return localStorage.getItem('cv-chap-chap-paid-id'); } catch { return null; }
+  });
 
   // On mount: if Zustand state is empty (e.g. after a page reload on mobile when the
   // browser killed the tab during USSD dialing), manually restore from localStorage.
@@ -142,6 +145,11 @@ export default function USSdPaymentPage() {
           templateId: templateId || 'charles',
           selectedColor,
         });
+        // Persist cvId so we can recover data from the server if iOS kills the tab
+        if (data.cvId) {
+          setPaidCvId(data.cvId);
+          try { localStorage.setItem('cv-chap-chap-paid-id', data.cvId); } catch { /* ignore */ }
+        }
         setStep('success');
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
@@ -157,31 +165,78 @@ export default function USSdPaymentPage() {
 
   const handleDownload = useCallback(async () => {
     setIsDownloading(true);
+
+    // Safari iOS blocks blob URL navigation when it happens after an async gap
+    // (the user-gesture chain is broken). Fix: pre-open a blank window synchronously
+    // before the async PDF generation, then navigate it to the blob URL afterward.
+    const ua = navigator.userAgent;
+    const isSafariIOS = /iP(hone|ad|od)/.test(ua) && /WebKit/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
+    let safariWindow: Window | null = null;
+    if (isSafariIOS) {
+      safariWindow = window.open('', '_blank');
+      if (safariWindow) {
+        safariWindow.document.write('<html><body style="font-family:sans-serif;padding:24px;color:#333"><p>Preparing your CV PDF, please wait…</p></body></html>');
+      }
+    }
+
     try {
-      // Prefer the snapshot captured at verification time; fall back to current Zustand state.
       const downloadCvData = verifiedSnapshot?.cvData ?? cvData;
       const downloadTemplateId = verifiedSnapshot?.templateId ?? templateId ?? 'charles';
       const downloadColor = verifiedSnapshot !== null
         ? verifiedSnapshot.selectedColor
         : selectedColor;
 
-      const TemplateComponent = getTemplate(downloadTemplateId);
-      const finalColor = downloadColor || getTemplateColor(downloadTemplateId);
-      const blob = await pdf(<TemplateComponent data={downloadCvData} colorOverride={finalColor} />).toBlob();
+      // If CV data is empty (iOS killed the tab during USSD dialing and cleared state),
+      // recover from the server using the cvId saved after payment verification.
+      const isEmpty = !downloadCvData.personalInfo.firstName && !downloadCvData.personalInfo.lastName && downloadCvData.workExperiences.length === 0;
+      let finalCvData = downloadCvData;
+      let finalTemplateId = downloadTemplateId;
+
+      if (isEmpty && paidCvId) {
+        if (safariWindow) {
+          safariWindow.document.write('<html><body style="font-family:sans-serif;padding:24px;color:#333"><p>Recovering your CV from server…</p></body></html>');
+        }
+        const recoveryRes = await fetch(`/api/cv/${paidCvId}`);
+        if (recoveryRes.ok) {
+          const recovered = await recoveryRes.json();
+          finalCvData = recovered.cvData;
+          finalTemplateId = recovered.templateId || downloadTemplateId;
+        } else {
+          if (safariWindow) safariWindow.close();
+          alert('Could not recover your CV. Please contact support on WhatsApp: +255 682 152 148');
+          return;
+        }
+      } else if (isEmpty) {
+        if (safariWindow) safariWindow.close();
+        alert('Your CV data could not be found. Please contact support on WhatsApp: +255 682 152 148');
+        return;
+      }
+
+      const TemplateComponent = getTemplate(finalTemplateId);
+      const finalColor = downloadColor || getTemplateColor(finalTemplateId);
+      const blob = await pdf(<TemplateComponent data={finalCvData} colorOverride={finalColor} />).toBlob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${downloadCvData.personalInfo.firstName || 'My'}_${downloadCvData.personalInfo.lastName || 'CV'}_CV.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      const filename = `${finalCvData.personalInfo.firstName || 'My'}_${finalCvData.personalInfo.lastName || 'CV'}_CV.pdf`;
+
+      if (safariWindow) {
+        // Navigate the pre-opened window to the blob URL (still within user-gesture scope)
+        safariWindow.location.href = url;
+      } else {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
     } catch {
+      if (safariWindow) safariWindow.close();
       alert('Download failed. Please try again.');
     } finally {
       setIsDownloading(false);
     }
-  }, [verifiedSnapshot, cvData, templateId, selectedColor]);
+  }, [verifiedSnapshot, cvData, templateId, selectedColor, paidCvId]);
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
@@ -278,9 +333,9 @@ export default function USSdPaymentPage() {
                 <div className="bg-blue-600 text-white rounded-2xl px-5 py-4 flex items-center justify-between">
                   <div>
                     <p className="text-xs text-blue-200 mb-0.5">USSD Code</p>
-                    <p className="text-2xl font-bold tracking-wide">*150*01*50#</p>
+                    <p className="text-2xl font-bold tracking-wide">*150*50*1#</p>
                   </div>
-                  <CopyButton text="*150*01*50#" />
+                  <CopyButton text="*150*50*1#" />
                 </div>
 
                 {/* Merchant ID */}
@@ -304,7 +359,7 @@ export default function USSdPaymentPage() {
                 {/* Steps */}
                 <ol className="space-y-2 pt-1">
                   {[
-                    'Dial *150*01*50# on your phone',
+                    'Dial *150*50*1# on your phone',
                     'Choose Pay Bill / Pay Till',
                     'Enter Merchant ID: 61115073',
                     'Enter amount: 5000',

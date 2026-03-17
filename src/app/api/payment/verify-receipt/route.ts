@@ -67,6 +67,8 @@ export async function POST(request: NextRequest) {
       referral_code?: string;
     };
 
+    let savedCvId: string | null = null;
+
     if (!receiptText || !cvData || !templateId) {
       return NextResponse.json(
         { error: 'Receipt text, CV data, and template ID are required' },
@@ -96,6 +98,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (!cvError && cv) {
+        savedCvId = cv.id;
         const orderId = `CV-${cv.id.slice(0, 8)}-${Date.now()}`;
 
         let affiliateId: string | null = null;
@@ -151,7 +154,7 @@ export async function POST(request: NextRequest) {
       console.error('DB save failed (non-blocking):', dbErr);
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, cvId: savedCvId });
 
   } catch (error) {
     console.error('Receipt verification error:', error);
