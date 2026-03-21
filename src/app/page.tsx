@@ -15,7 +15,8 @@ import {
   Menu,
   X,
   Star,
-  Download
+  Download,
+  Sparkles,
 } from "lucide-react";
 import { TemplatePreview } from "@/components/templates/preview";
 import { sampleCVData } from "@/lib/sample-data";
@@ -29,53 +30,45 @@ import amsonsLogo from "@/assets/logos/amsons.png";
 import tanzaniaGovtLogo from "@/assets/logos/tanzania-govt.png";
 import metlLogo from "@/assets/logos/metl.png";
 
-
-// Select 6 templates to showcase on homepage (mix of styles)
 const homeTemplateIds = ['charles', 'kathleen', 'grace-mint', 'classic-elegant', 'hexagon-blue', 'creative-yellow'];
 const homeTemplates = TEMPLATES.filter(t => homeTemplateIds.includes(t.id));
 
 const features = [
   {
     icon: Zap,
-    title: 'Haraka Sana',
-    subtitle: 'Lightning Fast',
-    description: 'Create a professional CV in under 5 minutes. No complicated forms, just simple steps.',
+    title: 'Lightning Fast',
+    description: 'Create a professional CV in under 5 minutes. Simple steps, zero confusion.',
   },
   {
     icon: FileText,
     title: '35+ Templates',
-    subtitle: 'Professional Designs',
-    description: 'Recruiter-approved templates designed for the East African job market.',
+    description: 'Recruiter-approved designs built for the East African job market.',
   },
   {
     icon: Bot,
     title: 'AI-Powered',
-    subtitle: 'Smart Suggestions',
-    description: 'Get intelligent content suggestions tailored to your industry and role.',
+    description: 'Smart content suggestions tailored to your industry and role.',
   },
   {
     icon: CheckCircle,
     title: 'ATS-Friendly',
-    subtitle: 'Beat the Bots',
     description: 'Our CVs pass Applicant Tracking Systems used by top employers.',
   },
   {
     icon: Download,
-    title: 'PDF Download',
-    subtitle: 'Professional Format',
-    description: 'Download high-quality PDFs ready to send to any employer.',
+    title: 'Instant PDF',
+    description: 'Download a high-quality PDF ready to send to any employer immediately.',
   },
   {
     icon: Smartphone,
     title: 'Mobile First',
-    subtitle: 'Create Anywhere',
-    description: 'Build your CV from your phone, tablet, or computer - anytime, anywhere.',
+    description: 'Built for your phone. Create your CV from anywhere, anytime.',
   },
 ];
 
 const steps = [
-  { number: '01', title: 'Choose Template', description: 'Pick from 35+ professional designs', icon: FileText },
-  { number: '02', title: 'Fill Your Details', description: 'AI helps you write compelling content', icon: Bot },
+  { number: '01', title: 'Pick a Template', description: 'Choose from 35+ professional designs', icon: FileText },
+  { number: '02', title: 'Add Your Details', description: 'AI helps you write compelling content', icon: Bot },
   { number: '03', title: 'Download & Apply', description: 'Get your professional CV instantly', icon: Download },
 ];
 
@@ -91,7 +84,7 @@ const testimonials = [
     name: 'Lucy Mdema',
     role: 'Sales Executive',
     location: 'Mwanza',
-    text: 'I was applying for a gig that needed verification with a proper CV. CV Chap Chap saved me - created a professional CV so fast!',
+    text: 'I was applying for a gig that needed verification with a proper CV. CV Chap Chap saved me — created a professional CV so fast!',
     avatar: 'LM',
   },
   {
@@ -126,9 +119,9 @@ const testimonials = [
 
 const stats = [
   { value: '50,000+', label: 'CVs Created' },
-  { value: '35', label: 'Templates' },
+  { value: '35+', label: 'Templates' },
   { value: '3 min', label: 'Average Time' },
-  { value: '4.9/5', label: 'User Rating' },
+  { value: '4.9★', label: 'User Rating' },
 ];
 
 const faqs = [
@@ -164,7 +157,6 @@ const trustedCompanies = [
   { name: 'MeTL Group', logo: metlLogo, size: 'lg' },
 ];
 
-// Live Template Card component for homepage
 function HomeTemplateCard({ template }: { template: typeof TEMPLATES[number] }) {
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -174,74 +166,48 @@ function HomeTemplateCard({ template }: { template: typeof TEMPLATES[number] }) 
     const updateScale = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
-        const templateWidth = 794;
-        const newScale = containerWidth / templateWidth;
-        setScale(newScale);
+        setScale(containerWidth / 794);
       }
     };
-
     updateScale();
     window.addEventListener('resize', updateScale);
     return () => window.removeEventListener('resize', updateScale);
   }, []);
 
   return (
-    <Link href="/template" className="block">
+    <Link href="/template" className="block group">
       <div
-        className="group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer border border-gray-200"
+        className="relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div
-          ref={containerRef}
-          className="relative overflow-hidden bg-white"
-          style={{ paddingBottom: '130%' }}
-        >
+        <div ref={containerRef} className="relative overflow-hidden bg-white" style={{ paddingBottom: '130%' }}>
           <div
             className="absolute top-0 left-0 origin-top-left pointer-events-none"
-            style={{
-              transform: `scale(${scale})`,
-              width: '794px',
-              height: '1123px',
-            }}
+            style={{ transform: `scale(${scale})`, width: '794px', height: '1123px' }}
           >
-            <TemplatePreview
-              templateId={template.id}
-              data={sampleCVData}
-              scale={1}
-              colorOverride={null}
-            />
+            <TemplatePreview templateId={template.id} data={sampleCVData} scale={1} colorOverride={null} />
           </div>
 
-          {/* Hover/Tap overlay with button */}
-          <div className={`absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col items-center justify-end pb-6 transition-opacity z-10 ${
-            isHovered ? 'opacity-100' : 'opacity-0 md:opacity-0'
+          <div className={`absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent flex flex-col items-center justify-end pb-5 transition-opacity z-10 ${
+            isHovered ? 'opacity-100' : 'opacity-0'
           }`}>
-            <span className="px-6 py-3 bg-white text-gray-900 rounded-xl font-semibold text-sm shadow-lg flex items-center gap-2">
-              Use This Template
-              <ArrowRight className="w-4 h-4" />
+            <span className="px-5 py-2.5 bg-white text-gray-900 rounded-xl font-semibold text-sm shadow-lg flex items-center gap-2">
+              Use This Template <ArrowRight className="w-4 h-4" />
             </span>
           </div>
 
-          {/* Always visible button on mobile */}
           <div className="md:hidden absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-10">
             <span className="flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-900 rounded-xl font-semibold text-sm w-full">
-              Use This Template
-              <ArrowRight className="w-4 h-4" />
+              Use Template <ArrowRight className="w-4 h-4" />
             </span>
           </div>
         </div>
 
-        <div className="p-4">
-          <h3 className="font-semibold text-gray-900">{template.name}</h3>
-          <p className="text-sm text-gray-500 mt-1 line-clamp-1">
-            {template.description}
-          </p>
-          <div className="flex items-center gap-2 mt-2">
-            <span
-              className="w-3 h-3 rounded-full border border-gray-200"
-              style={{ backgroundColor: template.primaryColor }}
-            />
+        <div className="p-4 border-t border-gray-50">
+          <h3 className="font-semibold text-gray-900 text-sm">{template.name}</h3>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="w-2.5 h-2.5 rounded-full border border-gray-200 flex-shrink-0" style={{ backgroundColor: template.primaryColor }} />
             <span className="text-xs text-gray-400 capitalize">{template.category}</span>
           </div>
         </div>
@@ -258,79 +224,80 @@ export default function HomePage() {
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 8000);
+    }, 6000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="min-h-screen bg-white font-body overflow-x-hidden">
-      {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrollY > 50 ? 'bg-white/90 backdrop-blur-lg shadow-lg shadow-blue-900/5' : 'bg-white md:bg-transparent'
+
+      {/* ─── Navigation ─────────────────────────────────────── */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrollY > 40 ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
       }`}>
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-cv-blue-600 flex items-center justify-center">
-                <FileText className="w-6 h-6 text-white" />
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-cv-blue-600 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-white" />
               </div>
-              <span className="font-display font-bold text-xl text-gray-900">
-                CV <span className="text-cv-blue-600">Chap Chap</span>
+              <span className={`font-display font-bold text-lg transition-colors ${scrollY > 40 ? 'text-gray-900' : 'text-white'}`}>
+                CV <span className={scrollY > 40 ? 'text-cv-blue-600' : 'text-blue-200'}>Chap Chap</span>
               </span>
+            </Link>
+
+            <div className="hidden md:flex items-center gap-7">
+              {[
+                { href: '/template', label: 'Templates' },
+                { href: '/letter', label: 'Cover Letters' },
+                { href: '/blog', label: 'Blog' },
+                { href: '#contact', label: 'Contact' },
+              ].map(({ href, label }) => (
+                <Link key={label} href={href} className={`font-medium text-sm transition-colors hover:text-cv-blue-400 ${scrollY > 40 ? 'text-gray-600' : 'text-white/80'}`}>
+                  {label}
+                </Link>
+              ))}
             </div>
 
-            {/* Desktop Nav */}
-            <div className="hidden md:flex items-center gap-8">
-              <Link href="/" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Home</Link>
-              <Link href="/template" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Templates</Link>
-              <Link href="/letter" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Cover Letters</Link>
-              <Link href="/blog" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Blog</Link>
-              <a href="#contact" className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Contact</a>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="hidden md:flex items-center gap-4">
-              <Link href="/auth/login" className="px-4 py-2 text-gray-700 font-medium hover:text-cv-blue-600 transition-colors">
+            <div className="hidden md:flex items-center gap-3">
+              <Link href="/auth/login" className={`text-sm font-medium transition-colors ${scrollY > 40 ? 'text-gray-600 hover:text-cv-blue-600' : 'text-white/80 hover:text-white'}`}>
                 Login
               </Link>
-              <Link
-                href="/template"
-                className="px-6 py-2.5 bg-cv-blue-600 text-white font-semibold rounded-lg shadow-sm hover:bg-cv-blue-700 transition-colors"
-              >
+              <Link href="/template" className="px-5 py-2 bg-cv-blue-600 text-white font-semibold rounded-lg text-sm hover:bg-cv-blue-700 transition-colors shadow-sm">
                 Create CV Free
               </Link>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button 
-              className="md:hidden p-2"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            <button className="md:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen
+                ? <X className={`w-6 h-6 ${scrollY > 40 ? 'text-gray-900' : 'text-white'}`} />
+                : <Menu className={`w-6 h-6 ${scrollY > 40 ? 'text-gray-900' : 'text-white'}`} />
+              }
             </button>
           </div>
 
-          {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 border-t border-gray-100">
+            <div className="md:hidden mt-3 pb-4 border-t border-white/10">
               <div className="flex flex-col gap-4 pt-4">
-                <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Home</Link>
-                <Link href="/template" onClick={() => setIsMenuOpen(false)} className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Templates</Link>
-                <Link href="/letter" onClick={() => setIsMenuOpen(false)} className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Cover Letters</Link>
-                <Link href="/blog" onClick={() => setIsMenuOpen(false)} className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Blog</Link>
-                <a href="#contact" onClick={() => setIsMenuOpen(false)} className="text-gray-600 hover:text-cv-blue-600 transition-colors font-medium">Contact</a>
-                <Link
-                  href="/template"
-                  className="px-6 py-2.5 bg-cv-blue-600 text-white font-semibold rounded-lg text-center mt-2"
-                >
+                {[
+                  { href: '/template', label: 'Templates' },
+                  { href: '/letter', label: 'Cover Letters' },
+                  { href: '/blog', label: 'Blog' },
+                  { href: '#contact', label: 'Contact' },
+                ].map(({ href, label }) => (
+                  <Link key={label} href={href} onClick={() => setIsMenuOpen(false)} className="text-white/90 font-medium">
+                    {label}
+                  </Link>
+                ))}
+                <Link href="/auth/login" onClick={() => setIsMenuOpen(false)} className="text-white/70">Login</Link>
+                <Link href="/template" onClick={() => setIsMenuOpen(false)} className="px-5 py-3 bg-white text-cv-blue-700 font-bold rounded-xl text-center mt-1">
                   Create CV Free
                 </Link>
               </div>
@@ -339,146 +306,162 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-20 md:pt-32 pb-12 md:pb-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-            >
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg mb-6">
-                <span className="w-2 h-2 bg-green-500 rounded-full" />
-                <span className="text-sm font-medium text-gray-700">Made In Tanzania</span>
-                <span className="text-xs">🇹🇿</span>
-              </div>
+      {/* ─── Hero ───────────────────────────────────────────── */}
+      <section className="relative min-h-screen flex items-center bg-gray-900 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-cv-blue-950/80 to-gray-900" />
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-cv-blue-600/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cv-blue-800/10 rounded-full blur-3xl" />
+          {/* Subtle grid */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
+            backgroundSize: '60px 60px'
+          }} />
+        </div>
 
-              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Create Your CV
-                <span className="block text-cv-blue-600">
-                  in 3 Minutes
-                </span>
-              </h1>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16 w-full">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
-              <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-xl">
-                Build a stunning CV that gets you noticed. AI-powered content suggestions,
-                35+ professional templates, and instant PDF download.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Link
-                  href="/create"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-cv-blue-600 text-white font-semibold rounded-lg shadow-sm hover:bg-cv-blue-700 transition-colors text-lg"
-                >
-                  Create Your CV Free
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <a
-                  href="#how-it-works"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-gray-700 font-semibold rounded-lg border border-gray-200 hover:border-gray-300 hover:text-gray-900 transition-colors text-lg"
-                >
-                  See How It Works
-                </a>
-              </div>
-
-              {/* Success stats */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <div className="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-lg border border-green-200">
-                  <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                  </svg>
-                  <span className="text-sm font-semibold text-green-700">30% higher chance of getting a job*</span>
+            {/* Left */}
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/10 border border-white/20 rounded-full mb-7 backdrop-blur-sm">
+                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                  <span className="text-xs font-semibold text-white/90 tracking-wide uppercase">Made in Tanzania 🇹🇿</span>
                 </div>
-                <div className="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-lg border border-green-200">
-                  <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                  </svg>
-                  <span className="text-sm font-semibold text-green-700">42% higher response rate from recruiters*</span>
-                </div>
-              </div>
-            </motion.div>
 
-            {/* Right Content - Hero Image */}
+                <h1 className="font-display font-bold text-white leading-[1.1] mb-6">
+                  <span className="text-4xl sm:text-5xl lg:text-6xl block">Create Your CV</span>
+                  <span className="text-4xl sm:text-5xl lg:text-6xl block mt-1">
+                    in{' '}
+                    <span className="relative inline-block">
+                      <span className="text-cv-blue-400">3 Minutes</span>
+                      <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 200 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 5.5C40 2 80 1 100 1.5C120 2 160 3.5 199 6" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round"/>
+                      </svg>
+                    </span>
+                  </span>
+                </h1>
+
+                <p className="text-lg text-white/70 mb-8 max-w-md leading-relaxed">
+                  AI-powered CV builder with 35+ professional templates — designed for East African job seekers. Free to create, instant to download.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3 mb-10">
+                  <Link
+                    href="/template"
+                    className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-cv-blue-600 text-white font-bold rounded-xl hover:bg-cv-blue-500 transition-colors text-base shadow-lg shadow-cv-blue-900/40"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Create Your CV Free
+                  </Link>
+                  <a
+                    href="#how-it-works"
+                    className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-white/10 text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-colors text-base backdrop-blur-sm"
+                  >
+                    See How It Works
+                    <ChevronDown className="w-4 h-4" />
+                  </a>
+                </div>
+
+                {/* Trust signals */}
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex">
+                      {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />)}
+                    </div>
+                    <span className="text-sm text-white/70 font-medium">4.9/5 from 1,000+ users</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-400" />
+                    <span className="text-sm text-white/70 font-medium">50,000+ CVs created</span>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right — Hero Image (desktop only) */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-              className="relative hidden lg:block"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="hidden lg:block relative"
             >
               <div className="relative">
-                {/* Hero Image */}
+                <div className="absolute -inset-4 bg-cv-blue-600/20 rounded-3xl blur-2xl" />
                 <Image
                   src="/images/cv-hero-image.png"
-                  alt="Professional CV Example - Create your own CV"
-                  width={550}
-                  height={550}
-                  className="w-full h-auto rounded-2xl"
+                  alt="Professional CV Example"
+                  width={560}
+                  height={560}
+                  className="relative w-full h-auto rounded-2xl shadow-2xl"
                   priority
                 />
-                <div className="absolute -top-3 -right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-lg shadow-sm">
-                  ATS-Ready
+                <div className="absolute -top-3 -right-3 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg">
+                  ATS-Ready ✓
+                </div>
+                <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-xl p-4 flex items-center gap-3">
+                  <div className="w-10 h-10 bg-cv-blue-50 rounded-xl flex items-center justify-center">
+                    <Zap className="w-5 h-5 text-cv-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Average time</p>
+                    <p className="font-bold text-gray-900">3 minutes</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
+
           </div>
         </div>
+
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent" />
       </section>
 
-      {/* Stats Bar */}
-      <section className="py-12 bg-cv-blue-600">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+      {/* ─── Stats Bar ──────────────────────────────────────── */}
+      <section className="py-10 bg-cv-blue-600">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="text-center"
-              >
-                <div className="font-display text-xl sm:text-2xl md:text-4xl font-bold text-white mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-cv-blue-100 text-xs md:text-sm">{stat.label}</div>
+              <div key={stat.label} className="text-center">
+                <div className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-0.5">{stat.value}</div>
+                <div className="text-blue-100 text-xs sm:text-sm font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Trusted By Section - Auto-scrolling logos */}
+      {/* ─── Trusted By ─────────────────────────────────────── */}
       <section className="py-12 bg-white border-b border-gray-100 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <p className="text-center text-gray-500 text-sm mb-8">
+        <div className="max-w-7xl mx-auto px-6 mb-6">
+          <p className="text-center text-gray-400 text-sm font-medium tracking-wide uppercase">
             Professionals from these companies have created CVs with us
           </p>
         </div>
-        {/* Auto-scrolling marquee */}
         <div className="relative">
-          {/* Gradient fade edges */}
           <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white to-transparent z-10" />
           <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent z-10" />
-
           <motion.div
             className="flex gap-12 items-center"
             animate={{ x: [0, -1000] }}
-            transition={{
-              duration: 25,
-              repeat: Infinity,
-              ease: "linear",
-            }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           >
-            {/* Double the logos for seamless loop */}
             {[...trustedCompanies, ...trustedCompanies, ...trustedCompanies].map((company, index) => (
-              <div key={`${company.name}-${index}`} className="flex-shrink-0">
+              <div key={`${company.name}-${index}`} className="flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity">
                 <Image
                   src={company.logo}
                   alt={company.name}
                   width={company.size === 'xl' ? 140 : company.size === 'lg' ? 120 : 100}
                   height={company.size === 'xl' ? 56 : company.size === 'lg' ? 48 : 40}
-                  className={`w-auto object-contain ${
-                    company.size === 'xl' ? 'h-14' : company.size === 'lg' ? 'h-12' : 'h-10'
-                  }`}
+                  className={`w-auto object-contain ${company.size === 'xl' ? 'h-12' : company.size === 'lg' ? 'h-10' : 'h-8'}`}
                 />
               </div>
             ))}
@@ -486,133 +469,109 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* ─── How It Works ───────────────────────────────────── */}
       <section id="how-it-works" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Create Your CV in 3 Easy Steps
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Our AI-powered platform makes it quick and effortless to create a professional CV
-              </p>
-            </motion.div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <p className="text-cv-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Simple Process</p>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900">
+              From Zero to Professional CV<br className="hidden sm:block" /> in 3 Steps
+            </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             {steps.map((step, index) => (
               <motion.div
                 key={step.number}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="relative"
+                className="relative bg-gray-50 rounded-2xl p-7 border border-gray-100"
               >
-                {/* Connector line */}
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-12 left-1/2 w-full h-0.5 bg-gray-200" />
-                )}
-
-                <div className="relative bg-white rounded-xl p-6 border border-gray-200 text-center">
-                  <div className="relative z-10 w-16 h-16 bg-cv-blue-50 text-cv-blue-600 rounded-xl flex items-center justify-center mx-auto mb-5">
-                    <step.icon className="w-8 h-8" />
+                <div className="flex items-start justify-between mb-5">
+                  <div className="w-12 h-12 bg-cv-blue-600 text-white rounded-xl flex items-center justify-center shadow-sm">
+                    <step.icon className="w-6 h-6" />
                   </div>
-                  <div className="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-600 rounded-lg flex items-center justify-center font-bold text-sm">
-                    {step.number}
-                  </div>
-                  <h3 className="font-display font-bold text-xl text-gray-900 mb-2">{step.title}</h3>
-                  <p className="text-gray-600">{step.description}</p>
+                  <span className="font-display font-bold text-4xl text-gray-100 select-none">{step.number}</span>
                 </div>
+                <h3 className="font-display font-bold text-lg text-gray-900 mb-2">{step.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{step.description}</p>
+
+                {index < steps.length - 1 && (
+                  <div className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white border border-gray-200 rounded-full items-center justify-center shadow-sm">
+                    <ArrowRight className="w-4 h-4 text-gray-400" />
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-10">
             <Link
-              href="/create"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-cv-blue-600 text-white font-semibold rounded-lg shadow-sm hover:bg-cv-blue-700 transition-colors text-lg"
+              href="/template"
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-cv-blue-600 text-white font-semibold rounded-xl hover:bg-cv-blue-700 transition-colors shadow-sm"
             >
-              Start Creating Now
-              <ArrowRight className="w-5 h-5" />
+              Start Creating Now <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Everything You Need to Stand Out
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Our platform is designed specifically for job seekers in East Africa
-              </p>
-            </motion.div>
+      {/* ─── Features ───────────────────────────────────────── */}
+      <section id="features" className="py-20 bg-gray-950">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <p className="text-cv-blue-400 font-semibold text-sm uppercase tracking-widest mb-3">Why CV Chap Chap</p>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-white">
+              Everything You Need to Stand Out
+            </h2>
+            <p className="text-gray-400 mt-3 max-w-xl mx-auto">
+              Built specifically for job seekers across East Africa
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.06 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-xl p-6 border border-gray-200"
+                className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 hover:border-cv-blue-500/30 transition-all group"
               >
-                <div className="w-12 h-12 bg-cv-blue-50 rounded-xl flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-cv-blue-600" />
+                <div className="w-11 h-11 bg-cv-blue-600/20 rounded-xl flex items-center justify-center mb-4 group-hover:bg-cv-blue-600/30 transition-colors">
+                  <feature.icon className="w-5 h-5 text-cv-blue-400" />
                 </div>
-                <h3 className="font-display font-semibold text-lg text-gray-900 mb-1">{feature.title}</h3>
-                <p className="text-cv-blue-600 text-sm mb-2">{feature.subtitle}</p>
-                <p className="text-gray-600 text-sm">{feature.description}</p>
+                <h3 className="font-semibold text-white mb-2">{feature.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Templates Showcase */}
+      {/* ─── Templates ──────────────────────────────────────── */}
       <section id="templates" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                35+ Professional Templates
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Choose from our collection of recruiter-approved designs
-              </p>
-            </motion.div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <p className="text-cv-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Templates</p>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900">
+              35+ Professional Designs
+            </h2>
+            <p className="text-gray-500 mt-3 max-w-xl mx-auto">
+              Recruiter-approved templates, ready to fill in and download
+            </p>
           </div>
 
-          {/* Desktop: Grid of 6 with live previews */}
-          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Desktop: 6 templates */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {homeTemplates.map((template, index) => (
               <motion.div
                 key={template.id}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 viewport={{ once: true }}
               >
@@ -621,352 +580,216 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Mobile: Vertical scroll - one card at a time */}
-          <div className="md:hidden space-y-6">
-            {homeTemplates.map((template) => (
+          {/* Mobile: Only 3 templates for performance */}
+          <div className="md:hidden grid grid-cols-1 gap-5">
+            {homeTemplates.slice(0, 3).map((template) => (
               <HomeTemplateCard key={template.id} template={template} />
             ))}
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-10">
             <Link
               href="/template"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-cv-blue-600 text-white font-semibold rounded-lg shadow-sm hover:bg-cv-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-7 py-3.5 border-2 border-cv-blue-600 text-cv-blue-600 font-semibold rounded-xl hover:bg-cv-blue-600 hover:text-white transition-all"
             >
-              Browse All 30+ Templates
-              <ArrowRight className="w-5 h-5" />
+              Browse All 35+ Templates <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* ─── Testimonials ───────────────────────────────────── */}
       <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                What Our Users Say
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Join thousands of professionals who landed their dream jobs
-              </p>
-            </motion.div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <p className="text-cv-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Success Stories</p>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900">
+              People Are Getting Jobs
+            </h2>
           </div>
 
-          {/* Desktop: 3 cards in a row */}
-          <div className="hidden md:grid md:grid-cols-3 gap-6">
+          {/* Desktop: 3 columns */}
+          <div className="hidden md:grid md:grid-cols-3 gap-5">
             {testimonials.slice(0, 6).map((testimonial, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
+                transition={{ duration: 0.4, delay: index * 0.08 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col"
               >
-                {/* Quote icon */}
-                <div className="mb-4">
-                  <svg className="w-8 h-8 text-cv-blue-200" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                  </svg>
+                <div className="flex gap-0.5 mb-4">
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />)}
                 </div>
-
-                {/* Stars */}
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
-
-                {/* Testimonial text */}
-                <p className="text-gray-700 mb-6 leading-relaxed text-sm">
+                <p className="text-gray-700 text-sm leading-relaxed flex-1 mb-5">
                   &ldquo;{testimonial.text}&rdquo;
                 </p>
-
-                {/* Author */}
-                <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-                  <div className="w-10 h-10 bg-gradient-to-br from-cv-blue-500 to-cv-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                <div className="flex items-center gap-3 pt-4 border-t border-gray-50">
+                  <div className="w-9 h-9 bg-gradient-to-br from-cv-blue-500 to-cv-blue-700 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
                     {testimonial.avatar}
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">{testimonial.name}</p>
-                    <p className="text-xs text-gray-500">
-                      {testimonial.role} • {testimonial.location}
-                    </p>
+                    <p className="text-xs text-gray-400">{testimonial.role} · {testimonial.location}</p>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
 
-          {/* Mobile: One card at a time with swipe */}
+          {/* Mobile: Carousel */}
           <div className="md:hidden">
-            <div className="relative">
-              <motion.div
-                key={activeTestimonial}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm"
-              >
-                {/* Quote icon */}
-                <div className="mb-4">
-                  <svg className="w-8 h-8 text-cv-blue-200" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                  </svg>
-                </div>
-
-                {/* Stars */}
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
-
-                {/* Testimonial text */}
-                <p className="text-gray-700 mb-6 leading-relaxed">
-                  &ldquo;{testimonials[activeTestimonial].text}&rdquo;
-                </p>
-
-                {/* Author */}
-                <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-                  <div className="w-12 h-12 bg-gradient-to-br from-cv-blue-500 to-cv-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                    {testimonials[activeTestimonial].avatar}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{testimonials[activeTestimonial].name}</p>
-                    <p className="text-sm text-gray-500">
-                      {testimonials[activeTestimonial].role} • {testimonials[activeTestimonial].location}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Navigation arrows */}
-              <div className="flex justify-between items-center mt-6">
-                <button
-                  onClick={() => setActiveTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)}
-                  className="w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 active:bg-gray-100 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-
-                {/* Dots */}
-                <div className="flex gap-1 items-center">
-                  {testimonials.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setActiveTestimonial(index)}
-                      className="p-2 flex items-center justify-center"
-                    >
-                      <span className={`h-2 rounded-full transition-all block ${
-                        index === activeTestimonial ? 'bg-cv-blue-600 w-6' : 'bg-gray-300 w-2'
-                      }`} />
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => setActiveTestimonial((prev) => (prev + 1) % testimonials.length)}
-                  className="w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 active:bg-gray-100 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              viewport={{ once: true }}
+              key={activeTestimonial}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm"
             >
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Simple, Fair Pricing
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Pay only when you download. No hidden fees, no subscriptions.
+              <div className="flex gap-0.5 mb-4">
+                {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 text-amber-400 fill-amber-400" />)}
+              </div>
+              <p className="text-gray-700 leading-relaxed mb-6">
+                &ldquo;{testimonials[activeTestimonial].text}&rdquo;
               </p>
-            </motion.div>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            viewport={{ once: true }}
-            className="max-w-md mx-auto"
-          >
-            <div className="bg-cv-blue-600 rounded-2xl p-6 sm:p-8 text-white">
-              <div className="text-center mb-6">
-                <p className="text-cv-blue-100 text-sm mb-2">One-time payment</p>
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-lg">TZS</span>
-                  <span className="font-display text-5xl sm:text-6xl font-bold">5,000</span>
+              <div className="flex items-center gap-3 pt-4 border-t border-gray-50">
+                <div className="w-11 h-11 bg-gradient-to-br from-cv-blue-500 to-cv-blue-700 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                  {testimonials[activeTestimonial].avatar}
                 </div>
-                <p className="text-cv-blue-100 text-sm mt-2">per CV download</p>
+                <div>
+                  <p className="font-semibold text-gray-900">{testimonials[activeTestimonial].name}</p>
+                  <p className="text-sm text-gray-400">{testimonials[activeTestimonial].role} · {testimonials[activeTestimonial].location}</p>
+                </div>
               </div>
+            </motion.div>
 
-              <ul className="space-y-4 mb-8">
-                {[
-                  'Choose from 21+ professional templates',
-                  'AI-powered content suggestions',
-                  'Unlimited edits before download',
-                  'High-quality PDF download',
-                  'M-Pesa & mobile money payment',
-                  'Instant delivery',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href="/template"
-                className="block w-full py-4 bg-white text-cv-blue-600 font-semibold rounded-lg text-center hover:bg-gray-50 transition-colors"
-              >
-                Start Creating Your CV
-              </Link>
+            <div className="flex justify-center gap-2 mt-5">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveTestimonial(index)}
+                  className={`h-2 rounded-full transition-all ${index === activeTestimonial ? 'bg-cv-blue-600 w-6' : 'bg-gray-200 w-2'}`}
+                />
+              ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Frequently Asked Questions
-              </h2>
-            </motion.div>
+      {/* ─── FAQ ────────────────────────────────────────────── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900">
+              Common Questions
+            </h2>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {faqs.map((faq, index) => (
-              <div key={index}>
+              <div key={index} className="border border-gray-200 rounded-xl overflow-hidden">
                 <button
                   onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full bg-white rounded-xl p-6 text-left border border-gray-200"
+                  className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-900">{faq.question}</span>
-                    <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${
-                      openFaq === index ? 'rotate-180' : ''
-                    }`} />
-                  </div>
-                  {openFaq === index && (
-                    <p className="mt-4 text-gray-600">{faq.answer}</p>
-                  )}
+                  <span className="font-semibold text-gray-900 text-sm sm:text-base">{faq.question}</span>
+                  <ChevronDown className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform ${openFaq === index ? 'rotate-180' : ''}`} />
                 </button>
+                {openFaq === index && (
+                  <div className="px-6 pb-5">
+                    <p className="text-gray-600 text-sm leading-relaxed">{faq.answer}</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-cv-blue-600">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+      {/* ─── Final CTA ──────────────────────────────────────── */}
+      <section className="py-20 bg-gray-900">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-6">
-              Ready to Land Your Dream Job?
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cv-blue-600/20 border border-cv-blue-500/30 rounded-full mb-6">
+              <Sparkles className="w-4 h-4 text-cv-blue-400" />
+              <span className="text-cv-blue-300 text-sm font-semibold">Free to Create</span>
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-5">
+              Your Dream Job<br />Starts with a Great CV
             </h2>
-            <p className="text-xl text-cv-blue-100 mb-8 max-w-2xl mx-auto">
-              Join thousands of job seekers who have already created their professional CVs with CV Chap Chap
+            <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">
+              Join 50,000+ East Africans who have already built their professional CVs with CV Chap Chap.
             </p>
             <Link
               href="/template"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-cv-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors text-lg"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-cv-blue-600 text-white font-bold rounded-xl hover:bg-cv-blue-500 transition-colors text-lg shadow-lg shadow-cv-blue-900/50"
             >
-              Create Your CV Now
-              <ArrowRight className="w-5 h-5" />
+              <Sparkles className="w-5 h-5" />
+              Create Your CV Now — Free
             </Link>
+            <p className="text-gray-500 text-sm mt-4">Only TZS 5,000 to download. No subscription.</p>
           </motion.div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-cv-dark text-white py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-12">
-            {/* Brand */}
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-cv-blue-600 flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-white" />
+      {/* ─── Footer ─────────────────────────────────────────── */}
+      <footer className="bg-gray-950 text-white py-14" id="contact">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-10">
+            <div className="sm:col-span-2">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-9 h-9 rounded-xl bg-cv-blue-600 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-white" />
                 </div>
-                <span className="font-display font-bold text-xl">CV Chap Chap</span>
+                <span className="font-display font-bold text-lg">CV Chap Chap</span>
               </div>
-              <p className="text-gray-400 max-w-md mb-6">
-                CV Chap Chap is a Tanzanian company revolutionizing job applications with AI-powered CV creation. We help job seekers across East Africa build professional CVs quickly and affordably.
+              <p className="text-gray-400 text-sm max-w-sm mb-5 leading-relaxed">
+                Tanzanian company revolutionizing job applications with AI-powered CV creation. Fast, affordable, and built for East Africa.
               </p>
-              <div className="flex gap-4">
-                <span className="text-2xl">🇹🇿</span>
-                <span className="text-gray-400">Made in Tanzania</span>
+              <div className="flex items-center gap-2 text-gray-500 text-sm">
+                <span>🇹🇿</span>
+                <span>Made with pride in Tanzania</span>
               </div>
             </div>
 
-            {/* Quick Links */}
             <div>
-              <h4 className="font-display font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-3 text-gray-400">
+              <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wide">Quick Links</h4>
+              <ul className="space-y-2.5 text-gray-400 text-sm">
                 <li><Link href="/template" className="hover:text-white transition-colors">Create CV</Link></li>
                 <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
                 <li><a href="#templates" className="hover:text-white transition-colors">Templates</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
                 <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
                 <li><Link href="/affiliate" className="hover:text-white transition-colors">Become an Affiliate</Link></li>
               </ul>
             </div>
 
-            {/* Contact */}
-            <div id="contact">
-              <h4 className="font-display font-semibold mb-4">Contact</h4>
-              <ul className="space-y-3 text-gray-400">
+            <div>
+              <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wide">Contact</h4>
+              <ul className="space-y-2.5 text-gray-400 text-sm">
                 <li>Dar es Salaam, Tanzania</li>
-                <li><a href="mailto:info@cvchapchap.com" className="hover:text-white transition-colors">info@cvchapchap.com</a></li>
-                <li><a href="tel:+255682152148" className="hover:text-white transition-colors">+255 682 152 148</a></li>
+                <li>
+                  <a href="mailto:info@cvchapchap.com" className="hover:text-white transition-colors">
+                    info@cvchapchap.com
+                  </a>
+                </li>
+                <li>
+                  <a href="tel:+255682152148" className="hover:text-white transition-colors">
+                    +255 682 152 148
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} CV Chap Chap. All rights reserved.
-            </p>
-            <div className="flex gap-6 text-gray-400 text-sm">
+          <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-gray-500 text-sm">© {new Date().getFullYear()} CV Chap Chap. All rights reserved.</p>
+            <div className="flex gap-5 text-gray-500 text-sm">
               <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
             </div>
