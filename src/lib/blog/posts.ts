@@ -21,7 +21,7 @@ export const blogPosts: BlogPost[] = [
     category: 'CV Writing',
     tags: ['how to write a cv', 'cv format', 'cv Tanzania', 'cv template', 'best cv format', 'cv samples', 'cv bora'],
     readTime: 12,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-647967692-612x612.jpg',
     featuredImageAlt: 'Professional CV template example for Tanzania job market',
     content: `
 <p>If you are searching for a job in Tanzania or anywhere in East Africa, your CV (curriculum vitae) is the single most important document standing between you and that interview call. A well-crafted CV does not just list your qualifications — it tells employers why you are the right person for the job.</p>
@@ -206,7 +206,7 @@ export const blogPosts: BlogPost[] = [
     category: 'CV Tips',
     tags: ['cv mistakes', 'cv tips', 'cv format', 'cv template', 'best cv format', 'cv samples'],
     readTime: 8,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-172746835-612x612.jpg',
     featuredImageAlt: 'Common CV mistakes infographic showing before and after examples',
     content: `
 <p>You have sent out dozens of CVs, applied to every job posting you can find on Ajira Portal and LinkedIn, but the phone never rings. Sound familiar? The problem might not be your qualifications — it could be your CV.</p>
@@ -361,7 +361,7 @@ export const blogPosts: BlogPost[] = [
     category: 'CV Writing',
     tags: ['cv examples for students with no experience', 'fresh graduate cv', 'cv template', 'cv format', 'cv builder', 'cv samples'],
     readTime: 10,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-2187092663-612x612.jpg',
     featuredImageAlt: 'Fresh graduate creating a professional CV on a laptop',
     content: `
 <p>You have just completed your studies — maybe at the University of Dar es Salaam, Ardhi University, or a college diploma programme. You are excited to start your career, but there is one problem: every job posting asks for experience, and you have none. How do you create a <strong>CV with no experience</strong> that actually gets you hired?</p>
@@ -535,7 +535,7 @@ export const blogPosts: BlogPost[] = [
     category: 'Career Advice',
     tags: ['professional cv', 'best cv format', 'best cv template', 'cv maker', 'cv creator', 'cv builder'],
     readTime: 9,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-974640838-612x612.jpg',
     featuredImageAlt: 'Side-by-side comparison of a good CV versus a job-winning CV',
     content: `
 <p>You have a CV. It is grammatically correct, neatly formatted, and lists your qualifications. By most standards, it is a "good" CV. But here is the uncomfortable truth — <strong>a good CV is not enough</strong>. In Tanzania's competitive job market, you need a <strong>job-winning CV</strong>.</p>
@@ -669,7 +669,7 @@ export const blogPosts: BlogPost[] = [
     category: 'CV Tips',
     tags: ['cv application letter', 'cv format', 'cv template', 'how to write a cv', 'cv ats', 'ajira'],
     readTime: 10,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-1276731894-612x612.jpg',
     featuredImageAlt: 'Person tailoring their CV on a laptop with a job description open',
     content: `
 <p>You find the perfect job posting on Ajira Portal, Brightermonday, or LinkedIn. Your heart races — you are qualified, experienced, and ready. You attach your CV, hit send, and... nothing. Weeks pass with no response.</p>
@@ -803,7 +803,7 @@ export const blogPosts: BlogPost[] = [
     category: 'Career Advice',
     tags: ['skills for cv', 'ajira', 'east africa jobs', 'cv skills', 'cv format', 'cv template', 'cv africa'],
     readTime: 9,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-1303119587-612x612.jpg',
     featuredImageAlt: 'Infographic showing top skills employers want in East Africa 2026',
     content: `
 <p>The East African job market is evolving rapidly. With digital transformation sweeping across Tanzania, Kenya, Uganda, and Rwanda, the skills employers value most are shifting. Whether you are updating your CV for a new job search or just entering the workforce, knowing which skills are in demand can make the difference between getting hired and getting ignored.</p>
@@ -994,7 +994,7 @@ export const blogPosts: BlogPost[] = [
     category: 'CV Tips',
     tags: ['cv ats', 'cv format', 'cv template', 'cv maker', 'cv builder', 'intelligent cv', 'ajira'],
     readTime: 11,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-1201199830-612x612.jpg',
     featuredImageAlt: 'Diagram showing how ATS systems scan and filter CVs',
     content: `
 <p>You are qualified. You have the experience. You write a great <strong>CV application letter</strong>, attach your CV, and submit your application online. Then... silence. No response. No interview. Nothing.</p>
@@ -1149,7 +1149,7 @@ export const blogPosts: BlogPost[] = [
     category: 'Career Advice',
     tags: ['professional cv', 'cv maker', 'cv builder', 'cv creator', 'cv template', 'best cv template'],
     readTime: 8,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-2181784214-612x612.jpg',
     featuredImageAlt: 'Success story - from CV rejection to job offer acceptance',
     content: `
 <p>Rejection after rejection. Application after application with no response. The self-doubt creeps in — "Maybe I am not good enough." But what if the problem was never you? What if it was your CV?</p>
@@ -1276,7 +1276,7 @@ export const blogPosts: BlogPost[] = [
     category: 'CV Writing',
     tags: ['internship cv', 'cv examples for students with no experience', 'cv format', 'cv template', 'fresh graduate cv', 'cv samples'],
     readTime: 8,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-1386403447-612x612.jpg',
     featuredImageAlt: 'Student presenting internship experience on a professional CV',
     content: `
 <p>You completed a 3-month industrial attachment at a bank. You did field work in Morogoro for your research project. You volunteered with a local NGO during your holidays. But when it comes to your CV, you are not sure how to present these experiences — or if they even count.</p>
@@ -1420,7 +1420,7 @@ Self-Employed — Dar es Salaam<br/>
     category: 'CV Tips',
     tags: ['cv checklist', 'cv format', 'cv template', 'how to write a cv', 'cv ats', 'best cv format', 'cv builder'],
     readTime: 7,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-1460455852-612x612.jpg',
     featuredImageAlt: 'Printable CV checklist with checkboxes for reviewing before job application',
     content: `
 <p>You have spent time crafting your CV, tailoring it for the job, and making it look professional. But before you attach it to that application email or upload it to Ajira Portal, there is one crucial step: <strong>the final review</strong>.</p>
@@ -1583,7 +1583,7 @@ Self-Employed — Dar es Salaam<br/>
     category: 'CV Writing',
     tags: ['best cv format', 'cv format', 'cv Tanzania', 'cv template', 'cv samples', 'cv africa', 'cv bora', 'best cv template'],
     readTime: 9,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-2181984655-612x612.jpg',
     featuredImageAlt: 'Three CV format examples side by side - chronological, functional, and combination',
     content: `
 <p>Choosing the right <strong>CV format</strong> is one of the first and most important decisions you will make when writing your CV. The format determines how your information is organised, what gets emphasised, and how easily a recruiter can find what they need. In Tanzania and East Africa, certain formats work better than others.</p>
@@ -1742,7 +1742,7 @@ Self-Employed — Dar es Salaam<br/>
     category: 'CV Tips',
     tags: ['cv photo', 'cv format', 'cv template', 'cv africa', 'cv Tanzania', 'best cv format'],
     readTime: 6,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-1132400324-612x612.jpg',
     featuredImageAlt: 'Professional headshot example for CV compared to unprofessional photos',
     content: `
 <p>It is one of the most common questions job seekers in Africa ask: <strong>"Should I put a photo on my CV?"</strong> The answer is not as straightforward as you might think. It depends on the country, the industry, the company, and even the specific role you are applying for.</p>
@@ -1861,7 +1861,7 @@ Self-Employed — Dar es Salaam<br/>
     category: 'CV Writing',
     tags: ['personal profile cv', 'professional summary', 'how to write a cv', 'cv format', 'cv template', 'cv creator', 'intelligent cv'],
     readTime: 8,
-    featuredImage: '',
+    featuredImage: '/Blog-Images/istockphoto-1182647703-612x612.jpg',
     featuredImageAlt: 'Examples of strong and weak personal profile sections on CVs',
     content: `
 <p>Your <strong>personal profile</strong> (also called a professional summary or personal statement) is the 2-4 sentence paragraph at the very top of your CV. It is the first thing a recruiter reads — and often the only thing that determines whether they keep reading.</p>

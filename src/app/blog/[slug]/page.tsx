@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getAllPosts, getPostBySlug, getRelatedPosts } from '@/lib/blog';
 import { FileText, ArrowLeft, ArrowRight, Clock, Calendar, User } from 'lucide-react';
@@ -245,12 +246,22 @@ export default async function BlogPostPage({ params }: PageProps) {
           </div>
         </header>
 
-        {/* Featured Image Placeholder */}
-        <div className="aspect-video bg-gradient-to-br from-cv-blue-50 to-gray-50 rounded-xl flex items-center justify-center mb-8 border border-gray-200">
-          <div className="text-center">
-            <FileText className="w-16 h-16 text-cv-blue-200 mx-auto mb-3" />
-            <p className="text-cv-blue-300 text-sm">Featured Image</p>
-          </div>
+        {/* Featured Image */}
+        <div className="relative aspect-video rounded-xl overflow-hidden mb-8 border border-gray-200">
+          {post.featuredImage ? (
+            <Image
+              src={post.featuredImage}
+              alt={post.featuredImageAlt || post.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 896px) 100vw, 896px"
+              priority
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-cv-blue-50 to-gray-50 flex items-center justify-center">
+              <FileText className="w-16 h-16 text-cv-blue-200" />
+            </div>
+          )}
         </div>
 
         {/* Article Content */}
@@ -271,28 +282,12 @@ export default async function BlogPostPage({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
-        {/* Image Placeholder Notice */}
+        {/* Blog content styles */}
         <style
           dangerouslySetInnerHTML={{
             __html: `
               .blog-image-placeholder {
-                width: 100%;
-                aspect-ratio: 16/9;
-                background: linear-gradient(135deg, #eff6ff 0%, #f9fafb 100%);
-                border: 2px dashed #bfdbfe;
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 2rem 0;
-                position: relative;
-              }
-              .blog-image-placeholder::after {
-                content: attr(data-alt);
-                color: #93c5fd;
-                font-size: 0.875rem;
-                text-align: center;
-                padding: 1rem;
+                display: none;
               }
             `,
           }}
@@ -368,8 +363,20 @@ export default async function BlogPostPage({ params }: PageProps) {
                   className="group block"
                 >
                   <article className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-cv-blue-200 hover:shadow-md transition-all h-full flex flex-col">
-                    <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
-                      <FileText className="w-10 h-10 text-gray-300" />
+                    <div className="relative aspect-video overflow-hidden">
+                      {related.featuredImage ? (
+                        <Image
+                          src={related.featuredImage}
+                          alt={related.featuredImageAlt || related.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
+                          <FileText className="w-10 h-10 text-gray-300" />
+                        </div>
+                      )}
                     </div>
                     <div className="p-5 flex flex-col flex-1">
                       <span className="text-xs text-cv-blue-600 font-medium mb-2">

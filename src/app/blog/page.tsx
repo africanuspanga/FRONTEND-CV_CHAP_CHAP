@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getAllPosts, getAllCategories } from '@/lib/blog';
 import { FileText, ArrowRight, Clock, Calendar } from 'lucide-react';
 
@@ -130,12 +131,21 @@ export default function BlogPage() {
         <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <Link href={`/blog/${featuredPost.slug}`} className="block group">
             <div className="grid md:grid-cols-2 gap-6 sm:gap-8 items-center bg-gray-50 rounded-2xl overflow-hidden border border-gray-200 hover:border-cv-blue-200 transition-colors">
-              {/* Image placeholder */}
-              <div className="aspect-video md:aspect-auto md:h-full bg-gradient-to-br from-cv-blue-100 to-cv-blue-50 flex items-center justify-center min-h-[200px] md:min-h-[300px]">
-                <div className="text-center p-6">
-                  <FileText className="w-16 h-16 text-cv-blue-300 mx-auto mb-3" />
-                  <p className="text-cv-blue-400 text-sm">Featured Article</p>
-                </div>
+              {/* Featured image */}
+              <div className="relative aspect-video md:aspect-auto md:h-full min-h-[200px] md:min-h-[300px] overflow-hidden">
+                {featuredPost.featuredImage ? (
+                  <Image
+                    src={featuredPost.featuredImage}
+                    alt={featuredPost.featuredImageAlt || featuredPost.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-cv-blue-100 to-cv-blue-50 flex items-center justify-center">
+                    <FileText className="w-16 h-16 text-cv-blue-300" />
+                  </div>
+                )}
               </div>
               <div className="p-6 sm:p-8">
                 <div className="flex items-center gap-3 mb-3">
@@ -181,12 +191,21 @@ export default function BlogPage() {
               className="group block"
             >
               <article className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-cv-blue-200 hover:shadow-md transition-all h-full flex flex-col">
-                {/* Image placeholder */}
-                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
-                  <div className="text-center">
-                    <FileText className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                    <p className="text-gray-400 text-xs">Article Image</p>
-                  </div>
+                {/* Card image */}
+                <div className="relative aspect-video overflow-hidden">
+                  {post.featuredImage ? (
+                    <Image
+                      src={post.featuredImage}
+                      alt={post.featuredImageAlt || post.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
+                      <FileText className="w-10 h-10 text-gray-300" />
+                    </div>
+                  )}
                 </div>
                 <div className="p-5 sm:p-6 flex flex-col flex-1">
                   <div className="flex items-center gap-3 mb-3">

@@ -157,6 +157,116 @@ const trustedCompanies = [
   { name: 'MeTL Group', logo: metlLogo, size: 'lg' },
 ];
 
+const latestBlogPosts = [
+  {
+    slug: 'how-to-write-cv-tanzania-2026',
+    title: 'How to Write a CV That Gets Interviews in Tanzania (2026 Guide)',
+    excerpt: 'A complete, step-by-step guide to writing a professional CV that actually gets you called for interviews in the Tanzanian and East African job market.',
+    category: 'CV Writing',
+    readTime: 12,
+    publishDate: '2026-02-20',
+    featuredImage: '/Blog-Images/istockphoto-647967692-612x612.jpg',
+  },
+  {
+    slug: 'common-cv-mistakes-costing-you-jobs',
+    title: '5 Common CV Mistakes That Are Costing You Jobs — And How to Fix Them',
+    excerpt: 'Are you sending out CVs but never hearing back? These 5 common mistakes might be the reason your CV keeps getting rejected.',
+    category: 'CV Tips',
+    readTime: 8,
+    publishDate: '2026-02-18',
+    featuredImage: '/Blog-Images/istockphoto-172746835-612x612.jpg',
+  },
+  {
+    slug: 'fresh-graduate-cv-no-experience',
+    title: "Fresh Graduate? Here's How to Create a Powerful CV With No Experience",
+    excerpt: 'You just graduated and have zero work experience. Does that mean you cannot have a strong CV? Absolutely not. Here is how to build a CV that gets you hired.',
+    category: 'CV Writing',
+    readTime: 10,
+    publishDate: '2026-02-15',
+    featuredImage: '/Blog-Images/istockphoto-2187092663-612x612.jpg',
+  },
+];
+
+function BlogPreviewSection() {
+  return (
+    <section className="py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-end justify-between mb-10">
+          <div>
+            <p className="text-cv-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">From the Blog</p>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900">
+              CV Tips & Career Advice
+            </h2>
+          </div>
+          <Link
+            href="/blog"
+            className="hidden sm:inline-flex items-center gap-1.5 text-cv-blue-600 font-semibold text-sm hover:gap-2.5 transition-all"
+          >
+            View All Articles <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {latestBlogPosts.map((post, index) => (
+            <motion.div
+              key={post.slug}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.08 }}
+              viewport={{ once: true }}
+            >
+              <Link href={`/blog/${post.slug}`} className="group block h-full">
+                <article className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-cv-blue-200 hover:shadow-lg transition-all h-full flex flex-col">
+                  <div className="relative aspect-video overflow-hidden">
+                    <Image
+                      src={post.featuredImage}
+                      alt={post.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  </div>
+                  <div className="p-5 sm:p-6 flex flex-col flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="px-2.5 py-0.5 bg-cv-blue-50 text-cv-blue-700 rounded-full text-xs font-medium">
+                        {post.category}
+                      </span>
+                      <span className="text-gray-400 text-xs">{post.readTime} min read</span>
+                    </div>
+                    <h3 className="font-display font-bold text-gray-900 mb-2 group-hover:text-cv-blue-600 transition-colors line-clamp-2 leading-snug">
+                      {post.title}
+                    </h3>
+                    <p className="text-gray-500 text-sm mb-4 line-clamp-2 flex-1 leading-relaxed">
+                      {post.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                      <span className="text-gray-400 text-xs">
+                        {new Date(post.publishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                      <span className="text-cv-blue-600 font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                        Read <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="text-center mt-8 sm:hidden">
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 px-6 py-3 border border-cv-blue-600 text-cv-blue-600 font-semibold rounded-xl hover:bg-cv-blue-50 transition-colors text-sm"
+          >
+            View All Articles <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function HomeTemplateCard({ template }: { template: typeof TEMPLATES[number] }) {
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -737,6 +847,9 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* ─── Blog Preview ───────────────────────────────────── */}
+      <BlogPreviewSection />
 
       {/* ─── Footer ─────────────────────────────────────────── */}
       <footer className="bg-gray-950 text-white py-14" id="contact">
