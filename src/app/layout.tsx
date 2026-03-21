@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/lib/auth/context";
 import { ReferralTracker } from "@/components/referral-tracker";
 import { Suspense } from "react";
+import Script from "next/script";
 
 const plusJakarta = Plus_Jakarta_Sans({ 
   subsets: ["latin"],
@@ -194,6 +195,16 @@ fbq('track', 'PageView');`,
         </noscript>
         {/* End Meta Pixel Code */}
       </head>
+      {/* Google Analytics */}
+      <Script src="https://www.googletagmanager.com/gtag/js?id=G-YE0Z3NGWN7" strategy="afterInteractive" />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-YE0Z3NGWN7');
+        `}
+      </Script>
       <body className={`${plusJakarta.variable} ${spaceGrotesk.variable} font-body`}>
         <AuthProvider>
           <Suspense fallback={null}>
