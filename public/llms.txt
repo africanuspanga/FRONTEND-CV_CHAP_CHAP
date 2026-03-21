@@ -1,0 +1,57 @@
+# CV Chap Chap
+
+> CV Chap Chap is a professional CV and cover letter builder designed for the Tanzanian and East African job market. It offers AI-powered content suggestions, 6 curated CV templates, and mobile-first design optimised for the 90% of users accessing from mobile devices.
+
+## About
+
+CV Chap Chap helps job seekers in Tanzania and East Africa create professional, interview-winning CVs and cover letters. The platform uses AI (GPT-4o) to suggest job descriptions, skills, and professional summaries tailored to local market expectations. Payment is handled via Tanzania mobile money (Selcom).
+
+## Features
+
+- AI-powered CV content suggestions (job descriptions, skills, professional summary)
+- 6 professional CV templates: Charles, Grace, Kathleen, Oliver, Aparna, and more
+- Cover letter builder with matching templates
+- PDF download of finished CV
+- Mobile-first design (works from 320px width)
+- Affiliate programme for referrals
+- Supabase authentication (email + Google sign-in)
+
+## Pages
+
+- https://www.cvchapchap.com — Homepage
+- https://www.cvchapchap.com/template — CV template selection (start building your CV)
+- https://www.cvchapchap.com/create — CV builder introduction
+- https://www.cvchapchap.com/letter — Cover letter builder
+- https://www.cvchapchap.com/blog — Career advice blog for East African job seekers
+- https://www.cvchapchap.com/affiliate — Affiliate programme overview
+- https://www.cvchapchap.com/affiliate/register — Join the affiliate programme
+- https://www.cvchapchap.com/auth/login — Sign in
+- https://www.cvchapchap.com/auth/register — Create an account
+- https://www.cvchapchap.com/privacy — Privacy policy
+- https://www.cvchapchap.com/terms — Terms of service
+
+## Blog
+
+Career advice articles optimised for the Tanzanian and East African job market:
+
+- https://www.cvchapchap.com/blog/how-to-write-cv-tanzania-2026
+- https://www.cvchapchap.com/blog/common-cv-mistakes-costing-you-jobs
+- https://www.cvchapchap.com/blog/fresh-graduate-cv-no-experience
+- https://www.cvchapchap.com/blog/difference-between-good-cv-and-job-winning-cv
+- https://www.cvchapchap.com/blog/tailoring-cv-for-every-job-application
+- https://www.cvchapchap.com/blog/top-skills-employers-east-africa-2026
+- https://www.cvchapchap.com/blog/why-cv-not-passing-ats
+- https://www.cvchapchap.com/blog/professional-cv-changes-everything
+- https://www.cvchapchap.com/blog/turn-internship-field-work-into-cv-experience
+- https://www.cvchapchap.com/blog/ultimate-cv-checklist-before-applying
+- https://www.cvchapchap.com/blog/best-cv-format-tanzania-east-africa
+- https://www.cvchapchap.com/blog/do-you-need-photo-on-cv-africa
+- https://www.cvchapchap.com/blog/how-to-write-winning-personal-profile-cv
+
+## Target Audience
+
+Job seekers in Tanzania and East Africa — including fresh graduates, experienced professionals, and career changers — who need professional CVs suited to the local job market.
+
+## Sitemap
+
+https://www.cvchapchap.com/sitemap.xml
