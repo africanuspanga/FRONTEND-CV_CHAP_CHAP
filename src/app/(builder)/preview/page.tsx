@@ -147,9 +147,9 @@ export default function PreviewPage() {
                   (window as any).fbq('track', 'InitiateCheckout', { value: 5000, currency: 'TZS' });
                 }
                 if (!user) {
-                  router.push('/auth/login?redirect=/ussd-payment');
+                  router.push('/auth/register?redirect=/payment');
                 } else {
-                  router.push('/ussd-payment');
+                  router.push('/payment');
                 }
               }}
               className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 active:scale-95 text-white text-base sm:text-lg font-semibold py-3.5 sm:py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2"

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createMobilePayment } from '@/lib/snippe/client';
 import { CVData } from '@/types/cv';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { createClient as createServerSupabase } from '@/lib/supabase/server';
 import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 export const maxDuration = 30;
@@ -38,6 +39,13 @@ export async function POST(request: NextRequest) {
       referral_code?: string;
     };
 
+    if (!cvData || !templateId || !phone) {
+      return NextResponse.json(
+        { error: 'CV data, template ID, and phone number are required' },
+        { status: 400 }
+      );
+    }
+
     const cleanPhone = phone.replace(/\D/g, '');
     if (!cleanPhone.match(/^255\d{9}$/) && !cleanPhone.match(/^0\d{9}$/)) {
       return NextResponse.json(
@@ -52,12 +60,23 @@ export async function POST(request: NextRequest) {
 
     const serviceSupabase = getServiceSupabase();
 
+    // Get authenticated user if available
+    let userId: string | null = null;
+    try {
+      const serverSupabase = await createServerSupabase();
+      const { data: { user: authUser } } = await serverSupabase.auth.getUser();
+      userId = authUser?.id || null;
+    } catch {
+      // not authenticated — continue as anonymous
+    }
+
     const { data: cv, error: cvError } = await serviceSupabase
       .from('cvs')
       .insert({
         template_id: templateId,
         data: cvData,
         anonymous_id: anonymousId || crypto.randomUUID(),
+        ...(userId ? { user_id: userId } : {}),
         status: 'draft',
       })
       .select()
