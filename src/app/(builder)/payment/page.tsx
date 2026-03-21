@@ -73,6 +73,10 @@ export default function PaymentPage() {
           stopPolling();
           setCvId(data.cvId || cvid);
           setPaymentStep('success');
+          // Fire Meta Pixel Purchase event
+          if (typeof window !== 'undefined' && (window as any).fbq) {
+            (window as any).fbq('track', 'Purchase', { value: 5000, currency: 'TZS' });
+          }
         } else if (data.status === 'failed' || data.status === 'voided' || data.status === 'expired') {
           stopPolling();
           setPaymentStep('failed');

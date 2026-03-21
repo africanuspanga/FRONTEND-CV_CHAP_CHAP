@@ -10,7 +10,6 @@ import {
   FileText,
   CreditCard,
   BarChart3,
-  FlaskConical,
   LogOut,
   Menu,
   ShieldX,
@@ -24,7 +23,6 @@ const NAV_ITEMS = [
   { href: '/admin/payments', label: 'Payments', icon: CreditCard },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/affiliates', label: 'Affiliates', icon: UserCheck },
-  { href: '/admin/test-payment', label: 'Test Payment', icon: FlaskConical },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

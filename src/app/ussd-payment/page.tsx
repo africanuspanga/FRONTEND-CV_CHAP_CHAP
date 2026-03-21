@@ -153,6 +153,10 @@ export default function USSdPaymentPage() {
         setStep('success');
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
+        // Fire Meta Pixel Purchase event
+        if (typeof window !== 'undefined' && (window as any).fbq) {
+          (window as any).fbq('track', 'Purchase', { value: 5000, currency: 'TZS' });
+        }
       } else {
         setError(data.error || 'Verification failed. Please check your message and try again.');
       }

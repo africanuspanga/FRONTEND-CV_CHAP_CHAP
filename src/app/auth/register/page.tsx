@@ -64,6 +64,10 @@ function RegisterForm() {
       }
 
       setSuccess(true);
+      // Fire Meta Pixel CompleteRegistration event
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'CompleteRegistration');
+      }
     } catch (err) {
       setError('An unexpected error occurred');
     } finally {

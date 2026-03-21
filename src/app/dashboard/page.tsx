@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth/context';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, Plus, Edit, Download, Trash2, LogOut } from 'lucide-react';
+import { FileText, Plus, Edit, Download, Trash2, LogOut, Loader2 } from 'lucide-react';
+import { pdf } from '@react-pdf/renderer';
+import { getTemplate, getTemplateColor } from '@/lib/pdf/generator';
 
 interface CVWithPayment {
   id: string;
@@ -29,6 +31,7 @@ export default function DashboardPage() {
   const { user, profile, isLoading: authLoading, signOut, claimAnonymousCVs } = useAuth();
   const [cvs, setCVs] = useState<CVWithPayment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -77,16 +80,68 @@ export default function DashboardPage() {
     }
   }, [user]);
 
-  const handleDownload = async (cvId: string) => {
+  const handleDownload = useCallback(async (cvId: string) => {
     const cv = cvs.find(c => c.id === cvId);
     const isPaid = cv?.payments?.some(p => p.status === 'completed');
 
-    if (isPaid) {
-      window.location.href = `/api/pdf/generate?cvId=${cvId}`;
-    } else {
+    if (!isPaid) {
       router.push(`/payment?cvId=${cvId}`);
+      return;
     }
-  };
+
+    // Safari iOS: pre-open blank window before any async work to keep user gesture chain
+    const ua = navigator.userAgent;
+    const isSafariIOS = /iP(hone|ad|od)/.test(ua) && /WebKit/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
+    let safariWindow: Window | null = null;
+    if (isSafariIOS) {
+      safariWindow = window.open('', '_blank');
+      if (safariWindow) {
+        safariWindow.document.write('<html><body style="font-family:sans-serif;padding:24px;color:#333"><p>Preparing your CV PDF, please wait…</p></body></html>');
+      }
+    }
+
+    setDownloadingId(cvId);
+    try {
+      let cvData = cv?.data;
+      const templateId = cv?.template_id || 'charles';
+
+      // If data is missing locally, recover from server
+      if (!cvData?.personalInfo?.firstName) {
+        const res = await fetch(`/api/cv/${cvId}`);
+        if (res.ok) {
+          const recovered = await res.json();
+          cvData = recovered.cvData;
+        } else {
+          if (safariWindow) safariWindow.close();
+          alert('Could not load CV data. Please contact support: +255 682 152 148');
+          return;
+        }
+      }
+
+      const TemplateComponent = getTemplate(templateId);
+      const color = getTemplateColor(templateId);
+      const blob = await pdf(<TemplateComponent data={cvData} colorOverride={color} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const filename = `${cvData.personalInfo?.firstName || 'My'}_${cvData.personalInfo?.lastName || 'CV'}_CV.pdf`;
+
+      if (safariWindow) {
+        safariWindow.location.href = url;
+      } else {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    } catch {
+      if (safariWindow) safariWindow.close();
+      alert('Download failed. Please try again.');
+    } finally {
+      setDownloadingId(null);
+    }
+  }, [cvs, router]);
 
   const handleEdit = (cvId: string) => {
     router.push(`/builder?cvId=${cvId}`);
@@ -140,8 +195,8 @@ export default function DashboardPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">My CVs</h1>
             <p className="text-gray-600 mt-1">
-              {cvs.length === 0 
-                ? "You haven't created any CVs yet" 
+              {cvs.length === 0
+                ? "You haven't created any CVs yet"
                 : `You have ${cvs.length} CV${cvs.length > 1 ? 's' : ''}`
               }
             </p>
@@ -161,7 +216,7 @@ export default function DashboardPage() {
               Create Your First CV
             </h2>
             <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              Choose from 21 professional templates, fill in your details, 
+              Choose from 21 professional templates, fill in your details,
               and download your polished CV in minutes.
             </p>
             <Button onClick={() => router.push('/template')} size="lg" className="bg-cv-blue-600 hover:bg-cv-blue-700">
@@ -173,6 +228,7 @@ export default function DashboardPage() {
             {cvs.map((cv) => {
               const isPaid = cv.payments?.some(p => p.status === 'completed');
               const cvTitle = cv.title || `${cv.data?.personalInfo?.firstName || 'Untitled'}'s CV`;
+              const isDownloading = downloadingId === cv.id;
 
               return (
                 <Card key={cv.id} className="overflow-hidden group hover:shadow-lg transition-shadow">
@@ -205,11 +261,18 @@ export default function DashboardPage() {
                       </Button>
                       <Button
                         size="default"
+                        disabled={isDownloading}
                         onClick={() => handleDownload(cv.id)}
                         className={`h-10 px-3 text-sm ${isPaid ? 'bg-green-600 hover:bg-green-700' : 'bg-cv-blue-600 hover:bg-cv-blue-700'}`}
                       >
-                        <Download className="w-4 h-4 mr-1" />
-                        {isPaid ? 'Download' : 'Pay'}
+                        {isDownloading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Download className="w-4 h-4 mr-1" />
+                            {isPaid ? 'Download' : 'Pay'}
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -226,14 +289,14 @@ export default function DashboardPage() {
                     )}
 
                     <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                      <button 
+                      <button
                         onClick={() => handleEdit(cv.id)}
                         className="text-sm text-cv-blue-600 hover:underline flex items-center gap-1"
                       >
                         <Edit className="w-3 h-3" />
                         Edit
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleDelete(cv.id)}
                         className="text-sm text-red-500 hover:underline flex items-center gap-1"
                       >

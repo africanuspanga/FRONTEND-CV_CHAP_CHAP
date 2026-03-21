@@ -141,7 +141,17 @@ export default function PreviewPage() {
         <div className="bg-gradient-to-t from-[#e8edf2] from-80% to-transparent pt-6 px-3 sm:px-4 pb-3 sm:pb-4">
           <div className="max-w-[400px] mx-auto">
             <button
-              onClick={() => router.push('/ussd-payment')}
+              onClick={() => {
+                // Fire Meta Pixel InitiateCheckout event
+                if (typeof window !== 'undefined' && (window as any).fbq) {
+                  (window as any).fbq('track', 'InitiateCheckout', { value: 5000, currency: 'TZS' });
+                }
+                if (!user) {
+                  router.push('/auth/login?redirect=/ussd-payment');
+                } else {
+                  router.push('/ussd-payment');
+                }
+              }}
               className="w-full bg-cv-blue-600 hover:bg-cv-blue-700 active:scale-95 text-white text-base sm:text-lg font-semibold py-3.5 sm:py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2"
             >
               <Download className="h-5 w-5" />
