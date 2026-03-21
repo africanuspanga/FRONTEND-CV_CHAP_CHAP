@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { triggerWalletPayment } from '@/lib/selcom/client';
+import { triggerPush } from '@/lib/snippe/client';
 import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 export const maxDuration = 30;
@@ -10,42 +10,27 @@ export async function POST(request: NextRequest) {
   if (!success) return rateLimitResponse(resetAt);
 
   try {
-    const { orderId, msisdn } = await request.json();
+    const { reference, phone } = await request.json();
 
-    if (!orderId || !msisdn) {
+    if (!reference) {
       return NextResponse.json(
-        { error: 'orderId and msisdn are required' },
+        { error: 'reference is required' },
         { status: 400 }
       );
     }
 
-    const cleanPhone = msisdn.replace(/\D/g, '');
-    const formattedMsisdn = cleanPhone.startsWith('0') 
-      ? `255${cleanPhone.slice(1)}` 
-      : cleanPhone;
-
-    const transId = `PUSH-${orderId}-${Date.now()}`;
-
-    const result = await triggerWalletPayment({
-      transId,
-      orderId,
-      msisdn: formattedMsisdn,
-    });
-
-    if (result.resultcode === '111' || result.resultcode === '000') {
-      return NextResponse.json({
-        success: true,
-        message: 'Payment request sent to your phone. Please enter your PIN to confirm.',
-        reference: result.reference,
-        status: 'pending',
-      });
+    let formattedPhone: string | undefined;
+    if (phone) {
+      const clean = phone.replace(/\D/g, '');
+      formattedPhone = clean.startsWith('0') ? `255${clean.slice(1)}` : clean;
     }
 
+    await triggerPush(reference, formattedPhone);
+
     return NextResponse.json({
-      success: false,
-      error: result.message || 'Failed to send payment request',
-      resultcode: result.resultcode,
-    }, { status: 400 });
+      success: true,
+      message: 'Payment request sent to your phone. Please enter your PIN to confirm.',
+    });
 
   } catch (error) {
     console.error('Push USSD error:', error);

@@ -1,85 +1,76 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyWebhookSignature } from '@/lib/selcom/client';
-
-export const maxDuration = 30;
+import { verifyWebhookSignature } from '@/lib/snippe/client';
 import { updatePaymentStatus, getCVById, updateCVStatus, getPaymentByOrderId } from '@/lib/supabase/database';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 
-interface SelcomWebhookPayload {
-  result: string;
-  resultcode: string;
-  order_id: string;
-  transid: string;
-  reference: string;
-  channel: string;
-  msisdn: string;
-  amount: string;
-  utilityref?: string;
-  message?: string;
+export const maxDuration = 30;
+
+interface SnippeWebhookPayload {
+  id: string;
+  type: 'payment.completed' | 'payment.failed';
+  api_version: string;
+  created_at: string;
+  data: {
+    reference: string;
+    external_reference?: string;
+    status: string;
+    amount: { value: number; currency: string };
+    channel?: { type: string; provider: string };
+    customer?: { phone?: string; name?: string; email?: string };
+    metadata?: Record<string, string>;
+    failure_reason?: string;
+    completed_at?: string;
+  };
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const timestamp = request.headers.get('Timestamp') || '';
-    const digest = request.headers.get('Digest') || '';
-    const signedFields = request.headers.get('Signed-Fields') || '';
+    const rawBody = await request.text();
 
-    const body: SelcomWebhookPayload = await request.json();
+    const webhookSecret = process.env.SNIPPE_WEBHOOK_SECRET;
+    if (webhookSecret) {
+      const signature = request.headers.get('X-Webhook-Signature') || '';
+      const isValid = verifyWebhookSignature(rawBody, signature, webhookSecret);
+      if (!isValid) {
+        console.error('Invalid Snippe webhook signature');
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      }
+    } else {
+      console.warn('SNIPPE_WEBHOOK_SECRET not set — skipping signature verification');
+    }
 
-    console.log('Received Selcom webhook:', {
-      order_id: body.order_id,
-      resultcode: body.resultcode,
-      transid: body.transid,
+    const body: SnippeWebhookPayload = JSON.parse(rawBody);
+
+    console.log('Received Snippe webhook:', {
+      event_id: body.id,
+      type: body.type,
+      reference: body.data?.reference,
     });
 
-    if (!process.env.SELCOM_API_SECRET) {
-      console.error('SELCOM_API_SECRET is not configured — rejecting webhook');
-      return NextResponse.json(
-        { error: 'Server misconfiguration' },
-        { status: 500 }
-      );
-    }
-
-    const isValid = verifyWebhookSignature(
-      timestamp,
-      digest,
-      body as unknown as Record<string, unknown>,
-      signedFields
-    );
-
-    if (!isValid) {
-      console.error('Invalid webhook signature');
-      return NextResponse.json(
-        { error: 'Invalid signature' },
-        { status: 401 }
-      );
-    }
-
-    const orderId = body.order_id;
-    const isSuccess = body.resultcode === '000';
+    const { reference, metadata } = body.data;
+    const isSuccess = body.type === 'payment.completed';
 
     if (isSuccess) {
-      await updatePaymentStatus(orderId, 'completed', body.transid);
+      await updatePaymentStatus(reference, 'completed', body.data.external_reference);
 
-      const cvIdMatch = orderId.match(/^CV-([a-f0-9-]+)-/);
-      if (cvIdMatch) {
-        const cvId = cvIdMatch[1];
+      // Get cv_id from metadata (set during payment creation)
+      const cvId = metadata?.cv_id;
+      if (cvId) {
         const cv = await getCVById(cvId);
         if (cv) {
           await updateCVStatus(cv.id, 'paid');
         }
       }
 
-      // Record affiliate conversion if payment has an affiliate
+      // Record affiliate conversion if applicable
       try {
-        const payment = await getPaymentByOrderId(orderId);
+        const payment = await getPaymentByOrderId(reference);
         if (payment?.affiliate_id) {
           const serviceSupabase = createServiceClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY!
           );
 
-          // Get affiliate commission rate
           const { data: affiliate } = await serviceSupabase
             .from('affiliates')
             .select('id, commission_rate')
@@ -87,10 +78,8 @@ export async function POST(request: NextRequest) {
             .single();
 
           if (affiliate) {
-            const amount = Number(body.amount) || 5000;
+            const amount = body.data.amount?.value || 5000;
             const commission = (amount * affiliate.commission_rate) / 100;
-
-            // Look up the CV to get the user_id
             const paymentCV = payment.cv_id ? await getCVById(payment.cv_id) : null;
 
             await serviceSupabase.rpc('record_affiliate_conversion', {
@@ -106,20 +95,15 @@ export async function POST(request: NextRequest) {
         }
       } catch (affError) {
         console.error('Affiliate conversion recording failed:', affError);
-        // Don't fail the webhook for affiliate errors
       }
 
-      console.log(`Payment completed for order ${orderId}`);
+      console.log(`Payment completed for reference ${reference}`);
     } else {
-      await updatePaymentStatus(orderId, 'failed');
-      console.log(`Payment failed for order ${orderId}: ${body.message}`);
+      await updatePaymentStatus(reference, 'failed');
+      console.log(`Payment failed for reference ${reference}: ${body.data.failure_reason}`);
     }
 
-    return NextResponse.json({
-      result: 'SUCCESS',
-      resultcode: '000',
-      message: 'Webhook processed successfully',
-    });
+    return NextResponse.json({ received: true }, { status: 200 });
 
   } catch (error) {
     console.error('Webhook processing error:', error);

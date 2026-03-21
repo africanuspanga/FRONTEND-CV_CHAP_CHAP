@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrderStatus } from '@/lib/selcom/client';
+import { getPaymentStatus } from '@/lib/snippe/client';
 import { getPaymentByOrderId } from '@/lib/supabase/database';
 import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
@@ -12,16 +12,17 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const orderId = searchParams.get('orderId');
+    const reference = searchParams.get('orderId');
 
-    if (!orderId) {
+    if (!reference) {
       return NextResponse.json(
         { error: 'orderId is required' },
         { status: 400 }
       );
     }
 
-    const payment = await getPaymentByOrderId(orderId);
+    // Check our DB first
+    const payment = await getPaymentByOrderId(reference);
 
     if (!payment) {
       return NextResponse.json(
@@ -46,27 +47,34 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Poll Snippe for live status
     try {
-      const selcomStatus = await getOrderStatus(orderId);
-      const paymentData = selcomStatus.data[0];
+      const snippeStatus = await getPaymentStatus(reference);
+      const { status } = snippeStatus.data;
 
-      if (paymentData?.payment_status === 'COMPLETED') {
+      if (status === 'completed') {
         return NextResponse.json({
           status: 'completed',
           cvId: payment.cv_id,
-          transactionId: paymentData.transid,
           message: 'Payment successful! Your CV is ready for download.',
         });
       }
 
+      if (status === 'failed' || status === 'voided' || status === 'expired') {
+        return NextResponse.json({
+          status: 'failed',
+          message: getStatusMessage(status),
+        });
+      }
+
       return NextResponse.json({
-        status: paymentData?.payment_status?.toLowerCase() || 'pending',
-        message: getStatusMessage(paymentData?.payment_status),
+        status: 'pending',
+        message: 'Waiting for payment confirmation...',
       });
     } catch {
       return NextResponse.json({
         status: payment.status,
-        message: 'Waiting for payment confirmation...',
+        message: 'Checking payment status...',
       });
     }
 
@@ -79,20 +87,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function getStatusMessage(status?: string): string {
+function getStatusMessage(status: string): string {
   switch (status) {
-    case 'PENDING':
-      return 'Waiting for payment...';
-    case 'INPROGRESS':
-      return 'Processing payment...';
-    case 'COMPLETED':
-      return 'Payment successful!';
-    case 'CANCELLED':
-    case 'USERCANCELLED':
-      return 'Payment was cancelled.';
-    case 'REJECTED':
-      return 'Payment was rejected.';
-    default:
-      return 'Checking payment status...';
+    case 'completed': return 'Payment successful!';
+    case 'failed': return 'Payment was declined. Please try again.';
+    case 'voided': return 'Payment was cancelled.';
+    case 'expired': return 'Payment expired. Please try again.';
+    default: return 'Checking payment status...';
   }
 }

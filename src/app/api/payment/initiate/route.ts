@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createOrderMinimal } from '@/lib/selcom/client';
+import { createMobilePayment } from '@/lib/snippe/client';
 import { CVData } from '@/types/cv';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const msisdn = cleanPhone.startsWith('0') 
-      ? `255${cleanPhone.slice(1)}` 
+    const msisdn = cleanPhone.startsWith('0')
+      ? `255${cleanPhone.slice(1)}`
       : cleanPhone;
 
     const serviceSupabase = getServiceSupabase();
@@ -65,31 +65,37 @@ export async function POST(request: NextRequest) {
 
     if (cvError) throw cvError;
 
-    const orderId = `CV-${cv.id.slice(0, 8)}-${Date.now()}`;
-
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cvchapchap.com';
     const webhookUrl = `${baseUrl}/api/payment/webhook`;
+    const idempotencyKey = `cv-${cv.id}-${Date.now()}`;
 
-    const selcomOrder = await createOrderMinimal({
-      orderId,
-      buyerEmail: email || `${msisdn}@cvchapchap.com`,
-      buyerName: name || `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`,
-      buyerPhone: msisdn,
+    const firstName = cvData.personalInfo.firstName || name?.split(' ')[0] || 'Customer';
+    const lastName = cvData.personalInfo.lastName || name?.split(' ').slice(1).join(' ') || 'User';
+    const customerEmail = email || cvData.personalInfo.email || `${msisdn}@cvchapchap.com`;
+
+    const snippeResponse = await createMobilePayment({
       amount: 5000,
+      phoneNumber: msisdn,
+      firstName,
+      lastName,
+      email: customerEmail,
       webhookUrl,
-      redirectUrl: `${baseUrl}/payment/success?order=${orderId}`,
-      cancelUrl: `${baseUrl}/payment/cancelled?order=${orderId}`,
+      metadata: {
+        cv_id: cv.id,
+        template_id: templateId,
+      },
+      idempotencyKey,
     });
 
-    if (selcomOrder.resultcode !== '000') {
-      console.error('Selcom order creation failed:', selcomOrder);
+    if (snippeResponse.status !== 'success') {
+      console.error('Snippe payment creation failed:', snippeResponse);
       return NextResponse.json(
-        { error: selcomOrder.message || 'Failed to create payment order' },
+        { error: 'Failed to create payment' },
         { status: 400 }
       );
     }
 
-    const paymentToken = selcomOrder.data[0]?.payment_token;
+    const { reference } = snippeResponse.data;
 
     // Look up affiliate from referral code
     let affiliateId: string | null = null;
@@ -107,7 +113,7 @@ export async function POST(request: NextRequest) {
 
     const insertData: Record<string, unknown> = {
       cv_id: cv.id,
-      request_id: orderId,
+      request_id: reference,
       amount: 5000,
       currency: 'TZS',
       status: 'pending',
@@ -115,11 +121,9 @@ export async function POST(request: NextRequest) {
     };
     if (affiliateId) insertData.affiliate_id = affiliateId;
 
-    const { data: payment, error: payError } = await serviceSupabase
+    const { error: payError } = await serviceSupabase
       .from('payments')
-      .insert(insertData)
-      .select()
-      .single();
+      .insert(insertData);
 
     if (payError) throw payError;
 
@@ -130,12 +134,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      orderId,
+      reference,
       cvId: cv.id,
-      paymentToken,
-      paymentGatewayUrl: selcomOrder.data[0]?.payment_gateway_url 
-        ? Buffer.from(selcomOrder.data[0].payment_gateway_url, 'base64').toString('utf-8')
-        : null,
       msisdn,
       amount: 5000,
       currency: 'TZS',
