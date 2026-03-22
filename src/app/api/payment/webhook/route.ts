@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyWebhookSignature } from '@/lib/snippe/client';
-import { updatePaymentStatus, getCVById, updateCVStatus, getPaymentByOrderId } from '@/lib/supabase/database';
+import { getPaymentByOrderId } from '@/lib/supabase/database';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+
+function getServiceSupabase() {
+  return createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export const maxDuration = 30;
 
@@ -51,25 +58,38 @@ export async function POST(request: NextRequest) {
     const isSuccess = body.type === 'payment.completed';
 
     if (isSuccess) {
-      await updatePaymentStatus(reference, 'completed', body.data.external_reference);
+      const serviceSupabase = getServiceSupabase();
 
-      // Get cv_id from metadata (set during payment creation)
-      const cvId = metadata?.cv_id;
+      // Use service role client to update payment status (anon key blocked by RLS)
+      const updateData: Record<string, unknown> = {
+        status: 'completed',
+        transaction_id: body.data.external_reference,
+        completed_at: new Date().toISOString(),
+      };
+      const { data: updatedPayment, error: payUpdateError } = await serviceSupabase
+        .from('payments')
+        .update(updateData)
+        .eq('request_id', reference)
+        .select()
+        .single();
+
+      if (payUpdateError) {
+        console.error('Failed to update payment status:', payUpdateError);
+      }
+
+      // Mark CV as paid
+      const cvId = metadata?.cv_id || updatedPayment?.cv_id;
       if (cvId) {
-        const cv = await getCVById(cvId);
-        if (cv) {
-          await updateCVStatus(cv.id, 'paid');
-        }
+        await serviceSupabase
+          .from('cvs')
+          .update({ status: 'paid', updated_at: new Date().toISOString() })
+          .eq('id', cvId);
       }
 
       // Record affiliate conversion if applicable
       try {
         const payment = await getPaymentByOrderId(reference);
         if (payment?.affiliate_id) {
-          const serviceSupabase = createServiceClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-          );
 
           const { data: affiliate } = await serviceSupabase
             .from('affiliates')
@@ -80,12 +100,20 @@ export async function POST(request: NextRequest) {
           if (affiliate) {
             const amount = body.data.amount?.value || 5000;
             const commission = (amount * affiliate.commission_rate) / 100;
-            const paymentCV = payment.cv_id ? await getCVById(payment.cv_id) : null;
+            let customerUserId: string | null = null;
+            if (payment.cv_id) {
+              const { data: paymentCV } = await serviceSupabase
+                .from('cvs')
+                .select('user_id')
+                .eq('id', payment.cv_id)
+                .single();
+              customerUserId = paymentCV?.user_id || null;
+            }
 
             await serviceSupabase.rpc('record_affiliate_conversion', {
               p_affiliate_id: affiliate.id,
               p_payment_id: payment.id,
-              p_customer_user_id: paymentCV?.user_id || null,
+              p_customer_user_id: customerUserId,
               p_amount: amount,
               p_commission: commission,
             });
@@ -99,7 +127,11 @@ export async function POST(request: NextRequest) {
 
       console.log(`Payment completed for reference ${reference}`);
     } else {
-      await updatePaymentStatus(reference, 'failed');
+      const serviceSupabase = getServiceSupabase();
+      await serviceSupabase
+        .from('payments')
+        .update({ status: 'failed' })
+        .eq('request_id', reference);
       console.log(`Payment failed for reference ${reference}: ${body.data.failure_reason}`);
     }
 

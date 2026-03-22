@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPaymentStatus } from '@/lib/snippe/client';
 import { getPaymentByOrderId } from '@/lib/supabase/database';
 import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+import { createClient as createServiceClient } from '@supabase/supabase-js';
+
+function getServiceSupabase() {
+  return createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export const maxDuration = 30;
 
@@ -53,6 +61,19 @@ export async function GET(request: NextRequest) {
       const { status } = snippeStatus.data;
 
       if (status === 'completed') {
+        // Persist to DB in case webhook was missed/delayed
+        try {
+          const svc = getServiceSupabase();
+          await svc.from('payments').update({
+            status: 'completed',
+            completed_at: new Date().toISOString(),
+          }).eq('request_id', reference).eq('status', 'pending');
+          if (payment.cv_id) {
+            await svc.from('cvs').update({ status: 'paid', updated_at: new Date().toISOString() }).eq('id', payment.cv_id);
+          }
+        } catch {
+          // non-fatal — DB update is best-effort here
+        }
         return NextResponse.json({
           status: 'completed',
           cvId: payment.cv_id,
