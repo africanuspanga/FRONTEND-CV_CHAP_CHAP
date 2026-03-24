@@ -6,15 +6,19 @@ import { Button } from '@/components/ui/button';
 
 interface GoogleButtonProps {
   label?: string;
+  redirectTo?: string;
 }
 
-export function GoogleButton({ label = 'Continue with Google' }: GoogleButtonProps) {
+export function GoogleButton({
+  label = 'Continue with Google',
+  redirectTo,
+}: GoogleButtonProps) {
   const { signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async () => {
     setIsLoading(true);
-    const { error } = await signInWithGoogle();
+    const { error } = await signInWithGoogle(redirectTo);
     if (error) {
       setIsLoading(false);
     }

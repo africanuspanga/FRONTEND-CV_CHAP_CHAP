@@ -62,7 +62,7 @@ function LoginForm() {
       </CardHeader>
 
       <CardContent>
-        <GoogleButton />
+        <GoogleButton redirectTo={redirectTo} />
         <AuthDivider />
 
         <form onSubmit={handleSubmit} className="space-y-3">

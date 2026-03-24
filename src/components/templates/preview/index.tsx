@@ -66,7 +66,7 @@ const templateComponents: Record<string, TemplateComponent> = {
   'classic-elegant': ClassicElegantPreview,
   'teal-accent': TealAccentPreview,
   'professional-sidebar': ProfessionalSidebarPreview,
-  'centered-traditional': ClassicElegantPreview, // no dedicated PDF — maps to ClassicElegantPDF
+  'centered-traditional': CenteredTraditionalPreview,
   'modern-header': ModernHeaderPreview,
   'creative-yellow': CreativeYellowPreview,
   'diamond-monogram': DiamondMonogramPreview,

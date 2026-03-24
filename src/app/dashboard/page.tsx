@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth/context';
+import { useCVStore } from '@/stores/cv-store';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -29,6 +30,14 @@ interface CVWithPayment {
 export default function DashboardPage() {
   const router = useRouter();
   const { user, profile, isLoading: authLoading, signOut, claimAnonymousCVs } = useAuth();
+  const {
+    resetCV,
+    setCVData,
+    setCVId,
+    setTemplateId,
+    setSelectedColor,
+    setCurrentStep,
+  } = useCVStore();
   const [cvs, setCVs] = useState<CVWithPayment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
@@ -80,12 +89,24 @@ export default function DashboardPage() {
     }
   }, [user]);
 
+  const loadCvIntoBuilder = useCallback((cv: CVWithPayment) => {
+    resetCV();
+    setCVData(cv.data || {});
+    setCVId(cv.id);
+    setTemplateId(cv.template_id || 'charles');
+    setSelectedColor(null);
+    setCurrentStep('preview');
+  }, [resetCV, setCVData, setCVId, setTemplateId, setSelectedColor, setCurrentStep]);
+
   const handleDownload = useCallback(async (cvId: string) => {
     const cv = cvs.find(c => c.id === cvId);
     const isPaid = cv?.payments?.some(p => p.status === 'completed');
 
     if (!isPaid) {
-      router.push(`/payment?cvId=${cvId}`);
+      if (cv) {
+        loadCvIntoBuilder(cv);
+      }
+      router.push('/payment');
       return;
     }
 
@@ -141,10 +162,14 @@ export default function DashboardPage() {
     } finally {
       setDownloadingId(null);
     }
-  }, [cvs, router]);
+  }, [cvs, loadCvIntoBuilder, router]);
 
   const handleEdit = (cvId: string) => {
-    router.push(`/builder?cvId=${cvId}`);
+    const cv = cvs.find((item) => item.id === cvId);
+    if (!cv) return;
+
+    loadCvIntoBuilder(cv);
+    router.push('/preview');
   };
 
   const handleDelete = async (cvId: string) => {

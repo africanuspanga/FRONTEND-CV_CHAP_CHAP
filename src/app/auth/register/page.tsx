@@ -108,7 +108,7 @@ function RegisterForm() {
       </CardHeader>
 
       <CardContent>
-        <GoogleButton label="Sign up with Google" />
+        <GoogleButton label="Sign up with Google" redirectTo={redirectTo} />
 
         <AuthDivider />
 

@@ -69,6 +69,7 @@ export default function PaymentPage() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollCountRef = useRef(0);
 
   // Auth gate
   useEffect(() => {
@@ -88,7 +89,20 @@ export default function PaymentPage() {
   useEffect(() => {
     if (step !== 'waiting' || !reference) return;
 
+    pollCountRef.current = 0;
+    const MAX_POLLS = 100; // ~5 minutes at 3s intervals
+
     const poll = async () => {
+      pollCountRef.current += 1;
+
+      // Timeout after ~5 minutes
+      if (pollCountRef.current > MAX_POLLS) {
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        setError('Payment confirmation timed out. If you paid successfully, contact support: +255 682 152 148');
+        setStep('form');
+        return;
+      }
+
       try {
         const res = await fetch(`/api/payment/status?orderId=${reference}`);
         const data = await res.json();

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPaymentStatus } from '@/lib/snippe/client';
-import { getPaymentByOrderId } from '@/lib/supabase/database';
 import { rateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 
@@ -29,14 +28,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check our DB first
-    const payment = await getPaymentByOrderId(reference);
+    // Check our DB first — use service role to bypass RLS
+    const svcForLookup = getServiceSupabase();
+    const { data: payment, error: lookupError } = await svcForLookup
+      .from('payments')
+      .select('*')
+      .eq('request_id', reference)
+      .single();
 
-    if (!payment) {
-      return NextResponse.json(
-        { error: 'Payment not found' },
-        { status: 404 }
-      );
+    if (lookupError || !payment) {
+      console.warn('Payment lookup failed:', lookupError?.message, 'ref:', reference);
+      return NextResponse.json({ status: 'pending', message: 'Checking payment status...' });
     }
 
     if (payment.status === 'completed') {
