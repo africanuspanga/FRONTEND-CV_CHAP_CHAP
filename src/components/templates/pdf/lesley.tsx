@@ -204,7 +204,7 @@ export function LesleyPDF({ data, colorOverride }: Props) {
                   <Text style={styles.expCompany}>
                     {exp.company}{exp.location ? ` • ${exp.location}` : ''}
                   </Text>
-                  {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
+                  {exp.achievements?.map((a: string, j: number) => (
                     <Text key={j} style={styles.bullet}>• {a}</Text>
                   ))}
                 </View>

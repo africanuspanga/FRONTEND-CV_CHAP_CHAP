@@ -3,18 +3,21 @@ import { Document, Page, Text, View, Image, StyleSheet } from '@react-pdf/render
 
 const createStyles = (primaryColor: string) => StyleSheet.create({
   page: {
-    flexDirection: 'row',
     backgroundColor: '#ffffff',
     fontFamily: 'Times-Roman',
   },
   sidebar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
     width: '35%',
+    height: '100%',
     backgroundColor: primaryColor + '15',
     padding: 20,
     paddingTop: 25,
   },
   main: {
-    width: '65%',
+    marginLeft: '35%',
     padding: 25,
     paddingTop: 25,
     backgroundColor: '#ffffff',
@@ -181,13 +184,13 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 10,
   },
   refName: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#374151',
     fontFamily: 'Times-Bold',
   },
   refDetails: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#6B7280',
   },
 });
@@ -223,7 +226,7 @@ export function DenicePDF({ data, colorOverride }: Props) {
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Sidebar */}
-        <View style={styles.sidebar}>
+        <View fixed style={styles.sidebar}>
           <View style={styles.photoContainer}>
             {personalInfo?.photoUrl ? (
               <Image src={personalInfo.photoUrl} style={styles.photo} />
@@ -306,7 +309,7 @@ export function DenicePDF({ data, colorOverride }: Props) {
                   </View>
                   <Text style={styles.expCompany}>{exp.company}</Text>
                   {exp.location && <Text style={styles.expLocation}>{exp.location}</Text>}
-                  {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
+                  {exp.achievements?.map((a: string, j: number) => (
                     <Text key={j} style={styles.bullet}>{'\u2014'} {a}</Text>
                   ))}
                 </View>

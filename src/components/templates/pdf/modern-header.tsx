@@ -194,12 +194,12 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 10,
   },
   refName: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#374151',
   },
   refDetails: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#6B7280',
   },
 });
@@ -290,7 +290,7 @@ export function ModernHeaderPDF({ data, colorOverride }: Props) {
                     </View>
                     <Text style={styles.expCompany}>{exp.company}</Text>
                     {exp.location && <Text style={styles.expLocation}>{exp.location}</Text>}
-                    {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
+                    {exp.achievements?.map((a: string, j: number) => (
                       <Text key={j} style={styles.bullet}>• {a}</Text>
                     ))}
                   </View>

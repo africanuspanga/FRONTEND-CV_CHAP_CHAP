@@ -134,12 +134,12 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 8,
   },
   refName: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#ffffff',
   },
   refDetails: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#BFDBFE',
   },
 });
@@ -200,7 +200,7 @@ export function AparnaPDF({ data, colorOverride }: Props) {
                   </Text>
                 </View>
                 <Text style={styles.expCompany}>{exp.company}</Text>
-                {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
+                {exp.achievements?.map((a: string, j: number) => (
                   <Text key={j} style={styles.bullet}>▸ {a}</Text>
                 ))}
               </View>

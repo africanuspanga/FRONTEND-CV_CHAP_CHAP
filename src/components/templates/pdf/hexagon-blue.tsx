@@ -138,12 +138,12 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     flex: 1,
   },
   refName: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#1F2937',
   },
   refDetails: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#6B7280',
   },
 });
@@ -282,7 +282,7 @@ export function HexagonBluePDF({ data, colorOverride }: Props) {
                     <Text style={styles.expMeta}>
                       {exp.jobTitle} | {exp.location} | {exp.startDate} to {exp.isCurrent ? 'Current' : exp.endDate}
                     </Text>
-                    {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
+                    {exp.achievements?.map((a: string, j: number) => (
                       <Text key={j} style={styles.bullet}>• {a}</Text>
                     ))}
                   </View>

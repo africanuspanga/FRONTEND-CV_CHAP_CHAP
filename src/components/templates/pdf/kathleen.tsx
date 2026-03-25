@@ -3,7 +3,6 @@ import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
 const createStyles = (primaryColor: string) => StyleSheet.create({
   page: {
-    flexDirection: 'row',
     backgroundColor: '#f5f7fa',
     fontFamily: 'Helvetica',
   },
@@ -17,12 +16,16 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     opacity: 0.3,
   },
   sidebar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
     width: '35%',
+    height: '100%',
     padding: 25,
     paddingTop: 35,
   },
   main: {
-    width: '65%',
+    marginLeft: '35%',
     padding: 25,
     paddingTop: 35,
     backgroundColor: '#ffffff',
@@ -141,12 +144,12 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 10,
   },
   refName: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#1F2937',
   },
   refDetails: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#6B7280',
   },
 });
@@ -179,7 +182,7 @@ export function KathleenPDF({ data, colorOverride }: Props) {
       <Page size="A4" style={styles.page}>
         <View style={styles.topBar} />
         
-        <View style={styles.sidebar}>
+        <View fixed style={styles.sidebar}>
           <Text style={styles.name}>{personalInfo?.firstName}</Text>
           <Text style={styles.name}>{personalInfo?.lastName}</Text>
           <Text style={styles.title}>{personalInfo?.professionalTitle}</Text>
@@ -261,7 +264,7 @@ export function KathleenPDF({ data, colorOverride }: Props) {
                     </Text>
                   </View>
                   <Text style={styles.expCompany}>{exp.company} | {exp.location}</Text>
-                  {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
+                  {exp.achievements?.map((a: string, j: number) => (
                     <Text key={j} style={styles.bullet}>• {a}</Text>
                   ))}
                 </View>

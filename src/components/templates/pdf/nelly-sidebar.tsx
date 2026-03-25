@@ -3,19 +3,22 @@ import { Document, Page, Text, View, Image, StyleSheet } from '@react-pdf/render
 
 const createStyles = (primaryColor: string) => StyleSheet.create({
   page: {
-    flexDirection: 'row',
     backgroundColor: '#ffffff',
     fontFamily: 'Helvetica',
   },
   sidebar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
     width: '35%',
+    height: '100%',
     backgroundColor: primaryColor,
     padding: 20,
     paddingTop: 25,
     color: '#ffffff',
   },
   main: {
-    width: '65%',
+    marginLeft: '35%',
     padding: 25,
     paddingTop: 25,
     backgroundColor: '#ffffff',
@@ -89,12 +92,12 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 10,
   },
   refName: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#ffffff',
   },
   refDetails: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#ffffff',
     opacity: 0.85,
   },
@@ -204,7 +207,7 @@ export function NellySidebarPDF({ data, colorOverride }: Props) {
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Sidebar */}
-        <View style={styles.sidebar}>
+        <View fixed style={styles.sidebar}>
           <Text style={styles.sidebarName}>
             {personalInfo?.firstName?.toUpperCase()}
           </Text>
@@ -294,7 +297,7 @@ export function NellySidebarPDF({ data, colorOverride }: Props) {
                   </View>
                   <Text style={styles.expCompany}>{exp.company}</Text>
                   {exp.location && <Text style={styles.expLocation}>{exp.location}</Text>}
-                  {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
+                  {exp.achievements?.map((a: string, j: number) => (
                     <Text key={j} style={styles.bullet}>• {a}</Text>
                   ))}
                 </View>

@@ -133,12 +133,12 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     marginBottom: 8,
   },
   refName: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#1F2937',
   },
   refDetails: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#6B7280',
   },
 });
@@ -198,7 +198,7 @@ export function OliverPDF({ data, colorOverride }: Props) {
                   </Text>
                 </View>
                 <Text style={styles.expCompany}>{exp.company}</Text>
-                {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
+                {exp.achievements?.map((a: string, j: number) => (
                   <Text key={j} style={styles.bullet}>▸ {a}</Text>
                 ))}
               </View>

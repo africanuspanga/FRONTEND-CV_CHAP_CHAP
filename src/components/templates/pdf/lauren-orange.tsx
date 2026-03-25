@@ -3,18 +3,21 @@ import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
 const createStyles = (primaryColor: string) => StyleSheet.create({
   page: {
-    flexDirection: 'row',
     backgroundColor: '#ffffff',
     fontFamily: 'Helvetica',
   },
   sidebar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
     width: '35%',
+    height: '100%',
     backgroundColor: primaryColor,
     padding: 24,
     paddingTop: 36,
   },
   main: {
-    width: '65%',
+    marginLeft: '35%',
     padding: 30,
     paddingTop: 36,
   },
@@ -168,12 +171,12 @@ const createStyles = (primaryColor: string) => StyleSheet.create({
     flex: 1,
   },
   refName: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#1F2937',
   },
   refDetails: {
-    fontSize: 8,
+    fontSize: 9,
     color: '#6B7280',
   },
 });
@@ -201,7 +204,7 @@ export function LaurenOrangePDF({ data, colorOverride }: Props) {
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Sidebar */}
-        <View style={styles.sidebar}>
+        <View fixed style={styles.sidebar}>
           {/* Name */}
           <Text style={styles.sidebarName}>{personalInfo?.firstName}</Text>
           <Text style={styles.sidebarName}>{personalInfo?.lastName}</Text>
@@ -288,7 +291,7 @@ export function LaurenOrangePDF({ data, colorOverride }: Props) {
                   <Text style={styles.expCompany}>
                     {exp.company}{exp.location ? ` | ${exp.location}` : ''}
                   </Text>
-                  {exp.achievements?.slice(0, maxBullets).map((a: string, j: number) => (
+                  {exp.achievements?.map((a: string, j: number) => (
                     <Text key={j} style={styles.bullet}>• {a}</Text>
                   ))}
                 </View>
