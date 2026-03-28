@@ -7,7 +7,7 @@ import { FileText, ArrowRight, Clock, Calendar } from 'lucide-react';
 export const metadata: Metadata = {
   title: 'CV Writing Blog | Tips, Guides & Career Advice',
   description:
-    'Expert CV writing tips, career advice, and job search guides for Tanzania and East Africa. Learn how to write a professional CV, pass ATS, and land your dream job.',
+    'Expert CV writing tips, career advice, and job search guides for East Africa. Learn to write a professional CV, pass ATS, and land your dream job.',
   alternates: {
     canonical: 'https://www.cvchapchap.com/blog',
   },

@@ -20,10 +20,10 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.cvchapchap.com'),
   title: {
-    default: 'CV Chap Chap - Create Professional CVs in Minutes | Tanzania CV Builder',
+    default: 'CV Chap Chap | CV Builder for Tanzania & East Africa',
     template: '%s | CV Chap Chap',
   },
-  description: 'Build stunning, professional CVs tailored for the East African job market. AI-powered CV builder with 35+ ATS-friendly templates. Create your CV in 3 minutes. Made in Tanzania.',
+  description: 'AI-powered CV builder for Tanzania & East Africa. Professional CV templates, AI suggestions, and instant PDF download. Create your CV in minutes.',
   keywords: [
     'CV', 'cv maker', 'cv builder', 'cv template', 'cv format',
     'how to write a cv', 'cv Tanzania', 'cv East Africa', 'cv samples',
@@ -44,8 +44,8 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://www.cvchapchap.com',
     siteName: 'CV Chap Chap',
-    title: 'CV Chap Chap - Create Professional CVs in Minutes | Tanzania CV Builder',
-    description: 'Build stunning, professional CVs tailored for the East African job market. AI-powered CV builder with 35+ ATS-friendly templates. Create your CV in 3 minutes.',
+    title: 'CV Chap Chap | CV Builder for Tanzania & East Africa',
+    description: 'AI-powered CV builder for Tanzania & East Africa. Professional CV templates, AI suggestions, and instant PDF download. Create your CV in minutes.',
     images: [
       {
         url: '/images/cv-hero-image.png',
@@ -173,7 +173,9 @@ export default function RootLayout({
             }),
           }}
         />
-        {/* Meta Pixel Code */}
+        {/* Ahrefs Analytics */}
+        <script src="https://analytics.ahrefs.com/analytics.js" data-key="NCyaH4wEh72zvT4dJyi2FQ" async></script>
+      {/* Meta Pixel Code */}
         <script
           dangerouslySetInnerHTML={{
             __html: `!function(f,b,e,v,n,t,s)

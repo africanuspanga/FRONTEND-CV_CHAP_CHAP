@@ -34,24 +34,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     ...blogUrls,
     {
-      url: `${BASE_URL}/auth/login`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${BASE_URL}/auth/register`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${BASE_URL}/create`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
       url: `${BASE_URL}/letter`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
@@ -68,12 +50,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
-    },
-    {
-      url: `${BASE_URL}/auth/forgot-password`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
     },
     {
       url: `${BASE_URL}/privacy`,

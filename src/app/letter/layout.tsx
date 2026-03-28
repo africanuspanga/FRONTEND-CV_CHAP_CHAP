@@ -3,6 +3,9 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Cover Letter Builder - CV Chap Chap',
   description: 'Create a professional cover letter in minutes. Free download after signup.',
+  alternates: {
+    canonical: 'https://www.cvchapchap.com/letter',
+  },
 };
 
 export default function LetterLayout({ children }: { children: React.ReactNode }) {
