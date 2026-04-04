@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Download, Loader2, Phone,
-  CheckCircle2, AlertCircle, Smartphone, Mail,
+  CheckCircle2, AlertCircle, Smartphone, Mail, ChevronDown, ChevronUp, Search,
 } from 'lucide-react';
 import { useCVStore } from '@/stores/cv-store';
 import { useAuth } from '@/lib/auth/context';
@@ -71,6 +71,12 @@ export default function PaymentPage() {
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollCountRef = useRef(0);
 
+  // Recovery flow
+  const [showRecovery, setShowRecovery] = useState(false);
+  const [recoveryRef, setRecoveryRef] = useState('');
+  const [isRecovering, setIsRecovering] = useState(false);
+  const [recoveryError, setRecoveryError] = useState('');
+
   // Auth gate
   useEffect(() => {
     if (!authLoading && !user) {
@@ -98,8 +104,10 @@ export default function PaymentPage() {
       // Timeout after ~5 minutes
       if (pollCountRef.current > MAX_POLLS) {
         if (pollingRef.current) clearInterval(pollingRef.current);
-        setError('Payment confirmation timed out. If you paid successfully, contact support: +255 682 152 148');
+        setError('Payment confirmation timed out. If you paid, use the "Already paid?" section below to recover your download.');
         setStep('form');
+        setShowRecovery(true);
+        setRecoveryRef(reference);
         return;
       }
 
@@ -257,6 +265,36 @@ export default function PaymentPage() {
       setIsDownloading(false);
     }
   }, [cvData, templateId, selectedColor, cvId]);
+
+  const handleRecovery = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRecoveryError('');
+    const ref = recoveryRef.trim();
+    if (!ref) {
+      setRecoveryError('Please enter your payment reference number.');
+      return;
+    }
+    setIsRecovering(true);
+    try {
+      const res = await fetch(`/api/payment/status?orderId=${encodeURIComponent(ref)}`);
+      const data = await res.json();
+      if (data.status === 'completed') {
+        if (data.cvId) setCvId(data.cvId);
+        setReference(ref);
+        setStep('success');
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 5500);
+      } else if (data.status === 'failed') {
+        setRecoveryError('This payment was declined. Please start a new payment.');
+      } else {
+        setRecoveryError('Payment not confirmed yet. If you paid, please wait a few minutes and try again, or contact support.');
+      }
+    } catch {
+      setRecoveryError('Connection error. Please check your internet and try again.');
+    } finally {
+      setIsRecovering(false);
+    }
+  };
 
   // Loading auth state
   if (authLoading) {
@@ -533,6 +571,68 @@ export default function PaymentPage() {
                     </span>
                   ))}
                 </div>
+              </div>
+
+              {/* Already paid? Recovery */}
+              <div className="rounded-2xl bg-amber-50 border border-amber-200 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => { setShowRecovery(v => !v); setRecoveryError(''); }}
+                  className="w-full flex items-center justify-between px-5 py-4 text-left"
+                >
+                  <div>
+                    <p className="font-semibold text-amber-800 text-sm">Already paid but can't download?</p>
+                    <p className="text-xs text-amber-600 mt-0.5">Enter your payment reference to recover access</p>
+                  </div>
+                  {showRecovery
+                    ? <ChevronUp className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                    : <ChevronDown className="h-4 w-4 text-amber-600 flex-shrink-0" />}
+                </button>
+
+                <AnimatePresence>
+                  {showRecovery && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <form onSubmit={handleRecovery} className="px-5 pb-5 space-y-3 border-t border-amber-200">
+                        <p className="text-xs text-amber-700 pt-3 leading-relaxed">
+                          Your reference was shown on screen while waiting (e.g. <span className="font-mono font-semibold">SN17752564121479428</span>). You can also find it in your mobile money SMS receipt.
+                        </p>
+                        <input
+                          type="text"
+                          value={recoveryRef}
+                          onChange={(e) => { setRecoveryRef(e.target.value); setRecoveryError(''); }}
+                          placeholder="e.g. SN17752564121479428"
+                          className="w-full border-2 border-amber-200 focus:border-amber-500 focus:outline-none rounded-xl px-4 py-3 text-sm font-mono text-slate-800 placeholder:text-slate-400 bg-white transition-colors"
+                          autoCapitalize="none"
+                          autoCorrect="off"
+                          spellCheck={false}
+                        />
+
+                        {recoveryError && (
+                          <div className="flex items-start gap-2 bg-red-50 border border-red-100 text-red-700 rounded-xl p-3 text-xs">
+                            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                            <span>{recoveryError}</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={isRecovering || !recoveryRef.trim()}
+                          className="w-full bg-amber-500 hover:bg-amber-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-sm transition-all active:scale-95"
+                        >
+                          {isRecovering
+                            ? <><Loader2 className="h-4 w-4 animate-spin" /> Checking...</>
+                            : <><Search className="h-4 w-4" /> Recover My Download</>}
+                        </button>
+                      </form>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Support */}
