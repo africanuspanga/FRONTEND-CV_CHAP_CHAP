@@ -129,7 +129,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-white font-body">
+    <div className="min-h-screen bg-white font-body overflow-x-hidden">
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
@@ -267,18 +267,22 @@ export default async function BlogPostPage({ params }: PageProps) {
         {/* Article Content */}
         <div
           className="prose prose-lg max-w-none
+            [&_*]:break-words [&_*]:overflow-wrap-anywhere
             prose-headings:font-display prose-headings:text-gray-900
-            prose-h2:text-2xl prose-h2:sm:text-3xl prose-h2:font-bold prose-h2:mt-10 prose-h2:mb-4
-            prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-8 prose-h3:mb-3
-            prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4
-            prose-li:text-gray-700
+            prose-h2:text-2xl prose-h2:sm:text-3xl prose-h2:font-bold prose-h2:mt-10 prose-h2:mb-4 prose-h2:border-b prose-h2:border-gray-100 prose-h2:pb-2
+            prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-8 prose-h3:mb-3 prose-h3:text-gray-800
+            prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-5
+            prose-ul:my-4 prose-ul:space-y-1
+            prose-ol:my-4 prose-ol:space-y-1
+            prose-li:text-gray-700 prose-li:leading-relaxed
             prose-a:text-cv-blue-600 prose-a:font-medium prose-a:no-underline hover:prose-a:underline
-            prose-blockquote:border-l-cv-blue-500 prose-blockquote:bg-gray-50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-gray-700
-            prose-strong:text-gray-900
-            prose-table:border-collapse
+            prose-blockquote:border-l-4 prose-blockquote:border-cv-blue-400 prose-blockquote:bg-blue-50 prose-blockquote:py-3 prose-blockquote:px-5 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-gray-700 prose-blockquote:my-6
+            prose-strong:font-normal prose-strong:text-gray-700
+            prose-table:border-collapse prose-table:w-full
             prose-th:bg-gray-100 prose-th:px-4 prose-th:py-2 prose-th:text-left prose-th:font-semibold prose-th:text-gray-900 prose-th:border prose-th:border-gray-200
             prose-td:px-4 prose-td:py-2 prose-td:border prose-td:border-gray-200
           "
+          style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
@@ -286,9 +290,15 @@ export default async function BlogPostPage({ params }: PageProps) {
         <style
           dangerouslySetInnerHTML={{
             __html: `
-              .blog-image-placeholder {
-                display: none;
-              }
+              .blog-image-placeholder { display: none; }
+              .prose { word-break: break-word; overflow-wrap: break-word; }
+              .prose h2 { scroll-margin-top: 80px; }
+              .prose h3 { scroll-margin-top: 80px; }
+              .prose ul { padding-left: 1.5rem; }
+              .prose ol { padding-left: 1.5rem; }
+              .prose li { margin-top: 0.3rem; margin-bottom: 0.3rem; }
+              .prose li + li { margin-top: 0.4rem; }
+              .prose p + ul, .prose p + ol { margin-top: -0.5rem; }
             `,
           }}
         />
